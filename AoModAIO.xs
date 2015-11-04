@@ -96,7 +96,9 @@ extern int gObeliskClearingPlanID = -1;   // Small attack plan used to remove en
 
 //==============================================================================
 
-// Placeholder
+// Placeholder Reth
+extern int fCitadelPlanID = -1;
+include "AoModAiExtra.xs";
 
 //==============================================================================
 //Minor Gods.

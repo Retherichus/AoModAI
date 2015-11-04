@@ -214,15 +214,22 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         return (true);  
     }
 
-    //-- setup Citadel
-    //-- This sets up the plan to cast itself immediately
+//==============================================================================
+// Citadel power
+//==============================================================================	
+    //-- setup the Citadel power
+    //-- disabled auto casting, cast when under attack
     if (powerProtoID == cPowerCitadel)
     {
-        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+        fCitadelPlanID = planID;
+        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false);
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
         aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTownCenter);
-        return (true);
-    }
+        xsEnableRule("rCitadel");
+        return (true);  
+    }	
+
+//==============================================================================
 
     //-- setup the dwarven mine
     if (powerProtoID == cPowerDwarvenMine)
@@ -1664,5 +1671,92 @@ rule rHesperidesPower
         //Finished.
         gHesperidesPlanID = -1;
         xsDisableSelf();
+    }
+}
+
+//==============================================================================
+// rule rCitadel, modified Sentinel plan to be exact.
+//==============================================================================
+rule rCitadel
+    minInterval 20 //starts in cAge1
+    inactive
+{
+    if (cMyCiv != cCivSet && cMyCiv != cCivRa) {
+        xsDisableSelf();
+        return;    
+    }
+	
+    aiEcho("rCitadel:");    
+
+    int planID=fCitadelPlanID;
+    static int unitQueryID=-1;
+    static int enemyQueryID=-1;
+
+    //If we don't have the query yet, create one.
+    if (unitQueryID < 0)
+    unitQueryID=kbUnitQueryCreate("Settlement Query");
+   
+    //Define a query to get all matching units
+    if (unitQueryID != -1)
+    {
+        if (aiRandInt(100) < 50)
+        {
+            kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+            kbUnitQuerySetPlayerRelation(unitQueryID, cPlayerRelationSelf);
+        }
+        else
+        {
+            kbUnitQuerySetPlayerID(unitQueryID, -1);
+            kbUnitQuerySetPlayerRelation(unitQueryID, cPlayerRelationAlly);
+        }
+        kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSettlement);
+        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+    }
+
+    kbUnitQueryResetResults(unitQueryID);
+    int settlementFound=kbUnitQueryExecute(unitQueryID);
+
+    if (settlementFound < 1)
+        return;
+
+    //If we don't have the query yet, create one.
+    if (enemyQueryID < 0)
+        enemyQueryID=kbUnitQueryCreate("Enemy Query");
+   
+    //Define a query to get all matching units
+    if (enemyQueryID != -1)
+    {
+        kbUnitQuerySetPlayerID(enemyQueryID, -1);
+        kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+        kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeLogicalTypeLandMilitary);
+        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+        kbUnitQuerySetMaximumDistance(enemyQueryID, 32);
+    }
+
+    int i=0;
+    int baseID=-1;
+    int enemyFound=0;
+    for (i=0; < settlementFound)
+    {
+        kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+        kbUnitQueryResetResults(enemyQueryID);
+        enemyFound=kbUnitQueryExecute(enemyQueryID);
+        if (enemyFound > 4)
+        {
+            baseID = kbUnitGetBaseID(kbUnitQueryGetResult(unitQueryID, i));
+            break;
+        }
+    }
+  
+    if (baseID != -1)
+    {
+        if (aiCastGodPowerAtUnit(cTechCitadel,kbUnitQueryGetResult(unitQueryID, i)) == true)
+        {
+            aiPlanSetBaseID(planID, baseID);
+            aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+            aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
+            aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTownCenter);
+            xsDisableSelf();
+        }
     }
 }
