@@ -2324,6 +2324,34 @@ void initEgyptian(void)
         }
     }
 
+	//Basic Towncenter empower plan for Son of Osiris
+		
+		if ((cvRandomMapName != "vinlandsaga") && (cvRandomMapName != "team migration"))
+	 {
+	    int eOsiris=aiPlanCreate("Osiris Empower", cPlanEmpower);
+        if (eOsiris >= 0)
+        {
+            aiPlanSetEconomy(eOsiris, true);
+            aiPlanAddUnitType(eOsiris, cUnitTypePharaohofOsiris, 1, 1, 1);
+            aiPlanSetVariableInt(eOsiris, cEmpowerPlanTargetTypeID, 0, cUnitTypeAbstractSettlement);
+            aiPlanSetActive(eOsiris);
+            }
+        }
+		
+	// Secondary Pharaoh Market empower plan
+		if ((cvRandomMapName != "vinlandsaga") && (cvRandomMapName != "team migration"))
+	 {
+	    int Pempowermarket=aiPlanCreate("Pharaoh Market Empower", cPlanEmpower);
+        if (Pempowermarket >= 0)
+        {
+            aiPlanSetEconomy(Pempowermarket, true);
+            aiPlanAddUnitType(Pempowermarket, cUnitTypePharaohSecondary, 1, 1, 1);
+            aiPlanSetVariableInt(Pempowermarket, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
+            aiPlanSetActive(Pempowermarket);
+            }
+        }
+		
+
     //Egyptian scout types.
     gLandScout=cUnitTypePriest;
     gAirScout=-1;
@@ -4429,6 +4457,14 @@ void age2Handler(int age=1)
                 aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
                 aiPlanSetActive(ePlanID);
             }
+			ePlanID=aiPlanCreate("Citadel TEST Empower", cPlanEmpower);
+            if (ePlanID >= 0)
+            {
+                aiPlanSetEconomy(ePlanID, true);
+                aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
+                aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeCitadelCenter);
+                aiPlanSetActive(ePlanID);
+            }					
         }
         
         aiPlanSetDesiredPriority(gHero1MaintainPlan, 100);
