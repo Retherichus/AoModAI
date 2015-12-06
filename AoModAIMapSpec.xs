@@ -208,7 +208,6 @@ void preInitMap()
     }
     else if ( cRandomMapName == "nomad" ||
              cRandomMapName == "nomad rivers" ||
-			 cRandomMapName == "EPH Nomadic Arabia" ||
              cRandomMapName == "land nomad")
     {
         cvMapSubType = NOMADMAP;

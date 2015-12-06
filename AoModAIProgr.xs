@@ -87,10 +87,48 @@ void progressAge2Handler(int age=1)
 {
     aiEcho("Progress Age "+age+".");
     xsEnableRule("age2Progress");
+	xsEnableRule("repairTitanGate");
+	
+	// The Greeks are working as intended, so we're skipping that.
+	
     if (cMyCulture == cCultureEgyptian)
-        xsEnableRule("buildMonuments");
+    {
+    xsEnableRule("buildMonuments");
+	}
+    if (cMyCiv == cCivIsis)
+    {   	
+	xsEnableRule("getFloodOfTheNile");
+    }
+    if (cMyCiv == cCivRa)		
+	{	 
+	xsEnableRule("getSkinOfTheRhino");
+    }    
+	if (cMyCiv == cCivSet)
+    {	
+	xsEnableRule("getFeral");
+    }
+	if (cMyCiv == cCivThor)
+    {	 
+	xsEnableRule("getPigSticker");
+        }
+	if (cMyCiv == cCivOdin)		
+	{	
+	xsEnableRule("getLoneWanderer");
+    }
+	if (cMyCiv == cCivLoki)
+    {
+	xsEnableRule("getEyesInTheForest");
+    }
+	if (cMyCiv == cCivGaia)
+    {	
+	xsEnableRule("getChannels");
+    }
+	if (cMyCiv == cCivKronos)
+    {	
+	xsEnableRule("getFocus");
+    }
+	
 }
-
 //==============================================================================
 void progressAge3Handler(int age=2)
 {

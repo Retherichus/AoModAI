@@ -88,12 +88,12 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     aiPlanSetBaseID(planID, mainBaseID);
 
     //-- setup prosperity
-    //-- This sets up the plan to cast itself when there are 16 people working on gold // Upped to 16 by Reth
+    //-- This sets up the plan to cast itself when there are 5 people working on gold
     if (powerProtoID == cPowerProsperity)
     {
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
-        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 16);
+        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
         aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceGold);
         aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
         return (true);
@@ -601,7 +601,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         return (true);  
     }
 
-    //-- setup the rain power to cast when we have at least 14 farms // Upped to 14 by Reth
+    //-- setup the rain power to cast when we have at least 5 farms
     if (powerProtoID == cPowerRain)
     {
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
@@ -620,7 +620,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 
         aiPlanSetVariableInt(planID, cGodPowerPlanQueryID, 0, queryID);
         aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, cMyID);
-        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 14);
+        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
 
 
         return (true);  

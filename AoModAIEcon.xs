@@ -30,9 +30,9 @@ rule updateWoodBreakdown
         randomBaseID = mainBaseID;
     }
         
-    int woodPriority=45;
+    int woodPriority=50;
     if (cMyCulture == cCultureEgyptian)
-        woodPriority=40;
+        woodPriority=55;
 
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
     int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
@@ -58,11 +58,11 @@ rule updateWoodBreakdown
     
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
-    int minVillagers = 12;
+    int minVillagers = 28;
     if (cMyCulture == cCultureAtlantean)
-        minVillagers = 7;
+        minVillagers = 12;
     else if (cMyCulture == cCultureGreek)
-        minVillagers = 14;
+        minVillagers = 28;
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
     {
@@ -206,7 +206,7 @@ rule updateWoodBreakdown
 
 //==============================================================================
 rule updateGoldBreakdown
-    minInterval 12
+    minInterval 13
     inactive
 {
     aiEcho("updateGoldBreakdown: ");
@@ -229,9 +229,9 @@ rule updateGoldBreakdown
     float goldSupply = kbResourceGet(cResourceGold);
         
 //    int goldPriority = 60; // Lower than wood for non-Egyptians
-   int goldPriority=55; // Lower than wood for non-Egyptians
+   int goldPriority=49; // Lower than wood for non-Egyptians
    if (cMyCulture == cCultureEgyptian)    // Higher than Egyptian wood
-      goldPriority=60;
+      goldPriority=56;
 
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
@@ -424,7 +424,7 @@ rule updateGoldBreakdown
 
 //==============================================================================
 rule updateFoodBreakdown
-    minInterval 10
+    minInterval 9
     inactive
 {
     aiEcho("updateFoodBreakdown: ");
@@ -435,7 +435,7 @@ rule updateFoodBreakdown
     float foodSupply = kbResourceGet(cResourceFood);
     float woodSupply = kbResourceGet(cResourceWood);
     
-    int easyPriority = 65;
+    int easyPriority = 95;
     int aggressivePriority = 45;
     int mainFarmPriority = 90;
     int otherFarmPriority = 89;
@@ -504,11 +504,11 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 26;
+    int desiredFarmers = 30;
     if (mapRequires2FarmPlans() == true)
-        desiredFarmers = 30;
+        desiredFarmers = 36;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 13;
+        desiredFarmers = 14;
         
     if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
     {
