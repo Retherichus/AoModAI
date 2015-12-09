@@ -97,7 +97,6 @@ extern int gObeliskClearingPlanID = -1;   // Small attack plan used to remove en
 //==============================================================================
 
 // Placeholder Reth
-extern int fCitadelPlanID = -1;
 include "AoModAiExtra.xs";
 
 //==============================================================================
@@ -926,6 +925,12 @@ rule updateEMAge2
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
             civPopTarget = 35;                                                // reserve pop slots for mil use.
         milPopTarget = getSoftPopCap() - civPopTarget;
+				
+		if (gAgeFaster == true && aiGetWorldDifficulty() == cDifficultyHard)
+		      {
+			  aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
+			 milPopTarget = eMaxMilPop;
+			 }
     }
     else
     {
@@ -2163,6 +2168,15 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     gGoldForecast = 0.0;
     gWoodForecast = 0.0;
     gFoodForecast = 700.0;
+    
+	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000)
+{
+	gFoodForecast = eBoomFood+.0;
+	gGoldForecast = eBoomGold+.0;
+	gWoodForecast = eBoomWood+.0;
+	aiEcho("Food, Gold and wood Goal "+eBoomFood+"F_"+eBoomGold+"G_"+eBoomWood+"W");
+
+    }
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -3559,6 +3573,11 @@ void init(void)
     {
         gBuildWalls = false;
         gBuildWallsAtMainBase = false;
+		if (gWallsInDM == true)
+		{
+        gBuildWalls = true;
+        gBuildWallsAtMainBase = true;
+		}
     }
 
     if (gBuildWallsAtMainBase == true)
@@ -5835,178 +5854,9 @@ void gpHandler(int powerProtoID=-1)
 }
 
 //==============================================================================
-// wonder death handler
-//==============================================================================
-void wonderDeathHandler(int playerID = -1)
-{
-   if (playerID == cMyID)
-   {
-      aiCommsSendStatement(aiGetMostHatedPlayerID(), cAICommPromptAIWonderDestroyed, -1);
-      return;
-   }
-   if (playerID == aiGetMostHatedPlayerID())
-      aiCommsSendStatement(playerID, cAICommPromptPlayerWonderDestroyed, -1);
-}
-
-
-//==============================================================================
-// retreat handler
-//==============================================================================
-void retreatHandler(int planID = -1)
-{
-   aiCommsSendStatement(aiGetMostHatedPlayerID(), cAICommPromptAIRetreat, -1);
-}
-
-//==============================================================================
-// relic handler
-//==============================================================================
-void relicHandler(int relicID = -1)
-{
-   if (aiRandInt(3) != 0)
-      return;
-
-   for (i=1; < cNumberPlayers)
-   {
-      if (i == cMyID)
-         continue;
-
-      //Only a 33% chance for either of these chats
-      if (kbIsPlayerAlly(i) == true)
-      {
-         if (relicID != -1)
-         {
-            vector position = kbUnitGetPosition(relicID);
-            aiCommsSendStatementWithVector(i, cAICommPromptTakingAllyRelic, -1, position);
-         }
-         else 
-            aiCommsSendStatement(i, cAICommPromptTakingAllyRelic, -1);
-      }
-      else 
-         aiCommsSendStatement(i, cAICommPromptTakingEnemyRelic, -1);
-   }
-}
-
-
-//==============================================================================
 // attackChatCallback
 //==============================================================================
 void attackChatCallback(int parm1=-1)
 {
     aiCommsSendStatement(aiGetMostHatedPlayerID(), cAICommPromptAIAttack, -1); 
-}
-
-//==============================================================================
-// RULE introChat
-//==============================================================================
-rule introChat
-   minInterval 15
-   active
-{
-   if (aiGetWorldDifficulty() != cDifficultyEasy)
-   {
-      for (i=1; < cNumberPlayers)
-      {
-         if (i == cMyID)
-            continue;
-         if (kbIsPlayerAlly(i) == true)
-            continue;
-         if (kbIsPlayerHuman(i) == true)
-            aiCommsSendStatement(i, cAICommPromptIntro, -1); 
-      }
-   }
-
-   xsDisableSelf();
-}
-
-//==============================================================================
-// RULE myAgeTracker
-//==============================================================================
-rule myAgeTracker
-   minInterval 60
-   active
-{
-   static bool bMessage=false;
-   static int messageAge=-1;
-
-   //Disable this in deathmatch.
-   if (aiGetGameMode() == cGameModeDeathmatch)
-   {
-      xsDisableSelf();
-      return;
-   }
-
-   //Only the captain does this.
-   if (aiGetCaptainPlayerID(cMyID) != cMyID)
-      return;
-
-   //Are we greater age than our most hated enemy?
-   int myAge=kbGetAge();
-   int hatedPlayerAge=kbGetAgeForPlayer(aiGetMostHatedPlayerID());
-
-   //Reset the message counter if we have changed ages.
-   if (bMessage == true)
-   {
-      if (messageAge == myAge)
-         return;
-      bMessage=false;
-   }
-
-   //Make a message??
-   if ((myAge > hatedPlayerAge) && (bMessage == false))
-   {
-      bMessage=true;
-      messageAge=myAge;
-      aiCommsSendStatement(aiGetMostHatedPlayerID(), cAICommPromptAIWinningAgeRace, -1);
-   }
-   if ((hatedPlayerAge > myAge) && (bMessage == false))
-   {
-      bMessage=true;
-      messageAge=myAge;
-      aiCommsSendStatement(aiGetMostHatedPlayerID(), cAICommPromptAILosingAgeRace, -1);
-   }
-
-   //Stop when we reach the finish line.
-   if (myAge == cAge4)
-      xsDisableSelf();
-}
-
-//==============================================================================
-// RULE Helpme
-//==============================================================================
-
-rule Helpme
-   minInterval 23
-   active
-{
-   static bool messageSent=false;
-   //Set our min interval back to 23 if it has been changed.
-   if (messageSent == true)
-   {
-      xsSetRuleMinIntervalSelf(23);
-      messageSent=false;
-   }
-
-   //Get our main base.
-   int mainBaseID=kbBaseGetMainID(cMyID);
-   if (mainBaseID < 0)
-      return;
-
-   //Get the time under attack.
-   int secondsUnderAttack=kbBaseGetTimeUnderAttack(cMyID, mainBaseID);
-   if (secondsUnderAttack < 30)
-         return;
-
-   vector location=kbBaseGetLastKnownDamageLocation(cMyID, kbBaseGetMainID(cMyID));
-   for (i=1; < cNumberPlayers)
-   {
-      if (i == cMyID)
-         continue;
-      if(kbIsPlayerAlly(i) == true)
-         if( cvOkToChat == true ) aiCommsSendStatementWithVector(i, cAICommPromptHelpHere, -1, location);
-   } 
-   
-
-   //Keep the books
-   messageSent=true;
-   xsSetRuleMinIntervalSelf(600);  
 }

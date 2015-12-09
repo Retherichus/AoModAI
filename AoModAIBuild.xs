@@ -72,7 +72,7 @@ rule norseInfantryBuild
 //==============================================================================
 rule repairTitanGate
 //    minInterval 10 //starts in cAge5
-    minInterval 11 //starts in cAge5
+    minInterval 30 //starts in cAge5
     inactive
 {
     aiEcho("repairTitanGate:");
