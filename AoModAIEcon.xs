@@ -10,7 +10,7 @@
 
 //==============================================================================
 rule updateWoodBreakdown
-    minInterval 12
+    minInterval 10
     inactive
 {   
     aiEcho("updateWoodBreakdown: ");
@@ -96,7 +96,7 @@ rule updateWoodBreakdown
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
     int desiredWoodPlans = 2;
-    if (xsGetTime() < 6*60*1000)
+    if (xsGetTime() < 14*60*1000)
         desiredWoodPlans = 1;
     
     if (woodGathererCount < desiredWoodPlans)
@@ -311,7 +311,7 @@ rule updateGoldBreakdown
         }
     }
     
-    if (xsGetTime() < 10*60*1000)
+    if (xsGetTime() < 12*60*1000)
         desiredGoldPlans = 1;
         
     if (goldGathererCount < desiredGoldPlans)
@@ -1559,7 +1559,14 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
     minInterval 7 //starts in cAge1
     inactive
 {
-    aiEcho("setEarlyEcon: ");
+    if (gWaterMap == true && RethFishEco == true)
+	{
+    xsDisableSelf();
+    xsEnableRule("econForecastAge1");
+	aiEcho("Looks like we're going fishing!");
+	}
+	
+	aiEcho("setEarlyEcon: ");
     int gathererCount = kbUnitCount(cMyID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer, 0), cUnitStateAlive);
 
     if (cMyCulture == cCultureAtlantean)
@@ -1687,7 +1694,7 @@ rule fishing
     //Get our fish gatherer.
     int fishGatherer = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish,0);
 
-    if ((gTransportMap == false) && (xsGetTime() < 10*60*1000) && (cRandomMapName != "anatolia"))
+    if ((gTransportMap == false) && (xsGetTime() < 1*60*1000) && (cRandomMapName != "anatolia"))
         return;
 	
     if (gTransportMap == true)

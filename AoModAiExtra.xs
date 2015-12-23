@@ -1,16 +1,16 @@
 //File: AoModAiExtra.xs
 //By Retherichus
 //I'm so happy that you made it this far! this is where you'll find some of the code I've added to the Ai.
-//
 //I do plan on putting every change into this file eventually... 
 //but that ain't so easy, so there's still some code lurking around in the other files.
 //Feel free to copy/borrow my stuff for your own projects if you like, though some credit would be appreciated!
+//Oh.. and suggestions are very welcome too.
 //
 //Now.. if you're just looking to enable/disable stuff, skip to "PART 2". (:
 
 
 //==============================================================================
-//PART 1 Int
+//PART 1 Int & Handler
 //Below, you'll find the Plan handler. 
 //you don't really want to touch this.
 //==============================================================================
@@ -29,23 +29,134 @@ mutable void wonderDeathHandler(int playerID=-1) { }
 //==============================================================================
 
 extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''
-extern bool gAgeFaster = true;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age.
-extern bool gSuperboom = false;           // This is somewhat unstable depending on map, but very rewarding if it works, the Ai will set goals to harvest X Food, X Gold and X Wood at a set timer.
+extern bool gAgeFaster = true;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
+extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
+extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
+extern bool RethFishEco = false;          // Changes the default fishing plan, by forcing early fishing. This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
+
+
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
-extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
+extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. (Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
 extern bool gEarlyMonuments = true;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 
-// If gSuperboom is set to true, the numbers below are what the Ai will attempt to gather in Archaic Age or untill X minutes have passed.
-
-extern int eBoomFood = 1000;              // Food
-extern int eBoomGold = 150;               // Gold
-extern int eBoomWood = 0;                 // Wood, duh.
-
-extern int eBoomTimer = 6;                // Minutes this plan will remain active. It'll disable itself after X minutes set.
 
 //For gAgefaster when true.
-extern int eMaxMilPop = 25;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless is just as bad!
+extern int eMaxMilPop = 30;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
+
+
+// If gSuperboom is set to true, the numbers below are what the Ai will attempt to gather in Archaic Age or untill X minutes have passed.
+// This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
+// Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
+
+extern int eBoomFood = 700;              // Food
+extern int eBoomGold = 200;              // Gold
+extern int eBoomWood = 100;              // Wood, duh.
+
+// For RethFishEco, this affects Fishing Maps ONLY, if you have it enabled.
+// If the Ai fails to find any valid fishing spot for any reason, it'll scrap this fishing plan and return to normal resource distribution.
+
+extern int eFBoomFood = 0;              // Food
+extern int eFBoomGold = 0;              // Gold
+extern int eFBoomWood = 100;            // Wood, The Ai will automatically boost it, if it's too low.
+
+
+//Timer for gSuperboom & fishing
+extern int eBoomTimer = 4;                // Minutes this plan will remain active. It'll disable itself after X minutes set.(minus delay) 
+extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Wood, this supports the Ai in building early fishing ships.
+
+
+
+
+
+
+
+// For RethEcoGoals, AoModAi do normally calculate the resources it needs, though.. we want it to keep some extra resources at all times, 
+// so let's make it a little bit more ''static'' by setting resource goals a little closer to what Admiral Ai use.
+//==============================================================================
+//Greek
+//==============================================================================
+//Age 2 (Classical Age)
+extern int RethLGFAge2 = 1000;             // Food
+extern int RethLGGAge2 = 700;              // Gold
+extern int RethLGWAge2 = 500;              // Wood
+
+//Age 3 (Heroic Age)
+
+extern int RethLGFAge3 = 1200;              // Food
+extern int RethLGGAge3 = 1000;              // Gold
+extern int RethLGWAge3 = 600;              // Wood
+
+//Age 4 (Mythic Age)
+
+extern int RethLGFAge4 = 1400;              // Food
+extern int RethLGGAge4 = 1000;              // Gold
+extern int RethLGWAge4 = 700;              // Wood
+
+
+//==============================================================================
+//Egyptian
+//==============================================================================
+
+//Age 2 (Classical Age)
+extern int RethLEFAge2 = 1000;              // Food
+extern int RethLEGAge2 = 800;              // Gold
+extern int RethLEWAge2 = 100;              // Wood
+
+//Age 3 (Heroic Age)
+
+extern int RethLEFAge3 = 1400;              // Food
+extern int RethLEGAge3 = 1200;              // Gold
+extern int RethLEWAge3 = 300;              // Wood
+
+//Age 4 (Mythic Age)
+
+extern int RethLEFAge4 = 1400;              // Food
+extern int RethLEGAge4 = 1100;              // Gold
+extern int RethLEWAge4 = 500;              // Wood
+
+//==============================================================================
+//Norse
+//==============================================================================
+
+//Age 2 (Classical Age)
+extern int RethLNFAge2 = 1000;             // Food
+extern int RethLNGAge2 = 700;              // Gold
+extern int RethLNWAge2 = 500;              // Wood
+
+//Age 3 (Heroic Age)
+
+extern int RethLNFAge3 = 1200;              // Food
+extern int RethLNGAge3 = 1000;              // Gold
+extern int RethLNWAge3 = 600;              // Wood
+
+//Age 4 (Mythic Age)
+
+extern int RethLNFAge4 = 1400;              // Food
+extern int RethLNGAge4 = 1000;              // Gold
+extern int RethLNWAge4 = 650;              // Wood
+
+//==============================================================================
+//Atlantean
+//==============================================================================
+
+//Age 2 (Classical Age)
+extern int RethLAFAge2 = 1000;              // Food
+extern int RethLAGAge2 = 700;              // Gold
+extern int RethLAWAge2 = 500;              // Wood
+
+//Age 3 (Heroic Age)
+
+extern int RethLAFAge3 = 1200;              // Food
+extern int RethLAGAge3 = 1000;              // Gold
+extern int RethLAWAge3 = 650;              // Wood
+
+//Age 4 (Mythic Age)
+
+extern int RethLAFAge4 = 1400;              // Food
+extern int RethLAGAge4 = 1000;              // Gold
+extern int RethLAWAge4 = 700;              // Wood
+
 
 
 //==============================================================================
@@ -71,7 +182,7 @@ void initRethlAge1(void)  // Am I doing this right??
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
 	
-	   If (gHuntEarly == True)
+	   If (gHuntEarly == true)
 		{
 		if (cMyCulture == cCultureGreek)
 		aiSetMinNumberNeedForGatheringAggressvies(5);      // The number inside of ( ) represents the amount of villagers/units needed.
@@ -80,9 +191,7 @@ void initRethlAge1(void)  // Am I doing this right??
 	    if (cMyCulture == cCultureEgyptian)
 		aiSetMinNumberNeedForGatheringAggressvies(5);
 		if (cMyCulture == cCultureNorse)
-		aiSetMinNumberNeedForGatheringAggressvies(4);
-		
-	    kbBaseSetMaximumResourceDistance(cMyID, kbBaseGetMainID(cMyID), 60.0);	
+		aiSetMinNumberNeedForGatheringAggressvies(4);	
         }
 }
 
@@ -136,6 +245,38 @@ rule ActivateRethOverridesAge1
         initRethlAge1();
 		if (gHuntingDogsASAP == true)
 		xsEnableRule("HuntingDogsAsap");
+		
+		// Force Dock down.
+		if (gWaterMap == true && RethFishEco == true)
+   {
+      int areaID=kbAreaGetClosetArea(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)), cAreaTypeWater);
+      int buildDock=aiPlanCreate("BuildDock", cPlanBuild);
+      if (buildDock >= 0)
+      {
+         aiPlanSetVariableInt(buildDock, cBuildPlanBuildingTypeID, 0, cUnitTypeDock);
+         aiPlanSetDesiredPriority(buildDock, 30);
+         aiPlanSetVariableVector(buildDock, cBuildPlanDockPlacementPoint, 0, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
+         aiPlanSetVariableVector(buildDock, cBuildPlanDockPlacementPoint, 1, kbAreaGetCenter(areaID));
+         aiPlanAddUnitType(buildDock, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+         aiPlanSetEscrowID(buildDock, cEconomyEscrowID);
+         aiPlanSetActive(buildDock);
+      }
+   }
+   
+   // Add some defense for the dock
+   
+         if (gWaterMap == true && RethFishEco == true && cRandomMapName != "sudden death" && cRandomMapName != "anatolia")
+      {
+        int planID=aiPlanCreate("Train Triremes", cPlanTrain);
+         if (planID >= 0)
+         {
+            aiPlanSetMilitary(planID, true);
+            aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeTrireme);
+            aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 3 + aiRandInt(1)); 
+            aiPlanSetActive(planID);
+            aiPlanSetDesiredPriority(planID, 50);
+         }
+      }
 		
 		xsDisableSelf();
            

@@ -1671,9 +1671,39 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 
     //aiEcho("age 4 start time: "+ageStartTime);
 
-    gGoldForecast = 700;
+    gGoldForecast = 600;
     gWoodForecast = 600;
-    gFoodForecast = 800;
+    gFoodForecast = 600;
+	
+	if (cMyCulture == cCultureGreek && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLGFAge4+.0;
+	gGoldForecast = RethLGGAge4+.0;
+	gWoodForecast = RethLGWAge4+.0;
+    }
+	
+	if (cMyCulture == cCultureEgyptian && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLEFAge4+.0;
+	gGoldForecast = RethLEGAge4+.0;
+	gWoodForecast = RethLEWAge4+.0;
+    }
+	
+	if (cMyCulture == cCultureNorse && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLNFAge4+.0;
+	gGoldForecast = RethLNGAge4+.0;
+	gWoodForecast = RethLNWAge4+.0;
+    }
+	
+	if (cMyCulture == cCultureAtlantean && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLAFAge4+.0;
+	gGoldForecast = RethLAGAge4+.0;
+	gWoodForecast = RethLAWAge4+.0;
+    }	
+	
+	
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -1761,14 +1791,14 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     }
     
     //aiEcho("__________");
-    //aiEcho("__Age 4 Forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
     //aiEcho("__________");
 }
 
 //==============================================================================
 rule econForecastAge3		// Rule activates when age3 research begins, turns off when age 4 research begins
-    minInterval 23
+    minInterval 15
     inactive
 {
     static int ageStartTime = -1;
@@ -1792,9 +1822,37 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 
     aiEcho("age 3 start time: "+ageStartTime);
     
-    gGoldForecast = 600;
+    gGoldForecast = 500;
     gWoodForecast = 500;
-    gFoodForecast = 700;
+    gFoodForecast = 500;
+	
+	if (cMyCulture == cCultureGreek && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLGFAge3+.0;
+	gGoldForecast = RethLGGAge3+.0;
+	gWoodForecast = RethLGWAge3+.0;
+    }
+	
+	if (cMyCulture == cCultureEgyptian && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLEFAge3+.0;
+	gGoldForecast = RethLEGAge3+.0;
+	gWoodForecast = RethLEWAge3+.0;
+    }
+	
+	if (cMyCulture == cCultureNorse && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLNFAge3+.0;
+	gGoldForecast = RethLNGAge3+.0;
+	gWoodForecast = RethLNWAge3+.0;
+    }
+	
+	if (cMyCulture == cCultureAtlantean && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLAFAge3+.0;
+	gGoldForecast = RethLAGAge3+.0;
+	gWoodForecast = RethLAWAge3+.0;
+    }	
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -1925,14 +1983,14 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
         gFoodForecast = gFoodForecast * 0.9;
 	
     //aiEcho("__________");
-    //aiEcho("__Age 3 Forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
     //aiEcho("__________");
 }
 
 //==============================================================================
 rule econForecastAge2		// Rule activates when age 2 research begins, turns off when age 3 research begins
-    minInterval 23
+    minInterval 15
     inactive
 {
     static int ageStartTime = -1;
@@ -1959,9 +2017,37 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     
     // If we've made it here, we're in age 2 (or researching it)
     
-    gGoldForecast = 500;
+    gGoldForecast = 400;
     gWoodForecast = 400;
-    gFoodForecast = 600;
+    gFoodForecast = 400;
+	
+	if (cMyCulture == cCultureGreek && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLGFAge2+.0;
+	gGoldForecast = RethLGGAge2+.0;
+	gWoodForecast = RethLGWAge2+.0;
+    }
+	
+	if (cMyCulture == cCultureEgyptian && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLEFAge2+.0;
+	gGoldForecast = RethLEGAge2+.0;
+	gWoodForecast = RethLEWAge2+.0;
+    }
+	
+	if (cMyCulture == cCultureNorse && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLNFAge2+.0;
+	gGoldForecast = RethLNGAge2+.0;
+	gWoodForecast = RethLNWAge2+.0;
+    }
+	
+	if (cMyCulture == cCultureAtlantean && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLAFAge2+.0;
+	gGoldForecast = RethLAGAge2+.0;
+	gWoodForecast = RethLAWAge2+.0;
+    }	
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -2133,7 +2219,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
         gFoodForecast = gFoodForecast * 0.9;
 
     //aiEcho("__________");
-    //aiEcho("__Age 2 forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
     //aiEcho("__________");
 }
@@ -2141,7 +2227,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 //==============================================================================
 rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in setEarlyEcon rule, ending when next age upgrade starts
 //    minInterval 23
-    minInterval 19
+    minInterval 8
     inactive
 {
     int age = kbGetAge();
@@ -2166,16 +2252,32 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     gGoldForecast = 0.0;
     gWoodForecast = 0.0;
     gFoodForecast = 700.0;
+
+	if (RethFishEco == true && gWaterMap == true && xsGetTime() < eFishTimer*60*1000)
+	{
+	gFoodForecast = eFBoomFood+.0;
+	gGoldForecast = eFBoomGold+.0;
+	gWoodForecast = eFBoomWood+.0;
+	aiEcho("Phase 2: Going wild on wood");
+		
+}	
+
+if (xsGetTime() > eFishTimer*60*1000 && RethFishEco == true)
+    {	
+    RethFishEco = false;
+	aiEcho("Phase 3: RethFishEco is disabled");
+    }
 	
-	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000)
+	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && RethFishEco == false)
 {
 	gFoodForecast = eBoomFood+.0;
 	gGoldForecast = eBoomGold+.0;
 	gWoodForecast = eBoomWood+.0;
-	aiEcho("Food, Gold and wood Goal "+eBoomFood+"F_"+eBoomGold+"G_"+eBoomWood+"W");
+	
 
-    }
+}	
 
+	
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -2206,7 +2308,7 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     }
 
     //aiEcho("__________");
-    //aiEcho("__Age 1 forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
     //aiEcho("__________");
 }
@@ -2223,6 +2325,7 @@ void initGreek(void)
     gLandScout=cUnitTypeScout;
     gAirScout=cUnitTypePegasus;
     gWaterScout=cUnitTypeFishingShipGreek;
+	
     //Greeks gather with heroes.
     gGatherRelicType=cUnitTypeHero;
         
@@ -2260,7 +2363,7 @@ void initGreek(void)
     else if (cMyCiv == cCivPoseidon)
     {
         //Give him the hippocampus as his water scout.
-        gWaterScout=cUnitTypeHippocampus;
+		gWaterScout=cUnitTypeHippocampus;
         //aiEcho("Poseidon's water scout is the "+kbGetUnitTypeName(gWaterScout)+".");
 
         //Random Age2 God.

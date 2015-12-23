@@ -863,36 +863,36 @@ rule updateEMAge1       // i.e. cAge1
     minInterval 25 //starts in cAge1
     active
 {
-    static int civPopTarget=-1;
-    static int milPopTarget=-1;
-    if (civPopTarget < 0)
-    {
-        if (aiGetWorldDifficulty() == cDifficultyEasy)
-        {
-            civPopTarget = 10;
-            milPopTarget = 10;
-            if (cMyCulture == cCultureAtlantean)
-                civPopTarget = 12;   // Make up for oracles
-        }
-        else if (aiGetWorldDifficulty() == cDifficultyModerate)
-        {
-            civPopTarget = 15;
-            milPopTarget = 30;
-        }
-        else if (aiGetWorldDifficulty() == cDifficultyHard)
-        {
-            civPopTarget = 60;
-            milPopTarget = 80;
-        }
-        else
-        {
-            civPopTarget = 60;
-            milPopTarget = 80;
-        }
-    }
+   static int civPopTarget=-1;
+   static int milPopTarget=-1;
+   if (civPopTarget < 0)
+   {
+      if (aiGetWorldDifficulty() == cDifficultyEasy)
+      {
+         civPopTarget = 10;
+         milPopTarget = 10;
+         if (cMyCulture == cCultureAtlantean)
+            civPopTarget = 12;   // Make up for oracles
+      }
+      else if (aiGetWorldDifficulty() == cDifficultyModerate)
+      {
+         civPopTarget = 15;
+         milPopTarget = 30;
+      }
+      else if (aiGetWorldDifficulty() == cDifficultyHard)
+      {
+         civPopTarget = 30;
+         milPopTarget = 60;
+      }
+      else
+      {
+         civPopTarget = 25;
+         milPopTarget = 80;
+      }
+   }
 
-    //All econ in the first age.
-    updateEM(civPopTarget, milPopTarget, 1.0, 0.2, 1.0, 1.0, 1.0, 1.0);
+   //All econ in the first age.
+   updateEM(civPopTarget, milPopTarget, 1.0, 0.2, 1.0, 1.0, 1.0, 1.0);
 }
 
 //==============================================================================
@@ -925,7 +925,7 @@ rule updateEMAge2
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
             civPopTarget = 35;                                                // reserve pop slots for mil use.
         milPopTarget = getSoftPopCap() - civPopTarget;
-				
+		
 		if (gAgeFaster == true && aiGetWorldDifficulty() == cDifficultyHard)
 		      {
 			  aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
@@ -987,11 +987,11 @@ rule updateEMAge3
     }
     else
     {
-        civPopTarget = 65 - (cvRushBoomSlider*5.99);    // +/- 5
-        if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
-            civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
-        kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-        kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);
+      civPopTarget = 34 - (cvRushBoomSlider*5.99);    // +/- 5
+      if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
+         civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
+      kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);
     }
 
     float econPercent = 0.3;     // Econ priority rating, range 0..1
@@ -1042,35 +1042,31 @@ rule updateEMAge4
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-//        civPopTarget = 65;      // 55 of first 115
-        civPopTarget = 58;      // 58 of first 115
-        if (kbUnitCount(cMyID, cUnitTypeAbstractTitan, cUnitStateAlive) > 0)
-            civPopTarget = civPopTarget - 3; 
-        if (gGlutRatio > 1.0)
-            civPopTarget = civPopTarget / gGlutRatio;
-        if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
-            civPopTarget = 20;   // limited for first 10 minutes while resource glut remains
-        civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115
-        if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
-            civPopTarget = 35;
-        milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
-        kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-        kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);   
-    }
-    else
-    {
-        civPopTarget = 65; 
-        if (gGlutRatio > 1.0)
-            civPopTarget = civPopTarget / gGlutRatio;
-        if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
-            civPopTarget = 20;   // limited for first 10 minutes while resource glut remains
-        civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115
-        if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
-            civPopTarget = 35;
-        milPopTarget = getSoftPopCap() - civPopTarget;
-        kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-        kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);
-    }
+      civPopTarget = 55;      // 55 of first 115
+      if (gGlutRatio > 1.0)
+         civPopTarget = civPopTarget / gGlutRatio;
+      if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
+         civPopTarget = 20;   // limited for first 10 minutes while resource glut remains
+      civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115
+      if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
+         civPopTarget = 35;
+      milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
+      kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);   }
+   else
+   {
+      civPopTarget = 40; 
+      if (gGlutRatio > 1.0)
+         civPopTarget = civPopTarget / gGlutRatio;
+      if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
+         civPopTarget = 20;   // limited for first 10 minutes while resource glut remains
+      civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115
+      if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
+         civPopTarget = 35;
+      milPopTarget = getSoftPopCap() - civPopTarget;
+      kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);
+   }
 
     float econPercent = 0.15;     // Econ priority rating, range 0..1
     float econEscrow = 0.15;      // Economy's share of non-root escrow, range 0..1
@@ -1676,6 +1672,36 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     gGoldForecast = 600;
     gWoodForecast = 600;
     gFoodForecast = 600;
+	
+	if (cMyCulture == cCultureGreek && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLGFAge4+.0;
+	gGoldForecast = RethLGGAge4+.0;
+	gWoodForecast = RethLGWAge4+.0;
+    }
+	
+	if (cMyCulture == cCultureEgyptian && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLEFAge4+.0;
+	gGoldForecast = RethLEGAge4+.0;
+	gWoodForecast = RethLEWAge4+.0;
+    }
+	
+	if (cMyCulture == cCultureNorse && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLNFAge4+.0;
+	gGoldForecast = RethLNGAge4+.0;
+	gWoodForecast = RethLNWAge4+.0;
+    }
+	
+	if (cMyCulture == cCultureAtlantean && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLAFAge4+.0;
+	gGoldForecast = RethLAGAge4+.0;
+	gWoodForecast = RethLAWAge4+.0;
+    }	
+	
+	
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -1763,14 +1789,14 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     }
     
     //aiEcho("__________");
-    //aiEcho("__Age 4 Forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
     //aiEcho("__________");
 }
 
 //==============================================================================
 rule econForecastAge3		// Rule activates when age3 research begins, turns off when age 4 research begins
-    minInterval 23
+    minInterval 15
     inactive
 {
     static int ageStartTime = -1;
@@ -1797,6 +1823,34 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     gGoldForecast = 500;
     gWoodForecast = 500;
     gFoodForecast = 500;
+	
+	if (cMyCulture == cCultureGreek && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLGFAge3+.0;
+	gGoldForecast = RethLGGAge3+.0;
+	gWoodForecast = RethLGWAge3+.0;
+    }
+	
+	if (cMyCulture == cCultureEgyptian && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLEFAge3+.0;
+	gGoldForecast = RethLEGAge3+.0;
+	gWoodForecast = RethLEWAge3+.0;
+    }
+	
+	if (cMyCulture == cCultureNorse && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLNFAge3+.0;
+	gGoldForecast = RethLNGAge3+.0;
+	gWoodForecast = RethLNWAge3+.0;
+    }
+	
+	if (cMyCulture == cCultureAtlantean && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLAFAge3+.0;
+	gGoldForecast = RethLAGAge3+.0;
+	gWoodForecast = RethLAWAge3+.0;
+    }	
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -1927,14 +1981,14 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
         gFoodForecast = gFoodForecast * 0.9;
 	
     //aiEcho("__________");
-    //aiEcho("__Age 3 Forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
     //aiEcho("__________");
 }
 
 //==============================================================================
 rule econForecastAge2		// Rule activates when age 2 research begins, turns off when age 3 research begins
-    minInterval 23
+    minInterval 15
     inactive
 {
     static int ageStartTime = -1;
@@ -1964,6 +2018,34 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     gGoldForecast = 400;
     gWoodForecast = 400;
     gFoodForecast = 400;
+	
+	if (cMyCulture == cCultureGreek && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLGFAge2+.0;
+	gGoldForecast = RethLGGAge2+.0;
+	gWoodForecast = RethLGWAge2+.0;
+    }
+	
+	if (cMyCulture == cCultureEgyptian && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLEFAge2+.0;
+	gGoldForecast = RethLEGAge2+.0;
+	gWoodForecast = RethLEWAge2+.0;
+    }
+	
+	if (cMyCulture == cCultureNorse && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLNFAge2+.0;
+	gGoldForecast = RethLNGAge2+.0;
+	gWoodForecast = RethLNWAge2+.0;
+    }
+	
+	if (cMyCulture == cCultureAtlantean && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLAFAge2+.0;
+	gGoldForecast = RethLAGAge2+.0;
+	gWoodForecast = RethLAWAge2+.0;
+    }	
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -2135,7 +2217,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
         gFoodForecast = gFoodForecast * 0.9;
 
     //aiEcho("__________");
-    //aiEcho("__Age 2 forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
     //aiEcho("__________");
 }
@@ -2143,7 +2225,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 //==============================================================================
 rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in setEarlyEcon rule, ending when next age upgrade starts
 //    minInterval 23
-    minInterval 19
+    minInterval 8
     inactive
 {
     int age = kbGetAge();
@@ -2168,16 +2250,32 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     gGoldForecast = 0.0;
     gWoodForecast = 0.0;
     gFoodForecast = 700.0;
-    
-	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000)
+
+	if (RethFishEco == true && gWaterMap == true && xsGetTime() < eFishTimer*60*1000)
+	{
+	gFoodForecast = eFBoomFood+.0;
+	gGoldForecast = eFBoomGold+.0;
+	gWoodForecast = eFBoomWood+.0;
+	aiEcho("Phase 2: Going wild on wood");
+		
+}	
+
+if (xsGetTime() > eFishTimer*60*1000 && RethFishEco == true)
+    {	
+    RethFishEco = false;
+	aiEcho("Phase 3: RethFishEco is disabled");
+    }
+	
+	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && RethFishEco == false)
 {
 	gFoodForecast = eBoomFood+.0;
 	gGoldForecast = eBoomGold+.0;
 	gWoodForecast = eBoomWood+.0;
-	aiEcho("Food, Gold and wood Goal "+eBoomFood+"F_"+eBoomGold+"G_"+eBoomWood+"W");
+	
 
-    }
+}	
 
+	
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -2208,7 +2306,7 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     }
 
     //aiEcho("__________");
-    //aiEcho("__Age 1 forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
     //aiEcho("__________");
 }
@@ -2225,6 +2323,7 @@ void initGreek(void)
     gLandScout=cUnitTypeScout;
     gAirScout=cUnitTypePegasus;
     gWaterScout=cUnitTypeFishingShipGreek;
+	
     //Greeks gather with heroes.
     gGatherRelicType=cUnitTypeHero;
         
@@ -2262,7 +2361,7 @@ void initGreek(void)
     else if (cMyCiv == cCivPoseidon)
     {
         //Give him the hippocampus as his water scout.
-        gWaterScout=cUnitTypeHippocampus;
+		gWaterScout=cUnitTypeHippocampus;
         //aiEcho("Poseidon's water scout is the "+kbGetUnitTypeName(gWaterScout)+".");
 
         //Random Age2 God.
@@ -2366,7 +2465,7 @@ void initEgyptian(void)
             aiPlanSetActive(Pempowermarket);
             }
         }
-		
+
 
     //Egyptian scout types.
     gLandScout=cUnitTypePriest;
@@ -3993,7 +4092,6 @@ void init(void)
     }
 
     xsEnableRule("buildInitialTemple");
-	
     
     xsEnableRule("buildResearchGranary");
 
@@ -4116,8 +4214,7 @@ void age2Handler(int age=1)
     
     xsEnableRule("monitorAttPlans");
     xsEnableRule("monitorDefPlans");
-	xsEnableRule("Helpme");
-    
+    xsEnableRule("Helpme");
     xsEnableRule("baseAttackTracker");
     
     xsEnableRule("otherBasesDefPlans");
@@ -4436,7 +4533,7 @@ void age2Handler(int age=1)
         
         //Always want 3 priests
         if (cMyCiv != cCivRa)
-            gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypePriest, 3, false, kbBaseGetMainID(cMyID));
+            gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypePriest, 4, false, kbBaseGetMainID(cMyID));
 	
         //Move our pharaoh empower to a generic "dropsite"
         if (gEmpowerPlanID > -1)
@@ -4485,9 +4582,9 @@ void age2Handler(int age=1)
                 aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
                 aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeCitadelCenter);
                 aiPlanSetActive(ePlanID);
-            }					
+            }			
         }
-        
+		        
         aiPlanSetDesiredPriority(gHero1MaintainPlan, 100);
 
         //Up the build limit for Outposts.
@@ -5860,3 +5957,5 @@ void attackChatCallback(int parm1=-1)
 {
     aiCommsSendStatement(aiGetMostHatedPlayerID(), cAICommPromptAIAttack, -1); 
 }
+
+
