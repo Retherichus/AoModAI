@@ -3844,7 +3844,7 @@ rule buildInitialTemple //and rebuild it if destroyed
 rule buildArmory
     inactive
 //    minInterval 17 //starts in cAge2
-    minInterval 47 //starts in cAge1
+    minInterval 25 //starts in cAge1
 {
     aiEcho("buildArmory:");
     
@@ -4776,7 +4776,7 @@ rule fixJammedDropsiteBuildPlans
     inactive
 {
     aiEcho("fixJammedDropsiteBuildPlans:");
-    
+	
     static int SHBuildPlanID = -1;
     static int LCBuildPlanID = -1;
     static int MCBuildPlanID = -1;

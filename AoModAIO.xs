@@ -1671,9 +1671,9 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 
     //aiEcho("age 4 start time: "+ageStartTime);
 
-    gGoldForecast = 600;
+    gGoldForecast = 700;
     gWoodForecast = 600;
-    gFoodForecast = 600;
+    gFoodForecast = 800;
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -1792,9 +1792,9 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 
     aiEcho("age 3 start time: "+ageStartTime);
     
-    gGoldForecast = 500;
+    gGoldForecast = 600;
     gWoodForecast = 500;
-    gFoodForecast = 500;
+    gFoodForecast = 700;
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -1959,9 +1959,9 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     
     // If we've made it here, we're in age 2 (or researching it)
     
-    gGoldForecast = 400;
+    gGoldForecast = 500;
     gWoodForecast = 400;
-    gFoodForecast = 400;
+    gFoodForecast = 600;
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);

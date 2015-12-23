@@ -10,7 +10,7 @@
 
 //==============================================================================
 rule updateWoodBreakdown
-    minInterval 25
+    minInterval 12
     inactive
 {   
     aiEcho("updateWoodBreakdown: ");
@@ -206,7 +206,7 @@ rule updateWoodBreakdown
 
 //==============================================================================
 rule updateGoldBreakdown
-    minInterval 28
+    minInterval 12
     inactive
 {
     aiEcho("updateGoldBreakdown: ");
@@ -424,7 +424,7 @@ rule updateGoldBreakdown
 
 //==============================================================================
 rule updateFoodBreakdown
-    minInterval 22
+    minInterval 10
     inactive
 {
     aiEcho("updateFoodBreakdown: ");
