@@ -3,8 +3,8 @@
 // AoModAI.xs
 // This is a modification of Georg Kalus' extension of the default aomx ai file
 // by Loki_GdD
-// and... slightly modified by Retherichus with a few fixes.
-// Though! all credit still goes to Loki_GdD!
+// and... slightly modified by Retherichus, to ensure online play without desyncs.
+// as well with some other fixes.. though! all credit still goes to Loki_GdD!
 //
 // This is the main ai file. If you want to use AoMod ai in your scenario,
 // this would be the file you need to select. All other AoMod*.xs files are
@@ -98,6 +98,8 @@ extern int gObeliskClearingPlanID = -1;   // Small attack plan used to remove en
 
 // Placeholder Reth
 include "AoModAiExtra.xs";
+
+
 
 //==============================================================================
 //Minor Gods.
@@ -2251,7 +2253,7 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     gWoodForecast = 0.0;
     gFoodForecast = 700.0;
 
-	if (RethFishEco == true && gWaterMap == true && xsGetTime() < eFishTimer*60*1000)
+	if (RethFishEco == true && gWaterMap == true && ConfirmFish == true	 && xsGetTime() < eFishTimer*60*1000)
 	{
 	gFoodForecast = eFBoomFood+.0;
 	gGoldForecast = eFBoomGold+.0;
@@ -3444,7 +3446,7 @@ void init(void)
 
 
     //Startup messages.
-    aiEcho("Init(): AI Player Name is "+cMyName+".");
+    aiEcho("Greetings, my name is "+cMyName+".");
     aiEcho("AI Filename='"+cFilename+"'.");
     //aiEcho("Map size is ("+kbGetMapXSize()+", "+kbGetMapZSize()+").");
     aiEcho("MapName="+cvRandomMapName+".");
@@ -5425,8 +5427,8 @@ void resignHandler(int result =-1)
 //==============================================================================
 rule findFish   //We don't know if this is a water map...if you see fish, it is.
 //    minInterval 11 //starts in cAge1
-    minInterval 131 //starts in cAge1
-    inactive
+    minInterval 10 //starts in cAge1
+    active
 {
     aiEcho("findFish:");
     
@@ -5447,6 +5449,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
     if (numberFound > 0)
     {
         gWaterMap=true;
+		ConfirmFish=true;
       
         //Tell the AI what kind of map we are on.
         aiSetWaterMap(gWaterMap);
@@ -5460,6 +5463,11 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
         if (gMaintainWaterXPortPlanID < 0)
             gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 1, false, kbBaseGetMainID(cMyID));
 
+		// Let's not try to run this query too often if it fails to find anything, Reth.
+
+        if (xsGetTime() > 4*60*1000)
+        xsSetRuleMinIntervalSelf(125);		
+			
         xsDisableSelf();
     }
 }

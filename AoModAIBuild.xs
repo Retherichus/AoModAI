@@ -685,9 +685,13 @@ rule buildHouse
             aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionDistance, 0, 20.0);
             aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionValue, 0, 1.0);
         }
-        else if ((findNumUnitsInBase(cMyID, kbBaseGetMain(cMyID), cUnitTypeTower) > 0)
+       
+	   // Added a little override as this rule didn't seem to work properly. // Reth.
+	   
+	    else if ((findNumUnitsInBase(cMyID, kbBaseGetMain(cMyID), cUnitTypeTower) > 0)
               && (mapPreventsHousesAtTowers() == false) && (gBuildWallsAtMainBase == false)
-              && (otherBaseID == mainBaseID))
+              && (otherBaseID == mainBaseID) || (bHouseBunkering == true && mapPreventsHousesAtTowers() == false))
+			  
         {
             //If we don't have the query yet, create one.
             if (unitQueryID < 0)

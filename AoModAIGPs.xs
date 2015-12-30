@@ -228,7 +228,20 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         xsEnableRule("rCitadel");
         return (true);  
     }	
+//==============================================================================
 
+//==============================================================================
+// Shifting Sands Power
+//==============================================================================
+   if (powerProtoID == cPowerShiftingSands)
+   {
+      gShiftingSandPlanID = planID;
+      aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false);
+      aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
+      aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelUnit);
+      xsEnableRule("rShiftingSand");
+      return (true);
+   }
 //==============================================================================
 
     //-- setup the dwarven mine
@@ -386,7 +399,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     }
 
     //-- setup the Restoration power
-    if (powerProtoID == cPowerRestoration)
+    if (powerProtoID == cPowerRestoration && aiIsMultiplayer() == false)
     {
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
         aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistancePosition);
@@ -438,7 +451,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     }
 
     //-- setup the Tornado power
-    if (powerProtoID == cPowerTornado)
+    if (powerProtoID == cPowerTornado && aiIsMultiplayer() == false)
     {
         gHeavyGPTechID = cTechTornado;
         gHeavyGPPlanID = planID;
@@ -1595,7 +1608,7 @@ void releaseTownDefenseGP()
 
 //==============================================================================
 rule rGaiaForestPower
-    minInterval 109 //starts in cAge1
+    minInterval 25 //starts in cAge1
     inactive
 {
     aiEcho("rGaiaForestPower:");    
@@ -1607,7 +1620,7 @@ rule rGaiaForestPower
     }
     
     //Don't cast it too early?
-    if (xsGetTime() < 3*60*1000)
+    if (xsGetTime() < 1*20*1000)
         return;
     
     static int count = 0;
@@ -1621,7 +1634,7 @@ rule rGaiaForestPower
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     int numTreesNearMB = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation, 40.0); //50? 60?
-    if (numTreesNearMB < 10)
+    if (numTreesNearMB > 0)
     {
         aiPlanSetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0, true);
         aiEcho("Setting cGodPowerPlanAutoCast to true");
@@ -1759,4 +1772,54 @@ rule rCitadel
             xsDisableSelf();
         }
     }
+}
+
+//==============================================================================
+// Shifting Sand Rule & Plan
+//==============================================================================
+rule rShiftingSand
+   minInterval 25
+   inactive
+{
+   static int queryID = -1;
+
+   int planID = gShiftingSandPlanID;
+   int mostHatedPlayerID=aiGetMostHatedPlayerID();
+
+
+   //-- create the query used for evaluation
+   if (queryID < 0)
+	  queryID=kbUnitQueryCreate("Shifting Sands Evaluation");
+
+   if (queryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(queryID, cPlayerRelationEnemy);
+		if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureNorse)
+			kbUnitQuerySetUnitType(queryID, cUnitTypeOxCart);
+		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureEgyptian)
+			kbUnitQuerySetUnitType(queryID, cUnitTypeMiningCamp);
+		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureGreek)
+			kbUnitQuerySetUnitType(queryID, cUnitTypeStorehouse);
+	        kbUnitQuerySetState(queryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(queryID);
+   int numberFound=kbUnitQueryExecute(queryID);
+
+   if (numberFound < 1)
+	return;
+
+   aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true);
+     
+   aiPlanSetVariableInt(planID, cGodPowerPlanQueryID, 0, queryID);
+   aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, aiGetMostHatedPlayerID());
+
+   aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, kbUnitGetPosition(kbUnitQueryGetResult(queryID, 0)));
+   aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 1, kbBaseGetMilitaryGatherPoint(cMyID, kbBaseGetMainID(cMyID)));
+
+   aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 1);
+   aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
+
+   aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelDualLocation);
+   
 }

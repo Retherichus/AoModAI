@@ -1,6 +1,6 @@
 <AI>
-   <script>AoModAIO</script>
-   <name>AoMod AI (Online Friendly)</name>
+   <script>..\mods\AoModAI\AoModAI</script>
+   <name>AoMod Ai (For Beta)</name>
    <playerNames>
       <name>Imhotep<culture>Egyptian</culture></name>
       <name>Miw-sher<culture>Egyptian</culture></name>

@@ -16,9 +16,11 @@
 //==============================================================================
 
 extern int fCitadelPlanID = -1;
+extern int gShiftingSandPlanID= -1;
 mutable void retreatHandler(int planID=-1) {}
 mutable void relicHandler(int relicID=-1) {}
 mutable void wonderDeathHandler(int playerID=-1) { }
+extern bool ConfirmFish = false;          // Don't change this, It's for extra safety when fishing, and it'll enable itself if fish is found.
 
 
 //==============================================================================
@@ -32,14 +34,14 @@ extern bool gWallsInDM = true;            // This allows the Ai to build walls i
 extern bool gAgeFaster = true;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
-extern bool RethFishEco = false;          // Changes the default fishing plan, by forcing early fishing. This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
+extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
 
 
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
 extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. (Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
 extern bool gEarlyMonuments = true;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
-
+extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
 
 //For gAgefaster when true.
 extern int eMaxMilPop = 30;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
@@ -177,12 +179,17 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetRetreatEventHandler("retreatHandler");
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
 	
+	if (aiIsMultiplayer() == false)
+	aiEcho("We're in a singleplayer/offline game, nothing can stop us here!");                 // Just to confirm game mode.
+	
+	if (aiIsMultiplayer() == true)
+	aiEcho("We're in a multiplayer game, I will make sure not to use any De-sync sensitive Godpowers.");  // ^ Ditto, heh.
 	
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
 	
-	   If (gHuntEarly == true)
+	   if (gHuntEarly == true)
 		{
 		if (cMyCulture == cCultureGreek)
 		aiSetMinNumberNeedForGatheringAggressvies(5);      // The number inside of ( ) represents the amount of villagers/units needed.
@@ -272,7 +279,7 @@ rule ActivateRethOverridesAge1
          {
             aiPlanSetMilitary(planID, true);
             aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeTrireme);
-            aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 3 + aiRandInt(1)); 
+            aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 3); 
             aiPlanSetActive(planID);
             aiPlanSetDesiredPriority(planID, 50);
          }

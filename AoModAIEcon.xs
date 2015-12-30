@@ -1559,11 +1559,11 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
     minInterval 7 //starts in cAge1
     inactive
 {
-    if (gWaterMap == true && RethFishEco == true)
+    if (gWaterMap == true && RethFishEco == true && ConfirmFish == true)
 	{
     xsDisableSelf();
     xsEnableRule("econForecastAge1");
-	aiEcho("Looks like we're going fishing!");
+	aiEcho("Found fish! Looks like we're going fishing then!");
 	}
 	
 	aiEcho("setEarlyEcon: ");
@@ -1730,7 +1730,7 @@ rule fishing
     gHouseAvailablePopRebuild = gHouseAvailablePopRebuild + 5;
     //aiEcho("House rebuild is now "+gHouseAvailablePopRebuild);
 
-    if (((gTransportMap == true) || (cRandomMapName == "anatolia")) && (gWaterExploreID == -1))
+    if (((gTransportMap == true) || RethFishEco == true || (cRandomMapName == "anatolia")) && (gWaterExploreID == -1))
     {
         //Make a plan to explore with the water scout.
         gWaterExploreID = aiPlanCreate("Explore_Water", cPlanExplore);
