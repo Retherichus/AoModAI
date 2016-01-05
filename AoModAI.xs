@@ -2253,8 +2253,9 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     gWoodForecast = 0.0;
     gFoodForecast = 700.0;
 
-	if (RethFishEco == true && gWaterMap == true && ConfirmFish == true	 && xsGetTime() < eFishTimer*60*1000)
+	if (RethFishEco == true && gWaterMap == true && ConfirmFish == true	&& xsGetTime() < eFishTimer*60*1000)
 	{
+	gSuperboom=false;
 	gFoodForecast = eFBoomFood+.0;
 	gGoldForecast = eFBoomGold+.0;
 	gWoodForecast = eFBoomWood+.0;
@@ -2262,13 +2263,14 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
 		
 }	
 
-if (xsGetTime() > eFishTimer*60*1000 && RethFishEco == true)
+if (xsGetTime() > eFishTimer*60*1000 && RethFishEco == true && ConfirmFish == true)
     {	
-    RethFishEco = false;
+    gSuperboom=true;
+	RethFishEco = false;
 	aiEcho("Phase 3: RethFishEco is disabled");
     }
 	
-	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && RethFishEco == false)
+	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000)
 {
 	gFoodForecast = eBoomFood+.0;
 	gGoldForecast = eBoomGold+.0;
@@ -5427,11 +5429,24 @@ void resignHandler(int result =-1)
 //==============================================================================
 rule findFish   //We don't know if this is a water map...if you see fish, it is.
 //    minInterval 11 //starts in cAge1
-    minInterval 10 //starts in cAge1
+    minInterval 25 //starts in cAge1
     active
 {
     aiEcho("findFish:");
-    
+	
+			// Disable early fishing for Nomad & Highland, to later be enabled.
+		
+		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") || (cRandomMapName == "vinlandsaga"))
+		  {
+		  aiEcho("FindFish disabled, map forced this.");
+		  xsDisableSelf();
+		  return;
+	}
+        
+		// Let's not try to run this query too often if it fails to find anything, Reth.
+		if (xsGetTime() > 3*60*1000)
+        xsSetRuleMinIntervalSelf(180);	
+	
     //Create the fish query.
     static int unitQueryID=-1;
     if (unitQueryID < 0)
@@ -5463,10 +5478,9 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
         if (gMaintainWaterXPortPlanID < 0)
             gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 1, false, kbBaseGetMainID(cMyID));
 
-		// Let's not try to run this query too often if it fails to find anything, Reth.
+		
 
-        if (xsGetTime() > 4*60*1000)
-        xsSetRuleMinIntervalSelf(125);		
+	
 			
         xsDisableSelf();
     }

@@ -60,7 +60,7 @@ extern int eBoomWood = 100;              // Wood, duh.
 
 extern int eFBoomFood = 0;              // Food
 extern int eFBoomGold = 0;              // Gold
-extern int eFBoomWood = 100;            // Wood, The Ai will automatically boost it, if it's too low.
+extern int eFBoomWood = 50;             // Wood, The Ai will automatically boost it, if it's too low.
 
 
 //Timer for gSuperboom & fishing
@@ -107,14 +107,14 @@ extern int RethLEWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLEFAge3 = 1400;              // Food
-extern int RethLEGAge3 = 1200;              // Gold
+extern int RethLEFAge3 = 1300;              // Food
+extern int RethLEGAge3 = 1100;              // Gold
 extern int RethLEWAge3 = 300;              // Wood
 
 //Age 4 (Mythic Age)
 
 extern int RethLEFAge4 = 1400;              // Food
-extern int RethLEGAge4 = 1100;              // Gold
+extern int RethLEGAge4 = 1000;              // Gold
 extern int RethLEWAge4 = 500;              // Wood
 
 //==============================================================================
@@ -178,6 +178,7 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetRelicEventHandler("relicHandler");
 	aiSetRetreatEventHandler("retreatHandler");
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
+	// kbLookAtAllUnitsOnMap();   // Semi cheating!.. Disabled due to unstable results.
 	
 	if (aiIsMultiplayer() == false)
 	aiEcho("We're in a singleplayer/offline game, nothing can stop us here!");                 // Just to confirm game mode.
@@ -239,6 +240,16 @@ void initRethlAge2(void)
     {	
 	xsEnableRule("getFocus");
     }
+	   if ((cRandomMapName == "highland") || (cRandomMapName == "nomad"))
+	{
+	gWaterMap=true;
+	ConfirmFish=true;
+	xsEnableRule("fishing");
+	aiEcho("Fishing enabled for Nomad and Highland map");
+	}
+
+	//  Enable Dock defense. 
+xsEnableRule("DockDefenseMonitor");
 	
 }	
 
@@ -269,21 +280,7 @@ rule ActivateRethOverridesAge1
          aiPlanSetActive(buildDock);
       }
    }
-   
-   // Add some defense for the dock
-   
-         if (gWaterMap == true && RethFishEco == true && cRandomMapName != "sudden death" && cRandomMapName != "anatolia")
-      {
-        int planID=aiPlanCreate("Train Triremes", cPlanTrain);
-         if (planID >= 0)
-         {
-            aiPlanSetMilitary(planID, true);
-            aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeTrireme);
-            aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 3); 
-            aiPlanSetActive(planID);
-            aiPlanSetDesiredPriority(planID, 50);
-         }
-      }
+		
 		
 		xsDisableSelf();
            
@@ -326,6 +323,44 @@ rule ActivateRethOverridesAge4
            
     }
 }	
+
+
+//==============================================================================
+// rule DockDefenseMonitor
+//==============================================================================
+rule DockDefenseMonitor
+   minInterval 45
+   inactive
+{  
+
+   
+   // Add some defense for the dock
+   
+         if (gWaterMap == true && kbGetAge() > cAge1 && cRandomMapName != "sudden death" && cRandomMapName != "anatolia")
+      {
+        int planID=aiPlanCreate("Train Triremes", cPlanTrain);
+         if (planID >= 0)
+         {
+            aiPlanSetMilitary(planID, true);
+			if (cMyCulture == cCultureGreek)
+            aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeTrireme);
+			if (cMyCulture == cCultureEgyptian)
+			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeKebenit);
+			if (cMyCulture == cCultureNorse)
+			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeLongboat);
+			if (cMyCulture == cCultureAtlantean)
+			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeBireme);
+            
+			aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 1); 
+            aiPlanSetActive(planID);
+            aiPlanSetDesiredPriority(planID, 50);
+			xsDisableSelf();
+         }
+      }
+	   if (gWaterMap == false)
+	   xsDisableSelf();
+	  
+}	  
 
 //==============================================================================
 // wonder death handler
