@@ -5271,11 +5271,17 @@ rule ShouldIResign
     //Don't quit if we have at least one settlement.
     if (numSettlements > 0)
         return;
-
+    
+	//Don't resign if we still have villagers and teamed up.
+	int numAliveVils=kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
+	if (numAliveVils > 0)
+	return;
+	
+		
     int builderUnitID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0);
     int numBuilders=kbUnitCount(cMyID, builderUnitID, cUnitStateAliveOrBuilding);   
 
-    if ((numSettlements <= 0) && (numBuilders <= 10))
+    if ((numSettlements <= 0) && (numBuilders <= 10) && numAliveVils < 1)
     {
 //        if ((kbCanAffordUnit(cUnitTypeSettlementLevel1, cEconomyEscrowID) == false) || (numBuilders <= 0))
         if (kbCanAffordUnit(cUnitTypeSettlementLevel1, cEconomyEscrowID) == false)

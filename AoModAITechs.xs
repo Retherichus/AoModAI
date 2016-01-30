@@ -497,7 +497,7 @@ rule getHusbandry
 
 //==============================================================================
 rule getPickaxe
-    minInterval 179 //starts in cAge1, gets set to 29
+    minInterval 25 //starts in cAge1, gets set to 15
     inactive
     group age1EconUpgrades
 {
@@ -512,7 +512,7 @@ rule getPickaxe
     static bool update = false;
     if (update == false)
     {
-        xsSetRuleMinIntervalSelf(29);
+        xsSetRuleMinIntervalSelf(15);
         update = true;
     }
     
@@ -542,8 +542,8 @@ rule getPickaxe
     if (numTemples < 1)
         return;
     
-    if ((cMyCulture != cCultureAtlantean) && (kbGetTechStatus(cTechHusbandry) < cTechStatusResearching))
-        return;
+    // if ((cMyCulture != cCultureAtlantean) && (kbGetTechStatus(cTechHusbandry) < cTechStatusResearching))
+    //    return;
     
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -568,14 +568,14 @@ rule getPickaxe
         aiPlanSetEscrowID(pickAxePlanID, cEconomyEscrowID);
         aiPlanSetActive(pickAxePlanID);
         aiEcho("getting pickaxe");
-        xsSetRuleMinIntervalSelf(179);
+        xsSetRuleMinIntervalSelf(15);
         update = false;
     }
 }
 
 //==============================================================================
 rule getHandaxe
-    minInterval 181 //starts in cAge1, gets set to 31
+    minInterval 25 //starts in cAge1, gets set to 15
     inactive
     group age1EconUpgrades
 {    
@@ -590,7 +590,7 @@ rule getHandaxe
     static bool update = false;
     if (update == false)
     {
-        xsSetRuleMinIntervalSelf(31);
+        xsSetRuleMinIntervalSelf(15);
         update = true;
     }
     
@@ -644,7 +644,7 @@ rule getHandaxe
         aiPlanSetEscrowID(handAxePlanID, cEconomyEscrowID);
         aiPlanSetActive(handAxePlanID);
         aiEcho("getting handaxe");
-        xsSetRuleMinIntervalSelf(181);
+        xsSetRuleMinIntervalSelf(15);
         update = false;
     }
 }
