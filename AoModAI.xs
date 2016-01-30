@@ -1044,7 +1044,7 @@ rule updateEMAge4
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-      civPopTarget = 55;      // 55 of first 115
+      civPopTarget = 70;      // 55 of first 115
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -3719,8 +3719,8 @@ void init(void)
         if (gTargetNumTowers > 10)  //max 10 towers
             gTargetNumTowers = 10;
         
-        if ( gBuildWalls == true)
-            gTargetNumTowers = gTargetNumTowers / 2;     // Halve the towers if we're doing walls
+      //  if ( gBuildWalls == true)
+         //   gTargetNumTowers = gTargetNumTowers * 2;     // Halve the towers if we're doing walls
         
         if ( aiGetWorldDifficulty() == cDifficultyEasy )
            gTargetNumTowers = gTargetNumTowers / 2;      // Not so many on easy

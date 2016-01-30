@@ -42,7 +42,6 @@ extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunti
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
 extern bool gEarlyMonuments = true;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
-extern bool eDeferUpgrades = true;
 
 //For gAgefaster when true.
 extern int eMaxMilPop = 30;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
@@ -52,7 +51,7 @@ extern int eMaxMilPop = 30;               // Max military pop cap during Classic
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 700;              // Food
+extern int eBoomFood = 600;              // Food
 extern int eBoomGold = 200;              // Gold
 extern int eBoomWood = 200;              // Wood, duh.
 
@@ -80,14 +79,14 @@ extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Woo
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 1000;             // Food
+extern int RethLGFAge2 = 900;             // Food
 extern int RethLGGAge2 = 700;              // Gold
 extern int RethLGWAge2 = 350;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLGFAge3 = 1200;              // Food
-extern int RethLGGAge3 = 1000;              // Gold
+extern int RethLGFAge3 = 1000;              // Food
+extern int RethLGGAge3 = 800;              // Gold
 extern int RethLGWAge3 = 350;              // Wood
 
 //Age 4 (Mythic Age)
@@ -102,14 +101,14 @@ extern int RethLGWAge4 = 600;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLEFAge2 = 1000;              // Food
+extern int RethLEFAge2 = 900;              // Food
 extern int RethLEGAge2 = 800;              // Gold
 extern int RethLEWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLEFAge3 = 1300;              // Food
-extern int RethLEGAge3 = 1100;              // Gold
+extern int RethLEFAge3 = 1000;              // Food
+extern int RethLEGAge3 = 1000;              // Gold
 extern int RethLEWAge3 = 250;              // Wood
 
 //Age 4 (Mythic Age)
@@ -123,13 +122,13 @@ extern int RethLEWAge4 = 500;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 1000;             // Food
+extern int RethLNFAge2 = 900;             // Food
 extern int RethLNGAge2 = 700;              // Gold
 extern int RethLNWAge2 = 300;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLNFAge3 = 1200;              // Food
+extern int RethLNFAge3 = 1000;              // Food
 extern int RethLNGAge3 = 1000;              // Gold
 extern int RethLNWAge3 = 350;              // Wood
 
@@ -144,13 +143,13 @@ extern int RethLNWAge4 = 600;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 1000;              // Food
+extern int RethLAFAge2 = 900;              // Food
 extern int RethLAGAge2 = 700;              // Gold
 extern int RethLAWAge2 = 300;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLAFAge3 = 1200;              // Food
+extern int RethLAFAge3 = 1000;              // Food
 extern int RethLAGAge3 = 1000;              // Gold
 extern int RethLAWAge3 = 350;              // Wood
 
