@@ -35,13 +35,14 @@ extern bool gAgeFaster = true;            // This will lower the amount of milit
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
 extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
-
+extern bool bWallUp = true;              // This ensures that the Ai will build walls(almost always), regardless of personality.
 
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
 extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. (Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
 extern bool gEarlyMonuments = true;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
+extern bool eDeferUpgrades = true;
 
 //For gAgefaster when true.
 extern int eMaxMilPop = 30;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
@@ -53,7 +54,7 @@ extern int eMaxMilPop = 30;               // Max military pop cap during Classic
 
 extern int eBoomFood = 700;              // Food
 extern int eBoomGold = 200;              // Gold
-extern int eBoomWood = 100;              // Wood, duh.
+extern int eBoomWood = 200;              // Wood, duh.
 
 // For RethFishEco, this affects Fishing Maps ONLY, if you have it enabled.
 // If the Ai fails to find any valid fishing spot for any reason, it'll scrap this fishing plan and return to normal resource distribution.
@@ -74,20 +75,20 @@ extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Woo
 
 
 // For RethEcoGoals, AoModAi do normally calculate the resources it needs, though.. we want it to keep some extra resources at all times, 
-// so let's make it a little bit more ''static'' by setting resource goals a little closer to what Admiral Ai use.
+// so, let's make it a little bit more ''static'' by setting resource goals a little closer to what Admiral Ai use.
 //==============================================================================
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
 extern int RethLGFAge2 = 1000;             // Food
 extern int RethLGGAge2 = 700;              // Gold
-extern int RethLGWAge2 = 200;              // Wood
+extern int RethLGWAge2 = 350;              // Wood
 
 //Age 3 (Heroic Age)
 
 extern int RethLGFAge3 = 1200;              // Food
 extern int RethLGGAge3 = 1000;              // Gold
-extern int RethLGWAge3 = 300;              // Wood
+extern int RethLGWAge3 = 350;              // Wood
 
 //Age 4 (Mythic Age)
 
@@ -109,7 +110,7 @@ extern int RethLEWAge2 = 100;              // Wood
 
 extern int RethLEFAge3 = 1300;              // Food
 extern int RethLEGAge3 = 1100;              // Gold
-extern int RethLEWAge3 = 200;              // Wood
+extern int RethLEWAge3 = 250;              // Wood
 
 //Age 4 (Mythic Age)
 
@@ -124,13 +125,13 @@ extern int RethLEWAge4 = 500;              // Wood
 //Age 2 (Classical Age)
 extern int RethLNFAge2 = 1000;             // Food
 extern int RethLNGAge2 = 700;              // Gold
-extern int RethLNWAge2 = 200;              // Wood
+extern int RethLNWAge2 = 300;              // Wood
 
 //Age 3 (Heroic Age)
 
 extern int RethLNFAge3 = 1200;              // Food
 extern int RethLNGAge3 = 1000;              // Gold
-extern int RethLNWAge3 = 300;              // Wood
+extern int RethLNWAge3 = 350;              // Wood
 
 //Age 4 (Mythic Age)
 
@@ -145,7 +146,7 @@ extern int RethLNWAge4 = 600;              // Wood
 //Age 2 (Classical Age)
 extern int RethLAFAge2 = 1000;              // Food
 extern int RethLAGAge2 = 700;              // Gold
-extern int RethLAWAge2 = 200;              // Wood
+extern int RethLAWAge2 = 300;              // Wood
 
 //Age 3 (Heroic Age)
 

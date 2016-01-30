@@ -3644,6 +3644,8 @@ void init(void)
         wallOdds = 0.1;                            // Now 0.1 to 1.2, always a 10% chance
 
     wallOdds = wallOdds * 100;                   // 10 to 120
+	if (bWallUp == true)
+	wallOdds = wallOdds * 3000;    
 
     if ((cMyCulture == cCultureNorse) && (gAge2MinorGod == cTechAge2Heimdall))
     {
@@ -4353,8 +4355,8 @@ void age2Handler(int age=1)
             aiPlanSetVariableBool(archeryRangePlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
             aiPlanSetVariableFloat(archeryRangePlanID, cBuildPlanRandomBPValue, 0, 0.0);
    
-            fx = fzOrig * (-9);
-            fz = fxOrig * 9;
+            fx = fzOrig * (-21);
+            fz = fxOrig * 21;
             //aiEcho("archery range fx: "+fx);
             //aiEcho("archery range fz: "+fz);
 
@@ -4415,8 +4417,8 @@ void age2Handler(int age=1)
             aiPlanSetVariableBool(academyPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
             aiPlanSetVariableFloat(academyPlanID, cBuildPlanRandomBPValue, 0, 0.0);
 
-            fx = fzOrig * 9;
-            fz = fxOrig * (-9);
+            fx = fzOrig * 21;
+            fz = fxOrig * (-21);
             //aiEcho("academy fx: "+fx);
             //aiEcho("academy fz: "+fz);
 
@@ -4487,8 +4489,8 @@ void age2Handler(int age=1)
             aiPlanSetVariableBool(barracks1PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
             aiPlanSetVariableFloat(barracks1PlanID, cBuildPlanRandomBPValue, 0, 0.0);
 
-            fx = fzOrig * (-9);
-            fz = fxOrig * 9;
+            fx = fzOrig * (-21);
+            fz = fxOrig * 21;
 
             frontVector = xsVectorSetX(frontVector, fx);
             frontVector = xsVectorSetZ(frontVector, fz);
@@ -4515,8 +4517,8 @@ void age2Handler(int age=1)
             aiPlanSetVariableBool(barracks2PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
             aiPlanSetVariableFloat(barracks2PlanID, cBuildPlanRandomBPValue, 0, 0.0);
          
-            fx = fzOrig * 9;
-            fz = fxOrig * (-9);
+            fx = fzOrig * 21;
+            fz = fxOrig * (-21);
 
             frontVector = xsVectorSetX(frontVector, fx);
             frontVector = xsVectorSetZ(frontVector, fz);
@@ -4613,8 +4615,8 @@ void age2Handler(int age=1)
             aiPlanSetVariableBool(longhouse1PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
             aiPlanSetVariableFloat(longhouse1PlanID, cBuildPlanRandomBPValue, 0, 0.0);
 
-            fx = fzOrig * (-9);
-            fz = fxOrig * 9;
+            fx = fzOrig * (-21);
+            fz = fxOrig * 21;
 
             frontVector = xsVectorSetX(frontVector, fx);
             frontVector = xsVectorSetZ(frontVector, fz);
@@ -4642,8 +4644,8 @@ void age2Handler(int age=1)
             aiPlanSetVariableBool(longhouse2PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
             aiPlanSetVariableFloat(longhouse2PlanID, cBuildPlanRandomBPValue, 0, 0.0);
 
-            fx = fzOrig * 9;
-            fz = fxOrig * (-9);
+            fx = fzOrig * 21;
+            fz = fxOrig * (-21);
 
             frontVector = xsVectorSetX(frontVector, fx);
             frontVector = xsVectorSetZ(frontVector, fz);
@@ -4684,8 +4686,8 @@ void age2Handler(int age=1)
             aiPlanSetVariableBool(atlanteanBarracksPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
             aiPlanSetVariableFloat(atlanteanBarracksPlanID, cBuildPlanRandomBPValue, 0, 0.0);
 
-            fx = fzOrig * (-9);
-            fz = fxOrig * 9;
+            fx = fzOrig * (-21);
+            fz = fxOrig * 21;
 
             frontVector = xsVectorSetX(frontVector, fx);
             frontVector = xsVectorSetZ(frontVector, fz);
@@ -4712,8 +4714,8 @@ void age2Handler(int age=1)
             aiPlanSetVariableBool(atlanteanCounterBarracksPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
             aiPlanSetVariableFloat(atlanteanCounterBarracksPlanID, cBuildPlanRandomBPValue, 0, 0.0);
           
-            fx = fzOrig * 9;
-            fz = fxOrig * (-9);
+            fx = fzOrig * 21;
+            fz = fxOrig * (-21);
 
             frontVector = xsVectorSetX(frontVector, fx);
             frontVector = xsVectorSetZ(frontVector, fz);

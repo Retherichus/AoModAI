@@ -3866,7 +3866,7 @@ rule buildArmory
     if (kbGetAge() < cAge2)
         return;
     
-    xsSetRuleMinIntervalSelf(47);
+    xsSetRuleMinIntervalSelf(25);
     
     int mainBaseID = kbBaseGetMainID(cMyID);
     int buildingID = cUnitTypeArmory;
@@ -3876,7 +3876,7 @@ rule buildArmory
     int armoryBuildPlan = aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, buildingID, true);
     if ((numArmories > 0) || (armoryBuildPlan != -1))
     {
-        xsSetRuleMinIntervalSelf(131);
+        xsSetRuleMinIntervalSelf(45);
         return;
     }
     

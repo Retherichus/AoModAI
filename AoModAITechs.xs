@@ -555,7 +555,7 @@ rule getPickaxe
     else
     {
 //        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
-        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false) && (xsGetTime() < 10*60*1000))
+        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false) && (xsGetTime() < 5*60*1000))
             return;
     }
     
@@ -631,7 +631,7 @@ rule getHandaxe
     else
     {
 //        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
-        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false) && (xsGetTime() < 10*60*1000))
+        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false) && (xsGetTime() < 5*60*1000))
             return;
     }
     
@@ -899,7 +899,7 @@ rule getBowSaw
     
     if (kbGetAge() < cAge3)
     {
-        if ((foodSupply < 1100) || (goldSupply < 700))
+        if ((foodSupply < 350) || (goldSupply < 250))
             return;
     }
     
@@ -975,7 +975,7 @@ rule getShaftMine
             {
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-                xsSetRuleMinIntervalSelf(29);
+                xsSetRuleMinIntervalSelf(25);
             }
         }
         return;
@@ -991,21 +991,9 @@ rule getShaftMine
     if (numResearchBuildings < 1)
         return;
     
-    if (cRandomMapName == "anatolia")
+    if (kbGetAge() < cAge3)
     {
-        if ((foodSupply > 560) && (goldSupply > 350))
-            return;
-    }
-//    if (kbGetAge() < cAge3)
-    else if (kbGetAge() < cAge3)
-    {
-        float requiredWood = 500;
-        if (xsGetTime() > 10*60*1000)
-            requiredWood = 350;
-        if ((foodSupply < 1000) || (woodSupply < requiredWood))
-            return;
-        
-        if ((foodSupply > 560) && (goldSupply > 350))
+        if ((foodSupply < 250) || (woodSupply < 250))
             return;
     }
     
@@ -1025,7 +1013,7 @@ rule getShaftMine
         aiPlanSetEscrowID(shaftMinePlanID, cEconomyEscrowID);
         aiPlanSetActive(shaftMinePlanID);
         aiEcho("getting ShaftMine");
-        xsSetRuleMinIntervalSelf(179);
+        xsSetRuleMinIntervalSelf(25);
     }
 }
 
@@ -1142,7 +1130,7 @@ rule getQuarry
             {
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-                xsSetRuleMinIntervalSelf(29);
+                xsSetRuleMinIntervalSelf(25);
             }
         }
         return;
@@ -1158,12 +1146,9 @@ rule getQuarry
     if (numResearchBuildings < 1)
         return;
     
-    if (kbGetAge() < cAge4)
+   if (kbGetAge() < cAge4)
     {
-        if ((foodSupply < 1300) || (woodSupply < 600))
-            return;
-    
-        if ((foodSupply > 700) && (goldSupply > 700))
+        if ((foodSupply < 300) || (woodSupply < 300))
             return;
     }
     
@@ -1183,7 +1168,7 @@ rule getQuarry
         aiPlanSetEscrowID(quarryPlanID, cEconomyEscrowID);
         aiPlanSetActive(quarryPlanID);
         aiEcho("getting Quarry");
-        xsSetRuleMinIntervalSelf(179);
+        xsSetRuleMinIntervalSelf(25);
     }
 }
 
@@ -1217,7 +1202,7 @@ rule getCarpenters
             {
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-                xsSetRuleMinIntervalSelf(31);
+                xsSetRuleMinIntervalSelf(25);
             }
         }
         return;
@@ -1233,9 +1218,9 @@ rule getCarpenters
     if (numResearchBuildings < 1)
         return;
     
-    if (kbGetAge() < cAge4)
+   if (kbGetAge() < cAge4)
     {
-        if ((foodSupply < 1400) || (goldSupply < 1300))
+        if ((foodSupply < 400) || (goldSupply < 300))
             return;
     }
     
@@ -1255,7 +1240,7 @@ rule getCarpenters
         aiPlanSetEscrowID(carpentersPlanID, cEconomyEscrowID);
         aiPlanSetActive(carpentersPlanID);
         aiEcho("getting Carpenters");
-        xsSetRuleMinIntervalSelf(181);
+        xsSetRuleMinIntervalSelf(25);
     }
 }
 
