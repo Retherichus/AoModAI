@@ -1154,7 +1154,7 @@ rule tacticalHeroAttackMyth
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0 && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeLogicalTypeLandMilitary) == true))
+	   if (numberFoundTemp > 0 && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeLogicalTypeLandMilitary) == true || cMyCulture == cCultureEgyptian))
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
@@ -1275,7 +1275,7 @@ rule IHateSiege
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 28);
    }
 
    int numberFoundTemp = 0;
@@ -1298,7 +1298,7 @@ rule IHateSiege
 // IHateBuildingsHadesSpecial
 //==============================================================================
 rule IHateBuildingsHadesSpecial
-   minInterval 5
+   minInterval 6
    active
 {
    static int unitQueryID=-1;
@@ -1312,13 +1312,13 @@ rule IHateBuildingsHadesSpecial
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   unitQueryID=kbUnitQueryCreate("My Unit Query");
    
    //Define a query to get all matching units
    if (unitQueryID != -1)
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeCrossbowman);
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeCrossbowman);
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
 
@@ -1337,7 +1337,7 @@ rule IHateBuildingsHadesSpecial
    {
 		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
 		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
 		kbUnitQuerySetMaximumDistance(enemyQueryID, 34);
@@ -1358,4 +1358,3 @@ rule IHateBuildingsHadesSpecial
 	   }
    }
 }
-

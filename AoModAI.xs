@@ -178,7 +178,6 @@ extern int gHouseAreaID = -1;
 extern bool gResetWallPlans = false;
 
 extern float gMainBaseAreaWallRadius = 32;
-extern float gSecondaryMainBaseAreaWallRadius = 35;
 
 extern int gMainBaseAreaWallTeam1PlanID = -1;
 extern int gMainBaseAreaWallTeam2PlanID = -1;
@@ -3777,7 +3776,7 @@ void init(void)
     if (towerOdds < 0.1)
         towerOdds = 0.1;                            // Now 0.1 - 1.4
             
-    towerOdds = (250+towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
+    towerOdds = (towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
 
     result = -1;
     result = aiRandInt(101) - 1;   //-1..99
@@ -3791,8 +3790,8 @@ void init(void)
         gTargetNumTowers = towerOdds / 10;    // Up to 14 for a mil/econ balanced player
         gTargetNumTowers = gTargetNumTowers * (1+(cvMilitaryEconSlider/2));  // +/- 50% based on mil/econ
         
-        if (gTargetNumTowers > 20)  //max 10 towers
-            gTargetNumTowers = 20;
+        if (gTargetNumTowers > 10)  //max 10 towers
+            gTargetNumTowers = 10;
         
       //  if ( gBuildWalls == true)
          //   gTargetNumTowers = gTargetNumTowers * 2;     // Halve the towers if we're doing walls
