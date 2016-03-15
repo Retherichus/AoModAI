@@ -177,15 +177,17 @@ extern int gBackAreaID = -1;
 extern int gHouseAreaID = -1;
 extern bool gResetWallPlans = false;
 
-extern float gMainBaseAreaWallRadius = 32;
+extern float gMainBaseAreaWallRadius = 34;
+extern float gSecondaryMainBaseAreaWallRadius = 40;
 
 extern int gMainBaseAreaWallTeam1PlanID = -1;
 extern int gMainBaseAreaWallTeam2PlanID = -1;
+extern int gMBSecondaryWall = -1;
 
 extern int gOtherBaseRingWallTeam1PlanID = -1;
 
 //extern float gOtherBaseWallRadius = 17.0;
-extern float gOtherBaseWallRadius = 20.0;
+extern float gOtherBaseWallRadius = 24.0;
 
 extern int gBuildBuilding1AtOtherBasePlanID = -1;
 
@@ -366,7 +368,7 @@ include "AoModAITrain.xs";
 //==============================================================================
 rule updatePlayerToAttack   //Updates the player we should be attacking.
 //    minInterval 27 //starts in cAge2
-    minInterval 43 //starts in cAge1
+    minInterval 45 //starts in cAge1
     inactive
 {
     static int lastTargetPlayerIDSaveTime = -1;
@@ -388,7 +390,7 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
         aiEcho("increasing startIndex. startIndex is now: "+startIndex);
     }
     
-    if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (10 + randNum)*60*1000))
+    if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (15)*60*1000))
     {
         startIndex = aiRandInt(cNumberPlayers);
         aiEcho("getting new random startIndex. startIndex is now: "+startIndex);
@@ -834,11 +836,6 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     if (vilPop < 34)
         vilPop = 34;
         
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
-    if ((numTrees < 15) && (xsGetTime() > 20*60*1000))
-    {   
-        vilPop = vilPop - 5;
-    }
 
     if (kbUnitCount(cMyID, cUnitTypePlentyVault, cUnitStateAlive) > 0)
         vilPop = vilPop - 3;
@@ -890,7 +887,7 @@ rule updateEMAge1       // i.e. cAge1
       }
       else
       {
-         civPopTarget = 25;
+         civPopTarget = 30;
          milPopTarget = 80;
       }
    }
@@ -991,7 +988,7 @@ rule updateEMAge3
     }
     else
     {
-      civPopTarget = 34 - (cvRushBoomSlider*5.99);    // +/- 5
+      civPopTarget = 65 - (cvRushBoomSlider*5.99);    // +/- 5
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
@@ -1032,9 +1029,9 @@ rule updateEMAge4
 
     if (aiGetWorldDifficulty() == cDifficultyEasy)
     {
-        civPopTarget = 10 + aiRandInt(3);
+        civPopTarget = 20 + aiRandInt(3);
         if (cMyCulture == cCultureAtlantean)
-            civPopTarget = 12 + aiRandInt(3);   // Make up for oracles
+            civPopTarget = 22 + aiRandInt(3);   // Make up for oracles
         milPopTarget = 26 + aiRandInt(8);  
     }
     else if (aiGetWorldDifficulty() == cDifficultyModerate)
@@ -1059,7 +1056,7 @@ rule updateEMAge4
       kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);   }
    else
    {
-      civPopTarget = 40; 
+      civPopTarget = 70; 
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -1473,9 +1470,10 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
             neededGoldGatherers = minGoldGatherers;
     }
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+
+	
     float neededWoodGatherers = desiredWoodUnits;
-    if (numTrees < 15)
+    if (woodSupply > goldSupply+1000)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -1485,7 +1483,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         float minFoodGatherers = 5;
         if (cMyCulture == cCultureAtlantean)
             minFoodGatherers = 2;
-        if ((numFishBoats < 4) && (kbGetAge() > cAge2) && ((numTrees < 15) || (numGoldSites < 1)))
+        if ((numFishBoats < 4) && (kbGetAge() > cAge2) || (numGoldSites < 1))
         {
             foodOverride = true;
             minFoodGatherers = 21;
@@ -1792,11 +1790,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     else if (woodSupply > 1300)
         gWoodForecast = gWoodForecast * 0.9;
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
-    if (numTrees < 15)
-    {
-        gWoodForecast = 100.0;
-    }
+
     
     //aiEcho("__________");
     aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
@@ -3784,7 +3778,7 @@ void init(void)
     if (towerOdds < 0.1)
         towerOdds = 0.1;                            // Now 0.1 - 1.4
             
-    towerOdds = (towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
+    towerOdds = (250+towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
 
     result = -1;
     result = aiRandInt(101) - 1;   //-1..99
@@ -3798,8 +3792,8 @@ void init(void)
         gTargetNumTowers = towerOdds / 10;    // Up to 14 for a mil/econ balanced player
         gTargetNumTowers = gTargetNumTowers * (1+(cvMilitaryEconSlider/2));  // +/- 50% based on mil/econ
         
-        if (gTargetNumTowers > 10)  //max 10 towers
-            gTargetNumTowers = 10;
+        if (gTargetNumTowers > 20)  //max 10 towers
+            gTargetNumTowers = 20;
         
       //  if ( gBuildWalls == true)
          //   gTargetNumTowers = gTargetNumTowers * 2;     // Halve the towers if we're doing walls
@@ -4887,9 +4881,11 @@ void age2Handler(int age=1)
         if (gBuildWallsAtMainBase == true)
         {
             xsEnableRule("mainBaseAreaWallTeam1");
+			xsEnableRule("MBSecondaryWall");
+			
 
-            if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
-                xsEnableRule("destroyUnnecessaryDropsites");
+         //   if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
+            //    xsEnableRule("destroyUnnecessaryDropsites");
             
             if (aiGetGameMode() != cGameModeDeathmatch)
                 xsEnableRule("setUnitPicker");
@@ -4921,8 +4917,8 @@ void age2Handler(int age=1)
         xsEnableRule("fixUnfinishedWalls");
         
         //enable the rule to destroy unnecessary dropsites near our mainbase
-        if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
-            xsEnableRule("destroyUnnecessaryDropsites");
+      //  if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
+       //     xsEnableRule("destroyUnnecessaryDropsites");
     }
 
     //build buildings at other bases

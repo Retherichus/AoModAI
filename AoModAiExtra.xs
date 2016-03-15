@@ -29,7 +29,7 @@ extern int gGardenBuildLimit = 0;
 //you can turn these on/off as you please, by setting the final value to true or false.
 //There's also a small description on all of them, to make it a little easier to understand what happens when you set it to true.
 //==============================================================================
-
+extern bool mCanIDefendAllies = true;     // Allows the AI to defend his allies.
 extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''
 extern bool gAgeFaster = true;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
@@ -1101,7 +1101,7 @@ rule buildManyBuildings
 // tacticalHeroAttackMyth
 //==============================================================================
 rule tacticalHeroAttackMyth
-   minInterval 8
+   minInterval 6
    active
 {
    static int unitQueryID=-1;
@@ -1154,7 +1154,7 @@ rule tacticalHeroAttackMyth
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0 && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeLogicalTypeLandMilitary) == true || cMyCulture == cCultureEgyptian))
+	   if (numberFoundTemp > 0 && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeLogicalTypeLandMilitary) == true))
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
@@ -1166,7 +1166,7 @@ rule tacticalHeroAttackMyth
 // IHateMonks
 //==============================================================================
 rule IHateMonks
-   minInterval 10
+   minInterval 6
    active
 {
    static int unitQueryID=-1;
@@ -1187,8 +1187,8 @@ rule IHateMonks
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
 		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractArcher);
-		if (cMyCulture == cCultureNorse)
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractCavalry);
+		if ((cMyCulture == cCultureNorse) || (cMyCulture == cCultureEgyptian))
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
 
@@ -1233,7 +1233,7 @@ rule IHateMonks
 // IHateSiege
 //==============================================================================
 rule IHateSiege
-   minInterval 11
+   minInterval 6
    active
 {
    static int unitQueryID=-1;
@@ -1275,7 +1275,7 @@ rule IHateSiege
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 28);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
    }
 
    int numberFoundTemp = 0;
@@ -1287,6 +1287,136 @@ rule IHateSiege
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   if (numberFoundTemp > 0 && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeLogicalTypeLandMilitary) == true || cMyCulture == cCultureEgyptian))
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+//==============================================================================
+// IHateBuildingsHadesSpecial
+//==============================================================================
+rule IHateBuildingsHadesSpecial
+   minInterval 5
+   active
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+   if ((aiGetWorldDifficulty() == cDifficultyEasy) || (cMyCiv != cCivHades))
+   {
+	xsDisableSelf();
+	return;
+   }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeCrossbowman);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 34);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+//==============================================================================
+// BanditMigdolRemoval // Valley of Kings special
+//==============================================================================
+rule BanditMigdolRemoval
+   minInterval 8
+   active
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+   if (cRandomMapName != "valley of kings")
+   {
+	xsDisableSelf();
+	return;
+   }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 8)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationAny);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBanditMigdol);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 42);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);

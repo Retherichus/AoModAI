@@ -1707,6 +1707,547 @@ rule mainBaseAreaWallTeam1
             alreadyStarted = true;
     }
 }
+//Reth
+//==============================================================================
+rule MBSecondaryWall
+//    minInterval 21 //starts in cAge2
+    minInterval 30 //starts in cAge4
+    inactive
+{
+   // Go back if we're not in Mythic Age
+    if (kbGetAge() < cAge4)
+	 return;    
+
+
+
+	//If we're in Mythic age, we want to ensure that we can spare some gold before building this mess of a wall.
+
+	float goldSupply = kbResourceGet(cResourceGold);
+
+    //Make sure we have enough gold
+	if (goldSupply < 350)
+	   return;   
+	
+	aiEcho("Secondary Wall plan launched");
+
+    static bool alreadyStarted = false;
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    if ((alreadyStarted == false) && (numHeroes < 1) && (xsGetTime() < 6.5*60*1000))
+        return;
+    
+
+    //If we already have a build wall plan, don't make another one.
+    int wallPlanID = aiPlanGetIDByTypeAndVariableType(cPlanBuildWall, cBuildWallPlanWallType, cBuildWallPlanWallTypeArea, true);
+    int activeWallPlans = aiPlanGetNumber(cPlanBuildWall, -1, true);
+
+    int mainBaseID=kbBaseGetMainID(cMyID);
+
+    if (wallPlanID >= 0)
+    {
+        for (i = 0; < activeWallPlans)
+        {
+            int wallPlanIndexID = aiPlanGetIDByIndex(cPlanBuildWall, -1, true, i);
+            if (wallPlanIndexID == gMBSecondaryWall)
+            {
+                static int SecondaryMainBaseWallStartTime = -1;
+                if (SecondaryMainBaseWallStartTime < 0)
+                    SecondaryMainBaseWallStartTime = xsGetTime();
+                //aiEcho("SecondaryMainBaseWallStartTime "+SecondaryMainBaseWallStartTime);
+                
+                if ((goldSupply < 50) && (xsGetTime() > 19*60*1000))
+                {
+                    aiPlanDestroy(wallPlanIndexID);
+                    SecondaryMainBaseWallStartTime = -1;
+                    //aiEcho("mainBaseAreaWallTeam1 destroyed, resetting SecondaryMainBaseWallStartTime");
+                    xsSetRuleMinIntervalSelf(23);
+                    return;
+                }
+                
+                //destroy the plan if it has been active for more than 12 minutes
+                if (xsGetTime() > (SecondaryMainBaseWallStartTime + 12*60*1000))
+                {
+                    aiPlanDestroy(wallPlanIndexID);
+                    SecondaryMainBaseWallStartTime = -1;
+                    //aiEcho("mainBaseAreaWallTeam1 destroyed, resetting SecondaryMainBaseWallStartTime");
+                    xsSetRuleMinIntervalSelf(61);
+                    return;
+                }
+
+                //Get the enemies near my base
+                int numEnemyUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
+                int myUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationSelf, cUnitTypeLogicalTypeLandMilitary);
+                int alliedUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationAlly, cUnitTypeLogicalTypeLandMilitary);
+
+                //Get the time under attack.
+                int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, mainBaseID);
+                if ((secondsUnderAttack > 25) && (xsGetTime() > 19*60*1000))
+                {
+                    //Destroy the plan if there are twice as many enemies as my units 
+                    if ((numEnemyUnitsNearBase > 2 * (myUnitsNearBase + alliedUnitsNearBase)) && (numEnemyUnitsNearBase > 4))
+                    {
+                        aiPlanDestroy(wallPlanIndexID);
+                        SecondaryMainBaseWallStartTime = -1;
+                        //aiEcho("mainBaseAreaWallTeam1 destroyed, resetting SecondaryMainBaseWallStartTime");
+                        xsSetRuleMinIntervalSelf(61);
+                        return;
+                    }
+                }
+
+                //aiEcho("mainBaseAreaWallTeam1Plan exists: ID is "+wallPlanIndexID);
+                return;
+            }
+        }
+    }
+    
+    if (alreadyStarted == false)
+    {
+        if (goldSupply < 100)
+            return;
+    }
+    else
+    {
+        if (goldSupply < 150)
+            return;
+    }
+    
+/*
+    New area-based walling.  The concept is to get a list of appropriate areas, pass them to the walling plan,
+    and have it build a wall around the convex hull defined by that area list.  To do this, I take this approach.
+    1) Define a 'radius', which is the length of a square zone that we want to enclose.
+    2) Add the center area to the list.
+    3) For each area within 2 layers of that center area, include it if its in the same area group and
+        a) its center is within that area, or
+        b) it is a gold area, or
+        c) it is a settlement area.
+*/
+
+    int builderType = cUnitTypeAbstractVillager;
+    if (cMyCulture == cCultureNorse)
+        builderType = cUnitTypeAbstractInfantry;
+    
+    int mainBaseAreaWallTeam1PlanID = aiPlanCreate("mainBaseAreaWallTeam1PlanID", cPlanBuildWall);
+    //aiEcho("mainBaseAreaWallTeam1PlanID is "+mainBaseAreaWallTeam1PlanID);
+    if (mainBaseAreaWallTeam1PlanID != -1)
+    {
+        if (cRandomMapName == "ghost lake") 
+            gMainBaseAreaWallRadius = 29;
+        else if (cRandomMapName == "marsh")
+            gMainBaseAreaWallRadius = 29;
+        else if (cRandomMapName == "jotunheim")
+            gMainBaseAreaWallRadius = 23;
+        else if (cRandomMapName == "anatolia")
+            gMainBaseAreaWallRadius = 23;
+        else if (cRandomMapName == "savannah")
+            gMainBaseAreaWallRadius = 31;
+        else if (cRandomMapName == "alfheim")
+            gMainBaseAreaWallRadius = 29;
+        else if (cRandomMapName == "tundra")    //TODO: find the best radius
+            gMainBaseAreaWallRadius = 29;
+        
+        //aiEcho("**!!**!!**!!**");
+        //aiEcho("gMainBaseAreaWallRadius: "+gMainBaseAreaWallRadius);
+        //aiEcho("**!!**!!**!!**");
+        aiPlanSetNumberVariableValues(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, 20, true);
+        int numAreasAdded = 0;
+
+        int mainArea = -1;
+        vector mainCenter = kbBaseGetLocation(cMyID, mainBaseID);
+        aiPlanSetInitialPosition(mainBaseAreaWallTeam1PlanID, mainCenter);
+        
+        float mainX = xsVectorGetX(mainCenter);
+        float mainZ = xsVectorGetZ(mainCenter);
+        mainArea = kbAreaGetIDByPosition(mainCenter);
+        //aiEcho("My main area is "+mainArea+", at "+mainCenter);
+        aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
+        numAreasAdded = numAreasAdded + 1;
+        
+        static bool firstRun = true;
+        static int savedBackAreaID = -1;
+        
+        if (gResetWallPlans == true)
+        {
+            firstRun = true;
+            gBackAreaLocation = cInvalidVector;
+            gHouseAreaLocation = cInvalidVector;
+            gBackAreaID = -1;
+            gHouseAreaID = -1;
+            gResetWallPlans = false;
+            savedBackAreaID = -1;
+        }
+        
+        if (firstRun == true)
+        {
+            //always include the backArea
+            if (equal(gBackAreaLocation, cInvalidVector) == true)
+            {
+                vector backVector = kbBaseGetBackVector(cMyID, kbBaseGetMainID(cMyID));
+                float bx = xsVectorGetX(backVector);
+                float origbx = bx;
+                float bz = xsVectorGetZ(backVector);
+                float origbz = bz;
+                bx = bx * 20.0;
+                bz = bz * 20.0;
+
+                for (m = 0; < 5)
+                {
+                    backVector = xsVectorSetX(backVector, bx);
+                    backVector = xsVectorSetZ(backVector, bz);
+                    backVector = xsVectorSetY(backVector, 0.0);
+
+                    int areaGroup1 = kbAreaGroupGetIDByPosition(mainCenter);   // base area group
+                    gBackAreaLocation = mainCenter + backVector;
+                    //aiEcho("gBackAreaLocation is: "+gBackAreaLocation);
+                    int areaGroup2 = kbAreaGroupGetIDByPosition(gBackAreaLocation);   // back vector area group
+                    if (areaGroup1 == areaGroup2)
+                    {
+                        gBackAreaID = kbAreaGetIDByPosition(gBackAreaLocation);
+                        if ((gBackAreaID == mainArea) || (gBackAreaID == savedBackAreaID))
+                        {
+                            if (m < 4)
+                            {
+                                bx = bx * 1.1;
+                                bz = bz * 1.1;
+/*
+                                if (gBackAreaID == mainArea)
+                                    aiEcho("gBackAreaID is the same as the mainArea,");
+                                else
+                                    aiEcho("gBackAreaID is the same as the savedBackAreaID,");
+*/
+                                //aiEcho("increasing distance by 10 percent");
+                                continue;
+                            }
+                            else
+                            {
+                                if (savedBackAreaID != -1)
+                                {
+                                    //aiEcho("setting gBackAreaID back to savedBackAreaID");
+                                    gBackAreaID = savedBackAreaID;
+                                    //aiEcho("gBackAreaID is: "+gBackAreaID);
+                                    break;
+                                }
+                                else
+                                {
+                                    gBackAreaID = -1;   //only add it if it's not the mainArea
+                                    //aiEcho("no need to add the gBackAreaID as it's the same as the mainArea");
+                                    break;
+                                }
+                            }
+                        }
+                        else if (gBackAreaID == -1)
+                        {
+                            if (savedBackAreaID != -1)
+                            {
+                                //aiEcho("setting gBackAreaID back to savedBackAreaID");
+                                gBackAreaID = savedBackAreaID;
+                                //aiEcho("gBackAreaID is: "+gBackAreaID);
+                                break;
+                            }
+                            else
+                            {
+                                //aiEcho("no need to add the gBackAreaID as it's -1");
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (kbAreaGetType(gBackAreaID) == cAreaTypeGold)
+                            {
+                                //aiEcho("saving gBackAreaID as it's a gold area");
+                                savedBackAreaID = gBackAreaID;
+                                //aiEcho("savedBackAreaID is: "+savedBackAreaID);
+                                continue;
+                            }
+                            else
+                            {
+                                //aiEcho("gBackAreaID is: "+gBackAreaID);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //aiEcho("no need to add the gBackAreaID as it's on a different AreaGroup");
+                        break;
+                    }
+                }
+            }
+            
+            //always include the houseArea
+            if (equal(gHouseAreaLocation, cInvalidVector) == true)
+            {
+                bx = origbx * 30.0;
+                bz = origbz * 30.0;
+
+                for (n = 0; < 5)
+                {
+                    backVector = xsVectorSetX(backVector, bx);
+                    backVector = xsVectorSetZ(backVector, bz);
+                    backVector = xsVectorSetY(backVector, 0.0);
+
+                    areaGroup1 = kbAreaGroupGetIDByPosition(mainCenter);   // base area group
+                    gHouseAreaLocation = mainCenter + backVector;
+                    //aiEcho("gHouseAreaLocation is: "+gHouseAreaLocation);
+                    areaGroup2 = kbAreaGroupGetIDByPosition(gHouseAreaLocation);   // house vector area group
+                    if (areaGroup1 == areaGroup2)
+                    {
+                        gHouseAreaID = kbAreaGetIDByPosition(gHouseAreaLocation);
+                        if ((gHouseAreaID == mainArea) || (gHouseAreaID == gBackAreaID))
+                        {
+                            if (n < 4)
+                            {
+                                bx = bx * 1.1;
+                                bz = bz * 1.1;
+/*
+                                if (gHouseAreaID == mainArea)
+                                    aiEcho("gHouseAreaID is the same as the mainArea,");
+                                else
+                                    aiEcho("gHouseAreaID is the same as the gBackAreaID,");
+*/
+                                //aiEcho("increasing distance by 10 percent");
+                                continue;
+                            }
+                            else
+                            {
+                                gHouseAreaID = -1;   //only add it if it's not the mainArea or the gBackAreaID
+/*
+                                if (gHouseAreaID == mainArea)
+                                    aiEcho("no need to add the gHouseAreaID as it's the same as the mainArea");
+                                else
+                                    aiEcho("no need to add the gHouseAreaID as it's the same as the gBackAreaID");
+*/
+                                break;
+                            }
+                        }
+                        else if (gHouseAreaID == -1)
+                        {
+                            //aiEcho("no need to add the gHouseAreaID as it's -1");
+                            break;
+                        }
+                        else
+                        {
+                            //aiEcho("gHouseAreaID is: "+gHouseAreaID);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        //aiEcho("no need to add the gHouseAreaID as it's on a different AreaGroup");
+                        break;
+                    }
+                }
+            }
+            xsEnableRule("mainBaseAreaWallTeam2");
+            firstRun = false;
+        }
+
+        
+        int firstRingCount = -1;      // How many areas are in first ring around main?
+        int firstRingIndex = -1;      // Which one are we on?
+        int secondRingCount = -1;     // How many border areas does the current first ring area have?
+        int secondRingIndex = -1;  
+        int firstRingID = -1;         // Actual ID of current 1st ring area
+        int secondRingID = -1;
+        vector areaCenter = cInvalidVector;    // Center point of this area
+        float areaX = 0.0;
+        float dx = 0.0;
+        float areaZ = 0.0;
+        float dz = 0.0;
+        int areaType = -1;
+        bool needToSave = false;
+
+        firstRingCount = kbAreaGetNumberBorderAreas(mainArea);
+ 
+        for (firstRingIndex = 0; < firstRingCount)      // Check each border area of the main area
+        {
+            needToSave = true;            // We'll save this unless we have a problem
+            firstRingID = kbAreaGetBorderAreaID(mainArea, firstRingIndex);
+            if (firstRingID == -1)
+                continue;
+                
+            areaCenter = kbAreaGetCenter(firstRingID);
+            
+            // Now, do the checks.
+            areaX = xsVectorGetX(areaCenter);
+            areaZ = xsVectorGetZ(areaCenter);
+            dx = mainX - areaX;
+            dz = mainZ - areaZ;
+            if ((dx > gSecondaryMainBaseAreaWallRadius) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius)
+             || (dz > gSecondaryMainBaseAreaWallRadius) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius))
+            {
+                needToSave = false;
+            }
+            
+            areaType = kbAreaGetType(firstRingID);
+            //increase the radius if it's a forest area
+            if (areaType == cAreaTypeForest)
+            {
+//                if ((dx > gSecondaryMainBaseAreaWallRadius * 1.3) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.3)
+//                 || (dz > gSecondaryMainBaseAreaWallRadius * 1.3) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.3))
+                if ((dx > gSecondaryMainBaseAreaWallRadius * 1.2) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.2)
+                 || (dz > gSecondaryMainBaseAreaWallRadius * 1.2) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.2))
+                {
+                    needToSave = false;
+                }
+                else
+                {
+                    needToSave = true;
+                    //aiEcho("areaType == cAreaTypeForest and it's within gSecondaryMainBaseAreaWallRadius * 1.2, adding area: "+firstRingID);
+                }
+            }
+            // Override if it's a special type
+            else if (areaType == cAreaTypeGold)
+            {
+                needToSave = true;
+                //aiEcho("areaType == cAreaTypeGold, adding area: "+firstRingID);
+            }
+            else if (areaType == cAreaTypeSettlement)
+            {
+                needToSave = true;
+                //aiEcho("areaType == cAreaTypeSettlement, adding area: "+firstRingID);
+            }
+            else
+            {
+                // Override if it's the gBackAreaID or the gHouseAreaID
+                if (gBackAreaID == firstRingID)
+                {
+                    needToSave = true;
+                    //aiEcho("gBackAreaID == firstRingID, adding the gBackAreaID: "+gBackAreaID);
+                }
+                else if (gHouseAreaID == firstRingID)
+                {
+                    needToSave = true;
+                    //aiEcho("gHouseAreaID == firstRingID, adding the gHouseAreaID: "+gHouseAreaID);
+                }
+/*
+                else
+                {
+                    if (needToSave == true)
+                        aiEcho("adding area: "+firstRingID+" as it's within gSecondaryMainBaseAreaWallRadius");
+                }
+*/
+            }
+
+            // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
+            if (needToSave == true)
+            {
+                bool found = false;
+                for (j = 0; < numAreasAdded)
+                {
+                    if (aiPlanGetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, j) == firstRingID)
+                    {
+                        found = true;     // It's in there, don't add it
+                    }
+                }
+                if ((found == false) && (numAreasAdded < 20))  // add it
+                {
+                    aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, firstRingID);
+                    numAreasAdded = numAreasAdded + 1;
+                    
+                    // If we had to add it, check all its surrounding areas, too...if it turns out we need to.
+                    secondRingCount = kbAreaGetNumberBorderAreas(firstRingID);     // How many does it touch?
+                    for (secondRingIndex = 0; < secondRingCount)
+                    {     
+                        // Check each border area.  If it's gold or settlement and not already in list, add it.
+                        secondRingID = kbAreaGetBorderAreaID(firstRingID, secondRingIndex);
+                        if (secondRingID == -1)
+                            continue;
+                        
+                        areaType = kbAreaGetType(secondRingID);
+                        if ((areaType == cAreaTypeSettlement) || (areaType == cAreaTypeGold) || (areaType == cAreaTypeForest) || ((gHouseAreaID == secondRingID) && (gHouseAreaID != -1)))
+                        {
+                            bool skipme = false;       // Skip it if center is outside gSecondaryMainBaseAreaWallRadius * 1.4
+                            areaX = xsVectorGetX(kbAreaGetCenter(secondRingID));
+                            areaZ = xsVectorGetZ(kbAreaGetCenter(secondRingID));
+                            dx = mainX - areaX;
+                            dz = mainZ - areaZ;
+                            
+                            if (areaType == cAreaTypeForest)
+                            {
+//                                if ((dx > gSecondaryMainBaseAreaWallRadius * 1.3) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.3)
+//                                 || (dz > gSecondaryMainBaseAreaWallRadius * 1.3) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.3))
+                                if ((dx > gSecondaryMainBaseAreaWallRadius * 1.2) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.2)
+                                 || (dz > gSecondaryMainBaseAreaWallRadius * 1.2) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.2))
+                                {
+                                    skipme = true;
+                                }
+                            }
+                            else
+                            {
+                                if ((dx > gSecondaryMainBaseAreaWallRadius * 1.4) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.4)
+                                 || (dz > gSecondaryMainBaseAreaWallRadius * 1.4) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.4))
+                                {
+                                    skipme = true;
+                                }
+                            }
+                            
+                            // add it if it's the gHouseAreaID and not already added
+                            if (gHouseAreaID == secondRingID)
+                            {
+                                skipme = false;
+                            }
+                            
+                            bool alreadyIn = false;
+
+                            for (k = 0; < numAreasAdded)
+                            {
+                                if (aiPlanGetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, k) == secondRingID)
+                                {
+                                    alreadyIn = true;     // It's in there, don't add it
+                                }
+                            }
+                            
+                            if ((alreadyIn == false) && (skipme == false) && (numAreasAdded < 20))  // add it
+                            {
+/*
+                                if (gHouseAreaID == secondRingID)
+                                {
+                                    aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
+                                }
+                                else
+                                {
+                                    if (areaType == cAreaTypeForest)
+                                        aiEcho("adding area: "+secondRingID+" as it's a forest area and within gSecondaryMainBaseAreaWallRadius * 1.2");
+                                    else if (areaType == cAreaTypeGold)
+                                        aiEcho("adding area: "+secondRingID+" as it's a gold area and within gSecondaryMainBaseAreaWallRadius * 1.4");
+                                    else if (areaType == cAreaTypeSettlement)
+                                        aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gSecondaryMainBaseAreaWallRadius * 1.4");
+                                    else
+                                        aiEcho("adding area: "+secondRingID+" as it's within gSecondaryMainBaseAreaWallRadius * 1.4");
+                                }
+*/
+                                aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, secondRingID);
+                                numAreasAdded = numAreasAdded + 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+/*
+        aiEcho("    Area list:");
+        for (l = 0; < numAreasAdded)
+            aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, l));
+*/
+        // Set the true number of area variables, preserving existing values, then turn on the plan
+        aiPlanSetNumberVariableValues(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
+
+        aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
+//        aiPlanAddUnitType(mainBaseAreaWallTeam1PlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+        aiPlanAddUnitType(mainBaseAreaWallTeam1PlanID, builderType, 1, 1, 1);
+        aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanNumberOfGates, 0, 50);
+        aiPlanSetVariableFloat(mainBaseAreaWallTeam1PlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
+        aiPlanSetBaseID(mainBaseAreaWallTeam1PlanID, mainBaseID);
+        aiPlanSetEscrowID(mainBaseAreaWallTeam1PlanID, cMilitaryEscrowID);
+        aiPlanSetDesiredPriority(mainBaseAreaWallTeam1PlanID, 100);
+        aiPlanSetActive(mainBaseAreaWallTeam1PlanID, true);
+        gMainBaseAreaWallTeam1PlanID = mainBaseAreaWallTeam1PlanID;
+        xsSetRuleMinIntervalSelf(127);
+        //aiEcho("mainBaseAreaWallTeam1PlanID set active: "+gMainBaseAreaWallTeam1PlanID);
+        if (alreadyStarted == false)
+            alreadyStarted = true;
+    }
+}
+
 
 //==============================================================================
 rule mainBaseAreaWallTeam2

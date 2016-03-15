@@ -1573,8 +1573,8 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
         if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
             aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 0, 1);
         
-        if (gAge2MinorGod == cTechAge2Okeanus)
-            aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeFlyingMedic, 0, 0, 1);
+      //  if (gAge2MinorGod == cTechAge2Okeanus)
+       //     aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeFlyingMedic, 0, 0, 1);
         
         aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeLogicalTypeLandMilitary, 0, 0, 1);
             
@@ -1710,8 +1710,8 @@ rule mainBaseDefPlan2   //Make a second defend plan that protects the main base
                 aiPlanAddUnitType(mainBaseDefPlan2ID, cUnitTypeHero, 0, 1, 1);
             }
         }
-        if (gAge2MinorGod == cTechAge2Okeanus)
-            aiPlanAddUnitType(mainBaseDefPlan2ID, cUnitTypeFlyingMedic, 0, 0, 1);
+    //    if (gAge2MinorGod == cTechAge2Okeanus)
+     //       aiPlanAddUnitType(mainBaseDefPlan2ID, cUnitTypeFlyingMedic, 0, 0, 1);
             
         aiPlanAddUnitType(mainBaseDefPlan2ID, cUnitTypeLogicalTypeLandMilitary, 0, 0, 1);
 
@@ -2605,7 +2605,7 @@ rule attackEnemySettlement
         }
     }
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    
     int mostHatedPlayerID = aiGetMostHatedPlayerID();
     int numMHPlayerSettlements = kbUnitCount(mostHatedPlayerID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
     //aiEcho("mostHatedPlayerID is: "+mostHatedPlayerID);
@@ -2639,8 +2639,7 @@ rule attackEnemySettlement
             aiEcho("returning as we don't have a Titan, a siege weapon, or a military myth unit");
             return;
         }
-//        else if ((((woodSupply < 400) && (numTrees > 14)) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap))
-        else if ((((woodSupply < 400) && (numTrees > 14)) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap - 2))
+        else if (((woodSupply < 400) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap - 2))
         {
             aiEcho("returning as we don't have enough resources");
             return;
@@ -2648,8 +2647,8 @@ rule attackEnemySettlement
     }
     else
     {
-//        if ((((woodSupply < 150) && (numTrees > 14)) || (goldSupply < 150) || (foodSupply < 110)) && (currentPop <= currentPopCap))
-        if ((((woodSupply < 150) && (numTrees > 14)) || (goldSupply < 150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 2))
+
+        if (((woodSupply < 150) || (goldSupply < 150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 2))
         {
             aiEcho("returning as we don't have enough resources");
             return;
@@ -2924,8 +2923,8 @@ rule attackEnemySettlement
         aiPlanSetUnitStance(enemySettlementAttPlanID, cUnitStanceDefensive);
     }
     
-    if (gAge2MinorGod == cTechAge2Okeanus)
-        aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeFlyingMedic, 0, 1, 1);
+  //  if (gAge2MinorGod == cTechAge2Okeanus)
+   //     aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeFlyingMedic, 0, 1, 1);
   
     int numScouts = kbUnitCount(cMyID, cUnitTypeAbstractScout, cUnitStateAlive);
 //    if ((aiRandInt(2) < 1) || (numTitans > 0) || (numScouts < 2) || (targetSettlementCloseToMB == true))
@@ -3175,8 +3174,8 @@ rule defendSettlementPosition
         }
         aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeAbstractTitan, 0, 1, 1);
         
-        if (gAge2MinorGod == cTechAge2Okeanus)
-            aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeFlyingMedic, 0, 0, 1);
+    //    if (gAge2MinorGod == cTechAge2Okeanus)
+     //       aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeFlyingMedic, 0, 0, 1);
 
         //override
         if (enemyMilUnitsInR50 > 18)
@@ -3276,9 +3275,9 @@ rule createRaidingParty
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
     
-    if (((woodSupply < 120) && (numTrees > 14)) || (foodSupply < 120) || (goldSupply < 120))
+    
+    if ((woodSupply < 120) || (foodSupply < 120) || (goldSupply < 120))
     {
         //aiEcho("returning as we don't have enough resources");
         return;
@@ -3734,9 +3733,9 @@ rule randomAttackGenerator
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+
     
-    if (((woodSupply < 200) && (numTrees > 14)) || (foodSupply < 200) || (goldSupply < 200))
+    if ((woodSupply < 200) || (foodSupply < 200) || (goldSupply < 200))
     {
         //aiEcho("returning as we don't have enough resources");
         return;
@@ -4220,7 +4219,7 @@ rule createLandAttack
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+
     
     int currentPop = kbGetPop();
     int currentPopCap = kbGetPopCap();
@@ -4237,7 +4236,7 @@ rule createLandAttack
             aiEcho("returning as gRushAttackCount >= gRushCount");
             return;
         }
-        else if (((woodSupply < 100) && (numTrees > 14)) || (foodSupply < 100) || (goldSupply < 100))
+        else if ((woodSupply < 100) || (foodSupply < 100) || (goldSupply < 100))
         {
             aiEcho("returning as we don't have enough resources");
             return;
@@ -4250,8 +4249,8 @@ rule createLandAttack
             aiEcho("returning as numMilitaryMythUnits > 1 or numSiegeWeapons > 0");
             return;
         }
-//        else if (((woodSupply < 230) && (numTrees >14)) || (foodSupply < 230) || (goldSupply < 230))
-        else if ((((woodSupply < 230) && (numTrees >14)) || (foodSupply < 230) || (goldSupply < 230)) && (currentPop < currentPopCap))
+
+        else if (((woodSupply < 230) || (foodSupply < 230) || (goldSupply < 230)) && (currentPop < currentPopCap))
         {
             aiEcho("returning as we don't have enough resources");
             return;
@@ -4442,8 +4441,8 @@ rule createLandAttack
         aiPlanSetVariableInt(landAttackPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
     }
     
-    if (gAge2MinorGod == cTechAge2Okeanus)
-        aiPlanAddUnitType(landAttackPlanID, cUnitTypeFlyingMedic, 0, 1, 1);
+  //  if (gAge2MinorGod == cTechAge2Okeanus)
+  //      aiPlanAddUnitType(landAttackPlanID, cUnitTypeFlyingMedic, 0, 1, 1);
     
 //    aiPlanSetInitialPosition(landAttackPlanID, defPlanBaseLocation);
     aiPlanSetInitialPosition(landAttackPlanID, baseLocationToUse);
@@ -4731,8 +4730,8 @@ rule defendBaseUnderAttack
         }
         aiPlanAddUnitType(baseUnderAttackDefPlanID, cUnitTypeAbstractTitan, 0, 1, 1);
         
-        if (gAge2MinorGod == cTechAge2Okeanus)
-            aiPlanAddUnitType(baseUnderAttackDefPlanID, cUnitTypeFlyingMedic, 0, 0, 1);
+     //   if (gAge2MinorGod == cTechAge2Okeanus)
+      //      aiPlanAddUnitType(baseUnderAttackDefPlanID, cUnitTypeFlyingMedic, 0, 0, 1);
         
         //override
         if (enemyMilUnitsInR40 > 16)
@@ -4754,8 +4753,15 @@ rule defendAlliedBase   //TODO: check all allied bases not just the main base of
     minInterval 89 //starts in cAge2
     inactive
 {
+ 
+ if (mCanIDefendAllies == false)
+ {
+	xsDisableSelf();
+	return;
+ }   
     aiEcho("........defendAlliedBase: ");
-    
+ 
+ 
     int startIndex = aiRandInt(cNumberPlayers);
     int alliedBaseUnitID = -1;
     for (i = 0; < cNumberPlayers)
@@ -5063,9 +5069,6 @@ rule tacticalSiege
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
 		// Don't want Norse Ballista to attack buildings.
-		if (cMyCulture != cCultureNorse)
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSiegeWeapon);
-		else
 			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSiegeWeapon);			
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
