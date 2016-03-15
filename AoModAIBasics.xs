@@ -56,7 +56,7 @@ extern bool    cvDelayStart = false;
 // DoAutoSaves:  Setting this true will cause the AI to do an auto-save every 3 minutes.  Setting it false
 // will eliminate auto saves.
 // Use only in setParamters()
-extern bool    cvDoAutoSaves = true;
+extern bool cvDoAutoSaves = true;
 
 
 // MaxAge:  Sets the age limit for this player.  Be careful to use cAge1...cAge4 constants, like cvMaxAge = cAge2 to 
@@ -865,14 +865,12 @@ vector getMainBaseMilitaryGatherPoint()
 //==============================================================================
 int getMainBaseUnitIDForPlayer(int playerID = -1)
 {
-    //aiEcho("-__-__-__-__-__-");
     //aiEcho("getMainBaseUnitIDForPlayer: "+playerID);
     
     int numSettlements = kbUnitCount(playerID, cUnitTypeAbstractSettlement, cUnitStateAlive);
     if (numSettlements < 1)
     {
         //aiEcho("no enemy settlements (sighted yet), returning -1");
-        //aiEcho("-__-__-__-__-__-");
         return(-1);
     }    
     
@@ -925,8 +923,6 @@ int getMainBaseUnitIDForPlayer(int playerID = -1)
     }
     
     //aiEcho("mainBaseUnitID: "+mainBaseUnitID+" for player:"+playerID);
-    //aiEcho("-__-__-__-__-__-");
-    //aiEcho("-__-__-__-__-__-");
     return(mainBaseUnitID);
 }
 
@@ -1747,7 +1743,6 @@ void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
     int numUnitsInPlan = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
     if (numUnitsInPlan > 0)
     {
-        //aiEcho("*_!_*_!_*_!_pullBackUnits: ");
         //Limited the maximum number of loops
         int min = 0;
         int max = 16;
@@ -1790,7 +1785,7 @@ void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
                 }
             }
         }
-        aiEcho("*_!_*_!_*_!_");
+        
     }
 }
 
@@ -1802,7 +1797,7 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
     int numUnitsInPlan = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
     if (numUnitsInPlan > 0)
     {
-        aiEcho("!_*_!_*_!_*_keepUnitsWithinRange: ");
+        aiEcho("keepUnitsWithinRange: ");
         aiEcho("planID: "+planID);
         //Limited the maximum number of loops
         int min = 0;
@@ -1919,7 +1914,7 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
                 aiEcho("sending unit: "+unitID+" back to position: "+desiredPosition);
             }
         }
-        aiEcho("!_*_!_*_!_*_");
+        
     }
 }
 
@@ -1956,7 +1951,7 @@ int getNumPlayersByRel(bool ally = true)
         }
     }
     aiEcho("numPlayersByRel: "+numPlayersByRel);
-    aiEcho("**!!**!!**");
+   
     return(numPlayersByRel);
 }
 
@@ -2009,7 +2004,7 @@ void taskMilUnitTrainAtBase(int baseID = -1)
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
     else if (cMyCulture == cCultureChinese)
-        building1ID = cUnitTypeAcademy;		
+        building1ID = cUnitTypeStableChinese;		
 
     int bigBuildingID = cUnitTypeMigdolStronghold;
     if (cMyCulture == cCultureGreek)
@@ -2253,165 +2248,4 @@ void taskMilUnitTrainAtBase(int baseID = -1)
     {
         aiEcho("a unit with puid: "+puid+" is already being trained near baseID: "+baseID);
     }
-}
-
-//==============================================================================
-rule testRule   //just for testing
-//    minInterval 307
-    minInterval 20
-//    active
-    inactive
-{
-    aiEcho("............................");
-    aiEcho("testRule");
-/*    
-    if (cMyCiv != cCivKronos)
-    {
-        xsDisableSelf();
-        return;
-    }
-    
-    aiEcho("test if aiTaskUnitBuild timeshifts Kronos' buildings");
-    
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    aiEcho("mainBaseLocation: "+mainBaseLocation);
-    int militaryBuildingIDInR40 = findUnit(cUnitTypeTemple, cUnitStateAlive, -1, cMyID, mainBaseLocation, 40.0);
-    aiEcho("militaryBuildingIDInR40: "+militaryBuildingIDInR40);
-    vector milBuildingPosition = kbUnitGetPosition(militaryBuildingIDInR40);
-    aiEcho("milBuildingPosition: "+milBuildingPosition);
-    int unitIsTypeSettlement = kbUnitIsType(militaryBuildingIDInR40, cUnitTypeAbstractSettlement);
-    aiEcho("unitIsTypeSettlement: "+unitIsTypeSettlement);
-    if ((militaryBuildingIDInR40 != -1) && (kbUnitIsType(militaryBuildingIDInR40, cUnitTypeAbstractSettlement) == false))
-    {
-        vector towardCenter = milBuildingPosition - kbGetMapCenter();
-        aiEcho("towardCenter: "+towardCenter);
-        towardCenter = xsVectorNormalize(towardCenter);
-        aiEcho("normalized towardCenter: "+towardCenter);
-        vector targetPosition = milBuildingPosition - towardCenter * 20;
-        aiEcho("targetPosition: "+targetPosition);
-        if (kbLocationVisible(targetPosition) == true)
-        {
-//            aiTaskUnitBuild(militaryBuildingIDInR40, cUnitTypeTimeshiftin, targetPosition);   //creates timeshiftin effect
-//            aiTaskUnitBuild(militaryBuildingIDInR40, cUnitTypeTimeshiftout, targetPosition);  //creates timeshiftout effect
-
-//            aiTaskUnitSpecialPower(militaryBuildingIDInR40, -1, targetPosition);
-//            aiTaskUnitSpecialPower(militaryBuildingIDInR40, 0, targetPosition);
-//            aiTaskUnitSpecialPower(militaryBuildingIDInR40, 1, targetPosition);
-
-            
-            breakpoint;
-        }
-    }
-*/    
-    aiEcho("............................");
-    aiEcho("____________________________");
-    
-/*    
-    //for testing a for loop in reverse
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    
-    int activeGatherPlans = aiPlanGetNumber(cPlanGather, cPlanStateGather, true);
-    for (i = 0; < activeGatherPlans)
-    {
-        int gatherPlanID = aiPlanGetIDByIndex(cPlanGather, cPlanStateGather, true, i);
-        pullBackUnits(gatherPlanID, mainBaseLocation);
-    }
-    aiEcho("--------");
-*/
-/* for testing: result: != and == don't work with vectors!!!!
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    aiEcho("------------");
-    aiEcho("____________");
-    aiEcho("************");
-    aiEcho("mainBaseLocation: "+mainBaseLocation);
-    if (mainBaseLocation != vector(-1,-1,-1))
-        aiEcho("mainBaseLocation != vector(-1,-1,-1)");
-    if (mainBaseLocation == vector(-1,-1,-1))
-        aiEcho("mainBaseLocation == vector(-1,-1,-1)");
-    if (mainBaseLocation != cInvalidVector)
-        aiEcho("mainBaseLocation != cInvalidVector");
-    if (mainBaseLocation == cInvalidVector)
-        aiEcho("mainBaseLocation == cInvalidVector");
-    if (mainBaseLocation != kbBaseGetLocation(cMyID, mainBaseID))
-        aiEcho("mainBaseLocation != kbBaseGetLocation(cMyID, mainBaseID)");
-    if (mainBaseLocation == kbBaseGetLocation(cMyID, mainBaseID))
-        aiEcho("mainBaseLocation == kbBaseGetLocation(cMyID, mainBaseID)");
-    aiEcho("************");
-    aiEcho("____________");
-    aiEcho("------------");
-*/ 
-/*  
-    //for testing of cUnitTypeGold
-    int numGold = kbUnitCount(0, cUnitTypeGold, cUnitStateAlive);
-    int numGoldViaGetNumUnits = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0);
-    int numGoldMinesNormal = kbUnitCount(0, cUnitTypeGoldMine, cUnitStateAlive);
-    int numGoldMinesSmall = kbUnitCount(0, cUnitTypeGoldMineSmall, cUnitStateAlive);
-    int numGoldMinesTiny = kbUnitCount(0, cUnitTypeGoldMineTiny, cUnitStateAlive);
-    int numGoldMinesDwarven = kbUnitCount(0, cUnitTypeGoldMineDwarven, cUnitStateAlive);
-    aiEcho("------------");
-    aiEcho("------------");
-    aiEcho("numGold: "+numGold);
-    aiEcho("numGoldViaGetNumUnits: "+numGoldViaGetNumUnits);
-    aiEcho("------------");
-    aiEcho("numGoldMinesNormal: "+numGoldMinesNormal);
-    aiEcho("numGoldMinesSmall: "+numGoldMinesSmall);
-    aiEcho("numGoldMinesTiny: "+numGoldMinesTiny);
-    aiEcho("numGoldMinesDwarven: "+numGoldMinesDwarven);
-    aiEcho("------------");
-*/
-/*  
-    //for testing of the sort function
-    aiEcho("<------------>");
-    aiEcho("<------------>");
-    vector mapCenter = kbGetMapCenter();
-    int numEnemyMilitaryBuildings = getNumUnitsByRel(cUnitTypeMilitaryBuilding, cUnitStateAlive, -1, cPlayerRelationEnemy, mapCenter, 2000.0, false);
-    int numEnemyMilitaryBuildingsNoRadius = getNumUnitsByRel(cUnitTypeMilitaryBuilding, cUnitStateAlive, -1, cPlayerRelationEnemy, mapCenter, -1, false);
-    int numEnemyMilitaryBuildingsNoCenterNoRadius = getNumUnitsByRel(cUnitTypeMilitaryBuilding, cUnitStateAlive, -1, cPlayerRelationEnemy, cInvalidVector, -1, false);
-    aiEcho("numEnemyMilitaryBuildings: "+numEnemyMilitaryBuildings);
-    aiEcho("numEnemyMilitaryBuildingsNoRadius: "+numEnemyMilitaryBuildingsNoRadius);
-    aiEcho("numEnemyMilitaryBuildingsNoCenterNoRadius: "+numEnemyMilitaryBuildingsNoCenterNoRadius);
-    if (numEnemyMilitaryBuildings > 0)
-    {
-        for (i = 0; < numEnemyMilitaryBuildings)
-        {
-            int enemyMilitaryBuildingID = findUnitByRelByIndex(cUnitTypeMilitaryBuilding, i, cUnitStateAlive, -1, cPlayerRelationEnemy, mapCenter, 2000.0, false);
-            aiEcho("enemyMilitaryBuildingID: "+enemyMilitaryBuildingID);
-            vector enemyMilitaryBuildingPosition = kbUnitGetPosition(enemyMilitaryBuildingID);
-            aiEcho("enemyMilitaryBuildingPosition:" +enemyMilitaryBuildingPosition);
-            float distanceToMapCenter = xsVectorLength(mapCenter - enemyMilitaryBuildingPosition);
-            aiEcho("distanceToMapCenter: "+distanceToMapCenter);
-        }
-    }
-    aiEcho("<------------>");
-    aiEcho("<------------>");
-*/      
-/*      
-    int playerID = -1;
-    for (playerID = 1; < cNumberPlayers)
-    {
-        int enemyMainBaseUnitID = getMainBaseUnitIDForPlayer(playerID);
-        
-// for testing of the kbBaseFindForwardMilitaryBase function
-//        if (enemyMainBaseUnitID != -1)
-//        {
-//            if ((playerID != cMyID) || (kbIsPlayerAlly(playerID) == false))
-//            {
-//                int enemyMainBaseID = kbUnitGetBaseID(enemyMainBaseUnitID);
-//                aiEcho("enemyMainBaseID: "+enemyMainBaseID);
-//                int forwardBaseID = kbBaseFindForwardMilitaryBase(playerID, enemyMainBaseID);
-//                aiEcho("forwardBaseID: "+forwardBaseID);
-//            }
-//        }
-    }
-*/
-         
-//    int numTurmas = kbUnitCount(cMyID, cUnitTypeJavelinCavalry, cUnitStateAlive);
-//    int numMurmillos = kbUnitCount(cMyID, cUnitTypeSwordsman, cUnitStateAlive);
-//    int numArcus = kbUnitCount(cMyID, cUnitTypeArcherAtlantean, cUnitStateAlive);
-//    int numContarius = kbUnitCount(cMyID, cUnitTypeLancer, cUnitStateAlive);    
-//    int numFanatics = kbUnitCount(cMyID, cUnitTypeRoyalGuard, cUnitStateAlive);
-
 }

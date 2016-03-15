@@ -532,7 +532,7 @@ rule getRoarOfOrthus
 rule getTempleOfHealing
     inactive
 //    minInterval 17 //starts in cAge3
-    minInterval 1 //starts in cAge3
+    minInterval 30 //starts in cAge3
     group techsGreekMinorGodAge3
 {
     int techID = cTechTempleofHealing;
@@ -805,7 +805,7 @@ rule getTrierarch
 //==============================================================================
 rule getForgeOfOlympus
     inactive
-    minInterval 1 //starts in cAge4
+    minInterval 35 //starts in cAge4
     group techsGreekMinorGodAge4
 {
     int techID = cTechForgeofOlympus;
@@ -814,9 +814,7 @@ rule getForgeOfOlympus
     {
         //cTechForgeofOlympus is researched, reactivate the attack goal
         aiPlanSetVariableBool(gLandAttackGoalID, cGoalPlanIdleAttack, 0, false);
-        aiEcho("____________________");
         aiEcho("reactivating attack goal");
-        aiEcho("____________________");
         xsDisableSelf();
         return;
     }
@@ -825,9 +823,7 @@ rule getForgeOfOlympus
     {
         //set the gLandAttackGoalID to idle so that no armory techs get researched
         aiPlanSetVariableBool(gLandAttackGoalID, cGoalPlanIdleAttack, 0, true);
-        aiEcho("____________________");
         aiEcho("setting gLandAttackGoalID to idle");
-        aiEcho("____________________");
         xsSetRuleMinIntervalSelf(10);
     }
     

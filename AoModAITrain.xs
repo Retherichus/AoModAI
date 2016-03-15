@@ -53,7 +53,6 @@ rule maintainTradeUnits
                         {
                             aiTaskUnitTrain(gTradeMarketUnitID, tradeCartPUID);
                             aiEcho("trainig a trade unit at our gTradeMarketUnitID: "+gTradeMarketUnitID);
-                            aiEcho("----------------------------");
                         }
                     }
                     return;
@@ -65,11 +64,18 @@ rule maintainTradeUnits
     int tradeTargetPop = gMaxTradeCarts;
     if ((cvMaxTradePop >= 0) && (tradeTargetPop > cvMaxTradePop))    // Stay under control variable limit
         tradeTargetPop = cvMaxTradePop;
-        
+		
+	if (aiGetWorldDifficulty() == cDifficultyNightmare)
+	{
+    gMaxTradeCarts = gTitanTradeCarts;
+	    if ((cvMaxTradePop >= 0) && (tradeTargetPop > cvMaxTradePop))    // Stay under control variable limit
+        tradeTargetPop = cvMaxTradePop;
+	}    
     int unitTypeToTrain = -1;
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
-    if (numTrees < 15)
+  
+	
+    if (woodSupply > 1500)
         tradeTargetPop = tradeTargetPop + 5;
     
     static bool firstRun = true;
@@ -325,7 +331,7 @@ rule trainMercs
 
 //==============================================================================
 rule trainMythUnit
-    minInterval 71 //starts in cAge2
+    minInterval 35 //starts in cAge2
     inactive
 {
     aiEcho("trainMythUnit:");
@@ -484,8 +490,8 @@ rule trainMythUnit
         // age2 myth units
         if (gAge2MinorGod == cTechAge2Leto)
             age2MythUnitID = cUnitTypeAutomaton;
-        else if (gAge2MinorGod == cTechAge2Okeanus)
-            age2MythUnitID = cUnitTypeFlyingMedic;
+   //     else if (gAge2MinorGod == cTechAge2Okeanus)   NO, JUST NO
+     //       age2MythUnitID = cUnitTypeFlyingMedic;    NO, JUST NO
         else if (gAge2MinorGod == cTechAge2Prometheus)
             age2MythUnitID = cUnitTypePromethean;
         
@@ -559,12 +565,42 @@ rule trainMythUnit
         }
     }
 
+
+
+
+	
     //aiEcho("TrainMythUnit gets "+puid+": a "+kbGetProtoUnitName(puid));
 
     if (puid < 0)
         return;
 
-
+    //In Mythic age only, this should give it a 75% chance of being an age 4 unit, and 25% for an age 3.. Never go for Age 2 ones.
+	int choiceMythic = aiRandInt(3);
+	if (kbGetAge() > cAge3)
+	switch(choiceMythic)
+    {
+        case 0:
+        {
+            puid = age4MythUnitID;
+            break;
+        }
+        case 1:
+        {
+            puid = age4MythUnitID;
+            break;
+        }
+        case 2:
+        {
+            puid = age4MythUnitID;
+            break;
+        }
+        case 3:
+        {
+            puid = age3MythUnitID;
+            break;
+        }		
+    }
+		
     int mainBaseID = kbBaseGetMainID(cMyID);
     int activeTrainPlans = aiPlanGetNumber(cPlanTrain, -1, true);
     if (activeTrainPlans > 0)
@@ -610,6 +646,8 @@ rule trainMythUnit
 }
 
 /* disabled for now
+
+
 //==============================================================================
 rule trainMilitaryUnitsAtOtherBase
     minInterval 45 //starts in cAge2
@@ -617,11 +655,7 @@ rule trainMilitaryUnitsAtOtherBase
 {
     aiEcho("trainMilitaryUnitsAtOtherBase:");
 
-    if (cMyCulture == cCultureAtlantean)
-    {
-        xsDisableSelf();
-        return;
-    }
+
     
     if (xsGetTime() < 10*60*1000)
         return;
@@ -658,7 +692,7 @@ rule trainMilitaryUnitsAtOtherBase
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
     else if (cMyCulture == cCultureChinese)
-        building1ID = cUnitTypeAcademy;		
+        building1ID = cUnitTypeStableChinese;		
 
     int bigBuildingID = cUnitTypeMigdolStronghold;
     if (cMyCulture == cCultureGreek)
@@ -754,6 +788,10 @@ rule trainMilitaryUnitsAtOtherBase
         {
             puid = cUnitTypeSwordsman;
         }
+        else if (cMyCulture == cCultureChinese)
+        {
+            puid = cUnitTypeAbstractCavalry;
+        }		
     }
     else if (buildingToUse == bigBuilding1ID)
     {
@@ -806,6 +844,16 @@ rule trainMilitaryUnitsAtOtherBase
                 puid = cUnitTypeTridentSoldier;
             }
         }
+        else if (cMyCulture == cCultureChinese)
+        {
+            if ((kbGetAge() > cAge3) && (randomUnit > 0))
+            {
+                puid = cUnitTypeFireLance;
+            }
+            else
+            {
+                puid = cUnitTypeWarChariot;
+            }		
     }
     else
     {
@@ -843,6 +891,7 @@ rule trainMilitaryUnitsAtOtherBase
 //    aiPlanSetDesiredPriority(trainRandomMilitaryUnitPlanID, 100);
     aiPlanSetDesiredPriority(trainRandomMilitaryUnitPlanID, 95);
     aiPlanSetActive(trainRandomMilitaryUnitPlanID);
+}
 }
 */
 
@@ -1059,12 +1108,16 @@ rule maintainSiegeUnits
     }
     else if (cMyCulture == cCultureEgyptian)
     {
-        siegeUnitType1 = cUnitTypeSiegeTower;
+        siegeUnitType1 = cUnitTypeCatapult;
     }
     else if (cMyCulture == cCultureNorse)
     {
-        siegeUnitType1 = cUnitTypePortableRam;
+        siegeUnitType1 = cUnitTypeBallista;
     }
+    else if (cMyCulture == cCultureChinese)
+    {
+        siegeUnitType1 = cUnitTypeSittingTiger;
+    }	
     else if (cMyCulture == cCultureAtlantean)
     {
         if (kbGetAge() < cAge4)
@@ -1324,7 +1377,7 @@ rule makeAtlanteanHeroes
         }
     }
 
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    
     int currentPop = kbGetPop();
     int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
     int numMacemen = kbUnitCount(cMyID, cUnitTypeMaceman, cUnitStateAlive);
@@ -1339,7 +1392,7 @@ rule makeAtlanteanHeroes
     {
         if (numHeroes <= 4)
         {
-            if ((favorSupply < 20) || ((woodSupply < 150) && (numTrees > 14)) || (foodSupply < 150) || (goldSupply < 150))
+            if ((favorSupply < 20) || ((woodSupply < 150) || (foodSupply < 150) || (goldSupply < 150)))
             {
                 aiEcho("not enough resources, returning");
                 return;
@@ -1347,7 +1400,7 @@ rule makeAtlanteanHeroes
         }
         else
         {
-            if ((favorSupply < 30) || ((woodSupply < 350) && (numTrees > 14)) || (foodSupply < 350) || (goldSupply < 350))
+            if ((favorSupply < 30) || ((woodSupply < 350) || (foodSupply < 350) || (goldSupply < 350)))
             {
                 aiEcho("not enough resources, returning");
                 return;
@@ -1452,13 +1505,13 @@ rule makeAtlanteanHeroes
             aiEcho("enabling the makeAtlanteanHeroesFallBack rule");
         }
     }
-    aiEcho("_________________");
+    
 }
 
 //new rule
 //==============================================================================
 rule makeAtlanteanHeroesFallBack
-    minInterval 5 //gets started in makeAtlanteanHeroes rule
+    minInterval 10 //gets started in makeAtlanteanHeroes rule
     inactive
 {
     aiEcho("makeAtlanteanHeroesFallBack:");
@@ -1514,7 +1567,6 @@ rule makeAtlanteanHeroesFallBack
         }
     }
     aiPlanSetDesiredPriority(gDefendPlanID, 20);
-    aiEcho("___________");
     xsDisableSelf();
     
 }
