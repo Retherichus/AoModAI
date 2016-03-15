@@ -7,9 +7,8 @@ extern int gTitanTradeCarts = 13;         // Max trade carts for Titan (+5)
 
 extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, Also affects Hard Difficulty, because it is nice.
 
-extern bool HardFocus = false;    // Please set this to true if you want the AI to focus the player with most units.
+extern bool HardFocus = true;    // Please set this to true if you want the AI to focus the player with most units.
 
-extern bool DisallowPullBack = false;
 // TC stuff
 
 extern int ModdedTCTimer = 25;
@@ -222,7 +221,7 @@ if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSuprema
 // CountEnemyUnitsOnMap
 //==============================================================================
 rule CountEnemyUnitsOnMap
-   minInterval 45
+   minInterval 4
    inactive
 {
    //Units
@@ -272,7 +271,6 @@ rule CountEnemyUnitsOnMap
 		kbUnitQuerySetPlayerID(unitQueryID1, 1);
 		kbUnitQuerySetUnitType(unitQueryID1, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID1, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID1, true);
 			
    }
 if (kbIsPlayerEnemy(1) && kbIsPlayerValid(1))
@@ -291,7 +289,6 @@ if (kbIsPlayerEnemy(1) && kbIsPlayerValid(1))
 		kbUnitQuerySetPlayerID(unitQueryID2, 2);
 		kbUnitQuerySetUnitType(unitQueryID2, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID2, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID2, true);
 			
    }
 if (kbIsPlayerEnemy(2) && kbIsPlayerValid(2))
@@ -310,7 +307,6 @@ if (kbIsPlayerEnemy(2) && kbIsPlayerValid(2))
 		kbUnitQuerySetPlayerID(unitQueryID3, 3);
 		kbUnitQuerySetUnitType(unitQueryID3, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID3, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID3, true);
 			
    }
 if (kbIsPlayerEnemy(3) && kbIsPlayerValid(3))
@@ -330,7 +326,6 @@ int Units3=kbUnitQueryExecute(unitQueryID3);
 		kbUnitQuerySetPlayerID(unitQueryID4, 4);
 		kbUnitQuerySetUnitType(unitQueryID4, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID4, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID4, true);
 			
    }
 if (kbIsPlayerEnemy(4) && kbIsPlayerValid(4))
@@ -349,7 +344,6 @@ int Units4=kbUnitQueryExecute(unitQueryID4);
 		kbUnitQuerySetPlayerID(unitQueryID5, 5);
 		kbUnitQuerySetUnitType(unitQueryID5, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID5, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID5, true);
 			
    }
 if (kbIsPlayerEnemy(5) && kbIsPlayerValid(5))
@@ -368,7 +362,6 @@ int Units5=kbUnitQueryExecute(unitQueryID5);
 		kbUnitQuerySetPlayerID(unitQueryID6, 6);
 		kbUnitQuerySetUnitType(unitQueryID6, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID6, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID6, true);
 			
    }
 if (kbIsPlayerEnemy(6) && kbIsPlayerValid(6))
@@ -387,7 +380,6 @@ int Units6=kbUnitQueryExecute(unitQueryID6);
 		kbUnitQuerySetPlayerID(unitQueryID7, 7);
 		kbUnitQuerySetUnitType(unitQueryID7, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID7, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID7, true);
 			
    }
 if (kbIsPlayerEnemy(7) && kbIsPlayerValid(7))
@@ -406,7 +398,6 @@ int Units7=kbUnitQueryExecute(unitQueryID7);
 		kbUnitQuerySetPlayerID(unitQueryID8, 8);
 		kbUnitQuerySetUnitType(unitQueryID8, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID8, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID8, true);
 			
    }
 if (kbIsPlayerEnemy(8) && kbIsPlayerValid(8))
@@ -425,7 +416,6 @@ int Units8=kbUnitQueryExecute(unitQueryID8);
 		kbUnitQuerySetPlayerID(unitQueryID9, 9);
 		kbUnitQuerySetUnitType(unitQueryID9, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID9, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID9, true);
 			
    }
 if (kbIsPlayerEnemy(9) && kbIsPlayerValid(9))
@@ -444,7 +434,6 @@ int Units9=kbUnitQueryExecute(unitQueryID9);
 		kbUnitQuerySetPlayerID(unitQueryID10, 10);
 		kbUnitQuerySetUnitType(unitQueryID10, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID10, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID10, true);
 			
    }
 if (kbIsPlayerEnemy(10) && kbIsPlayerValid(10))
@@ -463,7 +452,6 @@ int Units10=kbUnitQueryExecute(unitQueryID10);
 		kbUnitQuerySetPlayerID(unitQueryID11, 11);
 		kbUnitQuerySetUnitType(unitQueryID11, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID11, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID11, true);
 			
    }
 if (kbIsPlayerEnemy(11) && kbIsPlayerValid(11))
@@ -482,7 +470,6 @@ int Units11=kbUnitQueryExecute(unitQueryID11);
 		kbUnitQuerySetPlayerID(unitQueryID12, 12);
 		kbUnitQuerySetUnitType(unitQueryID12, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID12, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(unitQueryID12, true);
 			
    }
 if (kbIsPlayerEnemy(12) && kbIsPlayerValid(12))
@@ -503,7 +490,6 @@ int Units12=kbUnitQueryExecute(unitQueryID12);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID1, 1);
 		kbUnitQuerySetUnitType(BuildingunitQueryID1, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID1, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID1, true);
 			
    }
 if (kbIsPlayerEnemy(1) && kbIsPlayerValid(1))
@@ -522,7 +508,6 @@ if (kbIsPlayerEnemy(1) && kbIsPlayerValid(1))
 		kbUnitQuerySetPlayerID(BuildingunitQueryID2, 2);
 		kbUnitQuerySetUnitType(BuildingunitQueryID2, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID2, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID2, true);
 			
    }
 if (kbIsPlayerEnemy(2) && kbIsPlayerValid(2))
@@ -541,7 +526,6 @@ if (kbIsPlayerEnemy(2) && kbIsPlayerValid(2))
 		kbUnitQuerySetPlayerID(BuildingunitQueryID3, 3);
 		kbUnitQuerySetUnitType(BuildingunitQueryID3, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID3, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID3, true);
 			
    }
 if (kbIsPlayerEnemy(3) && kbIsPlayerValid(3))
@@ -561,7 +545,6 @@ int BuildingUnits3=kbUnitQueryExecute(BuildingunitQueryID3);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID4, 4);
 		kbUnitQuerySetUnitType(BuildingunitQueryID4, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID4, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID4, true);
 			
    }
 if (kbIsPlayerEnemy(4) && kbIsPlayerValid(4))
@@ -580,7 +563,6 @@ int BuildingUnits4=kbUnitQueryExecute(BuildingunitQueryID4);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID5, 5);
 		kbUnitQuerySetUnitType(BuildingunitQueryID5, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID5, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID5, true);
 			
    }
 if (kbIsPlayerEnemy(5) && kbIsPlayerValid(5))
@@ -599,7 +581,6 @@ int BuildingUnits5=kbUnitQueryExecute(BuildingunitQueryID5);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID6, 6);
 		kbUnitQuerySetUnitType(BuildingunitQueryID6, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID6, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID6, true);
 			
    }
 if (kbIsPlayerEnemy(6) && kbIsPlayerValid(6))
@@ -618,7 +599,6 @@ int BuildingUnits6=kbUnitQueryExecute(BuildingunitQueryID6);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID7, 7);
 		kbUnitQuerySetUnitType(BuildingunitQueryID7, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID7, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID7, true);
 			
    }
 if (kbIsPlayerEnemy(7) && kbIsPlayerValid(7))
@@ -637,7 +617,6 @@ int BuildingUnits7=kbUnitQueryExecute(BuildingunitQueryID7);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID8, 8);
 		kbUnitQuerySetUnitType(BuildingunitQueryID8, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID8, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID8, true);
 			
    }
 if (kbIsPlayerEnemy(8) && kbIsPlayerValid(8))
@@ -656,7 +635,6 @@ int BuildingUnits8=kbUnitQueryExecute(BuildingunitQueryID8);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID9, 9);
 		kbUnitQuerySetUnitType(BuildingunitQueryID9, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID9, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID9, true);
 			
    }
 if (kbIsPlayerEnemy(9) && kbIsPlayerValid(9))
@@ -675,7 +653,6 @@ int BuildingUnits9=kbUnitQueryExecute(BuildingunitQueryID9);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID10, 10);
 		kbUnitQuerySetUnitType(BuildingunitQueryID10, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID10, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID10, true);
 			
    }
 if (kbIsPlayerEnemy(10) && kbIsPlayerValid(10))
@@ -694,7 +671,6 @@ int BuildingUnits10=kbUnitQueryExecute(BuildingunitQueryID10);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID11, 11);
 		kbUnitQuerySetUnitType(BuildingunitQueryID11, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID11, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID11, true);
 			
    }
 if (kbIsPlayerEnemy(11) && kbIsPlayerValid(11))
@@ -713,7 +689,6 @@ int BuildingUnits11=kbUnitQueryExecute(BuildingunitQueryID11);
 		kbUnitQuerySetPlayerID(BuildingunitQueryID12, 12);
 		kbUnitQuerySetUnitType(BuildingunitQueryID12, cUnitTypeBuilding);
 	        kbUnitQuerySetState(BuildingunitQueryID12, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(BuildingunitQueryID12, true);
 			
    }
 if (kbIsPlayerEnemy(12) && kbIsPlayerValid(12))
@@ -838,70 +813,6 @@ int BuildingUnits12=kbUnitQueryExecute(BuildingunitQueryID12);
    }
 	
 
-	aiEcho("Player: "+HateChoice+" has a total of "+TotalUnits+" units and "+TotalBuildings+" buildings that is visible to me.. MHP set!");
-   xsEnableRule("LockOn");
-   xsDisableSelf();
+	aiEcho("Player: "+HateChoice+" has a total of "+TotalUnits+" units and "+TotalBuildings+" buildings that is visible to me.. I'll focus him!");
+	
 }
-
- //==============================================================================
-// LockOn
-//==============================================================================
-rule LockOn
-   minInterval 46
-   inactive
-{
-int MHP = aiGetMostHatedPlayerID();
-   static int MHPunitQueryID1=-1;
-   static int MHPBuildingMHPunitQueryID1=-1;
-   //Units for Player 1
-   if (MHPunitQueryID1 < 0)
-   MHPunitQueryID1=kbUnitQueryCreate("My Unit Query");
-   
-   //Define a query to get all matching units
-   if (MHPunitQueryID1 != -1)
-   {
-		kbUnitQuerySetPlayerID(MHPunitQueryID1, MHP);
-		kbUnitQuerySetUnitType(MHPunitQueryID1, cUnitTypeLogicalTypeLandMilitary);
-	        kbUnitQuerySetState(MHPunitQueryID1, cUnitStateAlive);
-			kbUnitQuerySetSeeableOnly(MHPunitQueryID1,true);
-			
-   }
-if (kbIsPlayerEnemy(MHP) && kbIsPlayerValid(MHP))
-{
-   kbUnitQueryResetResults(MHPunitQueryID1);
-   
-   int MHPUnits1=kbUnitQueryExecute(MHPunitQueryID1);
-  }
-   /*
-       //BuildingUnits for Player 1
-   if (MHPBuildingMHPunitQueryID1 < 0)
-   MHPBuildingMHPunitQueryID1=kbUnitQueryCreate("My Unit Query");
-   
-   //Define a query to get all matching BuildingUnits
-   if (MHPBuildingMHPunitQueryID1 != -1)
-   {
-		kbUnitQuerySetPlayerID(MHPBuildingMHPunitQueryID1, MHP);
-		kbUnitQuerySetUnitType(MHPBuildingMHPunitQueryID1, cUnitTypeBuilding);
-	        kbUnitQuerySetState(MHPBuildingMHPunitQueryID1, cUnitStateAlive);
-			
-   }
-   if (kbIsPlayerEnemy(MHP) && kbIsPlayerValid(MHP))
-{
-   kbUnitQueryResetResults(MHPBuildingMHPunitQueryID1);
-   int MHPBuildingUnits1=kbUnitQueryExecute(MHPBuildingMHPunitQueryID1);
-  }
-  
-*/  
-   int MHPTotalUnits1 = MHPUnits1;
-   
-   if (MHPTotalUnits1 > 30)
-   aiEcho("Locking on player "+MHP+"!");
-   
-   if (MHPTotalUnits1 < 30)
-   {
-   aiEcho("Player "+MHP+" has less than 30 units or is an invalid target, I will try to find new hate target.");
-   xsEnableRule("CountEnemyUnitsOnMap");
-   xsDisableSelf();
-   return;  
-  }
-  }

@@ -1505,7 +1505,7 @@ rule makeAtlanteanHeroes
             aiEcho("enabling the makeAtlanteanHeroesFallBack rule");
         }
     }
-    
+    aiEcho("_________________");
 }
 
 //new rule
@@ -1567,6 +1567,7 @@ rule makeAtlanteanHeroesFallBack
         }
     }
     aiPlanSetDesiredPriority(gDefendPlanID, 20);
+    aiEcho("___________");
     xsDisableSelf();
     
 }

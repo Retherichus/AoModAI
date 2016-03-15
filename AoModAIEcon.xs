@@ -92,7 +92,7 @@ rule updateWoodBreakdown
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
     int desiredWoodPlans = 2;
-    if (xsGetTime() < 6*60*1000)
+    if (xsGetTime() < 14*60*1000)
         desiredWoodPlans = 1;
     
     if (woodGathererCount < desiredWoodPlans)
@@ -287,7 +287,7 @@ rule updateGoldBreakdown
     int desiredGoldPlans = 2;
     
     int numGoldMinesNearMBInR50 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0);
-    
+    aiEcho(".-.-.-.-.-.-");
     aiEcho("numGoldMinesNearMBInR50: "+numGoldMinesNearMBInR50);
     //override on anatolia
     if (cRandomMapName == "anatolia")
@@ -300,7 +300,7 @@ rule updateGoldBreakdown
         }
     }
     
-    if (xsGetTime() < 10*60*1000)
+    if (kbGetAge() < cAge3)
         desiredGoldPlans = 1;
         
     if (goldGathererCount < desiredGoldPlans)
@@ -310,7 +310,7 @@ rule updateGoldBreakdown
         desiredGoldPlans = numGoldPlans;    // Try to preserve existing plans
 
     aiEcho("desiredGoldPlans: "+desiredGoldPlans);
-
+    aiEcho(".-.-.-.-.-.-");
     
     // Three cases are possible:
     // 1)  We have enough sites at our main base.  All should work in main base.

@@ -58,8 +58,7 @@ void preInitMap()
       (cRandomMapName == "tos_northamerica-v1-1") ||  
       (cRandomMapName == "Yellow River") || 	  
       (cRandomMapName == "vesuvius-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||
-      (cRandomMapName == "river styx") ||
-	  (cRandomMapName == "black sea"))
+      (cRandomMapName == "river styx"))
     {
         // on these maps, the players are on different islands.
         // we therefore have to consider water transport
