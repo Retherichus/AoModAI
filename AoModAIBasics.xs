@@ -56,7 +56,7 @@ extern bool    cvDelayStart = false;
 // DoAutoSaves:  Setting this true will cause the AI to do an auto-save every 3 minutes.  Setting it false
 // will eliminate auto saves.
 // Use only in setParamters()
-extern bool cvDoAutoSaves = true;
+extern bool    cvDoAutoSaves = true;
 
 
 // MaxAge:  Sets the age limit for this player.  Be careful to use cAge1...cAge4 constants, like cvMaxAge = cAge2 to 

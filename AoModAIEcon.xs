@@ -39,21 +39,21 @@ rule updateWoodBreakdown
     //aiEcho("initial woodGathererCount: "+woodGathererCount);
     //aiEcho("wood resource percentage: "+aiGetResourceGathererPercentage(cResourceWood, cRGPActual));
 
-      float woodSupply = kbResourceGet(cResourceWood);
-	  float goldSupply = kbResourceGet(cResourceGold);
-  
-    if ((woodSupply > goldSupply+1000) && (xsGetTime() > 20*60*1000))
+    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    if ((numTrees < 15) && (xsGetTime() > 20*60*1000))
         woodGathererCount = 0;
     
-    
+    float woodSupply = kbResourceGet(cResourceWood);
     bool reducedWoodGathererCount = false;
 
     if (woodGathererCount <= 0) //always some units on wood, unless there are less than 15 trees
     {
+        if ((numTrees > 14) && (kbGetAge() > cAge1))
+        {
             woodGathererCount = 1;
             reducedWoodGathererCount = true;
         }
-    
+    }
     //aiEcho("modified woodGathererCount: "+woodGathererCount);
     
 //Test
@@ -1785,10 +1785,9 @@ rule collectIdleVills
         numberVills = 4;
 
     bool noTrees = false;
-
-	float woodSupply = kbResourceGet(cResourceWood);
-
-    if ((woodSupply > 2500) && (xsGetTime() > 20*60*1000))
+    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    //aiEcho("numTrees: "+numTrees);
+    if ((numTrees < 15) && (xsGetTime() > 20*60*1000))
         noTrees = true;
         
     bool noGoldMines = false;
@@ -2563,7 +2562,7 @@ rule tradeWithCaravans
                             areaType = kbAreaGetType(areaID);
                             if (areaType == cAreaTypeForest)
                             {
-                                int numTreesInR15 = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, areaLocation, 10.0);
+                                int numTreesInR15 = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, areaLocation, 15.0);
                                 if (numTreesInR15 > 15)
                                 {
                                     aiEcho("There are too many trees, skipping area");
