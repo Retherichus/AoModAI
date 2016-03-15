@@ -1640,7 +1640,7 @@ void postInitEcon()
 
 //==============================================================================
 rule fishing
-    minInterval 10 //starts in cAge1
+    minInterval 30 //starts in cAge1
     inactive
 {
     if ((cRandomMapName == "river styx"))
@@ -1722,7 +1722,7 @@ rule fishing
 //==============================================================================
 rule collectIdleVills
 //    minInterval 61 //starts in cAge1
-    minInterval 22 //starts in cAge1
+    minInterval 59 //starts in cAge1
     inactive
 {
     aiEcho("collectIdleVills:");

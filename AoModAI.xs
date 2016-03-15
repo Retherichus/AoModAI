@@ -65,7 +65,7 @@ extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age hand
 
 
 // Trade globals
-extern int gMaxTradeCarts = 40;           // Max trade carts
+extern int gMaxTradeCarts = 20;           // Max trade carts + 5
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -92,7 +92,7 @@ extern int gDefendPlanID = -1;      // Uses military units to defend main base w
 extern int gWonderDefendPlan = -1;     // Uber-plan to defend my wonder
 extern int gEnemyWonderDefendPlan = -1;   // Uber-uber-plan to attack or defend other wonder
 extern int gObeliskClearingPlanID = -1;   // Small attack plan used to remove enemy obelisks
-//extern int gTargetNavySize = 0;     // Set periodically based on difficulty, enemy navy/fish boat count. Units, not pop slots.
+extern int gTargetNavySize = 0;     // Set periodically based on difficulty, enemy navy/fish boat count. Units, not pop slots.
 
 //==============================================================================
 
@@ -391,7 +391,7 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
         aiEcho("increasing startIndex. startIndex is now: "+startIndex);
     }
     
-    if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (15)*60*1000))
+    if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (10 + randNum)*60*1000))
     {
         startIndex = aiRandInt(cNumberPlayers);
         aiEcho("getting new random startIndex. startIndex is now: "+startIndex);
@@ -864,10 +864,6 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
         kbUnitPickSetMaximumPop(upID,(milPop*4)/5);
         kbUnitPickSetMinimumPop(upID,(milPop*3)/5);
     }
-/*
-    aiEcho("Unit picker military minPop: "+kbUnitPickGetMinimumPop(upID));
-    aiEcho("Unit picker military maxPop: "+kbUnitPickGetMaximumPop(upID));
-*/
     
     //Percentages.
     aiSetEconomyPercentage(1.0);
@@ -1077,7 +1073,7 @@ rule updateEMAge3
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-        civPopTarget = 65 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush
+        civPopTarget = 60 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush
         if (getSoftPopCap() > 115)
             civPopTarget = civPopTarget + 0.3 * (getSoftPopCap()-115);
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
@@ -1143,7 +1139,7 @@ rule updateEMAge4
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-      civPopTarget = 70;      // 55 of first 115
+      civPopTarget = 60;      // 55 of first 115
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -1153,7 +1149,8 @@ rule updateEMAge4
          civPopTarget = 35;
       milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.85);   }
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.90);   
+	  }
    else
  {
       int num1 =aiRandInt(3);
@@ -1391,7 +1388,7 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, i, kbGetAICostWeight(i));
     }
 	
-	// Special Treatment for excess gold as requested, thanks StinnerV!
+	// Special Treatment for excess gold as requested, thanks for the suggestion StinnerV!
 	
 if (aiGetWorldDifficulty() > cDifficultyEasy && kbGetAge() > cAge3 && xsGetTime() > 14*60*1000)
    {
@@ -1578,7 +1575,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 
 	
     float neededWoodGatherers = desiredWoodUnits;
-    if (woodSupply > goldSupply+1000)
+    if (woodSupply > goldSupply+2000)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -1741,37 +1738,149 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceWood, aiGetResourceGathererPercentage(cResourceWood, cRGPScript));
     aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood, aiGetResourceGathererPercentage(cResourceFood, cRGPScript));
     aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFavor, aiGetResourceGathererPercentage(cResourceFavor, cRGPScript));
-/*
-    if (kbGetAge() > cAge1)
-    {
-        aiEcho("gold resource percentage: "+aiGetResourceGathererPercentage(cResourceGold, cRGPActual));
-        aiEcho("wood resource percentage: "+aiGetResourceGathererPercentage(cResourceWood, cRGPActual));
-        aiEcho("food resource percentage: "+aiGetResourceGathererPercentage(cResourceFood, cRGPActual));
-        aiEcho("favor resource percentage: "+aiGetResourceGathererPercentage(cResourceFavor, cRGPActual));
-    }
-*/
-aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
+
+	//TELL US
+
+   if (cMyCulture == cCultureAtlantean)
+	  numGatherers = numGatherers * 3;  // Account for pop slots
+	
+	
+  
+
+
+   aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
+	
+}
+
+void addTechForecast(int techID=-1)
+{
+   if (techID < 0)
+	  return;
+   gGoldForecast = gGoldForecast + kbTechCostPerResource(techID, cResourceGold);
+   gWoodForecast = gWoodForecast + kbTechCostPerResource(techID, cResourceWood);
+   gFoodForecast = gFoodForecast + kbTechCostPerResource(techID, cResourceFood);
+}
+
+void addUnitForecast(int unitTypeID=-1, int qty=1)
+{
+   if (unitTypeID < 0)
+	  return;
+   gGoldForecast = gGoldForecast + kbUnitCostPerResource(unitTypeID, cResourceGold)*qty;
+   gWoodForecast = gWoodForecast + kbUnitCostPerResource(unitTypeID, cResourceWood)*qty;
+   gFoodForecast = gFoodForecast + kbUnitCostPerResource(unitTypeID, cResourceFood)*qty;
 }
 
 //==============================================================================
-rule econForecastAge4		// Rule activates when age 4 research begins
-    minInterval 23
-    inactive
-{	
-    static int ageStartTime = -1;
-    
-    if ( (kbGetAge() == cAge3) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) )	// Upgrade failed, revert
-    {
-        aiEcho("Age 4 upgrade failed.");
-        xsDisableSelf();
-        xsEnableRule("econForecastAge3");
-        return;
-    }
-    else if ((kbGetAge() > cAge3) && (ageStartTime == -1))
-        ageStartTime = xsGetTime();
+// setMilitaryUnitCostForecast
+// Checks the current age, looks into the appropriate unit picker,
+// calculates approximate resource needs for the next few (3?) minutes,
+// adds this amount to the global vars.
+//==============================================================================
+void setMilitaryUnitCostForecast(void)
+{
+	int upID = -1;  // ID of the unit picker to query
+	float totalAmount = 0.0;	// Total resources to be spent in near future
+	if (kbGetAge() == cAge2)
+	{
+		upID = gRushUPID;
+		totalAmount = 1200;
+	}
+	if (kbGetAge() == cAge3)
+	{
+		upID = gLateUPID;
+		totalAmount = 3000;
+	}
+	if (kbGetAge() >= cAge4)
+	{
+		upID = gLateUPID;
+		totalAmount = 5000;
+	}
+
+   int origGold = gGoldForecast;
+   int origWood = gWoodForecast;
+   int origFood = gFoodForecast;
+		
+
+   float goldCost = 0.0;
+   float woodCost = 0.0;
+   float foodCost = 0.0;
+   float totalCost = 0.0;
+
+	int unitID = kbUnitPickGetResult( upID, 0); // Primary unit
+	float weight = 1.0;
+   int numUnits = kbUnitPickGetDesiredNumberUnitTypes(upID);
+
+   if (numUnits == 2)
+	  weight = 0.67; // 2/3 and 1/3
+   if (numUnits >= 3)
+	  weight = 0.50; // 1/2, 1/3, 1/6
+   aiEcho("Military Unit Cost Forecast:");
+   aiEcho(" Main unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+   
+   goldCost = kbUnitCostPerResource(unitID, cResourceGold);
+   woodCost = kbUnitCostPerResource(unitID, cResourceWood);
+   foodCost = kbUnitCostPerResource(unitID, cResourceFood);
+   totalCost = goldCost+woodCost+foodCost;
+	
+	gGoldForecast = gGoldForecast + goldCost * (totalAmount*weight/totalCost);
+	gWoodForecast = gWoodForecast + woodCost * (totalAmount*weight/totalCost);
+	gFoodForecast = gFoodForecast + foodCost * (totalAmount*weight/totalCost);
+
+   if (numUnits > 1)
+   {  // Do second unit
+	  unitID = kbUnitPickGetResult(upID, 1);
+	  weight = 0.33;	// Second is 1/3 regardless 
+	  aiEcho("   Secondary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+	  goldCost = kbUnitCostPerResource(unitID, cResourceGold);
+	  woodCost = kbUnitCostPerResource(unitID, cResourceWood);
+	  foodCost = kbUnitCostPerResource(unitID, cResourceFood);
+	  totalCost = goldCost+woodCost+foodCost;
+	   
+	   gGoldForecast = gGoldForecast + goldCost * (totalAmount*weight/totalCost);
+	   gWoodForecast = gWoodForecast + woodCost * (totalAmount*weight/totalCost);
+	   gFoodForecast = gFoodForecast + foodCost * (totalAmount*weight/totalCost);
+   }
+
+   if (numUnits > 2)
+   {  // Do third unit
+	  unitID = kbUnitPickGetResult(upID, 2);
+	  weight = 0.167;   // Third unit, if used, is 1/6
+	  aiEcho("   Tertiary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+	  goldCost = kbUnitCostPerResource(unitID, cResourceGold);
+	  woodCost = kbUnitCostPerResource(unitID, cResourceWood);
+	  foodCost = kbUnitCostPerResource(unitID, cResourceFood);
+	  totalCost = goldCost+woodCost+foodCost;
+	   
+	   gGoldForecast = gGoldForecast + goldCost * (totalAmount*weight/totalCost);
+	   gWoodForecast = gWoodForecast + woodCost * (totalAmount*weight/totalCost);
+	   gFoodForecast = gFoodForecast + foodCost * (totalAmount*weight/totalCost);
+   }
+   aiEcho(" Mil forecast gold: "+(gGoldForecast-origGold)+", wood: "+(gWoodForecast-origWood)+", food: "+(gFoodForecast-origFood));
+}
 
 
-    gGoldForecast = 600;
+
+
+
+
+
+//==============================================================================
+// econForecastAge4
+//==============================================================================
+rule econForecastAge4   // Rule activates when age 4 research begins
+minInterval 11
+inactive
+runImmediately
+{   
+	if ( (kbGetAge() == cAge3) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) )   // Upgrade failed, revert
+	{
+		aiEcho("Age 4 upgrade failed.");
+		xsDisableSelf();
+		xsEnableRule("econForecastAge3Mid");
+		return;
+	}
+	
+	 gGoldForecast = 600;
     gWoodForecast = 600;
     gFoodForecast = 600;
 	
@@ -1843,122 +1952,111 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 	gFoodForecast = TRethLCFAge4+.0 ;
 	gGoldForecast = TRethLCGAge4+.0 ;
 	gWoodForecast = TRethLCWAge4+.0 ;
-    }			
+    }	
+
 	
+	int temp = 0;
+	// Assume all towers built.  Since we don't replace towers, doing a count is dangerous.
 	
+	// tower upgrades
+	if (gBuildTowers == true)
+		// BallistaTower
+		if ( (cMyCulture == cCultureEgyptian) && (kbGetTechStatus(cTechBallistaTower) < cTechStatusResearching) )
+			addTechForecast(cTechBallistaTower);	
+	
+	// villagers
+	temp = aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0);  // How many we want
+	temp = temp - 1;	// Assume 1 in production
+	temp = temp - kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);   // Number of villagers we have, including dwarves
+	temp = temp + kbUnitCount(cMyID, cUnitTypeDwarf, cUnitStateAlive);  // Makes up for counting dwarves toward our villager total
+	if (temp > 12)
+		temp = 12;  // Just 3 minutes worth, please.
+   if (temp < 0)
+	  temp = 0;
+	addUnitForecast(aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanUnitType, 0), temp);
+	
+	// Farms...assume we need to have 1 farm per food gatherer
+	if (gFarming == true)
+	{
+		float foodGatherersWanted = aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood);   // Percent food gatherers
+		foodGatherersWanted = foodGatherersWanted * kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive); // Actual count
+		temp = foodGatherersWanted - kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding);
+		if (temp < 0)
+			temp = 0;
+	  if (temp > 8 )
+		 temp = 8;  // more than we'll build in 3 minutes
 
-    float goldSupply = kbResourceGet(cResourceGold);
-    float woodSupply = kbResourceGet(cResourceWood);
-    float foodSupply = kbResourceGet(cResourceFood);
-    float favorSupply = kbResourceGet(cResourceFavor);
-    
-    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 7*60*1000))
-    {
-            if (foodSupply < 1400)
-                gFoodForecast = gFoodForecast + (1400 - foodSupply);
-            if (woodSupply < 1200)
-                gWoodForecast = gWoodForecast + (1200 - woodSupply);
-            if (goldSupply < 1400)
-                gGoldForecast = gGoldForecast + (1400 - goldSupply);
-    }
-    else
-    {
-        if (goldSupply < 500)
-            gGoldForecast = gGoldForecast + (500 - goldSupply);
-        if (woodSupply < 500)
-            gWoodForecast = gWoodForecast + (500 - woodSupply);
-        if (foodSupply < 500)
-            gFoodForecast = gFoodForecast + (500 - foodSupply);
-    }
+		if (temp > 0)
+			addUnitForecast(cUnitTypeFarm, temp);
+	}
+	
+	// Market
+	if (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) < 2)
+		addUnitForecast(cUnitTypeMarket, 1);
+	
+  
+   int myShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+   temp = gTargetNavySize - myShips;   // How many yet to train
+   if (temp < 0)
+      temp = 0;
+   if (temp > 0)
+   {
+      gWoodForecast = gWoodForecast + 100*temp;
+      gGoldForecast = gGoldForecast + 50*temp;
+   }
 
-    // Fortified TC
-    if (kbGetTechStatus(cTechFortifyTownCenter) < cTechStatusResearching) 
-    {
-        if (woodSupply < 700)
-            gWoodForecast = gWoodForecast + (700 - woodSupply);
-        if (goldSupply < 700)
-            gGoldForecast = gGoldForecast + (700 - goldSupply);
-    }
-    
-    // Settlements
-    if ((kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 3))
-    {
-        if (woodSupply < 500)
-            gWoodForecast = gWoodForecast + (500 - woodSupply);
-        if (goldSupply < 500)
-            gGoldForecast = gGoldForecast + (500 - goldSupply);
-        if (foodSupply < 200)
-            gFoodForecast = gFoodForecast + (200 - foodSupply);
-    }
-    
-    if (gFarming == true)
-    {
-        if (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) < 20)
-        {
-            if (cMyCulture == cCultureEgyptian)
-            {
-                if (goldSupply < 300)
-                    gGoldForecast = gGoldForecast + (300 - goldSupply);
-            }
-            else
-            {
-                if (woodSupply < 300)
-                    gWoodForecast = gWoodForecast + (300 - woodSupply);
-            }
-        }
-    }
-    
-    if (gTransportMap == true)
-    {
-        if (woodSupply < 300)
-            gWoodForecast = gWoodForecast + (300 - woodSupply);
-    }
 
-    
-    if (woodSupply > 1700)
-        gWoodForecast = gWoodForecast * 0.5;
-    else if (woodSupply > 1600)
-        gWoodForecast = gWoodForecast * 0.6;
-    else if (woodSupply > 1500)
-        gWoodForecast = gWoodForecast * 0.7;
-    else if (woodSupply > 1400)
-        gWoodForecast = gWoodForecast * 0.8;
-    else if (woodSupply > 1300)
-        gWoodForecast = gWoodForecast * 0.9;
-    
-
-    
-    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
-    updateGathererRatios();
+	// Fortress, etc.
+	int bigBuildingID = cUnitTypeMigdolStronghold;
+	if (cMyCulture == cCultureGreek)
+		bigBuildingID = cUnitTypeFortress;
+	if (cMyCulture == cCultureNorse)
+		bigBuildingID = cUnitTypeHillFort;
+	if(cMyCulture == cCultureChinese)
+		bigBuildingID = cUnitTypeCastle;
+	if (kbUnitCount(cMyID, bigBuildingID, cUnitStateAliveOrBuilding) < 1) 
+	  addUnitForecast(bigBuildingID, 1);
+   
+	setMilitaryUnitCostForecast();   // Get the estimate of military needs
+		
+	aiEcho("Age 4 Forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+	updateGathererRatios();
 }
 
-//==============================================================================
-rule econForecastAge3		// Rule activates when age3 research begins, turns off when age 4 research begins
-    minInterval 15
-    inactive
-{
-    static int ageStartTime = -1;
-    
-    if (kbGetTechStatus(gAge4MinorGod) >=  cTechStatusResearching)	// On our way to age 4, hand off...
-    {
-        xsEnableRule("econForecastAge4");
-        econForecastAge4();
-        xsDisableSelf();
-        return;		// We're done
-    }
-    else if ((kbGetAge() == cAge2) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))	// Upgrade failed, revert
-    {
-        aiEcho("Age 3 upgrade failed.");
-        xsDisableSelf();
-        xsEnableRule("econForecastAge2");
-        return;
-    }
-    else if ((kbGetAge() == cAge3) && (ageStartTime == -1))
-        ageStartTime = xsGetTime();
 
-    aiEcho("age 3 start time: "+ageStartTime);
-    
-    gGoldForecast = 500;
+
+//==============================================================================
+// econForecastAge3Mid
+//==============================================================================
+rule econForecastAge3Mid		// Rule activates when 2 minutes into age 3, turns off when age 4 research begins
+minInterval 11
+inactive
+runImmediately
+{
+	if ( kbGetTechStatus(gAge4MinorGod) >=  cTechStatusResearching )	// On our way to age 4, hand off...
+	{
+		xsEnableRule("econForecastAge4");
+		econForecastAge4();
+		xsDisableSelf();
+		return;  // We're done
+	}
+	
+	gGoldForecast = 0.0;
+	gWoodForecast = 0.0;
+	gFoodForecast = 0.0;
+	
+	/*
+	Baseline assumptions...assumes we'll need the following:
+	  1 more normal military building
+	  300f, 200w, 500g for generic upgrades
+	  4 more outposts (Egypt)
+	  1 more dropsite (greek) 
+	  Upgrade to age 4.
+	  1 Settlement 
+	  (Villagers, fish boats, trade carts, farms, towers and military units will be counted below.)
+	*/
+	
+	gGoldForecast = 500;
     gWoodForecast = 500;
     gFoodForecast = 500;
 	
@@ -2030,169 +2128,309 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 	gFoodForecast = TRethLCFAge3+.0 ;
 	gGoldForecast = TRethLCGAge3+.0 ;
 	gWoodForecast = TRethLCWAge3+.0 ;
-    }						
+    }		
 	
-    float goldSupply = kbResourceGet(cResourceGold);
-    float woodSupply = kbResourceGet(cResourceWood);
-    float foodSupply = kbResourceGet(cResourceFood);
-    float favorSupply = kbResourceGet(cResourceFavor);
-    
-    if (((ageStartTime != -1) && (xsGetTime() - ageStartTime > 8*60*1000)) || (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) > 0))
-    {
-        if (goldSupply < 1500)
-            gGoldForecast = gGoldForecast + (1500 - goldSupply);
-        if (foodSupply < 1500)
-            gFoodForecast = gFoodForecast + (1500 - foodSupply);
-        if (woodSupply < 550)
-            gWoodForecast = gWoodForecast + (550 - woodSupply);
-    }
-    else
-    {
-        if (goldSupply < 350)
-            gGoldForecast = gGoldForecast + (350 - goldSupply);
-        if (foodSupply < 350)
-            gFoodForecast = gFoodForecast + (350 - foodSupply);
-        if (woodSupply < 500)
-            gWoodForecast = gWoodForecast + (500 - woodSupply);
-    }
-    
-    
-    // Market
-    if (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) < 1)
-    {
-        if (woodSupply < 500)
-            gWoodForecast = gWoodForecast + (500 - woodSupply);
-    }
+	int temp = 0;
 
-    // Fortress, etc.
-    if (kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding) < 1)
-    {
-        if (goldSupply < 600)
-            gGoldForecast = gGoldForecast + (600 - goldSupply);
-        if ((woodSupply < 600) && (cMyCulture != cCultureEgyptian))
-            gWoodForecast = gWoodForecast + (600 - woodSupply);
-    }    
 
-    // Fortified TC
-    if (kbGetTechStatus(cTechFortifyTownCenter) < cTechStatusResearching) 
-    {
-        if (woodSupply < 700)
-            gWoodForecast = gWoodForecast + (700 - woodSupply);
-        if (goldSupply < 700)
-            gGoldForecast = gGoldForecast + (700 - goldSupply);
-    }
-    
-    // Settlements
-    if ((kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 3))
-    {
-        if (woodSupply < 500)
-            gWoodForecast = gWoodForecast + (500 - woodSupply);
-        if (goldSupply < 500)
-            gGoldForecast = gGoldForecast + (500 - goldSupply);
-        if (foodSupply < 200)
-            gFoodForecast = gFoodForecast + (200 - foodSupply);
-    }
-    
-    if ((cMyCulture != cCultureNorse) && (kbGetTechStatus(cTechGuardTower) < cTechStatusResearching))
-    {
-        if (woodSupply < 500)
-            gWoodForecast = gWoodForecast + (500 - woodSupply);
-        if (goldSupply < 500)
-            gGoldForecast = gGoldForecast + (500 - goldSupply);
-    }
 
-    if (gFarming == true)
-    {
-        if (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) < 20)
-        {
-            if (cMyCulture == cCultureEgyptian)
-            {
-                if (goldSupply < 300)
-                    gGoldForecast = gGoldForecast + (300 - goldSupply);
-            }
-            else
-            {
-//                if (woodSupply < 300)
-                if (woodSupply < 400)
-//                    gWoodForecast = gWoodForecast + (300 - woodSupply);
-                    gWoodForecast = gWoodForecast + (400 - woodSupply);
-            }
-        }
-    }
-    
-    if (gTransportMap == true)
-    {
-        if (woodSupply < 300)
-            gWoodForecast = gWoodForecast + (300 - woodSupply);
-    }
-    
+   // Fortified TC
+   if ( kbGetTechStatus(cTechFortifyTownCenter) < cTechStatusResearching) 
+	  addTechForecast(cTechFortifyTownCenter);
 
-    if (woodSupply > 1100)
-        gWoodForecast = gWoodForecast * 0.5;
-    else if (woodSupply > 1000)
-        gWoodForecast = gWoodForecast * 0.6;
-    else if (woodSupply > 900)
-        gWoodForecast = gWoodForecast * 0.7;
-    else if (woodSupply > 800)
-        gWoodForecast = gWoodForecast * 0.8;
-    else if (woodSupply > 700)
-        gWoodForecast = gWoodForecast * 0.9;
-        
-    if (goldSupply > 2000)
-        gGoldForecast = gGoldForecast * 0.5;
-    else if (goldSupply > 1900)
-        gGoldForecast = gGoldForecast * 0.6;
-    else if (goldSupply > 1800)
-        gGoldForecast = gGoldForecast * 0.7;
-    else if (goldSupply > 1700)
-        gGoldForecast = gGoldForecast * 0.8;
-    else if (goldSupply > 1600)
-        gGoldForecast = gGoldForecast * 0.9;
-        
-    if (foodSupply > 2000)
-        gFoodForecast = gFoodForecast * 0.5;
-    else if (foodSupply > 1900)
-        gFoodForecast = gFoodForecast * 0.6;
-    else if (foodSupply > 1800)
-        gFoodForecast = gFoodForecast * 0.7;
-    else if (foodSupply > 1700)
-        gFoodForecast = gFoodForecast * 0.8;
-    else if (foodSupply > 1600)
-        gFoodForecast = gFoodForecast * 0.9;
+	// towers
+	temp = 0;
+	if (gTargetNumTowers > 0)
+		temp = (4 + gTargetNumTowers) - kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
+	if (temp < 0)
+		temp = 0;
+   if (temp > 0)
+	  addUnitForecast(cUnitTypeTower, temp);
+ 
+	// tower upgrades
+	if (gBuildTowers == true)
+	{
+		// GuardTower
+		if ( (cMyCulture != cCultureNorse) &&(kbGetTechStatus(cTechGuardTower) < cTechStatusResearching) )
+		{
+			addTechForecast(cTechGuardTower);   
+		}
+		// Carrier Pigeons
+		if ( kbGetTechStatus(cTechCarrierPigeons) < cTechStatusResearching)
+		{
+		 addTechForecast(cTechCarrierPigeons);
+		}
+		// Boiling Oil
+		if ( kbGetTechStatus(cTechBoilingOil) < cTechStatusResearching)
+		{
+		 addTechForecast(cTechBoilingOil);
+		}
+	}
 	
-    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
-    updateGathererRatios();
+	// villagers
+	temp = aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0);  // How many we want
+	temp = temp - 1;	// Assume 1 in production
+	temp = temp - kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);   // Number of villagers we have, including dwarves
+	temp = temp + kbUnitCount(cMyID, cUnitTypeDwarf, cUnitStateAlive);  // Makes up for counting dwarves toward our villager total
+	if (temp > 12)
+		temp = 12;  // Just 3 minutes worth, please.
+   if (cMyCulture == cCultureAtlantean)
+	  if (temp > 4)
+		 temp = 4;
+	addUnitForecast(aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanUnitType, 0), temp);
+	
+	// Farms...assume we need to have 1 farm per food gatherer
+	if (gFarming == true)
+	{
+		float foodGatherersWanted = aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood);   // Percent food gatherers
+		foodGatherersWanted = foodGatherersWanted * kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive); // Actual count
+		temp = foodGatherersWanted - kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding);
+		if (temp < 0)
+			temp = 0;
+	  if (temp > 8 )
+		 temp = 8;  // more than we'll build in 3 minutes
+
+		if (temp > 0)
+		 addUnitForecast(cUnitTypeFarm, temp);
+	}
+	
+
+
+	// Market
+	if (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) < 1)
+	{
+	  addUnitForecast(cUnitTypeMarket, 1);
+	}
+	
+   int myShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+   temp = gTargetNavySize - myShips;   // How many yet to train
+   if (temp < 0)
+      temp = 0;
+   if (temp > 0)
+   {
+      gWoodForecast = gWoodForecast + 100*temp;
+      gGoldForecast = gGoldForecast + 50*temp;
+   }
+
+	// Fortress, etc.
+	int bigBuildingID = cUnitTypeMigdolStronghold;
+	if (cMyCulture == cCultureGreek)
+		bigBuildingID = cUnitTypeFortress;
+	if (cMyCulture == cCultureNorse)
+		bigBuildingID = cUnitTypeHillFort;
+	if(cMyCulture == cCultureChinese)
+		bigBuildingID = cUnitTypeCastle;
+	if (kbUnitCount(cMyID, bigBuildingID, cUnitStateAliveOrBuilding) < 1) 
+	  addUnitForecast(bigBuildingID, 1);
+	
+	setMilitaryUnitCostForecast();  
+	
+	aiEcho("Age 3 (mid) Forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+	updateGathererRatios();
 }
 
-//==============================================================================
-rule econForecastAge2		// Rule activates when age 2 research begins, turns off when age 3 research begins
-    minInterval 15
-    inactive
-{
-    static int ageStartTime = -1;
-   
-    if (kbGetTechStatus(gAge3MinorGod) >= cTechStatusResearching) 	// On our way to age 3, hand off...
-    {
-        xsEnableRule("econForecastAge3");
-        econForecastAge3();
-        xsDisableSelf();
-        return;		// We're done
-    }
-    else if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching))	// Upgrade failed, revert
-    {
-        aiEcho("Age 2 upgrade failed.");
-        xsDisableSelf();
-        xsEnableRule("econForecastAge1");
-        return;
-    }
-    else if ((kbGetAge() == cAge2) && (ageStartTime == -1))
-        ageStartTime = xsGetTime();
 
-    aiEcho("age 2 start time: "+ageStartTime);
-    
-    // If we've made it here, we're in age 2 (or researching it)
-    
-    gGoldForecast = 400;
+
+
+//==============================================================================
+// econForecastAge3Early
+//==============================================================================
+rule econForecastAge3Early  // Rule activates when age2 research begins, turns off when we've been in age 2 for 2 minutes
+minInterval 11
+inactive
+runImmediately
+{
+	static int  ageStartTime = -1;
+	
+	if ( (kbGetAge() == cAge2) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) )   // Upgrade failed, revert
+	{
+		//aiEcho("Age 3 upgrade failed.");
+		xsDisableSelf();
+		xsEnableRule("econForecastAge2Mid");
+		return;
+	}
+	
+	if ( (kbGetAge() >= cAge3) && (ageStartTime == -1))
+		ageStartTime = xsGetTime();
+		
+	if ( (kbGetAge() >= cAge3) && ((xsGetTime() - ageStartTime) > 120000) ) // more than 2 minutes in second age?
+	{
+		//aiEcho("Enabling econForecastAge3Mid.");
+		xsEnableRule("econForecastAge3Mid");
+		econForecastAge3Mid();
+		xsDisableSelf();
+		return;  // We're done
+	}
+	
+	// If we've made it here, we're in researching age 3, or we're in the first
+	// 2 minutes of age 3.  Let's see what we need.
+		
+	gGoldForecast = 0.0;
+	gWoodForecast = 0.0;
+	gFoodForecast = 0.0;	 
+	
+	/*
+	Baseline assumptions...assumes we'll need the following:
+	  3 more normal military buildings
+	  300f, 200w, 400g for generic upgrades
+	  4 more outposts (Egypt)
+	  1 more dropsite (greek)
+	  A market and a fortress/hill fort/migdol fortress
+	  Fortified TC upgrade or a settlement
+	 Milk Stones for Atlanteans
+	  (Villagers, fish boats, trade carts, farms, towers and military units will be counted below.)
+	*/
+	if (cMyCulture == cCultureEgyptian)
+	{
+		gGoldForecast = 1485;
+		gWoodForecast = 800;
+		gFoodForecast = 300;
+	}
+	if (cMyCulture == cCultureNorse)
+	{
+		gGoldForecast = 1000;
+		gWoodForecast = 1310;
+		gFoodForecast = 300;
+	}
+	if (cMyCulture == cCultureGreek)
+	{
+		gGoldForecast = 1100;
+		gWoodForecast = 1600;
+		gFoodForecast = 300;
+	}
+	if (cMyCulture == cCultureAtlantean)
+	{
+		gGoldForecast = 1325;
+		gWoodForecast = 1575;
+		gFoodForecast = 400;
+	}   
+	else if(cMyCulture == cCultureChinese)
+	{
+		gGoldForecast = 1325;
+		gWoodForecast = 1575;
+		gFoodForecast = 400; 
+	}
+	int temp = 0;
+	
+	// towers
+	temp = 0;
+	if (gTargetNumTowers > 0)
+		temp = (4 + gTargetNumTowers) - kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
+	if (temp < 0)
+		temp = 0;
+   if (temp>0)
+	  addUnitForecast(cUnitTypeTower, temp);
+
+	// tower upgrades
+	if (gBuildTowers == true)
+	{
+		// GuardTower
+		if ( (cMyCulture != cCultureNorse) &&(kbGetTechStatus(cTechGuardTower) < cTechStatusResearching) )
+		 addTechForecast(cTechGuardTower);  
+
+		// Carrier Pigeons
+		if ( kbGetTechStatus(cTechCarrierPigeons) < cTechStatusResearching)
+		 addTechForecast(cTechCarrierPigeons);
+
+		// Boiling Oil
+		if ( kbGetTechStatus(cTechBoilingOil) < cTechStatusResearching)
+		 addTechForecast(cTechBoilingOil);
+	}
+		
+	// villagers
+	temp = aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0);  // How many we want
+	temp = temp - 1;	// Assume 1 in production
+	temp = temp - kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);   // Number of villagers we need, ignoring dwarves
+	temp = temp + kbUnitCount(cMyID, cUnitTypeDwarf, cUnitStateAlive);  // Makes up for counting dwarves toward our villager total
+	if (cMyCulture != cCultureAtlantean)
+   {
+	  if (temp > 12)
+		temp = 12;  // Just 3 minutes worth, please.
+   }
+   else
+	  if (temp > 4)
+		 temp = 4;
+   
+	if (cMyCulture != cCultureAtlantean)
+   {
+	if (temp < 8)
+		   temp = 8;		// In transition, we won't have the age 2 villie target, so assume at least 8 more.
+   }
+   else
+	  if (temp < 3)
+		 temp = 3;
+	addUnitForecast(aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanUnitType, 0), temp);
+
+
+   int myShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+   temp = gTargetNavySize - myShips;   // How many yet to train
+   if (temp < 0)
+      temp = 0;
+   if (temp > 0)
+   {
+      gWoodForecast = gWoodForecast + 100*temp;
+      gGoldForecast = gGoldForecast + 50*temp;
+   }
+	// Farms...assume we need to have 1 farm per food gatherer
+	if (gFarming == true)
+	{
+		float foodGatherersWanted = aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood);   // Percent food gatherers
+		foodGatherersWanted = foodGatherersWanted * kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive); // Actual count
+		temp = foodGatherersWanted - kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding);
+		if (temp < 0)
+			temp = 0;
+	  if (temp > 8 )
+		 temp = 8;  // more than we'll build in 3 minutes
+
+		if (temp > 0)
+		 addUnitForecast(cUnitTypeFarm, temp);
+	}
+   // 1 Settlement for atlanteans
+   if ((cMyCulture == cCultureAtlantean) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) <= 3))
+	  addUnitForecast(cUnitTypeSettlementLevel1, 1);
+
+	setMilitaryUnitCostForecast();  
+	aiEcho("Age 3 (early) forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+
+	updateGathererRatios();
+}
+
+
+
+//==============================================================================
+// econForecastAge2Mid
+//==============================================================================
+rule econForecastAge2Mid		// Rule activates when 2 minutes into age 2, turns off when age 3 research begins
+minInterval 11
+inactive
+runImmediately
+{
+	if ( kbGetTechStatus(gAge3MinorGod) >=  cTechStatusResearching)  // On our way to age 3, hand off...
+	{
+		//aiEcho("Enabling econForecastAge3Early.");
+		xsEnableRule("econForecastAge3Early");
+		econForecastAge3Early();
+		xsDisableSelf();
+		return;  // We're done
+	}
+	
+	// If we've made it here, we're in mid age 2.
+	
+	gGoldForecast = 0.0;
+	gWoodForecast = 0.0;
+	gFoodForecast = 0.0;
+	
+	/*
+	Baseline assumptions...assumes we'll need the following:
+	  2 more houses
+	  1 more normal military building
+	  200f, 100w, 300g for generic upgrades
+	  4 more outposts (Egypt)
+	  2 more dropsites (greek) or 1 (norse)
+	  Upgrade to age 3.
+	  (Villagers, fish boats, trade carts, farms, towers and military units will be counted below.)
+	*/
+	gGoldForecast = 400;
     gWoodForecast = 400;
     gFoodForecast = 400;
 	
@@ -2265,178 +2503,314 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 	gGoldForecast = TRethLCGAge2+.0 ;
 	gWoodForecast = TRethLCWAge2+.0 ;
     }	
+	
+	int temp = 0;
 
-    float goldSupply = kbResourceGet(cResourceGold);
-    float woodSupply = kbResourceGet(cResourceWood);
-    float foodSupply = kbResourceGet(cResourceFood);
-    
-    int numArmories = -1;
-    if (cMyCiv == cCivThor)
-        numArmories = kbUnitCount(cMyID, cUnitTypeDwarfFoundry, cUnitStateAliveOrBuilding);
-    else
-        numArmories = kbUnitCount(cMyID, cUnitTypeArmory, cUnitStateAliveOrBuilding);
+	// towers
+	temp = 0;
+	if (gTargetNumTowers > 0)
+		temp = (4 + gTargetNumTowers/2) - kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
+	if (temp < 0)
+		temp = 0;
+   if (temp > 0)
+	  addUnitForecast(cUnitTypeTower, temp);
 
-    if (numArmories < 1)
-    {
-        if (woodSupply < 300)
-            gWoodForecast = gWoodForecast + (300 - woodSupply);
-    }
-    
-    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 7*60*1000) && (numArmories > 0))
-    {
-        if (goldSupply < 800)
-            gGoldForecast = gGoldForecast + (800 - goldSupply);
-        if (foodSupply < 1200)
-            gFoodForecast = gFoodForecast + (1200 - foodSupply);
-        if (woodSupply < 500)
-            gWoodForecast = gWoodForecast + (500 - woodSupply);
-    }
-    else
-    {
-        if (goldSupply < 300)
-            gGoldForecast = gGoldForecast + (300 - goldSupply);
-        if (foodSupply < 300)
-            gFoodForecast = gFoodForecast + (300 - foodSupply);
-        if (woodSupply < 450)
-            gWoodForecast = gWoodForecast + (450 - woodSupply);
-    }
-        
+	// tower upgrades
+	if (gBuildTowers == true)
+	{
+		// Watchtower
+		if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) <= cTechStatusResearching))
+		 addTechForecast(cTechWatchTower);
 
-    // first tower upgrade
-    if (gBuildTowers == true)
-    {
-        // Watchtower
-        if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching))
-        {
-            if (woodSupply < 400)
-                gWoodForecast = gWoodForecast + (400 - woodSupply);
-            if (goldSupply < 200)
-                gGoldForecast = gGoldForecast + (200 - goldSupply);
-        }
-    }
-    
-    // Settlements
-    int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, cMyID);  // Settlements paid for
-    int temp = gEarlySettlementTarget - numberSettlements;       // To be paid for
-    if (temp < 0)
-        temp = 0;
-    if (temp > 0)
-    {
-        if (woodSupply < 500)
-            gWoodForecast = gWoodForecast + (500 - woodSupply);
-        if (goldSupply < 500)
-            gGoldForecast = gGoldForecast + (500 - goldSupply);
-        if (foodSupply < 200)
-            gFoodForecast = gFoodForecast + (200 - foodSupply);
-    }
+		// Crenallations
+		if ( kbGetTechStatus(cTechCrenellations) < cTechStatusResearching)
+		 addTechForecast(cTechCrenellations);
 
-    // plow
-    if ((kbGetTechStatus(cTechPlow) < cTechStatusResearching) && (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) > 0))
-    {
-        if (woodSupply < 200)
-            gWoodForecast = gWoodForecast + (200 - woodSupply);
-        if (goldSupply < 100)
-            gGoldForecast = gGoldForecast + (100 - goldSupply);
-    }
+		// Signal Fires
+		if ( kbGetTechStatus(cTechSignalFires) < cTechStatusResearching)
+		 addTechForecast(cTechSignalFires);
+	}
 
-    if (gFarming == true)
-    {
-        if (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) < 20)
-        {
-            if (cMyCulture == cCultureEgyptian)
-            {
-                if (goldSupply < 300)
-                    gGoldForecast = gGoldForecast + (300 - goldSupply);
-            }
-            else
-            {
-//                if (woodSupply < 300)
-                if (woodSupply < 400)
-//                    gWoodForecast = gWoodForecast + (300 - woodSupply);
-                    gWoodForecast = gWoodForecast + (400 - woodSupply);
-            }
-        }
-    }
-    
-    // military buildings
-    if (cMyCulture == cCultureNorse)
-    {
-        if (kbUnitCount(cMyID, cUnitTypeLonghouse, cUnitStateAliveOrBuilding) < 2)
-        {
-            if (woodSupply < 300)
-                gWoodForecast = gWoodForecast + (300 - woodSupply);
-        }
-    }
-    else if (cMyCulture == cCultureEgyptian)
-    {
-        if (kbUnitCount(cMyID, cUnitTypeBarracks, cUnitStateAliveOrBuilding) < 2)
-        {
-            if (woodSupply < 300)
-                gWoodForecast = gWoodForecast + (300 - woodSupply);
-        }
-    }
-    else if (cMyCulture == cCultureGreek)
-    {
-        if ((kbUnitCount(cMyID, cUnitTypeArcheryRange, cUnitStateAliveOrBuilding) < 1) 
-         || (kbUnitCount(cMyID, cUnitTypeAcademy, cUnitStateAliveOrBuilding) < 1)
-         || (kbUnitCount(cMyID, cUnitTypeStable, cUnitStateAliveOrBuilding) < 1))
-        {
-            if (woodSupply < 300)
-                gWoodForecast = gWoodForecast + (300 - woodSupply);
-        }
-    }
-    else if (cMyCulture == cCultureAtlantean)
-    {
-        if ((kbUnitCount(cMyID, cUnitTypeBarracksAtlantean, cUnitStateAliveOrBuilding) < 1)
-         || (kbUnitCount(cMyID, cUnitTypeCounterBuilding, cUnitStateAliveOrBuilding) < 1))
-        {
-            if (woodSupply < 300)
-                gWoodForecast = gWoodForecast + (300 - woodSupply);
-        }
-    }
-    
-    if (gTransportMap == true)
-    {
-        if (woodSupply < 300)
-            gWoodForecast = gWoodForecast + (300 - woodSupply);
-    }    
+   int myShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+   temp = gTargetNavySize - myShips;   // How many yet to train
+   if (temp < 0)
+      temp = 0;
+   if (temp > 0)
+   {
+      gWoodForecast = gWoodForecast + 100*temp;
+      gGoldForecast = gGoldForecast + 50*temp;
+   }	
+   // Settlements
+   int numberSettlements=getNumberUnits(cUnitTypeAbstractSettlement, cMyID, cUnitStateAliveOrBuilding);  // Settlements paid for
+   temp = gEarlySettlementTarget - numberSettlements;   // To be paid for
+   if (temp < 0)
+	  temp = 0;
+   if (temp > 0)
+	  addUnitForecast(cUnitTypeSettlementLevel1, temp);
+   aiEcho("Adding forecast for "+temp+" early settlements.");
+	// outposts
+	if (cMyCulture == cCultureEgyptian)
+	{
+		temp = 10 - kbUnitCount(cMyID, cUnitTypeOutpost, cUnitStateAliveOrBuilding);
+		if (temp > 0)
+		 addUnitForecast(cUnitTypeOutpost, temp);
+	}   
 
 
-    if (woodSupply > 1000)
-        gWoodForecast = gWoodForecast * 0.5;
-    else if (woodSupply > 900)
-        gWoodForecast = gWoodForecast * 0.6;
-    else if (woodSupply > 800)
-        gWoodForecast = gWoodForecast * 0.7;
-    else if (woodSupply > 700)
-        gWoodForecast = gWoodForecast * 0.8;
-    else if (woodSupply > 600)
-        gWoodForecast = gWoodForecast * 0.9;
-        
-    if (goldSupply > 1300)
-        gGoldForecast = gGoldForecast * 0.5;
-    else if (goldSupply > 1200)
-        gGoldForecast = gGoldForecast * 0.6;
-    else if (goldSupply > 1100)
-        gGoldForecast = gGoldForecast * 0.7;
-    else if (goldSupply > 1000)
-        gGoldForecast = gGoldForecast * 0.8;
-    else if (goldSupply > 900)
-        gGoldForecast = gGoldForecast * 0.9;
-        
-    if (foodSupply > 1700)
-        gFoodForecast = gFoodForecast * 0.5;
-    else if (foodSupply > 1600)
-        gFoodForecast = gFoodForecast * 0.6;
-    else if (foodSupply > 1500)
-        gFoodForecast = gFoodForecast * 0.7;
-    else if (foodSupply > 1400)
-        gFoodForecast = gFoodForecast * 0.8;
-    else if (foodSupply > 1300)
-        gFoodForecast = gFoodForecast * 0.9;
+	
+	// villagers
+	temp = aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0);  // How many we want
+	temp = temp - 1;	// Assume 1 in production
+	temp = temp - kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);   // Number of villagers we have, including dwarves
+	temp = temp + kbUnitCount(cMyID, cUnitTypeDwarf, cUnitStateAlive);  // Makes up for counting dwarves toward our villager total
+	if (temp > 12)
+		temp = 12;  // Just 3 minutes worth, please.
+   if (cMyCulture == cCultureAtlantean)
+	  if (temp > 4)
+		 temp = 4;
+	addUnitForecast(aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanUnitType, 0), temp);
+	
+	// Farms...assume we need to have 1 farm per food gatherer
+	if (gFarming == true)
+	{
+		float foodGatherersWanted = aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood);   // Percent food gatherers
+		foodGatherersWanted = foodGatherersWanted * kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive); // Actual count
+		temp = foodGatherersWanted - kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding);
+		if (temp < 0)
+			temp = 0;
+	  if (temp > 8 )
+		 temp = 8;  // more than we'll build in 3 minutes
 
-    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
-    updateGathererRatios();
+		if (temp > 0)
+		 addUnitForecast(cUnitTypeFarm, temp);
+	}   
+   // 1 Settlement for atlanteans
+   if ((cMyCulture == cCultureAtlantean) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) <= 3))
+	  addUnitForecast(cUnitTypeSettlementLevel1, 1);
+
+	setMilitaryUnitCostForecast();  
+	
+	aiEcho("Age 2 (mid) forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+	updateGathererRatios();
+}
+
+
+
+
+
+//==============================================================================
+// econForecastAge2Early
+//==============================================================================
+rule econForecastAge2Early  // Rule activates when age2 research begins, turns off when we've been in age 2 for 2 minutes
+minInterval 11
+inactive
+runImmediately
+{
+	static int  ageStartTime = -1;
+	
+	if ( (kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) )   // Upgrade failed, revert
+	{
+		//aiEcho("Age 2 upgrade failed.");
+		xsDisableSelf();
+		xsEnableRule("econForecastAge1Mid");
+		return;
+	}
+	
+	if ( (kbGetAge() >= cAge2) && (ageStartTime == -1))
+		ageStartTime = xsGetTime();
+		
+	if ( (kbGetAge() >= cAge2) && ((xsGetTime() - ageStartTime) > 120000) ) // more than 2 minutes in second age?
+	{
+		//aiEcho("Enabling econForecastAge2Mid.");
+		xsEnableRule("econForecastAge2Mid");
+		econForecastAge2Mid();
+		xsDisableSelf();
+		return;  // We're done
+	}
+	
+	// If we've made it here, we're in researching age 2, or we're in the first
+	// 2 minutes of age 2.  Let's see what we need.
+	
+	
+	gGoldForecast = 0.0;
+	gWoodForecast = 0.0;
+	gFoodForecast = 200.0;   // Keep a bit of extra food around
+		
+   int temp=0;
+
+	// Houses...assume we'll need a total of 2 more
+   if (cMyCulture == cCultureAtlantean)
+	  addUnitForecast(cUnitTypeManor, 2);
+   else
+	  addUnitForecast(cUnitTypeHouse, 2);
+
+   // fish boats
+   if (gFishing == true)
+   {
+	  // get current fish boat count
+	  int fishBoatType = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish,0);
+	  int boatCount = kbUnitCount(cMyID, fishBoatType, cUnitStateAlive);
+	  temp = gNumBoatsToMaintain - boatCount;
+	  if (temp > 0)
+		 addUnitForecast(fishBoatType, temp);
+	  if (temp > 0)
+		 aiEcho("Need "+temp+" fishing boats.");
+
+	  temp = 1 - kbUnitCount(cMyID, cUnitTypeDock, cUnitStateAliveOrBuilding);
+	  if (temp < 0)
+		 temp = 0;
+	  if (temp > 0)
+		 addUnitForecast(cUnitTypeDock, 1);
+   }
+   // Guild
+   if (cMyCulture == cCultureAtlantean)
+   {
+	  if(kbUnitCount(cMyID,cUnitTypeGuild, cUnitStateAliveOrBuilding) <= 0)
+		 addUnitForecast(cUnitTypeGuild, 1);
+   }
+
+	// towers
+	temp = 0;
+	if (gTargetNumTowers > 0)
+		temp = (4 + gTargetNumTowers/2) - kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
+	if (temp < 0)
+		temp = 0;
+
+   if (temp > 0)
+	  addUnitForecast(cUnitTypeTower, temp);
+
+	// first tower upgrade
+	if (gBuildTowers == true)
+	{
+		if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) <= cTechStatusResearching))
+		 addTechForecast(cTechWatchTower);
+	}
+
+   // Settlements
+   int numberSettlements=getNumberUnits(cUnitTypeAbstractSettlement, cMyID, cUnitStateAliveOrBuilding);  // Settlements paid for
+   temp = gEarlySettlementTarget - numberSettlements;   // To be paid for
+   if (temp < 0)
+	  temp = 0;
+   if (temp > 0)
+	  addUnitForecast(cUnitTypeSettlementLevel1, temp);
+   aiEcho("Adding forecast for "+temp+" early settlements.");
+	// outposts
+	if (cMyCulture == cCultureEgyptian)
+	{
+		temp = 10 - kbUnitCount(cMyID, cUnitTypeOutpost, cUnitStateAliveOrBuilding);
+		if (temp > 0)
+		 addUnitForecast(cUnitTypeOutpost, temp);
+	}   
+	
+	// villagers
+	temp = aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0);  // How many we want
+	temp = temp - 1;	// Assume 1 in production
+	temp = temp - kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);   // Number of villagers we need, ignoring dwarves
+	temp = temp + kbUnitCount(cMyID, cUnitTypeDwarf, cUnitStateAlive);  // Makes up for counting dwarves toward our villager total
+	if (cMyCulture != cCultureAtlantean)
+   {
+	  if (temp > 12)
+		temp = 12;  // Just 3 minutes worth, please.
+   }
+   else
+	  if (temp > 4)
+		 temp = 4;
+   
+	if (cMyCulture != cCultureAtlantean)
+   {
+	if (temp < 8)
+		   temp = 8;		// In transition, we won't have the age 2 villie target, so assume at least 8 more.
+   }
+   else
+	  if (temp < 3)
+		 temp = 3;
+	addUnitForecast(aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanUnitType, 0), temp);
+   
+   int myShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+   temp = gTargetNavySize - myShips;   // How many yet to train
+   if (temp < 0)
+      temp = 0;
+   if (temp > 0)
+   {
+      gWoodForecast = gWoodForecast + 100*temp;
+      gGoldForecast = gGoldForecast + 50*temp;
+   }
+	
+	// dropsites, assume 1 for norse, 2 for greek.
+	if (cMyCulture == cCultureGreek)
+	{
+		temp =2;
+		gWoodForecast = gWoodForecast + 50*temp;
+	}
+	if (cMyCulture == cCultureNorse)
+	{
+		temp = 1;
+		gWoodForecast = gWoodForecast + 50*temp;
+		gFoodForecast = gFoodForecast + 50*temp;
+	}
+	
+	// military buildings, assume 1 needed regardless of how many we have
+	if (cMyCulture == cCultureGreek)
+	{
+		gWoodForecast = gWoodForecast + 100;
+	}
+	if (cMyCulture == cCultureNorse)
+	{
+		gWoodForecast = gWoodForecast + 110;
+	}
+	if (cMyCulture == cCultureEgyptian)
+	{
+		gGoldForecast = gGoldForecast + 75;
+	}
+   if (cMyCulture == cCultureAtlantean)
+   {
+		gWoodForecast = gWoodForecast + 75;
+		gGoldForecast = gGoldForecast + 25;
+   }
+	else if(cMyCulture == cCultureChinese)
+	{
+		gWoodForecast = gWoodForecast + 75;
+		gGoldForecast = gGoldForecast + 25;
+	}
+
+
+	if (gFarming == true)
+	{
+		float foodGatherersWanted = aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood);   // Percent food gatherers
+		foodGatherersWanted = foodGatherersWanted * kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive); // Actual count
+		temp = foodGatherersWanted - kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding);
+		if (temp < 0)
+			temp = 0;
+	  if (temp > 8 )
+		 temp = 8;  // more than we'll build in 3 minutes
+		if (temp > 0)
+		 addUnitForecast(cUnitTypeFarm, temp);
+	}
+	
+
+
+	// Techs
+	if ( kbGetTechStatus(cTechPlow) < cTechStatusResearching)
+	  addTechForecast(cTechPlow);
+   if ( kbGetTechStatus(cTechHusbandry) < cTechStatusResearching)
+	  addTechForecast(cTechHusbandry);
+	if ( kbGetTechStatus(cTechHuntingDogs) < cTechStatusResearching)
+	  addTechForecast(cTechHuntingDogs);
+	if ( kbGetTechStatus(cTechHandAxe) < cTechStatusResearching)
+	  addTechForecast(cTechHandAxe);	
+	if ( kbGetTechStatus(cTechPickaxe) < cTechStatusResearching)
+	  addTechForecast(cTechPickaxe);
+
+
+   // 1 Settlement for atlanteans
+   if ((cMyCulture == cCultureAtlantean) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) <= 1))
+   {
+		gGoldForecast = gGoldForecast + 200;
+		gWoodForecast = gWoodForecast + 200;
+		gFoodForecast = gFoodForecast + 100;	 
+   }
+	aiEcho("Age 2 (early) forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+	updateGathererRatios();
 }
 
 //==============================================================================
@@ -2449,7 +2823,7 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     if (age > cAge1)
     {
         xsDisableSelf();
-        xsEnableRule("econForecastAge2");
+        xsEnableRule("econForecastAge2Early");
 		gSuperboom = false;
         return;
     }
@@ -2457,8 +2831,8 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     if (kbGetTechStatus(gAge2MinorGod) >= cTechStatusResearching)	
     {	// Next age upgrade is on the way
         xsDisableSelf();
-        xsEnableRule("econForecastAge2");
-        econForecastAge2();	// Since runImmediately doesn't seem to be working
+        xsEnableRule("econForecastAge2Early");
+        econForecastAge2Early();	// Since runImmediately doesn't seem to be working
         return;
     }
 
@@ -2467,7 +2841,7 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
 	
     gGoldForecast = 0.0;
     gWoodForecast = 0.0;
-    gFoodForecast = 700.0;
+    gFoodForecast = 600.0;
 
 	if (RethFishEco == true && gWaterMap == true && ConfirmFish == true	&& xsGetTime() < eFishTimer*1*1000)
 	{
@@ -2525,8 +2899,8 @@ if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCul
     
     if (gFishing == true)
     {
-        if (woodSupply < 200)
-            gWoodForecast = gWoodForecast + (200 - woodSupply);
+        if (woodSupply < 50)
+            gWoodForecast = gWoodForecast + (50 - woodSupply);
     }
 
     aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
@@ -2790,7 +3164,7 @@ void initAtlantean(void)
 
    
     if (aiGetWorldDifficulty() != cDifficultyEasy)
-    createSimpleMaintainPlan(cUnitTypeOnager, 3, false, kbBaseGetMainID(cMyID));
+    createSimpleMaintainPlan(cUnitTypeOnager, 4, false, kbBaseGetMainID(cMyID));
 
    gLandScout=cUnitTypeOracleScout;
     gWaterScout=cUnitTypeFishingShipAtlantean;
@@ -2954,11 +3328,11 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
         return(-1);
 
     //Default init.
-     kbUnitPickResetAll(upID);
+    kbUnitPickResetAll(upID);
     //1 Part Preference, 2 Parts CE, 2 Parts Cost.  Testing 1/10/4
-    kbUnitPickSetPreferenceWeight(upID, 1.0);
-    kbUnitPickSetCombatEfficiencyWeight(upID, 2.0);
-    kbUnitPickSetCostWeight(upID, 2.0);
+    kbUnitPickSetPreferenceWeight(upID, 2.0);
+    kbUnitPickSetCombatEfficiencyWeight(upID, 4.0);
+    kbUnitPickSetCostWeight(upID, 7.0);
     //Desired number units types, buildings.
     kbUnitPickSetDesiredNumberUnitTypes(upID, numberTypes, numberBuildings, true);
     //Min/Max units and Min/Max pop.
@@ -4401,7 +4775,8 @@ void init(void)
     
     xsEnableRule("defendPlanRule");
     xsEnableRule("mainBaseDefPlan1");
-    xsEnableRule("mainBaseDefPlan2");
+    if (OnlyOneMBDefRule == false)
+	xsEnableRule("mainBaseDefPlan2");
     
     xsEnableRule("findMySettlementsBeingBuilt");
     
@@ -5003,11 +5378,13 @@ void age2Handler(int age=1)
         if (gBuildWallsAtMainBase == true)
         {
             xsEnableRule("mainBaseAreaWallTeam1");
+			
+			if (aiGetWorldDifficulty() > cDifficultyHard)
 			xsEnableRule("MBSecondaryWall");
 			
 
-         //   if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
-            //    xsEnableRule("destroyUnnecessaryDropsites");
+           if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
+                xsEnableRule("destroyUnnecessaryDropsites");
             
             if (aiGetGameMode() != cGameModeDeathmatch)
                 xsEnableRule("setUnitPicker");
@@ -5696,7 +6073,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
  xsSetRuleMinIntervalSelf(25);
    
    aiEcho("findFish:");
-		if (xsGetTime() > 15*60*1000)  // Disable if we've tried for too long.
+		if (xsGetTime() > 40*60*1000)  // Disable if we've tried for too long.
         xsDisableSelf();
 	
 			// Disable early fishing for Nomad & Highland, to later be enabled.

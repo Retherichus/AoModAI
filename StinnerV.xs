@@ -9,7 +9,7 @@ extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, Also
 
 extern bool HardFocus = false;    // Please set this to true if you want the AI to focus the player with most units.
 
-extern bool DisallowPullBack = true;  // set true to make the AI no longer retreat.
+extern bool DisallowPullBack = false;
 // TC stuff
 
 extern int ModdedTCTimer = 25;
