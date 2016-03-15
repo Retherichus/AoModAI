@@ -67,10 +67,7 @@ rule maintainTradeUnits
         tradeTargetPop = cvMaxTradePop;
         
     int unitTypeToTrain = -1;
-    
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
-    if (numTrees < 15)
-        tradeTargetPop = tradeTargetPop + 5;
+
     
     static bool firstRun = true;
     if (firstRun == true)
@@ -1341,7 +1338,6 @@ rule makeAtlanteanHeroes
         }
     }
 
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
     int currentPop = kbGetPop();
     int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
     int numMacemen = kbUnitCount(cMyID, cUnitTypeMaceman, cUnitStateAlive);
@@ -1356,7 +1352,7 @@ rule makeAtlanteanHeroes
     {
         if (numHeroes <= 4)
         {
-            if ((favorSupply < 20) || ((woodSupply < 150) && (numTrees > 14)) || (foodSupply < 150) || (goldSupply < 150))
+            if ((favorSupply < 20) || ((woodSupply < 150) || (foodSupply < 150) || (goldSupply < 150)))
             {
                 aiEcho("not enough resources, returning");
                 return;
@@ -1364,7 +1360,7 @@ rule makeAtlanteanHeroes
         }
         else
         {
-            if ((favorSupply < 30) || ((woodSupply < 350) && (numTrees > 14)) || (foodSupply < 350) || (goldSupply < 350))
+            if ((favorSupply < 30) || ((woodSupply < 350) || (foodSupply < 350) || (goldSupply < 350)))
             {
                 aiEcho("not enough resources, returning");
                 return;

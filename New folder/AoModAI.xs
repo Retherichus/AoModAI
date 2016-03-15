@@ -699,7 +699,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         }
     }
 }
-
+//==============================================================================
 //==============================================================================
 void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     float rootEscrow=0.2, float econFoodEscrow=0.5, float econWoodEscrow=0.5,
@@ -834,7 +834,12 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     if (vilPop < 34)
         vilPop = 34;
         
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+	    	    int mainBaseID2 = kbBaseGetMainID(cMyID);
+vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);
+	
+	int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
+    int mostHatedPlayerID = aiGetMostHatedPlayerID();	
+		
     if ((numTrees < 15) && (xsGetTime() > 20*60*1000))
     {   
         vilPop = vilPop - 5;
@@ -1472,8 +1477,11 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         if (neededGoldGatherers < minGoldGatherers)
             neededGoldGatherers = minGoldGatherers;
     }
-    
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+	
+	
+    int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocationTree = kbBaseGetLocation(cMyID, mainBaseID);
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocationTree, 40.0);
     float neededWoodGatherers = desiredWoodUnits;
     if (numTrees < 15)
         neededWoodGatherers = 0;
@@ -1654,6 +1662,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 */
 }
 
+
 //==============================================================================
 rule econForecastAge4		// Rule activates when age 4 research begins
     minInterval 23
@@ -1791,8 +1800,9 @@ rule econForecastAge4		// Rule activates when age 4 research begins
         gWoodForecast = gWoodForecast * 0.8;
     else if (woodSupply > 1300)
         gWoodForecast = gWoodForecast * 0.9;
-    
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2); 
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     if (numTrees < 15)
     {
         gWoodForecast = 100.0;
@@ -2247,7 +2257,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 //==============================================================================
 rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in setEarlyEcon rule, ending when next age upgrade starts
 //    minInterval 23
-    minInterval 10
+    minInterval 60
     inactive
 {
     int age = kbGetAge();
@@ -2290,7 +2300,7 @@ if (xsGetTime() > eFishTimer*60*1000 && RethFishEco == true && ConfirmFish == tr
 	aiEcho("Phase 3: RethFishEco is disabled");
     }
 	
-	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000)
+	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture != cCultureEgyptian)
 {
 	gFoodForecast = eBoomFood+.0;
 	gGoldForecast = eBoomGold+.0;
@@ -2446,6 +2456,7 @@ void initEgyptian(void)
             aiPlanSetEconomy(Pempowermarket, true);
             aiPlanAddUnitType(Pempowermarket, cUnitTypePharaohSecondary, 1, 1, 1);
             aiPlanSetVariableInt(Pempowermarket, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
+			aiPlanSetDesiredPriority(Pempowermarket, 30);
             aiPlanSetActive(Pempowermarket);
             }
         }
@@ -2983,8 +2994,8 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else if (upRand == 1)
@@ -2996,8 +3007,8 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else
@@ -3009,8 +3020,8 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 break;
@@ -3027,8 +3038,8 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else if (upRand == 1)
@@ -3040,8 +3051,8 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else
@@ -3053,8 +3064,8 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 break;
@@ -3071,8 +3082,8 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else if (upRand == 1)
@@ -3084,8 +3095,8 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else
@@ -3097,8 +3108,8 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeCatapult, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 break;
@@ -4619,7 +4630,7 @@ void age2Handler(int age=1)
             aiPlanSetActive(barracks2PlanID);
         }
         
-        //Always want 3 priests
+        //Always want 4 priests
         if (cMyCiv != cCivRa)
             gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypePriest, 4, false, kbBaseGetMainID(cMyID));
 	
@@ -4637,7 +4648,8 @@ void age2Handler(int age=1)
                 aiPlanSetEconomy(ePlanID, true);
                 aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
                 aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMiningCamp);
-                aiPlanSetActive(ePlanID);
+                aiPlanSetDesiredPriority(ePlanID, 25);
+				aiPlanSetActive(ePlanID);
             }
             ePlanID=aiPlanCreate("Lumber Camp Empower", cPlanEmpower);
             if (ePlanID >= 0)
@@ -4661,7 +4673,7 @@ void age2Handler(int age=1)
                 aiPlanSetEconomy(ePlanID, true);
                 aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
                 aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
-                aiPlanSetActive(ePlanID);
+				aiPlanSetActive(ePlanID);
             }
 			ePlanID=aiPlanCreate("Citadel TEST Empower", cPlanEmpower);
             if (ePlanID >= 0)

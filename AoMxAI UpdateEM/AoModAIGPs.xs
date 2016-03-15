@@ -1548,8 +1548,6 @@ rule rRagnorokPower
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
     int currentPop = kbGetPop();
     int currentPopCap = kbGetPopCap();
     
@@ -1573,7 +1571,7 @@ rule rRagnorokPower
     if ((currentPop > currentPopCap * 0.7) && (myMilUnitsInR75 + alliedMilUnitsInR75 + 3 >= enemyMilUnitsInR75)
      && (numEnemyTitansInR75 - numAlliedTitansInR75 - numTitans <= 0))
     {
-        if ((currentPop <= currentPopCap - 2) || (foodSupply < 1000) || (goldSupply < 1000) || ((woodSupply < 800) && (numTrees > 14)))
+        if ((currentPop <= currentPopCap - 2) || (foodSupply < 1000) || (goldSupply < 1000) || ((woodSupply < 800)))
         {
             count = 0;
             return;
@@ -1809,8 +1807,8 @@ rule rGaiaForestPower
     
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    int numTreesNearMB = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation, 40.0); //50? 60?
-    if (numTreesNearMB > 0)
+    bool JustCastIt = true; 
+    if (JustCastIt == true)
     {
         aiPlanSetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0, true);
         aiEcho("Setting cGodPowerPlanAutoCast to true");

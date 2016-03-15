@@ -2605,7 +2605,9 @@ rule attackEnemySettlement
         }
     }
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    	int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);
+	int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     int mostHatedPlayerID = aiGetMostHatedPlayerID();
     int numMHPlayerSettlements = kbUnitCount(mostHatedPlayerID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
     //aiEcho("mostHatedPlayerID is: "+mostHatedPlayerID);
@@ -3276,7 +3278,9 @@ rule createRaidingParty
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+	int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     
     if (((woodSupply < 120) && (numTrees > 14)) || (foodSupply < 120) || (goldSupply < 120))
     {
@@ -3734,7 +3738,9 @@ rule randomAttackGenerator
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+	int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     
     if (((woodSupply < 200) && (numTrees > 14)) || (foodSupply < 200) || (goldSupply < 200))
     {
@@ -4220,7 +4226,9 @@ rule createLandAttack
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+ 	int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);   
+	int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     
     int currentPop = kbGetPop();
     int currentPopCap = kbGetPopCap();

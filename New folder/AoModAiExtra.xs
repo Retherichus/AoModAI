@@ -22,6 +22,12 @@ mutable void relicHandler(int relicID=-1) {}
 mutable void wonderDeathHandler(int playerID=-1) { }
 extern bool ConfirmFish = false;          // Don't change this, It's for extra safety when fishing, and it'll enable itself if fish is found.
 extern int gGardenBuildLimit = 0;
+extern int gInitialGoldBaseID = -1;
+extern int gInitialWoodBaseID = -1;
+extern int gFoodBaseID = -1;
+extern int startingHerdableCount = 0;
+extern int gFarmDelay = 180000;
+
 
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
@@ -53,14 +59,14 @@ extern int eMaxMilPop = 50;               // Max military pop cap during Classic
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 500;              // Food
+extern int eBoomFood = 600;              // Food
 extern int eBoomGold = 100;              // Gold
 extern int eBoomWood = 250;              // Wood, duh.
 
 
 //Egyptians have their own, because they don't like wood as much.
 
-extern int egBoomGold = 250;              // Gold
+extern int egBoomGold = 100;              // Gold
 extern int egBoomWood = 0;              // Wood
 
 
@@ -218,9 +224,10 @@ void initRethlAge1(void)  // Am I doing this right??
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
+	
 	   
 	   
-	   if (gHuntEarly == true && cRandomMapName != "Deep Jungle")
+	   if (gHuntEarly == true)
 		{
 		if (cMyCulture == cCultureGreek)
 		aiSetMinNumberNeedForGatheringAggressvies(5);      // The number inside of ( ) represents the amount of villagers/units needed.
@@ -1166,7 +1173,7 @@ rule tacticalHeroAttackMyth
 // IHateMonks
 //==============================================================================
 rule IHateMonks
-   minInterval 10
+   minInterval 8
    active
 {
    static int unitQueryID=-1;
@@ -1254,6 +1261,8 @@ rule IHateSiege
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
 		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractCavalry);
+		if (cMyCulture == cCultureEgyptian)
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeSpearman);
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
 

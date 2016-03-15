@@ -2604,8 +2604,8 @@ rule attackEnemySettlement
             }
         }
     }
+
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
     int mostHatedPlayerID = aiGetMostHatedPlayerID();
     int numMHPlayerSettlements = kbUnitCount(mostHatedPlayerID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
     //aiEcho("mostHatedPlayerID is: "+mostHatedPlayerID);
@@ -2640,7 +2640,7 @@ rule attackEnemySettlement
             return;
         }
 //        else if ((((woodSupply < 400) && (numTrees > 14)) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap))
-        else if ((((woodSupply < 400) && (numTrees > 14)) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap - 2))
+        else if (((woodSupply < 400) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap - 2))
         {
             aiEcho("returning as we don't have enough resources");
             return;
@@ -2649,7 +2649,7 @@ rule attackEnemySettlement
     else
     {
 //        if ((((woodSupply < 150) && (numTrees > 14)) || (goldSupply < 150) || (foodSupply < 110)) && (currentPop <= currentPopCap))
-        if ((((woodSupply < 150) && (numTrees > 14)) || (goldSupply < 150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 2))
+        if (((woodSupply < 150) || (goldSupply < 150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 2))
         {
             aiEcho("returning as we don't have enough resources");
             return;
@@ -3276,9 +3276,9 @@ rule createRaidingParty
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+
     
-    if (((woodSupply < 120) && (numTrees > 14)) || (foodSupply < 120) || (goldSupply < 120))
+    if ((woodSupply < 120) || (foodSupply < 120) || (goldSupply < 120))
     {
         //aiEcho("returning as we don't have enough resources");
         return;
@@ -3734,9 +3734,9 @@ rule randomAttackGenerator
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
     
-    if (((woodSupply < 200) && (numTrees > 14)) || (foodSupply < 200) || (goldSupply < 200))
+    
+    if ((woodSupply < 200)|| (foodSupply < 200) || (goldSupply < 200))
     {
         //aiEcho("returning as we don't have enough resources");
         return;
@@ -4220,7 +4220,7 @@ rule createLandAttack
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    
     
     int currentPop = kbGetPop();
     int currentPopCap = kbGetPopCap();
@@ -4237,7 +4237,7 @@ rule createLandAttack
             aiEcho("returning as gRushAttackCount >= gRushCount");
             return;
         }
-        else if (((woodSupply < 100) && (numTrees > 14)) || (foodSupply < 100) || (goldSupply < 100))
+        else if ((woodSupply < 100) || (foodSupply < 100) || (goldSupply < 100))
         {
             aiEcho("returning as we don't have enough resources");
             return;
@@ -4251,7 +4251,7 @@ rule createLandAttack
             return;
         }
 //        else if (((woodSupply < 230) && (numTrees >14)) || (foodSupply < 230) || (goldSupply < 230))
-        else if ((((woodSupply < 230) && (numTrees >14)) || (foodSupply < 230) || (goldSupply < 230)) && (currentPop < currentPopCap))
+        else if (((woodSupply < 230) || (foodSupply < 230) || (goldSupply < 230)) && (currentPop < currentPopCap))
         {
             aiEcho("returning as we don't have enough resources");
             return;

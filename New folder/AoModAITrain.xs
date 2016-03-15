@@ -68,7 +68,9 @@ rule maintainTradeUnits
         
     int unitTypeToTrain = -1;
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+	int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);
+	int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     if (numTrees < 15)
         tradeTargetPop = tradeTargetPop + 5;
     
@@ -1340,8 +1342,9 @@ rule makeAtlanteanHeroes
             return;
         }
     }
-
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+ 	int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2); 
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     int currentPop = kbGetPop();
     int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
     int numMacemen = kbUnitCount(cMyID, cUnitTypeMaceman, cUnitStateAlive);

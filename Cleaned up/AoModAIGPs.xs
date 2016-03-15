@@ -1548,8 +1548,9 @@ rule rRagnorokPower
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
-    
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     int currentPop = kbGetPop();
     int currentPopCap = kbGetPopCap();
     

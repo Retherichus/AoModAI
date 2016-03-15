@@ -834,11 +834,8 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     if (vilPop < 34)
         vilPop = 34;
         
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
-    if ((numTrees < 15) && (xsGetTime() > 20*60*1000))
-    {   
-        vilPop = vilPop - 5;
-    }
+    
+ 
 
     if (kbUnitCount(cMyID, cUnitTypePlentyVault, cUnitStateAlive) > 0)
         vilPop = vilPop - 3;
@@ -1473,9 +1470,9 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
             neededGoldGatherers = minGoldGatherers;
     }
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+
     float neededWoodGatherers = desiredWoodUnits;
-    if (numTrees < 15)
+    if (woodSupply < 50)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -1485,7 +1482,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         float minFoodGatherers = 5;
         if (cMyCulture == cCultureAtlantean)
             minFoodGatherers = 2;
-        if ((numFishBoats < 4) && (kbGetAge() > cAge2) && ((numTrees < 15) || (numGoldSites < 1)))
+        if ((numFishBoats < 4) && (kbGetAge() > cAge2) && ((woodSupply < 50) || (numGoldSites < 1)))
         {
             foodOverride = true;
             minFoodGatherers = 21;
@@ -1792,11 +1789,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     else if (woodSupply > 1300)
         gWoodForecast = gWoodForecast * 0.9;
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
-    if (numTrees < 15)
-    {
-        gWoodForecast = 100.0;
-    }
+
     
     //aiEcho("__________");
     aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
@@ -4921,8 +4914,8 @@ void age2Handler(int age=1)
         xsEnableRule("fixUnfinishedWalls");
         
         //enable the rule to destroy unnecessary dropsites near our mainbase
-        if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
-            xsEnableRule("destroyUnnecessaryDropsites");
+       // if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
+       //     xsEnableRule("destroyUnnecessaryDropsites");
     }
 
     //build buildings at other bases

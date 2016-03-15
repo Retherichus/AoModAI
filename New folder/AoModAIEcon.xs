@@ -39,7 +39,9 @@ rule updateWoodBreakdown
     //aiEcho("initial woodGathererCount: "+woodGathererCount);
     //aiEcho("wood resource percentage: "+aiGetResourceGathererPercentage(cResourceWood, cRGPActual));
 
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+      int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocationTree = kbBaseGetLocation(cMyID, mainBaseID);
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocationTree, 50.0);
     if ((numTrees < 15) && (xsGetTime() > 20*60*1000))
         woodGathererCount = 0;
     
@@ -311,7 +313,7 @@ rule updateGoldBreakdown
         }
     }
     
-    if (xsGetTime() < 12*60*1000)
+    if (kbGetAge() < cAge3)
         desiredGoldPlans = 1;
         
     if (goldGathererCount < desiredGoldPlans)
@@ -424,7 +426,7 @@ rule updateGoldBreakdown
 
 //==============================================================================
 rule updateFoodBreakdown
-    minInterval 10
+    minInterval 13
     inactive
 {
     aiEcho("updateFoodBreakdown: ");
@@ -504,11 +506,11 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 26;
+    int desiredFarmers = 24;
     if (mapRequires2FarmPlans() == true)
         desiredFarmers = 30;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 13;
+        desiredFarmers = 11;
         
     if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
     {
@@ -1251,7 +1253,7 @@ rule relocateFarming
 
 //==============================================================================
 rule startLandScouting  //grabs the first scout in the scout list and starts scouting with it.
-    minInterval 1 //starts in cAge1
+    minInterval 5 //starts in cAge1
     inactive
 {
     //If no scout, go away.
@@ -1311,7 +1313,7 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
 //==============================================================================
 // RULE: autoBuildOutpost
 rule autoBuildOutpost   //Restrict Egyptians from building outposts until they have a temple.
-    minInterval 10 //starts in cAge1, activated in startLandScouting
+    minInterval 23 //starts in cAge1, activated in startLandScouting
     inactive  
 {
     if ((gLandScout == -1) || (cMyCulture != cCultureEgyptian))
@@ -1556,7 +1558,7 @@ void initEcon() //setup the initial Econ stuff.
 //==============================================================================
 rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it to the food-heavy
                     //"starting" mix after we have 7 villagers (or 3 for Atlantea)
-    minInterval 7 //starts in cAge1
+    minInterval 10 //starts in cAge1
     inactive
 {
     if (gWaterMap == true && RethFishEco == true && ConfirmFish == true)
@@ -1565,6 +1567,14 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
     xsEnableRule("econForecastAge1");
 	aiEcho("Found fish! Looks like we're going fishing then!");
 	}
+	
+	    if (gSuperboom == true)
+	{
+    xsDisableSelf();
+    xsEnableRule("econForecastAge1");
+	aiEcho("Well, okay..");
+	}
+	
 	
 	aiEcho("setEarlyEcon: ");
     int gathererCount = kbUnitCount(cMyID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer, 0), cUnitStateAlive);
@@ -1785,7 +1795,10 @@ rule collectIdleVills
         numberVills = 4;
 
     bool noTrees = false;
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    
+    int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);
+	int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     //aiEcho("numTrees: "+numTrees);
     if ((numTrees < 15) && (xsGetTime() > 20*60*1000))
         noTrees = true;
@@ -1958,7 +1971,7 @@ rule randomUpgrader
 
 //==============================================================================
 rule createHerdplan
-    minInterval 10 //starts in cAge1
+    minInterval 14 //starts in cAge1
     inactive
 {
     aiEcho("createHerdplan:");

@@ -833,8 +833,9 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     
     if (vilPop < 34)
         vilPop = 34;
-        
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);        
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     if ((numTrees < 15) && (xsGetTime() > 20*60*1000))
     {   
         vilPop = vilPop - 5;
@@ -1472,8 +1473,9 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         if (neededGoldGatherers < minGoldGatherers)
             neededGoldGatherers = minGoldGatherers;
     }
-    
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+	int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);    
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     float neededWoodGatherers = desiredWoodUnits;
     if (numTrees < 15)
         neededWoodGatherers = 0;
@@ -1791,8 +1793,9 @@ rule econForecastAge4		// Rule activates when age 4 research begins
         gWoodForecast = gWoodForecast * 0.8;
     else if (woodSupply > 1300)
         gWoodForecast = gWoodForecast * 0.9;
-    
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+	int mainBaseID2 = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation2 = kbBaseGetLocation(cMyID, mainBaseID2);    
+    int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation2, 30.0);
     if (numTrees < 15)
     {
         gWoodForecast = 100.0;

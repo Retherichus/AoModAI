@@ -220,7 +220,7 @@ void initRethlAge1(void)  // Am I doing this right??
     xsEnableRule("buildMonuments");
 	   
 	   
-	   if (gHuntEarly == true && cRandomMapName != "Deep Jungle")
+	   if (gHuntEarly == true)
 		{
 		if (cMyCulture == cCultureGreek)
 		aiSetMinNumberNeedForGatheringAggressvies(5);      // The number inside of ( ) represents the amount of villagers/units needed.
