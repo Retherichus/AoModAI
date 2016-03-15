@@ -1739,10 +1739,12 @@ float adjustSigmoid(float var=0.0, float fraction=0.0,  float lowerLimit=0.0, fl
 void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
 {
     aiEcho("pullBackUnits:");    
-    
+    if (DisallowPullBack == true)
+	return;
     int numUnitsInPlan = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
     if (numUnitsInPlan > 0)
     {
+        //aiEcho("*_!_*_!_*_!_pullBackUnits: ");
         //Limited the maximum number of loops
         int min = 0;
         int max = 16;
@@ -1785,7 +1787,7 @@ void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
                 }
             }
         }
-        
+        aiEcho("*_!_*_!_*_!_");
     }
 }
 
@@ -1797,7 +1799,7 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
     int numUnitsInPlan = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
     if (numUnitsInPlan > 0)
     {
-        aiEcho("keepUnitsWithinRange: ");
+        
         aiEcho("planID: "+planID);
         //Limited the maximum number of loops
         int min = 0;
@@ -1951,7 +1953,7 @@ int getNumPlayersByRel(bool ally = true)
         }
     }
     aiEcho("numPlayersByRel: "+numPlayersByRel);
-   
+    
     return(numPlayersByRel);
 }
 
@@ -2249,3 +2251,4 @@ void taskMilUnitTrainAtBase(int baseID = -1)
         aiEcho("a unit with puid: "+puid+" is already being trained near baseID: "+baseID);
     }
 }
+

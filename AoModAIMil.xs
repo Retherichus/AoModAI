@@ -740,7 +740,7 @@ rule monitorAttPlans
                     else
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
-                        aiPlanSetUnitStance(attackPlanID, cUnitStancePassive);
+                        aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killSettlementAttPlanCount = 0;
                     }
@@ -845,7 +845,7 @@ rule monitorAttPlans
                         if ((numMythInPlan < 1) && (numSiegeInPlan < 1) && (currentPop <= currentPopCap - 3) && (distanceToTarget > 110.0))
                         {
                             aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
-                            aiPlanSetUnitStance(attackPlanID, cUnitStancePassive);
+                            aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                             pullBackUnits(attackPlanID, attPlanRetreatPosition);
                             killSettlementAttPlanCount = 0;
                         }
@@ -854,7 +854,7 @@ rule monitorAttPlans
                               && (currentPop <= currentPopCap * 0.95))
                         {
                             aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
-                            aiPlanSetUnitStance(attackPlanID, cUnitStancePassive);                            
+                            aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);                            
                             pullBackUnits(attackPlanID, attPlanRetreatPosition);
                             killSettlementAttPlanCount = 0; 
                         }
@@ -901,7 +901,7 @@ rule monitorAttPlans
                     else
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
-                        aiPlanSetUnitStance(attackPlanID, cUnitStancePassive);
+                        aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killRandomAttPlanCount = 0;
                     }
@@ -969,7 +969,7 @@ rule monitorAttPlans
                      || ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMythInPlan < 1) && (numSiegeInPlan < 1) && (numMilUnitsInPlan < 15)))))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
-                        aiPlanSetUnitStance(attackPlanID, cUnitStancePassive);
+                        aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killRandomAttPlanCount = 0;
                         if (numMilUnitsInPlan < 3)
@@ -1031,7 +1031,7 @@ rule monitorAttPlans
                      || (numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan)))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
-                        aiPlanSetUnitStance(attackPlanID, cUnitStancePassive);
+                        aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killRaidAttPlanCount = 0;
                     }
@@ -1103,7 +1103,7 @@ rule monitorAttPlans
                     else
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
-                        aiPlanSetUnitStance(attackPlanID, cUnitStancePassive);
+                        aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killLandAttPlanCount = 0;
                     }
@@ -1173,7 +1173,7 @@ rule monitorAttPlans
                      || ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMythInPlan < 1) && (numSiegeInPlan < 1) && (numMilUnitsInPlan < 15)))))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
-                        aiPlanSetUnitStance(attackPlanID, cUnitStancePassive);
+                        aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killLandAttPlanCount = 0;
                         
@@ -1278,7 +1278,7 @@ rule defendPlanRule
             aiPlanSetVariableFloat(defPlanID, cDefendPlanGatherDistance, 0, 30.0);
         }
     
-        aiPlanSetUnitStance(defPlanID, cUnitStancePassive);
+        aiPlanSetUnitStance(defPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(defPlanID, cDefendPlanPatrol, 0, false);
 
         aiPlanSetNumberVariableValues(defPlanID, cDefendPlanAttackTypeID, 2, true);
@@ -1453,7 +1453,7 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
 //        aiPlanSetVariableFloat(mainBaseDefPlan1ID, cDefendPlanGatherDistance, 0, 20.0);
         aiPlanSetVariableFloat(mainBaseDefPlan1ID, cDefendPlanGatherDistance, 0, 25.0);
         
-        aiPlanSetUnitStance(mainBaseDefPlan1ID, cUnitStancePassive);
+        aiPlanSetUnitStance(mainBaseDefPlan1ID, cUnitStanceDefensive);
         aiPlanSetVariableBool(mainBaseDefPlan1ID, cDefendPlanPatrol, 0, false);
 
         aiPlanSetNumberVariableValues(mainBaseDefPlan1ID, cDefendPlanAttackTypeID, 2, true);
@@ -1592,7 +1592,7 @@ rule mainBaseDefPlan2   //Make a second defend plan that protects the main base
         aiPlanSetVariableFloat(mainBaseDefPlan2ID, cDefendPlanGatherDistance, 0, 20.0);
 //        aiPlanSetVariableFloat(mainBaseDefPlan2ID, cDefendPlanGatherDistance, 0, 15.0);
 
-        aiPlanSetUnitStance(mainBaseDefPlan2ID, cUnitStancePassive);
+        aiPlanSetUnitStance(mainBaseDefPlan2ID, cUnitStanceDefensive);
         aiPlanSetVariableBool(mainBaseDefPlan2ID, cDefendPlanPatrol, 0, false);
 
         aiPlanSetNumberVariableValues(mainBaseDefPlan2ID, cDefendPlanAttackTypeID, 2, true);
@@ -2119,7 +2119,7 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
         aiPlanSetVariableVector(otherBaseDefPlanID, cDefendPlanDefendPoint, 0, newBaseUnitPosition);
 //        aiPlanSetVariableInt(otherBaseDefPlanID, cDefendPlanRefreshFrequency, 0, 5);
         aiPlanSetVariableInt(otherBaseDefPlanID, cDefendPlanRefreshFrequency, 0, 10);
-        aiPlanSetUnitStance(otherBaseDefPlanID, cUnitStancePassive);
+        aiPlanSetUnitStance(otherBaseDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(otherBaseDefPlanID, cDefendPlanPatrol, 0, false);
 
         aiPlanSetNumberVariableValues(otherBaseDefPlanID, cDefendPlanAttackTypeID, 2, true);
@@ -2204,8 +2204,8 @@ rule attackEnemySettlement
     minInterval 29 //starts in cAge2
     inactive
 {
-    aiEcho("-----_____-----");
-    aiEcho("******* attackEnemySettlement:");
+   
+    aiEcho("attackEnemySettlement:");
     
     int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
     int numMilUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive);
@@ -2629,7 +2629,7 @@ rule attackEnemySettlement
             {
                 aiEcho("setting targetSettlementID to random settlement ID: "+targetSettlementID);
                 targetPlayerID = mostHatedPlayerID;
-                aiEcho("----------------------------------------");
+                
             }
             else
             {
@@ -2904,7 +2904,7 @@ rule defendSettlementPosition
     minInterval 1 //starts in cAge2, activated in monitorAttack rule or findMySettlementsBeingBuilt rule
     inactive
 {
-    aiEcho("--------------------");
+    
     aiEcho("defendSettlementPosition");
     xsSetRuleMinIntervalSelf(23);
     static int defendPlanStartTime = -1;
@@ -3046,7 +3046,7 @@ rule defendSettlementPosition
 //        aiPlanSetVariableFloat(settlementPosDefPlanID, cDefendPlanGatherDistance, 0, 15.0);
         aiPlanSetVariableFloat(settlementPosDefPlanID, cDefendPlanGatherDistance, 0, 17.0);
 
-        aiPlanSetUnitStance(settlementPosDefPlanID, cUnitStancePassive);
+        aiPlanSetUnitStance(settlementPosDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(settlementPosDefPlanID, cDefendPlanPatrol, 0, false);
 
         aiPlanSetNumberVariableValues(settlementPosDefPlanID, cDefendPlanAttackTypeID, 1, true);
@@ -3120,7 +3120,7 @@ rule defendSettlementPosition
 //==============================================================================
 rule createRaidingParty
 //    minInterval 63 //starts in cAge2
-    minInterval 67 //starts in cAge2
+    minInterval 57 //starts in cAge2
     inactive
 {
     aiEcho("*!*!*createRaidingParty:");
@@ -3532,7 +3532,7 @@ rule createRaidingParty
 //==============================================================================
 rule randomAttackGenerator
 //    minInterval 43 //starts in cAge2
-    minInterval 41 //starts in cAge2
+    minInterval 21 //starts in cAge2
     inactive
 {
     aiEcho("******* randomAttackGenerator:");
@@ -3951,7 +3951,7 @@ rule randomAttackGenerator
 
 //==============================================================================
 rule createLandAttack
-    minInterval 53 //starts in cAge2
+    minInterval 33 //starts in cAge2
     inactive
 {
 
@@ -4482,7 +4482,7 @@ rule defendBaseUnderAttack
 //        aiPlanSetVariableFloat(baseUnderAttackDefPlanID, cDefendPlanGatherDistance, 0, 15.0);
         aiPlanSetVariableFloat(baseUnderAttackDefPlanID, cDefendPlanGatherDistance, 0, 20.0);
 
-        aiPlanSetUnitStance(baseUnderAttackDefPlanID, cUnitStancePassive);
+        aiPlanSetUnitStance(baseUnderAttackDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(baseUnderAttackDefPlanID, cDefendPlanPatrol, 0, false);
 
         aiPlanSetNumberVariableValues(baseUnderAttackDefPlanID, cDefendPlanAttackTypeID, 2, true);
@@ -4724,7 +4724,7 @@ rule defendAlliedBase   //TODO: check all allied bases not just the main base of
 
         aiPlanSetVariableFloat(alliedBaseDefPlanID, cDefendPlanGatherDistance, 0, 15.0);
 
-        aiPlanSetUnitStance(alliedBaseDefPlanID, cUnitStancePassive);
+        aiPlanSetUnitStance(alliedBaseDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(alliedBaseDefPlanID, cDefendPlanPatrol, 0, false);
 
         aiPlanSetNumberVariableValues(alliedBaseDefPlanID, cDefendPlanAttackTypeID, 2, true);
@@ -4971,7 +4971,7 @@ rule baseAttackTracker
     minInterval 13 //starts in cAge2
     inactive
 {
-    aiEcho("---------------------------------------");
+    
     aiEcho("baseAttackTracker:");
 
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);

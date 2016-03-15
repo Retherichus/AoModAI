@@ -56,7 +56,7 @@ extern int eMaxMilPop = 50;               // Max military pop cap during Classic
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 600;              // Food
+extern int eBoomFood = 650;              // Food
 extern int eBoomGold = 100;              // Gold
 extern int eBoomWood = 200;              // Wood, duh.
 
@@ -77,7 +77,7 @@ extern int eFBoomWood = 50;             // Wood, The Ai will automatically boost
 
 //Timer for gSuperboom & fishing
 extern int eBoomTimer = 5;                // Minutes this plan will remain active. It'll disable itself after X minutes set.(minus delay) 
-extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Wood, this supports the Ai in building early fishing ships.
+extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wood, this supports the Ai in building early fishing ships.
 
 
 
@@ -98,15 +98,15 @@ extern int RethLGWAge2 = 150;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLGFAge3 = 1000;              // Food
-extern int RethLGGAge3 = 800;              // Gold
-extern int RethLGWAge3 = 550;              // Wood
+extern int RethLGFAge3 = 1300;              // Food
+extern int RethLGGAge3 = 1700;              // Gold
+extern int RethLGWAge3 = 600;              // Wood
 
 //Age 4 (Mythic Age)
 
 extern int RethLGFAge4 = 3000;              // Food
 extern int RethLGGAge4 = 2400;              // Gold
-extern int RethLGWAge4 = 600;              // Wood
+extern int RethLGWAge4 = 1200;              // Wood
 
 
 //==============================================================================
@@ -120,9 +120,9 @@ extern int RethLEWAge2 = 50;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLEFAge3 = 1000;              // Food
-extern int RethLEGAge3 = 1000;              // Gold
-extern int RethLEWAge3 = 250;              // Wood
+extern int RethLEFAge3 = 1300;              // Food
+extern int RethLEGAge3 = 1700;              // Gold
+extern int RethLEWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
@@ -141,15 +141,15 @@ extern int RethLNWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLNFAge3 = 1000;              // Food
-extern int RethLNGAge3 = 1000;              // Gold
-extern int RethLNWAge3 = 350;              // Wood
+extern int RethLNFAge3 = 1200;              // Food
+extern int RethLNGAge3 = 1700;              // Gold
+extern int RethLNWAge3 = 750;              // Wood
 
 //Age 4 (Mythic Age)
 
 extern int RethLNFAge4 = 3000;              // Food
 extern int RethLNGAge4 = 2400;              // Gold
-extern int RethLNWAge4 = 700;              // Wood
+extern int RethLNWAge4 = 1000;              // Wood
 
 //==============================================================================
 //Atlantean
@@ -162,15 +162,15 @@ extern int RethLAWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLAFAge3 = 1000;              // Food
-extern int RethLAGAge3 = 1000;              // Gold
-extern int RethLAWAge3 = 350;              // Wood
+extern int RethLAFAge3 = 1700;              // Food
+extern int RethLAGAge3 = 1400;              // Gold
+extern int RethLAWAge3 = 800;              // Wood
 
 //Age 4 (Mythic Age)
 
 extern int RethLAFAge4 = 3000;              // Food
 extern int RethLAGAge4 = 2400;              // Gold
-extern int RethLAWAge4 = 700;              // Wood
+extern int RethLAWAge4 = 1000;              // Wood
 
 
 //==============================================================================
@@ -184,15 +184,15 @@ extern int RethLCWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLCFAge3 = 1000;              // Food
-extern int RethLCGAge3 = 1000;              // Gold
+extern int RethLCFAge3 = 1300;              // Food
+extern int RethLCGAge3 = 1700;              // Gold
 extern int RethLCWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
 extern int RethLCFAge4 = 3000;              // Food
 extern int RethLCGAge4 = 2400;              // Gold
-extern int RethLCWAge4 = 700;              // Wood
+extern int RethLCWAge4 = 1000;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -332,7 +332,7 @@ rule ActivateRethOverridesAge1
 		xsEnableRuleGroup("MassDonations");
 		
 		
-		
+		/*
 		// Force Dock down.
 		if (gWaterMap == true && RethFishEco == true)
    {
@@ -349,7 +349,7 @@ rule ActivateRethOverridesAge1
          aiPlanSetActive(buildDock);
       }
    }
-		
+	*/	
 		
 		xsDisableSelf();
            

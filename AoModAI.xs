@@ -65,7 +65,7 @@ extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age hand
 
 
 // Trade globals
-extern int gMaxTradeCarts = 20;           // Max trade carts + 5
+extern int gMaxTradeCarts = 40;           // Max trade carts
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -391,7 +391,7 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
         aiEcho("increasing startIndex. startIndex is now: "+startIndex);
     }
     
-    if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (10 + randNum)*60*1000))
+    if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (15)*60*1000))
     {
         startIndex = aiRandInt(cNumberPlayers);
         aiEcho("getting new random startIndex. startIndex is now: "+startIndex);
@@ -864,6 +864,10 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
         kbUnitPickSetMaximumPop(upID,(milPop*4)/5);
         kbUnitPickSetMinimumPop(upID,(milPop*3)/5);
     }
+/*
+    aiEcho("Unit picker military minPop: "+kbUnitPickGetMinimumPop(upID));
+    aiEcho("Unit picker military maxPop: "+kbUnitPickGetMaximumPop(upID));
+*/
     
     //Percentages.
     aiSetEconomyPercentage(1.0);
@@ -1073,7 +1077,7 @@ rule updateEMAge3
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-        civPopTarget = 60 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush
+        civPopTarget = 65 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush
         if (getSoftPopCap() > 115)
             civPopTarget = civPopTarget + 0.3 * (getSoftPopCap()-115);
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
@@ -1139,7 +1143,7 @@ rule updateEMAge4
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-      civPopTarget = 60;      // 55 of first 115
+      civPopTarget = 70;      // 55 of first 115
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -1149,8 +1153,7 @@ rule updateEMAge4
          civPopTarget = 35;
       milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.90);   
-	  }
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.85);   }
    else
  {
       int num1 =aiRandInt(3);
@@ -1388,7 +1391,7 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, i, kbGetAICostWeight(i));
     }
 	
-	// Special Treatment for excess gold as requested, thanks for the suggestion StinnerV!
+	// Special Treatment for excess gold as requested, thanks StinnerV!
 	
 if (aiGetWorldDifficulty() > cDifficultyEasy && kbGetAge() > cAge3 && xsGetTime() > 14*60*1000)
    {
@@ -1575,7 +1578,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 
 	
     float neededWoodGatherers = desiredWoodUnits;
-    if (woodSupply > goldSupply+2000)
+    if (woodSupply > goldSupply+1000)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -1747,6 +1750,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         aiEcho("favor resource percentage: "+aiGetResourceGathererPercentage(cResourceFavor, cRGPActual));
     }
 */
+aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
 }
 
 //==============================================================================
@@ -1935,14 +1939,6 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 {
     static int ageStartTime = -1;
     
-    int age = kbGetAge();
-    if (age > cAge3)
-    {
-        xsDisableSelf();
-        xsEnableRule("econForecastAge4");
-        return;
-    }
-
     if (kbGetTechStatus(gAge4MinorGod) >=  cTechStatusResearching)	// On our way to age 4, hand off...
     {
         xsEnableRule("econForecastAge4");
@@ -2174,14 +2170,6 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     inactive
 {
     static int ageStartTime = -1;
-   
-    int age = kbGetAge();
-    if (age > cAge2)
-    {
-        xsDisableSelf();
-        xsEnableRule("econForecastAge3");
-        return;
-    }
    
     if (kbGetTechStatus(gAge3MinorGod) >= cTechStatusResearching) 	// On our way to age 3, hand off...
     {
@@ -2479,9 +2467,9 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
 	
     gGoldForecast = 0.0;
     gWoodForecast = 0.0;
-    gFoodForecast = 600.0;
+    gFoodForecast = 700.0;
 
-	if (RethFishEco == true && gWaterMap == true && ConfirmFish == true	&& xsGetTime() < eFishTimer*60*1000)
+	if (RethFishEco == true && gWaterMap == true && ConfirmFish == true	&& xsGetTime() < eFishTimer*1*1000)
 	{
 	gSuperboom=false;
 	gFoodForecast = eFBoomFood+.0;
@@ -2491,7 +2479,7 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
 		
 }	
 
-if (xsGetTime() > eFishTimer*60*1000 && RethFishEco == true && ConfirmFish == true)
+if (xsGetTime() > eFishTimer*1*1000 && RethFishEco == true && ConfirmFish == true)
     {	
     gSuperboom=true;
 	RethFishEco = false;
@@ -2802,7 +2790,7 @@ void initAtlantean(void)
 
    
     if (aiGetWorldDifficulty() != cDifficultyEasy)
-    createSimpleMaintainPlan(cUnitTypeOnager, 4, false, kbBaseGetMainID(cMyID));
+    createSimpleMaintainPlan(cUnitTypeOnager, 3, false, kbBaseGetMainID(cMyID));
 
    gLandScout=cUnitTypeOracleScout;
     gWaterScout=cUnitTypeFishingShipAtlantean;
@@ -2966,11 +2954,11 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
         return(-1);
 
     //Default init.
-    kbUnitPickResetAll(upID);
+     kbUnitPickResetAll(upID);
     //1 Part Preference, 2 Parts CE, 2 Parts Cost.  Testing 1/10/4
-    kbUnitPickSetPreferenceWeight(upID, 2.0);
-    kbUnitPickSetCombatEfficiencyWeight(upID, 4.0);
-    kbUnitPickSetCostWeight(upID, 7.0);
+    kbUnitPickSetPreferenceWeight(upID, 1.0);
+    kbUnitPickSetCombatEfficiencyWeight(upID, 2.0);
+    kbUnitPickSetCostWeight(upID, 2.0);
     //Desired number units types, buildings.
     kbUnitPickSetDesiredNumberUnitTypes(upID, numberTypes, numberBuildings, true);
     //Min/Max units and Min/Max pop.
@@ -4413,8 +4401,7 @@ void init(void)
     
     xsEnableRule("defendPlanRule");
     xsEnableRule("mainBaseDefPlan1");
-    if (OnlyOneMBDefRule == false)
-	xsEnableRule("mainBaseDefPlan2");
+    xsEnableRule("mainBaseDefPlan2");
     
     xsEnableRule("findMySettlementsBeingBuilt");
     
@@ -5016,13 +5003,11 @@ void age2Handler(int age=1)
         if (gBuildWallsAtMainBase == true)
         {
             xsEnableRule("mainBaseAreaWallTeam1");
-			
-			if (aiGetWorldDifficulty() > cDifficultyHard)
 			xsEnableRule("MBSecondaryWall");
 			
 
-           if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
-                xsEnableRule("destroyUnnecessaryDropsites");
+         //   if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
+            //    xsEnableRule("destroyUnnecessaryDropsites");
             
             if (aiGetGameMode() != cGameModeDeathmatch)
                 xsEnableRule("setUnitPicker");
@@ -5711,7 +5696,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
  xsSetRuleMinIntervalSelf(25);
    
    aiEcho("findFish:");
-		if (xsGetTime() > 40*60*1000)  // Disable if we've tried for too long.
+		if (xsGetTime() > 15*60*1000)  // Disable if we've tried for too long.
         xsDisableSelf();
 	
 			// Disable early fishing for Nomad & Highland, to later be enabled.

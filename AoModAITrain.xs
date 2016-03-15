@@ -1567,6 +1567,7 @@ rule makeAtlanteanHeroesFallBack
         }
     }
     aiPlanSetDesiredPriority(gDefendPlanID, 20);
+    
     xsDisableSelf();
     
 }
