@@ -1033,11 +1033,12 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	}
 	// Set up the Tsunami power
 	// Or actually destroy the plan and use painful manual casting
-	if(powerProtoID == cPowerTsunami)
-	{
-		xsEnableRule("rTsunami");
-		return (false);  
-	}
+//	if(powerProtoID == cPowerTsunami)
+//	{
+//		xsEnableRule("rTsunami");
+//		return (false);  
+//		}
+		
 	// Set up the Uproot power
 	if(powerProtoID == cPowerUproot)
 	{
@@ -1052,7 +1053,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	}
 	// Set up the Year of the Goat power
 	// Or actually destroy the plan and use manual casting
-	if(powerProtoID == cPowerTsunami)
+	if(powerProtoID == cPowerYearOfTheGoat)
 	{
 		xsEnableRule("rYearOfTheGoat");
 		return (false);  
@@ -2041,7 +2042,7 @@ bool canAffordSpeedUpConstruction(int queryID = -1, int index = -1, int escrowID
 // We might want to add randomness as now every building is sped up ^^
 //==============================================================================
 rule rSpeedUpBuilding
-minInterval 6
+minInterval 10
 inactive
 {
 	// Set up a query
@@ -2109,7 +2110,7 @@ inactive
 // - No enemy army nearby otherwise they get killed, resurrected and killed again
 //==============================================================================
 rule rRecreation
-minInterval 1
+minInterval 15
 inactive
 {
 	static int deadQuery = -1;
@@ -2189,7 +2190,7 @@ inactive
 // This is gonna be ugly
 //==============================================================================
 rule rTsunami
-minInterval 5
+minInterval 25
 inactive
 {
 	static int enemyTownQuery = -1;
@@ -2256,7 +2257,7 @@ inactive
 			{
 				// Yay we did it!
 				aiEcho("Thanks WarriorMario for helping me out here ;)");
-				breakpoint;
+			//	breakpoint;   // WHY??? :(
 			}
 			
 		}
@@ -2265,7 +2266,7 @@ inactive
 }
 //==============================================================================
 rule rYearOfTheGoat
-minInterval 12
+minInterval 15
 inactive
 {
 	vector position = kbGetTownLocation()+ vector(2,2,2);// Little bit off the town position

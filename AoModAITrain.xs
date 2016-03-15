@@ -609,7 +609,7 @@ rule trainMythUnit
     //aiEcho("Training a myth unit: "+kbGetProtoUnitName(puid));
 }
 
-/* disabled for now
+
 //==============================================================================
 rule trainMilitaryUnitsAtOtherBase
     minInterval 45 //starts in cAge2
@@ -617,11 +617,7 @@ rule trainMilitaryUnitsAtOtherBase
 {
     aiEcho("trainMilitaryUnitsAtOtherBase:");
 
-    if (cMyCulture == cCultureAtlantean)
-    {
-        xsDisableSelf();
-        return;
-    }
+
     
     if (xsGetTime() < 10*60*1000)
         return;
@@ -658,7 +654,7 @@ rule trainMilitaryUnitsAtOtherBase
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
     else if (cMyCulture == cCultureChinese)
-        building1ID = UnitTypeStableChinese;		
+        building1ID = cUnitTypeStableChinese;		
 
     int bigBuildingID = cUnitTypeMigdolStronghold;
     if (cMyCulture == cCultureGreek)
@@ -754,6 +750,10 @@ rule trainMilitaryUnitsAtOtherBase
         {
             puid = cUnitTypeSwordsman;
         }
+        else if (cMyCulture == cCultureChinese)
+        {
+            puid = cUnitTypeAbstractCavalry;
+        }		
     }
     else if (buildingToUse == bigBuilding1ID)
     {
@@ -806,6 +806,16 @@ rule trainMilitaryUnitsAtOtherBase
                 puid = cUnitTypeTridentSoldier;
             }
         }
+        else if (cMyCulture == cCultureChinese)
+        {
+            if ((kbGetAge() > cAge3) && (randomUnit > 0))
+            {
+                puid = cUnitTypeFireLance;
+            }
+            else
+            {
+                puid = cUnitTypeWarChariot;
+            }		
     }
     else
     {
@@ -844,7 +854,8 @@ rule trainMilitaryUnitsAtOtherBase
     aiPlanSetDesiredPriority(trainRandomMilitaryUnitPlanID, 95);
     aiPlanSetActive(trainRandomMilitaryUnitPlanID);
 }
-*/
+}
+
 
 //==============================================================================
 rule hesperides //Watch for ownership of a hesperides tree, make driads if you own it.  
@@ -1065,6 +1076,10 @@ rule maintainSiegeUnits
     {
         siegeUnitType1 = cUnitTypePortableRam;
     }
+    else if (cMyCulture == cCultureChinese)
+    {
+        siegeUnitType1 = cUnitTypeSittingTiger;
+    }	
     else if (cMyCulture == cCultureAtlantean)
     {
         if (kbGetAge() < cAge4)

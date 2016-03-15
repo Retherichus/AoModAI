@@ -36,6 +36,8 @@ extern bool gSuperboom = true;            // The Ai will set goals to harvest X 
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
 extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
 extern bool bWallUp = true;              // This ensures that the Ai will build walls(almost always), regardless of personality.
+extern bool Age3Armory = false;           // Prevents the Ai from researching armory upgrades before reaching Heroic Age.
+
 
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
 extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. (Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
@@ -210,6 +212,8 @@ void initRethlAge1(void)  // Am I doing this right??
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
 	
+	   
+	   
 	   if (gHuntEarly == true)
 		{
 		if (cMyCulture == cCultureGreek)
@@ -336,7 +340,7 @@ rule ActivateRethOverridesAge1
     }
 	
 rule ActivateRethOverridesAge2
-   minInterval 60
+   minInterval 30
    active
 {
     if (kbGetAge() > cAge1)
@@ -356,12 +360,12 @@ rule ActivateRethOverridesAge2
 }
 
 rule ActivateRethOverridesAge3
-   minInterval 60
+   minInterval 30
    active
 {
     if (kbGetAge() > cAge2)
     {
-            int mainBaseID = kbBaseGetMainID(cMyID);
+        
 		if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Dabogong) == cTechStatusActive)
         xsEnableRuleGroup("Dabogong");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Hebo) == cTechStatusActive)
@@ -369,13 +373,19 @@ rule ActivateRethOverridesAge3
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Zhongkui) == cTechStatusActive)
         xsEnableRuleGroup("Zhongkui");
 		
+		
+		if (cMyCiv != cCivThor && Age3Armory == true)
+        xsEnableRuleGroup("ArmoryAge2");
+        if (cMyCiv == cCivThor && Age3Armory == true)
+        xsEnableRuleGroup("ArmoryThor");
+		
 		xsDisableSelf();
            
     }
 }
 
 rule ActivateRethOverridesAge4
-   minInterval 5
+   minInterval 30
    active
 {
     if (kbGetAge() > cAge3)
@@ -386,6 +396,8 @@ rule ActivateRethOverridesAge4
         xsEnableRuleGroup("Xiwangmu");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Chongli) == cTechStatusActive)
         xsEnableRuleGroup("Chongli");
+		if (cMyCulture == cCultureNorse)
+		xsEnableRule("getMediumArchers");	
     
 	   xsEnableRule("repairTitanGate");
 		
@@ -820,13 +832,13 @@ if (GoldSupply < 400 && FoodSupply > 500 && WoodSupply > GoldSupply)
 		resname = "Gold";
 	}
 
-	if (MyFavor < 60 && FoodSupply > 600 && WoodSupply > 600 && GoldSupply > 600)
+	if (MyFavor < 60 && FoodSupply > 600 && WoodSupply > 300 && GoldSupply > 600)
 	{
 		res  = cResourceFavor;
 		resname = "Favor";
 	}
 	
-	if (MyFavor < 20)
+	if (MyFavor < 30)
 	{
 		res  = cResourceFavor;
 		resname = "Favor";
@@ -944,4 +956,136 @@ rule getGreatWall
         aiPlanSetActive(x);
         aiEcho("Getting Great Wall");
     }
+}
+//==============================================================================
+// getNumberUnits
+//==============================================================================
+int getNumberUnits(int unitType=-1, int playerID=-1, int state=cUnitStateAlive)
+{
+	int count=-1;
+   static int unitQueryID=-1;
+
+   //Create the query if we don't have it yet.
+   if (unitQueryID < 0)
+      unitQueryID=kbUnitQueryCreate("GetNumberOfUnitsQuery");
+   
+	//Define a query to get all matching units.
+	if (unitQueryID != -1)
+	{
+		kbUnitQuerySetPlayerID(unitQueryID, playerID);
+      kbUnitQuerySetUnitType(unitQueryID, unitType);
+      kbUnitQuerySetState(unitQueryID, state);
+	}
+	else
+   	return(0);
+
+	kbUnitQueryResetResults(unitQueryID);
+	return(kbUnitQueryExecute(unitQueryID));
+}
+//==============================================================================
+// RULE: buildManyBuildings (Age of Buildings strategy --- Poseidon ONLY)
+//==============================================================================
+rule buildManyBuildings
+   minInterval 30
+   active
+{
+//   float currentFood=kbResourceGet(cResourceFood);
+   float currentWood=kbResourceGet(cResourceWood);
+//   float currentGold=kbResourceGet(cResourceGold);
+//   float currentFavor=kbResourceGet(cResourceFavor);
+
+   static int unitQueryID=-1;
+
+   if (cMyCiv != cCivPoseidon)
+   {
+	xsDisableSelf();
+	return;
+   }
+  
+   int numberOfArcheryRange=kbUnitCount(cMyID, cUnitTypeArcheryRange, cUnitStateAlive);
+   int numberOfBarracks=kbUnitCount(cMyID, cUnitTypeBarracks, cUnitStateAlive);
+   int numberOfStables=kbUnitCount(cMyID, cUnitTypeStable, cUnitStateAlive);
+   int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAlive);
+   int numberSettlements=getNumberUnits(cUnitTypeAbstractSettlement, cMyID, cUnitStateAliveOrBuilding);
+
+   if (numberOfFortresses < 1 || numberSettlements < 2)
+      return;
+
+   if (kbGetAge() < 2)
+      return;
+
+   if (currentWood < 900)
+      return;
+
+ if (numberOfArcheryRange < 15 || numberOfBarracks < 15 || numberOfStables < 15)
+ {
+   int planID=aiPlanCreate("Build More Buildings", cPlanBuild);
+   if (planID >= 0)
+   {
+      int randSelect=aiRandInt(3);
+
+      if (randSelect == 0)
+	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeArcheryRange);
+      else if (randSelect == 1)
+	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeBarracks);
+      else
+	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeStable);
+
+      aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
+      aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 0.0);
+      aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
+      aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
+      aiPlanSetBaseID(planID, kbBaseGetMainID(cMyID));
+      aiPlanSetDesiredPriority(planID, 20);
+      int builderTypeID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder,0);
+      aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
+      aiPlanSetEscrowID(planID, cRootEscrowID);
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Settlement Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSettlement);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+
+   kbUnitQueryResetResults(unitQueryID);
+   int numberFound=kbUnitQueryExecute(unitQueryID);
+   int unit=kbUnitQueryGetResult(unitQueryID, aiRandInt(numberFound));
+
+    int unitBaseID=kbBaseGetMainID(cMyID);
+    if (unit != -1)
+    {
+       //Get new base ID.
+       unitBaseID=kbUnitGetBaseID(unit);
+    }
+
+      aiPlanSetBaseID(planID, unitBaseID);
+
+      vector location = kbUnitGetPosition(unit);
+
+      vector backVector = kbBaseGetFrontVector(cMyID, unitBaseID);
+
+      float x = xsVectorGetX(backVector);
+      float z = xsVectorGetZ(backVector);
+      x = x * aiRandInt(40) - 20;
+      z = z * aiRandInt(40) - 20;
+
+      backVector = xsVectorSetX(backVector, x);
+      backVector = xsVectorSetZ(backVector, z);
+      backVector = xsVectorSetY(backVector, 0.0);
+//      vector location = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
+      location = location + backVector;
+      aiPlanSetVariableVector(planID, cBuildPlanInfluencePosition, 0, location);
+      aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionDistance, 0, 10.0);
+      aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionValue, 0, 1.0);
+
+      aiPlanSetActive(planID);
+   }
+ }
 }

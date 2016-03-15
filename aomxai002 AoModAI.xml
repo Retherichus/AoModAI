@@ -144,5 +144,17 @@
       <name>Suennon<culture>Atlantean</culture></name>
       <name>Thildo<culture>Atlantean</culture></name>
       <name>Thoun<culture>Atlantean</culture></name>
+		<nameID>62000<culture>Chinese</culture></nameID>
+		<nameID>62001<culture>Chinese</culture></nameID>
+		<nameID>62002<culture>Chinese</culture></nameID>
+		<nameID>62003<culture>Chinese</culture></nameID>
+		<nameID>62004<culture>Chinese</culture></nameID>
+		<nameID>62005<culture>Chinese</culture></nameID>
+		<nameID>62006<culture>Chinese</culture></nameID>
+		<nameID>62007<culture>Chinese</culture></nameID>
+		<nameID>62008<culture>Chinese</culture></nameID>
+		<nameID>62009<culture>Chinese</culture></nameID>
+		<nameID>62010<culture>Chinese</culture></nameID>
+		<nameID>62011<culture>Chinese</culture></nameID>	  
    </playerNames>
 </AI>
