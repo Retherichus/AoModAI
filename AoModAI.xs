@@ -355,6 +355,7 @@ include "AoModAITechsA.xs";
 include "AoModAITechsE.xs";
 include "AoModAITechsG.xs";
 include "AoModAITechsN.xs";
+include "AoModAITechsC.xs";  // Chinese god-techs
 
 //==============================================================================
 //trainRules Include.
@@ -1702,6 +1703,12 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 	gGoldForecast = RethLAGAge4+.0;
 	gWoodForecast = RethLAWAge4+.0;
     }	
+	if (cMyCulture == cCultureChinese && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLCFAge4+.0;
+	gGoldForecast = RethLCGAge4+.0;
+	gWoodForecast = RethLCWAge4+.0;
+    }		
 	
 	
 
@@ -1853,6 +1860,12 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 	gGoldForecast = RethLAGAge3+.0;
 	gWoodForecast = RethLAWAge3+.0;
     }	
+	if (cMyCulture == cCultureChinese && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLCFAge3+.0;
+	gGoldForecast = RethLCGAge3+.0;
+	gWoodForecast = RethLCWAge3+.0;
+    }		
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -2047,7 +2060,13 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 	gFoodForecast = RethLAFAge2+.0;
 	gGoldForecast = RethLAGAge2+.0;
 	gWoodForecast = RethLAWAge2+.0;
-    }	
+    }
+	if (cMyCulture == cCultureChinese && RethEcoGoals == true)
+    {
+	gFoodForecast = RethLCFAge2+.0;
+	gGoldForecast = RethLCGAge2+.0;
+	gWoodForecast = RethLCWAge2+.0;
+    }		
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -2817,6 +2836,84 @@ void initAtlantean(void)
         xsEnableRule("buildSkyPassages");
 }
 
+
+//==============================================================================
+void initChinese(void)
+{
+    //aiEcho("Chinese Init:");
+
+    // Chinese
+    // aiSetFavorNeedModifier(10.0); // The Greek uses this, perhaps the chinese should as well?
+    gLandScout=cUnitTypeScoutChinese;
+    gWaterScout=cUnitTypeFishingShipChinese;
+    gAirScout=-1;
+    // Use any hero for gathering relics
+    gGatherRelicType = cUnitTypeHero;   //use any hero       
+    gGardenBuildLimit = 10;
+
+	if (cMyCiv == cCivNuwa)
+    {	
+	tradeWithCaravans();
+    }		
+		if (cMyCiv == cCivFuxi)
+	   { 
+		xsEnableRule("rSpeedUpBuilding");
+	   }
+		if(cMyCulture == cCultureChinese)
+	{   
+		createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 6, false, kbBaseGetMainID(cMyID));
+		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 3, false, kbBaseGetMainID(cMyID));
+		createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, 2, false, kbBaseGetMainID(cMyID));
+	}
+        if (aiGetWorldDifficulty() != cDifficultyEasy && cMyCulture == cCultureChinese)
+            createSimpleMaintainPlan(cUnitTypeSittingTiger, 3, false, kbBaseGetMainID(cMyID));
+
+      //Create the Chinese scout plans.
+    int exploreID=-1;
+    int i = 0;
+ 
+    for (i = 0; < 2)
+    {
+        exploreID = aiPlanCreate("Explore_Special_Chinese"+i, cPlanExplore);
+        if (exploreID >= 0)
+        {
+            aiPlanAddUnitType(exploreID, cUnitTypeScoutChinese, 0, 1, 1);
+            aiPlanAddUnitType(exploreID, cUnitTypeScoutChinese, 0, 1, 1); 
+            aiPlanSetVariableBool(exploreID, cExplorePlanDoLoops, 0, false);
+            aiPlanSetActive(exploreID);
+        }  
+
+		
+
+
+   // Make sure we always have at least 1 Scout Cavalry
+   int oracleMaintainPlanID = createSimpleMaintainPlan(cUnitTypeScoutChinese, 1, true, kbBaseGetMainID(cMyID));
+
+    // Special emergency house build for Lightning
+    if (aiGetGameMode() == cGameModeLightning)
+    {                                   
+        // Build a house, just one, ASAP, not military, economy, economy escrow, my main base, 1 builder please.
+        createSimpleBuildPlan(cUnitTypeHouse, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
+    }
+   
+    aiSetAutoFavorGather(false);
+
+    // Default to random minor god choices, override below if needed
+    gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
+    //Random Age3 God.
+    gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
+    //Random Age4 God.
+    gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
+
+    // Control variable overrides
+    if (cvAge2GodChoice != -1)
+        gAge2MinorGod = cvAge2GodChoice;
+    if (cvAge3GodChoice != -1)
+        gAge3MinorGod = cvAge3GodChoice;
+    if (cvAge4GodChoice != -1)
+        gAge4MinorGod = cvAge4GodChoice;
+}
+}
 //==============================================================================
 int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
     int maxUnits=20, int minPop=-1, int maxPop=-1, int numberBuildings=1,
@@ -3402,7 +3499,121 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                 }
                 break;
             }
+  //Shennong.
+            case cCivShennong:
+            {
+                if (upRand == 0)
+                {
+                    //aiEcho("Executing case 0, upRand = "+upRand);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractInfantry, 0.5);    // vs inf
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+                }
+                else if (upRand == 1)
+                {
+                    //aiEcho("Executing case 1, upRand = "+upRand);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractInfantry, 0.3);    // vs archer
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.8);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+                }
+                else
+                {
+                    //aiEcho("Executing case 2, upRand = "+upRand);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractInfantry, 0.7);    // vs cav
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.6);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+                }
+                break;			
         }
+  //Nuwa.
+            case cCivNuwa:
+            {
+                if (upRand == 0)
+                {
+                    //aiEcho("Executing case 0, upRand = "+upRand);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractInfantry, 0.5);    // vs inf
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+                }
+                else if (upRand == 1)
+                {
+                    //aiEcho("Executing case 1, upRand = "+upRand);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractInfantry, 0.3);    // vs archer
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.8);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+                }
+                else
+                {
+                    //aiEcho("Executing case 2, upRand = "+upRand);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractInfantry, 0.7);    // vs cav
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.6);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+                }
+                break;			
+        }
+  //Fuxi.
+            case cCivFuxi:
+            {
+                if (upRand == 0)
+                {
+                    //aiEcho("Executing case 0, upRand = "+upRand);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractInfantry, 0.5);    // vs inf
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+                }
+                else if (upRand == 1)
+                {
+                    //aiEcho("Executing case 1, upRand = "+upRand);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractInfantry, 0.3);    // vs archer
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.8);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+                }
+                else
+                {
+                    //aiEcho("Executing case 2, upRand = "+upRand);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractInfantry, 0.7);    // vs cav
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.6);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
+//                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+                }
+                break;			
+        }
+}		
         kbUnitPickSetPreferenceFactor(upID, cUnitTypeDryad, 0.0);      // This should *only* be produced through the hesperides rule
     }  // End if / cvPrimaryMilitaryUnit
 
@@ -3576,6 +3787,11 @@ void init(void)
             initAtlantean();
             break;
         }
+        case cCultureChinese:
+        {
+            initChinese();
+            break;
+        }		
     }
     //Setup the progression to follow these minor gods.
     kbTechTreeAddMinorGodPref(gAge2MinorGod);
@@ -4740,6 +4956,64 @@ void age2Handler(int age=1)
             xsEnableRule("getSafePassage");
         }
     }
+ else if (cMyCulture == cCultureChinese)
+    {
+        //Force Chinese Stables to go down.
+        int ChineseStablesPlanID=aiPlanCreate("ChineseStables", cPlanBuild);
+        if (ChineseStablesPlanID >= 0)
+        {
+            aiPlanSetVariableInt(ChineseStablesPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeStableChinese);
+            aiPlanSetVariableBool(ChineseStablesPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
+            aiPlanSetVariableFloat(ChineseStablesPlanID, cBuildPlanRandomBPValue, 0, 0.0);
+
+            fx = fzOrig * (-21);
+            fz = fxOrig * 21;
+
+            frontVector = xsVectorSetX(frontVector, fx);
+            frontVector = xsVectorSetZ(frontVector, fz);
+            frontVector = xsVectorSetY(frontVector, 0.0);
+            location = origLocation + frontVector;
+
+            aiPlanSetVariableVector(ChineseStablesPlanID, cBuildPlanInfluencePosition, 0, location);
+            aiPlanSetVariableFloat(ChineseStablesPlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
+            aiPlanSetVariableFloat(ChineseStablesPlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
+            aiPlanSetVariableFloat(ChineseStablesPlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
+
+            aiPlanSetDesiredPriority(ChineseStablesPlanID, 100);
+            aiPlanAddUnitType(ChineseStablesPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+            aiPlanSetEscrowID(ChineseStablesPlanID, cMilitaryEscrowID);
+            aiPlanSetBaseID(ChineseStablesPlanID, kbBaseGetMainID(cMyID));
+            aiPlanSetActive(ChineseStablesPlanID);
+        }
+
+        //Force Chinese War Academy to go down.
+        int WarAcademyPlanID=aiPlanCreate("WarAcademy", cPlanBuild);
+        if (WarAcademyPlanID >= 0)
+        {
+            aiPlanSetVariableInt(WarAcademyPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeAcademy);
+            aiPlanSetVariableBool(WarAcademyPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
+            aiPlanSetVariableFloat(WarAcademyPlanID, cBuildPlanRandomBPValue, 0, 0.0);
+          
+            fx = fzOrig * 21;
+            fz = fxOrig * (-21);
+
+            frontVector = xsVectorSetX(frontVector, fx);
+            frontVector = xsVectorSetZ(frontVector, fz);
+            frontVector = xsVectorSetY(frontVector, 0.0);
+            location = origLocation + frontVector;
+
+            aiPlanSetVariableVector(WarAcademyPlanID, cBuildPlanInfluencePosition, 0, location);
+            aiPlanSetVariableFloat(WarAcademyPlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
+            aiPlanSetVariableFloat(WarAcademyPlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
+            aiPlanSetVariableFloat(WarAcademyPlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
+
+            aiPlanSetDesiredPriority(WarAcademyPlanID, 100);
+            aiPlanAddUnitType(WarAcademyPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+            aiPlanSetEscrowID(WarAcademyPlanID, cMilitaryEscrowID);
+            aiPlanSetBaseID(WarAcademyPlanID, kbBaseGetMainID(cMyID));
+            aiPlanSetActive(WarAcademyPlanID);
+        }
+    }	
 
     //Build walls if we should.
     if (gBuildWalls == true)
@@ -4974,6 +5248,12 @@ void age3Handler(int age=2)
             numBuilders = 1;
             break;
         }
+        case cCultureChinese:
+        {
+            buildingType = cUnitTypeCastle;
+            numBuilders = 2;
+            break;
+        }		
     }
     
     int builderType = cUnitTypeAbstractVillager;
@@ -5987,5 +6267,9 @@ void attackChatCallback(int parm1=-1)
 {
     aiCommsSendStatement(aiGetMostHatedPlayerID(), cAICommPromptAIAttack, -1); 
 }
+
+
+
+
 
 

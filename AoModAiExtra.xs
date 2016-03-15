@@ -21,7 +21,7 @@ mutable void retreatHandler(int planID=-1) {}
 mutable void relicHandler(int relicID=-1) {}
 mutable void wonderDeathHandler(int playerID=-1) { }
 extern bool ConfirmFish = false;          // Don't change this, It's for extra safety when fishing, and it'll enable itself if fish is found.
-
+extern int gGardenBuildLimit = 0;
 
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
@@ -160,6 +160,26 @@ extern int RethLAGAge4 = 1000;              // Gold
 extern int RethLAWAge4 = 600;              // Wood
 
 
+//==============================================================================
+//Chinese
+//==============================================================================
+
+//Age 2 (Classical Age)
+extern int RethLCFAge2 = 900;              // Food
+extern int RethLCGAge2 = 700;              // Gold
+extern int RethLCWAge2 = 400;              // Wood
+
+//Age 3 (Heroic Age)
+
+extern int RethLCFAge3 = 1000;              // Food
+extern int RethLCGAge3 = 1000;              // Gold
+extern int RethLCWAge3 = 450;              // Wood
+
+//Age 4 (Mythic Age)
+
+extern int RethLCFAge4 = 1400;              // Food
+extern int RethLCGAge4 = 1000;              // Gold
+extern int RethLCWAge4 = 600;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -199,8 +219,16 @@ void initRethlAge1(void)  // Am I doing this right??
 	    if (cMyCulture == cCultureEgyptian)
 		aiSetMinNumberNeedForGatheringAggressvies(5);
 		if (cMyCulture == cCultureNorse)
-		aiSetMinNumberNeedForGatheringAggressvies(4);	
+		aiSetMinNumberNeedForGatheringAggressvies(4);
+		if (cMyCulture == cCultureChinese)
+		aiSetMinNumberNeedForGatheringAggressvies(5);			
         }
+		
+	  if ((cRandomMapName == "highlands") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad")))
+	  {
+	  gTransportMap = false;
+	  }
+
 }
 
 //==============================================================================
@@ -240,6 +268,27 @@ void initRethlAge2(void)
     {	
 	xsEnableRule("getFocus");
     }
+	if (cMyCiv == cCivNuwa)
+    {	
+	xsEnableRule("getAcupuncture");
+	xsEnableRule("getEarthenWall");
+	xsEnableRule("buildGarden");
+	xsEnableRule("ChooseGardenResource");	
+    }	
+	if (cMyCiv == cCivFuxi)
+    {	
+	xsEnableRule("getDomestication");
+	xsEnableRule("getEarthenWall");
+	xsEnableRule("buildGarden");
+	xsEnableRule("ChooseGardenResource");	
+    }	
+	if (cMyCiv == cCivShennong)
+    {	
+	xsEnableRule("getWheelbarrow");
+	xsEnableRule("getEarthenWall");
+	xsEnableRule("buildGarden");
+	xsEnableRule("ChooseGardenResource");
+    }		
 	   if ((cRandomMapName == "highland") || (cRandomMapName == "nomad"))
 	{
 	gWaterMap=true;
@@ -293,7 +342,15 @@ rule ActivateRethOverridesAge2
     if (kbGetAge() > cAge1)
     {
 		initRethlAge2();
+        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Change) == cTechStatusActive)
+        xsEnableRuleGroup("Change");
+        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Huangdi) == cTechStatusActive)
+        xsEnableRuleGroup("Huangdi");
+        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Sunwukong) == cTechStatusActive)
+        xsEnableRuleGroup("Sunwukong");
+		
 		xsDisableSelf();
+		
            
     }
 }
@@ -304,7 +361,13 @@ rule ActivateRethOverridesAge3
 {
     if (kbGetAge() > cAge2)
     {
-        //placeholder.. thanks for noticing!
+            int mainBaseID = kbBaseGetMainID(cMyID);
+		if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Dabogong) == cTechStatusActive)
+        xsEnableRuleGroup("Dabogong");
+        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Hebo) == cTechStatusActive)
+        xsEnableRuleGroup("Hebo");
+        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Zhongkui) == cTechStatusActive)
+        xsEnableRuleGroup("Zhongkui");
 		
 		xsDisableSelf();
            
@@ -317,7 +380,14 @@ rule ActivateRethOverridesAge4
 {
     if (kbGetAge() > cAge3)
     {
-    xsEnableRule("repairTitanGate");
+	    if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Aokuang) == cTechStatusActive)
+        xsEnableRuleGroup("Aokuang");
+        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Xiwangmu) == cTechStatusActive)
+        xsEnableRuleGroup("Xiwangmu");
+        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Chongli) == cTechStatusActive)
+        xsEnableRuleGroup("Chongli");
+    
+	   xsEnableRule("repairTitanGate");
 		
 		xsDisableSelf();
            
@@ -350,8 +420,10 @@ rule DockDefenseMonitor
 			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeLongboat);
 			if (cMyCulture == cCultureAtlantean)
 			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeBireme);
+			if (cMyCulture == cCultureChinese)
+			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeJunk);
             
-			aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 1); 
+			aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 2); 
             aiPlanSetActive(planID);
             aiPlanSetDesiredPriority(planID, 50);
 			xsDisableSelf();
@@ -638,4 +710,238 @@ rule Helpme
    //Keep the books
    messageSent=true;
    xsSetRuleMinIntervalSelf(600);  
+}
+
+
+//==============================================================================
+// buildGarden // Stolen from the Expansion. ):
+//==============================================================================
+rule buildGarden
+   minInterval 11
+   inactive
+{
+	if(cMyCulture != cCultureChinese)
+	{
+		xsDisableSelf();
+		return;
+	}
+
+	int gardenProtoID = cUnitTypeGarden;
+
+   //If we have any houses that are building, skip.
+   if (kbUnitCount(cMyID, gardenProtoID, cUnitStateBuilding) > 0)
+	  return;
+   
+	//If we already have gGardenBuildLimit gardens, we shouldn't build anymore.
+   if (gGardenBuildLimit != -1)
+   {
+	  int numberOfGardens = kbUnitCount(cMyID, gardenProtoID, cUnitStateAliveOrBuilding);
+	  if (numberOfGardens >= gGardenBuildLimit)
+		 return;
+   }
+   //If we already have a garden plan active, skip.
+   if (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, gardenProtoID) > -1)
+	  return;
+
+   //Over time, we will find out what areas are good and bad to build in.  Use that info here, because we want to protect houses.
+	int planID = aiPlanCreate("BuildGarden", cPlanBuild);
+   if (planID >= 0)
+   {
+	  aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, gardenProtoID);
+	  aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, true);
+	  aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 100.0);
+	  aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
+	  aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
+	  aiPlanSetDesiredPriority(planID, 100);
+
+		int builderTypeID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder,0);
+	  if (cMyCulture == cCultureNorse)
+		 builderTypeID = cUnitTypeUlfsark;   // Exact match for land scout, so build plan can steal scout
+	  if(cMyCulture == cCultureChinese)
+		  builderTypeID = cUnitTypeVillagerChinese; // Temp chinese fix
+
+		aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
+	  aiPlanSetEscrowID(planID, cEconomyEscrowID);
+
+	  vector backVector = kbBaseGetBackVector(cMyID, kbBaseGetMainID(cMyID));
+
+	  float x = xsVectorGetX(backVector);
+	  float z = xsVectorGetZ(backVector);
+	  x = x * 40.0;
+	  z = z * 40.0;
+
+	  backVector = xsVectorSetX(backVector, x);
+	  backVector = xsVectorSetZ(backVector, z);
+	  backVector = xsVectorSetY(backVector, 0.0);
+	  vector location = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
+	  int areaGroup1 = kbAreaGroupGetIDByPosition(location);   // Base area group
+	  location = location + backVector;
+	  int areaGroup2 = kbAreaGroupGetIDByPosition(location);   // Back vector area group
+	  if (areaGroup1 != areaGroup2)
+		 location = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));   // Reset to area center if back is in wrong area group
+
+	  aiPlanSetVariableVector(planID, cBuildPlanInfluencePosition, 0, location);
+	  aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionDistance, 0, 20.0);
+	  aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionValue, 0, 1.0);
+
+	  aiPlanSetActive(planID);
+   }
+}
+
+//==============================================================================
+// Rule: ChooseGardenResource  // Redefined to fit this Ai better. (Reth)
+//==============================================================================
+rule ChooseGardenResource
+minInterval 20
+inactive
+{
+    float FoodSupply = kbResourceGet(cResourceFood);
+    float WoodSupply = kbResourceGet(cResourceWood); 
+	float GoldSupply = kbResourceGet(cResourceGold);
+    float MyFavor = kbResourceGet(cResourceFavor); 
+	
+	int res  = cResourceGold;
+	string resname = "Gold";
+if (FoodSupply < 500)
+	{
+		res  = cResourceFood;
+		resname = "Food";
+	}	
+
+	if (WoodSupply < 200 && FoodSupply > 500 && GoldSupply > WoodSupply)
+	{
+		res  = cResourceWood;
+		resname = "Wood";
+	}
+	
+if (GoldSupply < 400 && FoodSupply > 500 && WoodSupply > GoldSupply)
+	{
+		res  = cResourceGold;
+		resname = "Gold";
+	}
+
+	if (MyFavor < 60 && FoodSupply > 600 && WoodSupply > 600 && GoldSupply > 600)
+	{
+		res  = cResourceFavor;
+		resname = "Favor";
+	}
+	
+	if (MyFavor < 20)
+	{
+		res  = cResourceFavor;
+		resname = "Favor";
+	}
+	
+else if (FoodSupply > 600 && WoodSupply > 300 && GoldSupply > 400 && MyFavor > 60)
+{	
+    int choice = -1;
+    choice = aiRandInt(3);     // 0-3
+    
+    switch(choice)
+    {
+        case 0:  // Food
+        {
+		res  = cResourceFood;
+		resname = "Food";
+        }
+        case 1:  // Wood
+        {
+		res  = cResourceWood;
+		resname = "Wood";
+        }
+        case 2:  // Gold
+        {
+		res  = cResourceGold;
+		resname = "Gold";
+        }	
+}
+}	
+	aiEcho("Setting gardens to: " + resname);
+	kbSetGardenResource(res);
+    }		
+
+
+//==============================================================================
+rule getEarthenWall
+    inactive
+    minInterval 37 //starts in cAge2
+{
+    int techID = cTechEarthenWall;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        if (cMyCulture == cCultureChinese)
+            xsEnableRule("getStoneWall");
+        xsDisableSelf();
+        return;
+    }
+
+    aiEcho("getEarhernWall:");
+
+
+    
+    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+       
+    
+    if (kbGetTechStatus(techID) == cTechStatusAvailable)
+    {
+        int x = aiPlanCreate("StoneWall", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 98);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+
+    }
+}
+
+//==============================================================================
+rule getGreatWall
+    inactive
+//    minInterval 31 //starts in cAge3
+    minInterval 37 //starts in cAge2 activated in getStoneWall
+{
+    int techID = cTechGreatWall;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {		
+			
+        xsDisableSelf();
+        return;
+    }
+    
+    aiEcho("getGreatWall:");
+
+    if (kbGetTechStatus(cTechStoneWall) < cTechStatusResearching)
+    {
+        return;
+    }
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+    
+    int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
+    if (numFortresses < 1)
+        return;
+    
+    float goldSupply = kbResourceGet(cResourceGold);
+    float foodSupply = kbResourceGet(cResourceFood);    
+    if ((goldSupply < 600) || (foodSupply < 750))
+        return;
+        
+
+    static int count = 0;        
+    if (count < 1)
+    {
+        count = count + 1;
+        return;
+    }
+
+    if (kbGetTechStatus(techID) == cTechStatusAvailable)
+    {
+        int x = aiPlanCreate("GreatWall", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 90);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        aiEcho("Getting Great Wall");
+    }
 }

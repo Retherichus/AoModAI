@@ -895,8 +895,183 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         return (true);
     }
 
-    return (false);
+
+// Chinese GPS, copy paste from WarriorMario  ////////////
+
+// Set up the Barrage power
+	// 20 enemy military units within 30m of attack plan
+	if(powerProtoID == cPowerBarrage)
+	{
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
+		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelAttachedPlanLocation);
+		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 30.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 12);
+		aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
+		return (true);
+	}
+	// Set up the Call to Arms power
+	// If we have a group of 10 or more military units. Lets hope there is a mythunit present
+	if(powerProtoID == cPowerCallToArms)
+	{
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistanceSelf);
+		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
+		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 0.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
+		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
+		return (true);
+	}
+	// Set up the Earth Dragon power
+	// Near enemies?
+	if(powerProtoID == cPowerEarthDragon)
+	{
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
+		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
+		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 30.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
+		aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
+		aiPlanSetVariableBool(planID, cGodPowerPlanMultiCast, 0, true);
+		return (true);
+	}
+	// Set up the Examination power
+	// At least 50 villagers
+	if(powerProtoID == cPowerExamination)
+	{
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+
+		 //-- create the query used for evaluation
+		queryID = kbUnitQueryCreate("Examination Evaluation");
+		if (queryID < 0)
+		   return (false);
+
+		kbUnitQueryResetData(queryID);
+		kbUnitQuerySetPlayerID(queryID, cMyID);
+		kbUnitQuerySetUnitType(queryID, cUnitTypeAbstractVillager);
+		kbUnitQuerySetState(cUnitStateAlive);
+
+		aiPlanSetVariableInt(planID, cGodPowerPlanQueryID, 0, queryID);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 50);
+		aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
+		aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, cMyID);
+
+		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
+		return (true);   
+	}
+	// Set up the Geyser power
+	// Atleast 15 enemies lets hope we can get an army at once
+	// And we can place it nearby our army as we cannot be damaged by it (range is 10m)
+	if(powerProtoID == cPowerGeyser)
+	{ 
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
+		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
+		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 10.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 15);
+		aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
+		return (true);  
+	}
+	// Set up the Inferno power
+	// Atleast 25 enemies
+	// Dangerous for us too (range is 50 and not in our base!)
+	if(powerProtoID == cPowerInferno)
+	{ 
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
+		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
+		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 50.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 25);
+		return (true);  
+	}
+	// Set up the Journey power
+	// At least 70 units
+	if(powerProtoID == cPowerJourney)
+	{
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+
+		 //-- create the query used for evaluation
+		queryID = kbUnitQueryCreate("Journey Evaluation");
+		if (queryID < 0)
+		   return (false);
+
+		kbUnitQueryResetData(queryID);
+		kbUnitQuerySetPlayerID(queryID, cMyID);
+		kbUnitQuerySetUnitType(queryID, cUnitTypeLogicalTypeUnitsNotBuildings);
+		kbUnitQuerySetState(cUnitStateAlive);
+
+		aiPlanSetVariableInt(planID, cGodPowerPlanQueryID, 0, queryID);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 70);
+		aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
+		aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, cMyID);
+
+		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
+		return (true);   
+	}
+	// Set up the Recreation power
+	// Or actually destroy the plan and use painful manual casting
+	if(powerProtoID == cPowerRecreation)
+	{
+		aiPlanDestroy(planID);
+		xsEnableRule("rRecreation");
+		return (false);  
+	}
+	// Set up the Timber Harvest power
+	// We want 10 villagers on wood
+	if(powerProtoID == cPowerTimberHarvest)
+	{
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+		aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
+		aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceGold);
+		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
+		return (true);
+	}
+	// Set up the Tsunami power
+	// Or actually destroy the plan and use painful manual casting
+	if(powerProtoID == cPowerTsunami)
+	{
+		xsEnableRule("rTsunami");
+		return (false);  
+	}
+	// Set up the Uproot power
+	if(powerProtoID == cPowerUproot)
+	{
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
+		aiPlanSetVariableInt(planID,  cGodPowerPlanQueryPlayerID, 0, aiGetMostHatedPlayerID());
+		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
+		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 50.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 6);
+		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeLogicalTypeBuildingNotTitanGate);
+		return (true);  
+	}
+	// Set up the Year of the Goat power
+	// Or actually destroy the plan and use manual casting
+	if(powerProtoID == cPowerTsunami)
+	{
+		xsEnableRule("rYearOfTheGoat");
+		return (false);  
+	}
+
+   return (false);
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 //==============================================================================
 void initGodPowers(void)    //initialize the god power module
@@ -1822,4 +1997,290 @@ rule rShiftingSand
 
    aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelDualLocation);
    
+}
+
+// Chinese rules, copy paste from WarriorMario //////////
+
+
+//==============================================================================
+// canAffordSpeedUpConstruction(int queryID, int index)
+// Function to check whether we can afford a speed up
+//==============================================================================
+bool canAffordSpeedUpConstruction(int queryID = -1, int index = -1, int escrowID = -1)
+{
+	int gold  = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceGold );
+	int wood  = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceWood );
+	int food  = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceFood );
+	int favor = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceFavor);
+	if(kbEscrowGetAmount(escrowID, cResourceGold)<gold)
+	{
+		return(false);
+	}
+	if(kbEscrowGetAmount(escrowID, cResourceWood)<wood)
+	{
+		return(false);
+	}
+	if(kbEscrowGetAmount(escrowID, cResourceFood)<food)
+	{
+		return(false);
+	}
+	if(kbEscrowGetAmount(escrowID, cResourceFavor)<favor)
+	{
+		return(false);
+	}
+	return(true);
+}
+	
+//==============================================================================
+// rSpeedUpBuilding
+// There are some times we want to speed up when possible:
+// - economic buildings so we can get an edge over the other players as long as
+// it doesn't mess up our age times.
+// - military buildings in classical and higher
+// Script is somewhat weird atm as the functions require queryID and indices
+// We might want to add randomness as now every building is sped up ^^
+//==============================================================================
+rule rSpeedUpBuilding
+minInterval 6
+inactive
+{
+	// Set up a query
+	static int queryID = -1;
+	if(queryID ==-1)
+	{
+		queryID = kbUnitQueryCreate("Unit_ID_Query");
+	}
+	// Look for constructions
+	kbUnitQuerySetPlayerID(queryID, cMyID);
+	kbUnitQuerySetUnitType(queryID, cUnitTypeBuilding);
+	kbUnitQuerySetState(queryID, cUnitStateBuilding);
+	int numConstructions = kbUnitQueryExecute(queryID);
+	for(i =0; < numConstructions)
+	{
+		int buildingID = kbUnitQueryGetResult(queryID,i);
+		if(kbBuildingCanSpeedUpConstruction(queryID, i))
+		{
+			// Things we should speed up
+			if(kbUnitIsType(buildingID,cUnitTypeEconomicBuilding))
+			{
+				if(canAffordSpeedUpConstruction(queryID,0,cEconomyEscrowID))
+				{
+					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cEconomyEscrowID);
+				}
+			}
+			else if(kbUnitIsType(buildingID,cUnitTypeAbstractTemple))
+			{
+				if(canAffordSpeedUpConstruction(queryID,0,cEconomyEscrowID))
+				{
+					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cEconomyEscrowID);
+				}
+			}
+			else if(kbUnitIsType(buildingID,cUnitTypeDropsite))
+			{
+				if(canAffordSpeedUpConstruction(queryID,0,cEconomyEscrowID))
+				{
+					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cEconomyEscrowID);
+				}
+			}
+			else if(kbUnitIsType(buildingID,cUnitTypeAbstractDock))
+			{
+				if(canAffordSpeedUpConstruction(queryID,0,cEconomyEscrowID))
+				{
+					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cEconomyEscrowID);
+				}
+			}
+			else if(kbUnitIsType(buildingID,cUnitTypeBuilding)&&kbGetAge()>cAge1)
+			{
+				if(canAffordSpeedUpConstruction(queryID,0,cMilitaryEscrowID))
+				{
+					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cMilitaryEscrowID);
+				}
+			}
+		}
+	}
+}
+
+//==============================================================================
+// rRecreation
+// There are some times we want to cast recreation:
+// - 1 dead villager in archaic -> rule interval is very low, every second counts
+// - 2 dead villagers in classical
+// - 3 dead villagers in heroic and later
+// - No enemy army nearby otherwise they get killed, resurrected and killed again
+//==============================================================================
+rule rRecreation
+minInterval 1
+inactive
+{
+	static int deadQuery = -1;
+	static int deadNearbyQuery = -1;
+	static int enemyQuery = -1;
+	float enemyRange = 20.0;
+	int numRequired  = 1;// Early we want every villager to be alive
+	if(kbGetAge()==cAge2)
+	{
+		xsSetRuleMinIntervalSelf(10);// Less important
+		numRequired = 2;
+	}
+	if(kbGetAge()>cAge2)
+	{
+		xsSetRuleMinIntervalSelf(10);
+		numRequired = 3;
+	}
+	// Set up queries
+	if(deadQuery == -1)
+	{
+		deadQuery = kbUnitQueryCreate("Dead Villager Query");
+		kbUnitQuerySetPlayerID(deadQuery, cMyID);
+		kbUnitQuerySetUnitType(deadQuery, cUnitTypeVillagerChineseDeadReplacement);
+		kbUnitQuerySetState(deadQuery, cUnitStateAny);
+	}
+	kbUnitQueryResetResults(deadQuery);
+	if(deadNearbyQuery == -1)
+	{
+		deadNearbyQuery = kbUnitQueryCreate("Dead Nearby Villager Query");
+		kbUnitQuerySetPlayerID(deadNearbyQuery, cMyID);
+		kbUnitQuerySetUnitType(deadNearbyQuery, cUnitTypeVillagerChineseDeadReplacement);
+		kbUnitQuerySetState(deadNearbyQuery, cUnitStateAny);
+	}
+	int numDead = kbUnitQueryExecute(deadQuery);
+	if(enemyQuery == -1)
+	{
+		enemyQuery = kbUnitQueryCreate("Enemy Army Query");
+		kbUnitQuerySetPlayerID(enemyQuery, cMyID);
+		kbUnitQuerySetPlayerRelation(enemyQuery, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQuery, cUnitTypeMilitary);
+		kbUnitQuerySetState(enemyQuery, cUnitStateAlive);
+	}
+	// Loop through all the dead villagers we found
+	for(i=0;<numDead)
+	{
+		vector position = kbUnitGetPosition(kbUnitQueryGetResult(deadQuery,i));
+		kbUnitQueryResetResults(enemyQuery);
+		kbUnitQuerySetPosition(enemyQuery,position);
+		kbUnitQuerySetMaximumDistance(enemyQuery,enemyRange);
+		// Check for enemies
+		if(kbUnitQueryExecute(enemyQuery)==0)
+		{
+			// We want atleast 2 dead villagers
+			kbUnitQueryResetResults(deadNearbyQuery);
+			kbUnitQuerySetPosition(deadNearbyQuery,position);
+			kbUnitQuerySetMaximumDistance(deadNearbyQuery,10);// GP range
+			if(kbUnitQueryExecute(deadNearbyQuery)>1)
+			{
+				// 2 villagers to be revived lets go!
+				if(aiCastGodPowerAtPosition(cTechRecreation,position))
+				{
+					// Did we make it? Kill the rule if so
+					xsDisableSelf();
+				}
+			}
+		}
+	}
+}
+
+//==============================================================================
+// rTsunami
+// When to cast Tsunami:
+// - Enemy town
+// - Enough enemy buildings and units
+// Then we want to know how to cast Tsunami:
+// - In the direction of the houses
+// This is gonna be ugly
+//==============================================================================
+rule rTsunami
+minInterval 5
+inactive
+{
+	static int enemyTownQuery = -1;
+	static int enemyUnitsQuery = -1;
+	static int directionQuery = -1;
+	float townRange = 25;
+	int numReqUnits = 25;
+	if(enemyTownQuery == -1)
+	{
+		enemyTownQuery = kbUnitQueryCreate("Enemy Town Query");
+		kbUnitQuerySetPlayerID(enemyTownQuery, cMyID);
+		kbUnitQuerySetPlayerRelation(enemyTownQuery, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyTownQuery, cUnitTypeAbstractSettlement);
+		kbUnitQuerySetState(enemyTownQuery, cUnitStateAlive);
+	}
+	if(enemyUnitsQuery == -1)
+	{
+		enemyUnitsQuery = kbUnitQueryCreate("Enemy Units Query");
+		kbUnitQuerySetPlayerID(enemyUnitsQuery, cMyID);
+		kbUnitQuerySetPlayerRelation(enemyUnitsQuery, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyUnitsQuery, cUnitTypeLogicalTypeMilitaryUnitsAndBuildings);
+		kbUnitQuerySetState(enemyUnitsQuery, cUnitStateAliveOrBuilding);
+	}
+	if(directionQuery == -1)
+	{
+		directionQuery = kbUnitQueryCreate("Enemy Tower Query");
+		kbUnitQuerySetPlayerID(directionQuery, cMyID);
+		kbUnitQuerySetPlayerRelation(directionQuery, cPlayerRelationEnemy);
+		kbUnitQuerySetState(directionQuery, cUnitStateAlive);
+	}
+	int numTowns = kbUnitQueryExecute(enemyTownQuery);
+	for(i=0;< numTowns)
+	{
+		vector position = kbUnitGetPosition(kbUnitQueryGetResult(enemyTownQuery,i));
+		kbUnitQueryResetResults(enemyUnitsQuery);
+		kbUnitQuerySetPosition(enemyUnitsQuery, position);
+		kbUnitQuerySetMaximumDistance(enemyUnitsQuery,townRange);
+		if(kbUnitQueryExecute(enemyUnitsQuery)>=numReqUnits)
+		{
+			// Valid town
+			// Now get a good direction... I guess players and AI all love towers so lets try and nuke those
+			kbUnitQueryResetResults(directionQuery);
+			kbUnitQuerySetUnitType(directionQuery, cUnitTypeTower);
+			kbUnitQuerySetPosition(directionQuery, position);
+			kbUnitQuerySetMaximumDistance(directionQuery,townRange);
+			int numBuildings = kbUnitQueryExecute(directionQuery);
+			if(numBuildings==0)// Try other military buildings :/
+			{
+				kbUnitQueryResetResults(directionQuery);
+				kbUnitQuerySetUnitType(directionQuery, cUnitTypeMilitaryBuilding);
+				numBuildings = kbUnitQueryExecute(directionQuery);
+			}
+			if(numBuildings==0)// Still nothing
+			{
+				// This should never happen as we already checked for this but maybe in the nanosecond all the buildings died...
+				continue;// Better luck next town
+			}
+			// Okay now the shit that is super easy but is always done in the wrong order... Even by the devs so we have to fix that too
+			// aiCastGodPowerAtPositionFacingPosition() basically faces in the opposite direction because the dev rushed it.
+			vector startPosition = kbUnitGetPosition(kbUnitQueryGetResult(directionQuery,0));
+			// So uhm get the distance between the start and end position do that 2x and subtract it from the realfinalposition
+			vector finalPosition = position - (position-startPosition)*2;
+			if(aiCastGodPowerAtPositionFacingPosition(cTechTsunami,startPosition,finalPosition))
+			{
+				// Yay we did it!
+				aiEcho("Thanks WarriorMario for helping me out here ;)");
+				breakpoint;
+			}
+			
+		}
+	}
+	
+}
+//==============================================================================
+rule rYearOfTheGoat
+minInterval 12
+inactive
+{
+	vector position = kbGetTownLocation()+ vector(2,2,2);// Little bit off the town position
+	// Cast in archaic because we're rushing
+	if(cvRushBoomSlider>0.5)
+	{
+		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
+	}
+	else if(cvRushBoomSlider>0.0&&kbGetAge()>cAge1)
+	{
+		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
+	}
+	else if(kbGetAge()>cAge2)
+	{
+		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
+	}
+	
 }

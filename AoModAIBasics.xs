@@ -2008,6 +2008,8 @@ void taskMilUnitTrainAtBase(int baseID = -1)
         building1ID = cUnitTypeLonghouse;
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
+    else if (cMyCulture == cCultureChinese)
+        building1ID = cUnitTypeStableChinese;		
 
     int bigBuildingID = cUnitTypeMigdolStronghold;
     if (cMyCulture == cCultureGreek)
@@ -2015,7 +2017,9 @@ void taskMilUnitTrainAtBase(int baseID = -1)
     else if (cMyCulture == cCultureNorse)
         bigBuildingID = cUnitTypeHillFort;
     else if (cMyCulture == cCultureAtlantean)
-        bigBuildingID = cUnitTypePalace;	
+        bigBuildingID = cUnitTypePalace;
+    else if (cMyCulture == cCultureChinese)
+        bigBuildingID = cUnitTypeCastle;			
     
     int building1NearBase = getNumUnits(building1ID, cUnitStateAlive, -1, cMyID, baseLocation, 30.0);
     int bigBuildingNearBase = getNumUnits(bigBuildingID, cUnitStateAlive, -1, cMyID, baseLocation, 30.0);

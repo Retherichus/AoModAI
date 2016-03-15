@@ -505,6 +505,32 @@ rule trainMythUnit
         else if (gAge4MinorGod == cTechAge4Hekate)
             age4MythUnitID = cUnitTypeLampades;
     }
+    else if (cMyCulture == cCultureChinese)
+    {
+        // age2 myth units
+        if (gAge2MinorGod == cTechAge2Change)
+            age2MythUnitID = cUnitTypeQilin;
+        else if (gAge2MinorGod == cTechAge2Huangdi)
+            age2MythUnitID = cUnitTypeTerracottaSoldier;
+        else if (gAge2MinorGod == cTechAge2Sunwukong)
+            age2MythUnitID = cUnitTypeMonkeyKing;
+        
+        // age3 myth units
+        if (gAge3MinorGod == cTechAge3Dabogong)
+            age3MythUnitID = cUnitTypePixiu;
+        else if (gAge3MinorGod == cTechAge3Hebo)
+            age3MythUnitID = cUnitTypeWarSalamander;
+        else if (gAge3MinorGod == cTechAge3Zhongkui)
+            age3MythUnitID = cUnitTypeJiangshi;
+        
+        // age4 myth units
+        if (gAge4MinorGod == cTechAge4Aokuang)
+            age4MythUnitID = cUnitTypeAzureDragon;
+        else if (gAge4MinorGod == cTechAge4Xiwangmu)
+            age4MythUnitID = cUnitTypeWhiteTiger;
+        else if (gAge4MinorGod == cTechAge4Chongli)
+            age4MythUnitID = cUnitTypeVermilionBird;
+    }	
     
     if (number < 0)
     {
@@ -631,6 +657,8 @@ rule trainMilitaryUnitsAtOtherBase
         building1ID = cUnitTypeLonghouse;
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
+    else if (cMyCulture == cCultureChinese)
+        building1ID = UnitTypeStableChinese;		
 
     int bigBuildingID = cUnitTypeMigdolStronghold;
     if (cMyCulture == cCultureGreek)
@@ -638,7 +666,9 @@ rule trainMilitaryUnitsAtOtherBase
     else if (cMyCulture == cCultureNorse)
         bigBuildingID = cUnitTypeHillFort;
     else if (cMyCulture == cCultureAtlantean)
-        bigBuildingID = cUnitTypePalace;	
+        bigBuildingID = cUnitTypePalace;
+    else if (cMyCulture == cCultureChinese)
+        bigBuildingID = cUnitTypeCastle;		
     
 //    int building1NearBase = kbBaseGetNumberUnits(cMyID, otherBaseID, cPlayerRelationSelf, building1ID);    
     int building1NearBase = getNumUnits(building1ID, cUnitStateAlive, -1, cMyID, otherBaseLocation, 30.0);

@@ -56,7 +56,8 @@ void preInitMap()
       (cRandomMapName == "red sea migration") ||
       (cRandomMapName == "tos_northamerica-v1") ||    
       (cRandomMapName == "tos_northamerica") ||    
-      (cRandomMapName == "tos_northamerica-v1-1") ||    
+      (cRandomMapName == "tos_northamerica-v1-1") ||  
+      (cRandomMapName == "Yellow River") || 	  
       (cRandomMapName == "vesuvius-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||
       (cRandomMapName == "river styx"))
     {

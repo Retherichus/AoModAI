@@ -3093,6 +3093,8 @@ rule buildFortress
         bigBuildingID = cUnitTypeHillFort;
     else if (cMyCulture == cCultureAtlantean)
         bigBuildingID = cUnitTypePalace;	
+    else if (cMyCulture == cCultureChinese)
+        bigBuildingID = cUnitTypeCastle;		
 
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     if (numFortresses >= kbGetBuildLimit(cMyID, bigBuildingID))
@@ -3199,6 +3201,8 @@ rule buildFortress
                     building1ID = cUnitTypeLonghouse;
                 else if (cMyCulture == cCultureAtlantean)
                     building1ID = cUnitTypeBarracksAtlantean;
+                else if (cMyCulture == cCultureAtlantean)
+                    building1ID = cUnitTypeStableChinese;					
                 int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
                 if (numBuilding1NearBase > 0)
                     return;
@@ -3482,6 +3486,8 @@ rule buildBuildingsAtOtherBase
         building1ID = cUnitTypeLonghouse;
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
+    else if (cMyCulture == cCultureChinese)
+        building1ID = cUnitTypeStableChinese;		
         
     vector location = kbUnitGetPosition(otherBaseUnitID);
     aiEcho("location: "+location);
@@ -4252,11 +4258,27 @@ rule destroyUnnecessaryDropsites
                         continue;
                     }
                 }
+                else if (cMyCulture == cCultureChinese)
+                {
+                    if (kbUnitIsType(dropsiteID, cUnitTypeStoragePit) == true)
+                    {
+                        //aiEcho("dropsite is a Storage Pit, ID is: "+dropsiteID);
+                        //aiEcho("numTrees: "+numTrees+", numGoldMines: "+numGoldMines);
+                        if (((numTrees < 1) && (numGoldMines < 1)) || ((otherBaseID != mainBaseID) && (numGoldMines < 1)))
+                        {
+                            if ((kbGetTechStatus(cTechHandAxe) != cTechStatusResearching) && (kbGetTechStatus(cTechPickaxe) != cTechStatusResearching))
+                            {
+                                aiTaskUnitDelete(dropsiteID);
+                                //aiEcho("deleted unnecessary Storehouse with ID: "+dropsiteID);
+                            }
+                        }
+                        continue;				
             }
         }
     }
 }
-
+}
+}
 //==============================================================================
 rule findMySettlementsBeingBuilt
 //    minInterval 16 //starts in cAge2
