@@ -1149,7 +1149,8 @@ rule updateEMAge4
          civPopTarget = 35;
       milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.90);   }
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.90);   
+	  }
    else
  {
       int num1 =aiRandInt(3);
@@ -2801,7 +2802,7 @@ void initAtlantean(void)
 
    
     if (aiGetWorldDifficulty() != cDifficultyEasy)
-    createSimpleMaintainPlan(cUnitTypeOnager, 3, false, kbBaseGetMainID(cMyID));
+    createSimpleMaintainPlan(cUnitTypeOnager, 4, false, kbBaseGetMainID(cMyID));
 
    gLandScout=cUnitTypeOracleScout;
     gWaterScout=cUnitTypeFishingShipAtlantean;
@@ -5015,11 +5016,13 @@ void age2Handler(int age=1)
         if (gBuildWallsAtMainBase == true)
         {
             xsEnableRule("mainBaseAreaWallTeam1");
+			
+			if (aiGetWorldDifficulty() > cDifficultyHard)
 			xsEnableRule("MBSecondaryWall");
 			
 
-         //   if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
-            //    xsEnableRule("destroyUnnecessaryDropsites");
+           if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
+                xsEnableRule("destroyUnnecessaryDropsites");
             
             if (aiGetGameMode() != cGameModeDeathmatch)
                 xsEnableRule("setUnitPicker");

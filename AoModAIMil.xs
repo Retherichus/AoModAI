@@ -191,7 +191,7 @@ rule monitorDefPlans
                             gDefendPlanID = -1;
                             xsDisableRule("defendPlanRule");
                             
-                            xsSetRuleMinInterval("defendPlanRule", 8);
+                            xsSetRuleMinInterval("defendPlanRule", 2);
                             xsEnableRule("defendPlanRule");
                             countZ = 0;
                         }
@@ -461,7 +461,7 @@ rule monitorDefPlans
                     else
                     {
                         countA = 0;
-                        xsSetRuleMinInterval("defendSettlementPosition", 10);
+                        xsSetRuleMinInterval("defendSettlementPosition", 1);
                         xsDisableRule("defendSettlementPosition");
                         aiPlanDestroy(defendPlanID);
                         continue;
@@ -479,7 +479,7 @@ rule monitorDefPlans
                         else
                         {
                             resourceCountA = 0;
-                            xsSetRuleMinInterval("defendSettlementPosition", 10);
+                            xsSetRuleMinInterval("defendSettlementPosition", 1);
                             xsDisableRule("defendSettlementPosition");
                             aiPlanDestroy(defendPlanID);
                             continue;
@@ -568,7 +568,7 @@ rule monitorDefPlans
                     else
                     {
                         countB = 0;
-                        xsSetRuleMinInterval("defendBaseUnderAttack", 7);
+                        xsSetRuleMinInterval("defendBaseUnderAttack", 1);
                         xsDisableRule("defendBaseUnderAttack");
                         aiPlanDestroy(defendPlanID);
                         continue;
@@ -586,7 +586,7 @@ rule monitorDefPlans
                         else
                         {
                             resourceCountB = 0;
-                            xsSetRuleMinInterval("defendBaseUnderAttack", 7);
+                            xsSetRuleMinInterval("defendBaseUnderAttack", 1);
                             xsDisableRule("defendBaseUnderAttack");
                             aiPlanDestroy(defendPlanID);
                             
@@ -595,7 +595,7 @@ rule monitorDefPlans
                             xsDisableRule("defendPlanRule");
                             gBaseUnderAttackID = -1;
                             
-                            xsSetRuleMinInterval("defendPlanRule", 8);
+                            xsSetRuleMinInterval("defendPlanRule", 2);
                             xsEnableRule("defendPlanRule");
                             continue;
                         }
@@ -613,7 +613,7 @@ rule monitorDefPlans
 
 //==============================================================================
 rule monitorAttPlans
-    minInterval 15 //starts in cAge2
+    minInterval 7 //starts in cAge2
     inactive
 {
     aiEcho("* monitorAttackPlans:");
@@ -762,7 +762,7 @@ rule monitorAttPlans
                     
                     if (gSettlementPosDefPlanID > 0)
                     {
-                        xsSetRuleMinInterval("defendSettlementPosition", 10);
+                        xsSetRuleMinInterval("defendSettlementPosition", 1);
                         xsDisableRule("defendSettlementPosition");
                         aiPlanDestroy(gSettlementPosDefPlanID);
                     }
@@ -1256,7 +1256,7 @@ rule defendPlanRule
                     {
                         aiPlanDestroy(defendPlanID);
                         gDefendPlanID = -1;
-                        xsSetRuleMinIntervalSelf(11);
+                        xsSetRuleMinIntervalSelf(2);
                         aiEcho("destroying current gDefendPlanID and restarting defendPlanRule");
                         return;
                     }
@@ -1476,12 +1476,12 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
 
         if (kbGetAge() > cAge2)
         {
-            aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractCavalry, 0, 2, 2);
-            aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 2, 2);
+            aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractCavalry, 0, 1, 1);
+            aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
             if (cMyCulture == cCultureNorse)
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeThrowingAxeman, 0, 2, 2);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 2, 2);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeThrowingAxeman, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
 //                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeBallista, 0, 1, 1);
             }
             else if (cMyCulture == cCultureGreek)
@@ -1489,53 +1489,53 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
                 if (cMyCiv == cCivHades)
                 {  
                     aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypePeltast, 0, 1, 1);
-//                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeToxotes, 1, 1, 1);
+//                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeToxotes, 0, 1, 1);
                     aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeToxotes, 0, 1, 1);
                 }
                 else
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 2, 2);
+                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else if (cMyCulture == cCultureAtlantean)
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 2, 2);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 2, 2);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
         }
         else
         {
-            aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractCavalry, 1, 2, 2);
+            aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractCavalry, 0, 1, 1);
             if (cMyCulture == cCultureNorse)
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 1, 2, 2);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeThrowingAxeman, 1, 2, 2);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 1, 2, 2);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeThrowingAxeman, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else if (cMyCulture == cCultureGreek)
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 1, 2, 2);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
                 if (cMyCiv == cCivHades)
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeToxotes, 1, 2, 2);
+                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeToxotes, 0, 1, 1);
                 else
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 1, 2, 2);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 1, 1, 1);
+                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else if (cMyCulture == cCultureAtlantean)
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 1, 3, 3);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 1, 2, 2);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 1, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 1, 3, 3);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 1, 2, 2);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 1, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
         }
 
@@ -2994,7 +2994,7 @@ rule defendSettlementPosition
                         aiEcho("destroying gSettlementPosDefPlan as there's an enemy Settlement at our defend position");
                     else
                         aiEcho("destroying gSettlementPosDefPlan as there are too many enemies near our main base");
-                    xsSetRuleMinIntervalSelf(11);
+                    xsSetRuleMinIntervalSelf(1);
                     xsDisableSelf();
                     return;
                 }
@@ -3014,7 +3014,7 @@ rule defendSettlementPosition
                         aiEcho("and I have a settlement plus 1 defensive building at the defend position");
                     }
                     aiPlanDestroy(defendPlanID);
-                    xsSetRuleMinIntervalSelf(11);
+                    xsSetRuleMinIntervalSelf(1);
                     xsDisableSelf();
                     return;
                 }
@@ -3040,7 +3040,7 @@ rule defendSettlementPosition
         xsSetRuleMinIntervalSelf(11);
         if (count > 2)
         {
-            xsSetRuleMinIntervalSelf(12);
+            xsSetRuleMinIntervalSelf(1);
             count = 0;
             xsDisableSelf();
         }
@@ -4375,7 +4375,7 @@ rule setUnitPicker
 
 //==============================================================================
 rule defendBaseUnderAttack
-    minInterval 15 //starts in cAge2, activated in baseAttackTracker rule
+    minInterval 3 //starts in cAge2, activated in baseAttackTracker rule
     inactive
 {
     aiEcho("defendBaseUnderAttack: ");
@@ -4439,10 +4439,10 @@ rule defendBaseUnderAttack
                     aiEcho("destroying current gDefendPlanID and restarting defendPlanRule");
                     gBaseUnderAttackID = -1;
                     
-                    xsSetRuleMinInterval("defendPlanRule", 8);
+                    xsSetRuleMinInterval("defendPlanRule", 2);
                     xsEnableRule("defendPlanRule");
                     
-                    xsSetRuleMinIntervalSelf(9);
+                    xsSetRuleMinIntervalSelf(1);
                     xsDisableSelf();
                     return;
                 }
@@ -4456,7 +4456,7 @@ rule defendBaseUnderAttack
                         aiEcho("destroying gBaseUnderAttackDefPlanID as it has been active for more than 3 Minutes and there are less than 3 enemies");
                     gBaseUnderAttackID = -1;
                     gBaseUnderAttackDefPlanID = -1;
-                    xsSetRuleMinIntervalSelf(9);
+                    xsSetRuleMinIntervalSelf(1);
                     xsDisableSelf();
                     return;
                 }
@@ -5074,7 +5074,7 @@ rule baseAttackTracker
                  && ((equal(aiPlanGetVariableVector(gBaseUnderAttackDefPlanID, cDefendPlanDefendPoint, 0), gBaseUnderAttackLocation) == false)
                   || (gBaseUnderAttackDefPlanID == -1)))
                 {
-                    xsSetRuleMinInterval("defendBaseUnderAttack", 9);
+                    xsSetRuleMinInterval("defendBaseUnderAttack", 1);
                     xsDisableRule("defendBaseUnderAttack");
                     aiPlanDestroy(gBaseUnderAttackDefPlanID);
                     gBaseUnderAttackDefPlanID = -1;
@@ -5087,7 +5087,7 @@ rule baseAttackTracker
                     gDefendPlanID = -1;
                     xsDisableRule("defendPlanRule");
                     aiEcho("destroying current gDefendPlanID and restarting defendPlanRule");
-                    xsSetRuleMinInterval("defendPlanRule", 8);
+                    xsSetRuleMinInterval("defendPlanRule", 2);
                     xsEnableRule("defendPlanRule");
         
 //                    aiEcho("otherBaseID != mainBaseID and distanceToMainBase > 65.0, enabling defendBaseUnderAttack rule");

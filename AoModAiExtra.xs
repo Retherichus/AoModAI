@@ -33,7 +33,7 @@ extern int gInitialWoodBaseID = -1;
 //==============================================================================
 extern bool mCanIDefendAllies = true;     // Allows the AI to defend his allies.
 extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''
-extern bool gAgeFaster = true;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
+extern bool gAgeFaster = false;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
 extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
@@ -56,7 +56,7 @@ extern int eMaxMilPop = 50;               // Max military pop cap during Classic
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 500;              // Food
+extern int eBoomFood = 600;              // Food
 extern int eBoomGold = 100;              // Gold
 extern int eBoomWood = 200;              // Wood, duh.
 
@@ -92,8 +92,8 @@ extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Woo
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 1000;             // Food
-extern int RethLGGAge2 = 600;              // Gold
+extern int RethLGFAge2 = 700;             // Food
+extern int RethLGGAge2 = 450;              // Gold
 extern int RethLGWAge2 = 150;              // Wood
 
 //Age 3 (Heroic Age)
@@ -114,8 +114,8 @@ extern int RethLGWAge4 = 600;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLEFAge2 = 900;              // Food
-extern int RethLEGAge2 = 800;              // Gold
+extern int RethLEFAge2 = 700;              // Food
+extern int RethLEGAge2 = 600;              // Gold
 extern int RethLEWAge2 = 50;              // Wood
 
 //Age 3 (Heroic Age)
@@ -135,9 +135,9 @@ extern int RethLEWAge4 = 600;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 1000;             // Food
-extern int RethLNGAge2 = 700;              // Gold
-extern int RethLNWAge2 = 300;              // Wood
+extern int RethLNFAge2 = 700;             // Food
+extern int RethLNGAge2 = 500;              // Gold
+extern int RethLNWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -156,9 +156,9 @@ extern int RethLNWAge4 = 700;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 900;              // Food
-extern int RethLAGAge2 = 700;              // Gold
-extern int RethLAWAge2 = 300;              // Wood
+extern int RethLAFAge2 = 700;              // Food
+extern int RethLAGAge2 = 450;              // Gold
+extern int RethLAWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -178,9 +178,9 @@ extern int RethLAWAge4 = 700;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLCFAge2 = 900;              // Food
-extern int RethLCGAge2 = 700;              // Gold
-extern int RethLCWAge2 = 400;              // Wood
+extern int RethLCFAge2 = 700;              // Food
+extern int RethLCGAge2 = 450;              // Gold
+extern int RethLCWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -1609,7 +1609,7 @@ rule IHateBuildingsBeheAndScarab
    {
 		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
 		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
 		kbUnitQuerySetMaximumDistance(enemyQueryID, 26);
@@ -1700,10 +1700,10 @@ rule IHateBuildingsSiege
 
 
 
-
+/*
 // PART 4: Borrowed code.
 // Borrowed code from the Stardard AI to support a more stable WoodBase.
-
+TEST, DO YOU EVEN IGNORE ME?
 float vec2LenSq(vector vec2 = cInvalidVector)
 {
 	return((xsVectorGetX(vec2)*xsVectorGetX(vec2))+(xsVectorGetZ(vec2)*xsVectorGetZ(vec2)));
@@ -1800,5 +1800,6 @@ int findClosestAreaWithUnits(int areaID = -1,int type=-1, int unitType = -1, int
 	}
 	return(closestArea);
 }
+*/
 // TESTING GROUND
 
