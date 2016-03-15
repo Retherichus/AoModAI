@@ -68,8 +68,9 @@ rule maintainTradeUnits
         
     int unitTypeToTrain = -1;
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
-    if (numTrees < 15)
+  
+	
+    if (woodSupply > 1500)
         tradeTargetPop = tradeTargetPop + 5;
     
     static bool firstRun = true;
@@ -484,8 +485,8 @@ rule trainMythUnit
         // age2 myth units
         if (gAge2MinorGod == cTechAge2Leto)
             age2MythUnitID = cUnitTypeAutomaton;
-        else if (gAge2MinorGod == cTechAge2Okeanus)
-            age2MythUnitID = cUnitTypeFlyingMedic;
+   //     else if (gAge2MinorGod == cTechAge2Okeanus)   NO, JUST NO
+     //       age2MythUnitID = cUnitTypeFlyingMedic;    NO, JUST NO
         else if (gAge2MinorGod == cTechAge2Prometheus)
             age2MythUnitID = cUnitTypePromethean;
         
@@ -608,6 +609,8 @@ rule trainMythUnit
     aiPlanSetActive(planID);
     //aiEcho("Training a myth unit: "+kbGetProtoUnitName(puid));
 }
+
+/* disabled for now
 
 
 //==============================================================================
@@ -855,7 +858,7 @@ rule trainMilitaryUnitsAtOtherBase
     aiPlanSetActive(trainRandomMilitaryUnitPlanID);
 }
 }
-
+*/
 
 //==============================================================================
 rule hesperides //Watch for ownership of a hesperides tree, make driads if you own it.  
@@ -1070,11 +1073,11 @@ rule maintainSiegeUnits
     }
     else if (cMyCulture == cCultureEgyptian)
     {
-        siegeUnitType1 = cUnitTypeSiegeTower;
+        siegeUnitType1 = cUnitTypeCatapult;
     }
     else if (cMyCulture == cCultureNorse)
     {
-        siegeUnitType1 = cUnitTypePortableRam;
+        siegeUnitType1 = cUnitTypeBallista;
     }
     else if (cMyCulture == cCultureChinese)
     {
@@ -1339,7 +1342,7 @@ rule makeAtlanteanHeroes
         }
     }
 
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+    
     int currentPop = kbGetPop();
     int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
     int numMacemen = kbUnitCount(cMyID, cUnitTypeMaceman, cUnitStateAlive);
@@ -1354,7 +1357,7 @@ rule makeAtlanteanHeroes
     {
         if (numHeroes <= 4)
         {
-            if ((favorSupply < 20) || ((woodSupply < 150) && (numTrees > 14)) || (foodSupply < 150) || (goldSupply < 150))
+            if ((favorSupply < 20) || ((woodSupply < 150) || (foodSupply < 150) || (goldSupply < 150)))
             {
                 aiEcho("not enough resources, returning");
                 return;
@@ -1362,7 +1365,7 @@ rule makeAtlanteanHeroes
         }
         else
         {
-            if ((favorSupply < 30) || ((woodSupply < 350) && (numTrees > 14)) || (foodSupply < 350) || (goldSupply < 350))
+            if ((favorSupply < 30) || ((woodSupply < 350) || (foodSupply < 350) || (goldSupply < 350)))
             {
                 aiEcho("not enough resources, returning");
                 return;
@@ -1473,7 +1476,7 @@ rule makeAtlanteanHeroes
 //new rule
 //==============================================================================
 rule makeAtlanteanHeroesFallBack
-    minInterval 5 //gets started in makeAtlanteanHeroes rule
+    minInterval 10 //gets started in makeAtlanteanHeroes rule
     inactive
 {
     aiEcho("makeAtlanteanHeroesFallBack:");

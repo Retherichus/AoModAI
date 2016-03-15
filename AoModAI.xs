@@ -83,7 +83,7 @@ extern bool gBuildTowers = false;
 extern int gRushUPID=-1;            // Unit picker ID for age 2 (cAge2) armies.
 extern int gLateUPID=-1;            // Unit picker for age 3/4 (cAge3 and cAge4).
 extern int gNavalUPID=-1;
-extern int gNumberBuildings=3;      // Number of buildings requested for late unit picker
+extern int gNumberBuildings=5;      // Number of buildings requested for late unit picker
 extern int gNavalAttackGoalID=-1;
 extern int gRushGoalID=-1;
 extern int gLandAttackGoalID=-1;
@@ -178,6 +178,7 @@ extern int gHouseAreaID = -1;
 extern bool gResetWallPlans = false;
 
 extern float gMainBaseAreaWallRadius = 32;
+extern float gSecondaryMainBaseAreaWallRadius = 35;
 
 extern int gMainBaseAreaWallTeam1PlanID = -1;
 extern int gMainBaseAreaWallTeam2PlanID = -1;
@@ -448,7 +449,7 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
 
 //==============================================================================
 rule checkEscrow    //Verify that escrow totals and real inventory are in sync
-    minInterval 7 //starts in cAge1
+    minInterval 10 //starts in cAge1
     active
 {
     aiEcho("checkEscrow:");
@@ -834,11 +835,6 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     if (vilPop < 34)
         vilPop = 34;
         
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
-    if ((numTrees < 15) && (xsGetTime() > 20*60*1000))
-    {   
-        vilPop = vilPop - 5;
-    }
 
     if (kbUnitCount(cMyID, cUnitTypePlentyVault, cUnitStateAlive) > 0)
         vilPop = vilPop - 3;
@@ -890,7 +886,7 @@ rule updateEMAge1       // i.e. cAge1
       }
       else
       {
-         civPopTarget = 25;
+         civPopTarget = 30;
          milPopTarget = 80;
       }
    }
@@ -991,7 +987,7 @@ rule updateEMAge3
     }
     else
     {
-      civPopTarget = 34 - (cvRushBoomSlider*5.99);    // +/- 5
+      civPopTarget = 42 - (cvRushBoomSlider*5.99);    // +/- 5
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
@@ -1032,9 +1028,9 @@ rule updateEMAge4
 
     if (aiGetWorldDifficulty() == cDifficultyEasy)
     {
-        civPopTarget = 10 + aiRandInt(3);
+        civPopTarget = 20 + aiRandInt(3);
         if (cMyCulture == cCultureAtlantean)
-            civPopTarget = 12 + aiRandInt(3);   // Make up for oracles
+            civPopTarget = 22 + aiRandInt(3);   // Make up for oracles
         milPopTarget = 26 + aiRandInt(8);  
     }
     else if (aiGetWorldDifficulty() == cDifficultyModerate)
@@ -1059,7 +1055,7 @@ rule updateEMAge4
       kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);   }
    else
    {
-      civPopTarget = 40; 
+      civPopTarget = 46; 
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -1473,9 +1469,10 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
             neededGoldGatherers = minGoldGatherers;
     }
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
+
+	
     float neededWoodGatherers = desiredWoodUnits;
-    if (numTrees < 15)
+    if (woodSupply > goldSupply+1000)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -1485,7 +1482,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         float minFoodGatherers = 5;
         if (cMyCulture == cCultureAtlantean)
             minFoodGatherers = 2;
-        if ((numFishBoats < 4) && (kbGetAge() > cAge2) && ((numTrees < 15) || (numGoldSites < 1)))
+        if ((numFishBoats < 4) && (kbGetAge() > cAge2) || (numGoldSites < 1))
         {
             foodOverride = true;
             minFoodGatherers = 21;
@@ -1792,11 +1789,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     else if (woodSupply > 1300)
         gWoodForecast = gWoodForecast * 0.9;
     
-    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
-    if (numTrees < 15)
-    {
-        gWoodForecast = 100.0;
-    }
+
     
     //aiEcho("__________");
     aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
@@ -2247,7 +2240,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 //==============================================================================
 rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in setEarlyEcon rule, ending when next age upgrade starts
 //    minInterval 23
-    minInterval 8
+    minInterval 10
     inactive
 {
     int age = kbGetAge();
@@ -2295,10 +2288,14 @@ if (xsGetTime() > eFishTimer*60*1000 && RethFishEco == true && ConfirmFish == tr
 	gFoodForecast = eBoomFood+.0;
 	gGoldForecast = eBoomGold+.0;
 	gWoodForecast = eBoomWood+.0;
-	
+}
 
-}	
-
+if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCultureEgyptian)
+{
+	gFoodForecast = eBoomFood+.0;
+	gGoldForecast = egBoomGold+.0;
+	gWoodForecast = egBoomWood+.0;
+}
 	
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -2371,76 +2368,28 @@ void initGreek(void)
         //Create a simple plan to maintain 1 water scout.
         if ((gWaterMap == true) || (gTransportMap == true))
             createSimpleMaintainPlan(gWaterScout, gMaintainNumberWaterScouts, true, -1);
-
-        //Random Age2 God.
-        gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
-        //Get Apollo if we have a transport map or if we are defensive.  Else, random.
-        if ((gTransportMap == true) || (cvOffenseDefenseSlider < -0.7))
-            gAge3MinorGod=cTechAge3Apollo;
-        else
-            gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
-        //Get Hera if we're rushing.  Else, random.
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge4MinorGod=cTechAge4Hera;
-        else
-            gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
     }
     //Poseidon.
-    else if (cMyCiv == cCivPoseidon)
-    {
-        //Give him the hippocampus as his water scout.
-		gWaterScout=cUnitTypeHippocampus;
-        //aiEcho("Poseidon's water scout is the "+kbGetUnitTypeName(gWaterScout)+".");
-
-        //Random Age2 God.
-        gAge2MinorGod = kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
-        //Random Age3 God.
-        gAge3MinorGod = kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
-        //Get Artemis if we're rushing.  Else, random.
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge4MinorGod=cTechAge4Artemis;
-        else
-            gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
-    }
+    if (cMyCiv == cCivPoseidon)
+	gWaterScout=cUnitTypeHippocampus;
+   
     //Hades.
-    else if (cMyCiv == cCivHades)
+    if (cMyCiv == cCivHades)
     {
         //Create a simple plan to maintain 1 water scout.
         if ((gWaterMap == true) || (gTransportMap == true))
             createSimpleMaintainPlan(gWaterScout, gMaintainNumberWaterScouts, true, -1);
-        
-        // 2/3 chance to get Athena as Age2 God, else random
-        if (aiRandInt(3) < 2)
-            gAge2MinorGod = cTechAge2Athena;
-        else
-            gAge2MinorGod = kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
-
-//        gAge2MinorGod = cTechAge2Ares;  //for testing
-    
-      
-        //Get Apollo if we have a transport map or if we are defensive.  Else, random.
-        if ((gTransportMap == true) || (cvOffenseDefenseSlider < -0.7))
-            gAge3MinorGod = cTechAge3Apollo;
-        else
-            gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
-        
-//        gAge3MinorGod = cTechAge3Aphrodite;  //for testing
-        
-       
-        //Get Artemis if we're rushing.  Else, 2/3 chance to get Hephaestus, else random
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge4MinorGod = cTechAge4Artemis;
-        else
-        {
-            if (aiRandInt(3) < 2)
-                gAge4MinorGod = cTechAge4Hephaestus;
-            else
-                gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
         }
 
-//        gAge4MinorGod = cTechAge4Artemis;    //for testing
         
-    }
+  // Default to random minor god choices, override below if needed
+    gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
+    //Random Age3 God.
+    gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
+    //Random Age4 God.
+    gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
+
+    // Control variable overrides
     if (cvAge2GodChoice != -1)
         gAge2MinorGod = cvAge2GodChoice;
     if (cvAge3GodChoice != -1)
@@ -2514,37 +2463,9 @@ void initEgyptian(void)
     //Set the build limit for Outposts.
     aiSetMaxLOSProtoUnitLimit(4);
 
-    //Isis.
-    if (cMyCiv == cCivIsis)
-    {
-        //Random Age2 God.
-        gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
-        //Get Nephthys if we're rushing, else random.
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge3MinorGod=cTechAge3Nephthys;
-        else
-            gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
-        //Random Age4 God.
-        gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
-    }
-    //Ra.
-    else if (cMyCiv == cCivRa)
-    {
-        //Get Ptah if we're rushing, else random.
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge2MinorGod=cTechAge2Ptah;
-        else
-            gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
-        //Get Hathor if we're rushing, else random.
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge3MinorGod=cTechAge3Hathor;
-        else
-            gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
-        //Random Age4 God.
-        gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
-    }
+
     //Set.
-    else if (cMyCiv == cCivSet)
+      if (cMyCiv == cCivSet)
     {
         //Create air explore plans for the hyena.
         int explorePID=aiPlanCreate("Explore_SpecialSetHyena", cPlanExplore);
@@ -2553,19 +2474,16 @@ void initEgyptian(void)
             aiPlanAddUnitType(explorePID, cUnitTypeHyenaofSet, 1, 1, 1);
             aiPlanSetActive(explorePID);
         }
-        //Get Anubis if we're rushing, else random.
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge2MinorGod=cTechAge2Anubis;
-        else
-            gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
-        //Get Nephthys if we're rushing, else random.
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge3MinorGod=cTechAge3Nephthys;
-        else
-            gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
-        //Random Age4 God.
-        gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
-    }
+		}
+        
+  // Default to random minor god choices, override below if needed
+    gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
+    //Random Age3 God.
+    gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
+    //Random Age4 God.
+    gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
+
+    // Control variable overrides
     if (cvAge2GodChoice != -1)
         gAge2MinorGod = cvAge2GodChoice;
     if (cvAge3GodChoice != -1)
@@ -2600,8 +2518,8 @@ void initNorse(void)
         xsEnableRule("ulfsarkMaintain");
     }
 
-    // On easy or moderate, get two extra oxcarts ASAP before we're at econ pop cap
-    if ( aiGetWorldDifficulty() <= cDifficultyModerate )
+    // Get two extra oxcarts ASAP before we're at econ pop cap, not on Easy though.
+    if ( aiGetWorldDifficulty() > cDifficultyEasy )
     {
         int easyOxPlan=aiPlanCreate("Easy/Moderate Oxcarts", cPlanTrain);
         if (easyOxPlan >= 0)
@@ -2609,7 +2527,7 @@ void initNorse(void)
             aiPlanSetVariableInt(easyOxPlan, cTrainPlanUnitType, 0, cUnitTypeOxCart);
             //Train off of economy escrow.
             aiPlanSetEscrowID(easyOxPlan, cEconomyEscrowID);
-            aiPlanSetVariableInt(easyOxPlan, cTrainPlanNumberToTrain, 0, 2); 
+            aiPlanSetVariableInt(easyOxPlan, cTrainPlanNumberToTrain, 0, 1); 
             aiPlanSetVariableInt(easyOxPlan, cTrainPlanBuildFromType, 0, cUnitTypeAbstractSettlement); 
             aiPlanSetDesiredPriority(easyOxPlan, 100); 
             aiPlanSetActive(easyOxPlan);
@@ -2633,89 +2551,27 @@ void initNorse(void)
             aiPlanSetActive(dmUlfPlan);
         }
     }
-
-
     //Norse scout types.
     gLandScout=cUnitTypeUlfsark;
     gAirScout=-1;
     gWaterScout=cUnitTypeFishingShipNorse;
     //Norse gather with their heros.
     gGatherRelicType=cUnitTypeHeroNorse;
+    if (cMyCiv == cCivOdin)
+    gAirScout = cUnitTypeRaven;
     
     //Create a simple plan to maintain 1 water scout.
     if ((gWaterMap == true) || (gTransportMap == true))
         createSimpleMaintainPlan(gWaterScout, gMaintainNumberWaterScouts, true, -1);
 
-    //Odin.
-    if (cMyCiv == cCivOdin)
-    {
-        gAirScout = cUnitTypeRaven;
+  // Default to random minor god choices, override below if needed
+    gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
+    //Random Age3 God.
+    gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
+    //Random Age4 God.
+    gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
 
-       //Get Heimdall if we're rushing or defensive, else random.
-        if (((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7)) || (cvOffenseDefenseSlider < -0.7))
-            gAge2MinorGod=cTechAge2Heimdall;
-        else
-            gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
-        //Random Age3 God.
-        gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
-        // don't get Baldr on a transport map.
-        if (gTransportMap == true)
-            gAge4MinorGod=cTechAge4Tyr;
-        else
-            gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
-
-    }
-    //Thor.
-    else if (cMyCiv == cCivThor)
-    {
-        //Random Age2 God.
-        gAge2MinorGod = kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
-        
-/* TODO: remove it once we tested it completely
-        //just for testing
-        gAge2MinorGod = cTechAge2Forseti;
-*/
-
-        //Get Bragi if we're rushing, else random.
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge3MinorGod=cTechAge3Bragi;
-        else
-            gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);
-        // don't get Baldr on a transport map.
-        if (gTransportMap == true)
-            gAge4MinorGod=cTechAge4Tyr;
-        else
-            gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
-
-        //Thor likes dwarves.
-        if (aiGetGameMode() != cGameModeLightning)
-//            gDwarfMaintainPlanID=createSimpleMaintainPlan(cUnitTypeDwarf, 2, true, -1);
-            xsEnableRule("trainDwarves");
-    }
-    //Loki.
-    else if (cMyCiv == cCivLoki)
-    {
-        //Get Heimdall if we're rushing or defensive, else random.
-        if (((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7)) || (cvOffenseDefenseSlider < -0.7))
-            gAge2MinorGod=cTechAge2Heimdall;
-        else
-            gAge2MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge2);
-        //Get Bragi if we're rushing, else random.
-        if ((cvRushBoomSlider > 0.7) && (cvOffenseDefenseSlider > 0.7))
-            gAge3MinorGod=cTechAge3Bragi;
-        else
-            gAge3MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge3);    
-        //always get Hel except on transport maps
-        if (gTransportMap == true)
-        {
-            if (aiRandInt(4) < 3)
-                gAge4MinorGod = cTechAge4Hel;
-            else
-                gAge4MinorGod = cTechAge4Tyr;
-        }
-        else
-            gAge4MinorGod = cTechAge4Hel; //suggested by HMHS8
-    }
+    // Control variable overrides
     if (cvAge2GodChoice != -1)
         gAge2MinorGod = cvAge2GodChoice;
     if (cvAge3GodChoice != -1)
@@ -2744,7 +2600,7 @@ void initAtlantean(void)
     // Use hero oracle for gathering relics
 //    gGatherRelicType = cUnitTypeOracleHero;
     gGatherRelicType = cUnitTypeHero;   //use any hero       
-    aiSetMinNumberNeedForGatheringAggressvies(3);      // Rather than 8
+    aiSetMinNumberNeedForGatheringAggressvies(2);      // Rather than 8
 
     //Create the atlantean scout plans.
     int exploreID=-1;
@@ -2769,8 +2625,8 @@ void initAtlantean(void)
             gLandExplorePlanID=exploreID;
     }  
 
-   // Make sure we always have at least 2 oracles
-   int oracleMaintainPlanID = createSimpleMaintainPlan(cUnitTypeOracleScout, 2, true, kbBaseGetMainID(cMyID));
+   // Make sure we always have at least 1 oracles
+   int oracleMaintainPlanID = createSimpleMaintainPlan(cUnitTypeOracleScout, 1, true, kbBaseGetMainID(cMyID));
 
     // Special emergency manor build for Lightning
     if (aiGetGameMode() == cGameModeLightning)
@@ -2795,48 +2651,6 @@ void initAtlantean(void)
     //Random Age4 God.
     gAge4MinorGod=kbTechTreeGetMinorGodChoices(aiRandInt(2), cAge4);
 
-    if (cMyCiv == cCivGaia)
-    {
-        // Age 2 is a toss up, both are good for defense/boomer
-        // Age3Theia for military-oriented players
-        if (cvMilitaryEconSlider > 0.3)
-            gAge3MinorGod = cTechAge3Theia;
-        // Age4...atlas for Defense/Econ (buildings), Hekate for offense/mil
-        if ( (cvMilitaryEconSlider + cvOffenseDefenseSlider) > 0.6 )
-            gAge3MinorGod = cTechAge4Hekate;
-        if ( (cvMilitaryEconSlider + cvOffenseDefenseSlider) < -0.6 )
-            gAge4MinorGod = cTechAge4Atlas;      
-    }
-
-
-    if (cMyCiv == cCivKronos)
-    {
-        // Age 2 Leto for defense/boomer
-        if ( (cvRushBoomSlider + cvOffenseDefenseSlider) > -0.6)
-            gAge2MinorGod = cTechAge2Leto;
-        // Age 3 is a toss up
-        // Age4...atlas for Offense/mil (implode), Helios (vortex) for defense/econ
-        if ( (cvMilitaryEconSlider + cvOffenseDefenseSlider) > 0.6 )
-            gAge3MinorGod = cTechAge4Atlas;
-        if ( (cvMilitaryEconSlider + cvOffenseDefenseSlider) < -0.6 )
-            gAge4MinorGod = cTechAge4Helios;      
-    }
-
-    if (cMyCiv == cCivOuranos)
-    {
-        // Age 2 oceanus for defense (carnivora)
-        if (cvOffenseDefenseSlider < -0.3)
-            gAge2MinorGod = cTechAge2Okeanus;
-        // Age3Theia for military-oriented players
-        if (cvMilitaryEconSlider > 0.3)
-            gAge3MinorGod = cTechAge3Theia;
-        // Age4...Helios for Defense/Econ (vortex), Hekate for offense/mil
-        if ( (cvMilitaryEconSlider + cvOffenseDefenseSlider) > 0.6 )
-            gAge3MinorGod = cTechAge4Hekate;
-        if ( (cvMilitaryEconSlider + cvOffenseDefenseSlider) < -0.6 )
-            gAge4MinorGod = cTechAge4Helios;      
-    }
-
     // Control variable overrides
     if (cvAge2GodChoice != -1)
         gAge2MinorGod = cvAge2GodChoice;
@@ -2860,7 +2674,7 @@ void initChinese(void)
     //aiEcho("Chinese Init:");
 
     // Chinese
-    // aiSetFavorNeedModifier(10.0); // The Greek uses this, perhaps the chinese should as well?
+
     gLandScout=cUnitTypeScoutChinese;
     gWaterScout=cUnitTypeFishingShipChinese;
     gAirScout=-1;
@@ -2884,7 +2698,7 @@ void initChinese(void)
 		createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, 2, false, kbBaseGetMainID(cMyID));
 	}
         if (aiGetWorldDifficulty() != cDifficultyEasy && cMyCulture == cCultureChinese)
-            createSimpleMaintainPlan(cUnitTypeSittingTiger, 2, false, kbBaseGetMainID(cMyID));
+            createSimpleMaintainPlan(cUnitTypeSittingTiger, 4, false, kbBaseGetMainID(cMyID));
 
       //Create the Chinese scout plans.
     int exploreID=-1;
@@ -3548,6 +3362,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
                 }
                 else if (upRand == 1)
                 {
@@ -3559,6 +3374,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
                 }
                 else
                 {
@@ -3570,6 +3386,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
                 }
                 break;			
         }
@@ -3586,6 +3403,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
                 }
                 else if (upRand == 1)
                 {
@@ -3597,6 +3415,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
                 }
                 else
                 {
@@ -3608,6 +3427,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
                 }
                 break;			
         }
@@ -3624,6 +3444,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
                 }
                 else if (upRand == 1)
                 {
@@ -3635,6 +3456,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
                 }
                 else
                 {
@@ -3646,6 +3468,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
                 }
                 break;			
         }
@@ -3954,7 +3777,7 @@ void init(void)
     if (towerOdds < 0.1)
         towerOdds = 0.1;                            // Now 0.1 - 1.4
             
-    towerOdds = (towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
+    towerOdds = (250+towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
 
     result = -1;
     result = aiRandInt(101) - 1;   //-1..99
@@ -3968,8 +3791,8 @@ void init(void)
         gTargetNumTowers = towerOdds / 10;    // Up to 14 for a mil/econ balanced player
         gTargetNumTowers = gTargetNumTowers * (1+(cvMilitaryEconSlider/2));  // +/- 50% based on mil/econ
         
-        if (gTargetNumTowers > 10)  //max 10 towers
-            gTargetNumTowers = 10;
+        if (gTargetNumTowers > 20)  //max 10 towers
+            gTargetNumTowers = 20;
         
       //  if ( gBuildWalls == true)
          //   gTargetNumTowers = gTargetNumTowers * 2;     // Halve the towers if we're doing walls
@@ -4324,7 +4147,7 @@ void init(void)
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFood, 1.5);
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFavor, 10.0);
         //Set our farm limits.
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 20);  //  Up from 4
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 26);  //  Up from 4
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanMaxFarmLimit, 0, 40);     //  Up from 24
         aiSetFarmLimit(aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0));
         //Do our late econ init.
@@ -5058,8 +4881,8 @@ void age2Handler(int age=1)
         {
             xsEnableRule("mainBaseAreaWallTeam1");
 
-            if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
-                xsEnableRule("destroyUnnecessaryDropsites");
+         //   if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
+            //    xsEnableRule("destroyUnnecessaryDropsites");
             
             if (aiGetGameMode() != cGameModeDeathmatch)
                 xsEnableRule("setUnitPicker");
@@ -5091,8 +4914,8 @@ void age2Handler(int age=1)
         xsEnableRule("fixUnfinishedWalls");
         
         //enable the rule to destroy unnecessary dropsites near our mainbase
-        if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
-            xsEnableRule("destroyUnnecessaryDropsites");
+      //  if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
+       //     xsEnableRule("destroyUnnecessaryDropsites");
     }
 
     //build buildings at other bases
@@ -5103,10 +4926,10 @@ void age2Handler(int age=1)
     //build towers at other bases
     xsEnableRule("buildTowerAtOtherBase");  
 /* disabled for now
-
-*/
     //train military units at other bases
     xsEnableRule("trainMilitaryUnitsAtOtherBase");
+*/
+
 
     if (gRushCount < 1)
     {
@@ -5450,7 +5273,7 @@ void age4Handler(int age=3)
 
         //Catapults.
         if (aiGetWorldDifficulty() != cDifficultyEasy)
-            createSimpleMaintainPlan(cUnitTypeCatapult, 2, false, kbBaseGetMainID(cMyID));
+            createSimpleMaintainPlan(cUnitTypeCatapult, 4, false, kbBaseGetMainID(cMyID));
         //Set the build limit for Outposts.
         aiSetMaxLOSProtoUnitLimit(11);
 
@@ -5481,7 +5304,7 @@ void age4Handler(int age=3)
     {
         // maintain 1 ballista
         if (aiGetWorldDifficulty() != cDifficultyEasy)
-            createSimpleMaintainPlan(cUnitTypeBallista, 1, false, kbBaseGetMainID(cMyID));
+            createSimpleMaintainPlan(cUnitTypeBallista, 4, false, kbBaseGetMainID(cMyID));
     }
 
     //If we're in deathmatch, no more hard pop cap.
@@ -5764,7 +5587,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 	
 			// Disable early fishing for Nomad & Highland, to later be enabled.
 		
-		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") || (cRandomMapName == "vinlandsaga"))
+		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") || (cRandomMapName == "vinlandsaga") || (cRandomMapName == "Deep Jungle"))
 		  {
 		  aiEcho("FindFish disabled, map forced this.");
 		  xsDisableSelf();
@@ -5850,7 +5673,7 @@ rule watchForFirstWonderStart   //Look for any wonder being built.  If found, ac
 rule watchForFirstWonderDone    //See who makes the first wonder, note its ID, make a defend
                                 //plan to kill it, kill defend plan when it's gone
     inactive
-    minInterval 7 //starts in cAge3 activated in watchForFirstWonderStart
+    minInterval 30 //starts in cAge3 activated in watchForFirstWonderStart
 {
     aiEcho("watchForFirstWonderDone:");
     
@@ -6073,7 +5896,7 @@ rule watchForWonder  // See if my wonder has been placed.  If so, go build it.
 
 //==============================================================================
 rule watchWonderLost    // Kill the uber-defend plan if wonder falls
-    minInterval 7 //starts in cAge4, activated in watchForWonder
+    minInterval 35 //starts in cAge4, activated in watchForWonder
     inactive
 {
     aiEcho("watchWonderLost:");

@@ -532,7 +532,7 @@ rule getRoarOfOrthus
 rule getTempleOfHealing
     inactive
 //    minInterval 17 //starts in cAge3
-    minInterval 1 //starts in cAge3
+    minInterval 30 //starts in cAge3
     group techsGreekMinorGodAge3
 {
     int techID = cTechTempleofHealing;
@@ -805,7 +805,7 @@ rule getTrierarch
 //==============================================================================
 rule getForgeOfOlympus
     inactive
-    minInterval 1 //starts in cAge4
+    minInterval 35 //starts in cAge4
     group techsGreekMinorGodAge4
 {
     int techID = cTechForgeofOlympus;
