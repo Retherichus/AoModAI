@@ -12,7 +12,7 @@ rule getAcupuncture
     inactive
     minInterval 23
 {
-    if (kbGetTechStatus(cTechAcupuncture) == cTechStatusAvailable)
+    if (kbGetTechStatus(cTechChannels) == cTechStatusAvailable)
     {
         int x=-1;
         x = aiPlanCreate("Acupuncture", cPlanResearch);

@@ -1033,12 +1033,11 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	}
 	// Set up the Tsunami power
 	// Or actually destroy the plan and use painful manual casting
-//	if(powerProtoID == cPowerTsunami)
-//	{
-//		xsEnableRule("rTsunami");
-//		return (false);  
-//		}
-		
+	if(powerProtoID == cPowerTsunami)
+	{
+		xsEnableRule("rTsunami");
+		return (false);  
+	}
 	// Set up the Uproot power
 	if(powerProtoID == cPowerUproot)
 	{
@@ -1053,7 +1052,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	}
 	// Set up the Year of the Goat power
 	// Or actually destroy the plan and use manual casting
-	if(powerProtoID == cPowerYearOfTheGoat)
+	if(powerProtoID == cPowerTsunami)
 	{
 		xsEnableRule("rYearOfTheGoat");
 		return (false);  
@@ -1425,7 +1424,7 @@ rule rPlaceTitanGate
         xsDisableSelf();
 */
     // TODO: does this work at all?
-        aiEcho("couldn't create plan to place Titan Gate, retrying in 2 minutes");
+        aiEcho("____-----____ couldn't create plan to place Titan Gate, retrying in 2 minutes");
         xsSetRuleMinIntervalSelf(127);
         return;
     }
@@ -1454,7 +1453,7 @@ rule rPlaceTitanGate
 
 //==============================================================================
 rule rSentinel
-    minInterval 15 //starts in cAge1
+    minInterval 11 //starts in cAge1
     inactive
 {
     aiEcho("rSentinel:");    
@@ -1549,7 +1548,7 @@ rule rRagnorokPower
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
     
-
+    int numTrees = kbUnitCount(0, cUnitTypeTree, cUnitStateAlive);
     int currentPop = kbGetPop();
     int currentPopCap = kbGetPopCap();
     
@@ -1573,7 +1572,7 @@ rule rRagnorokPower
     if ((currentPop > currentPopCap * 0.7) && (myMilUnitsInR75 + alliedMilUnitsInR75 + 3 >= enemyMilUnitsInR75)
      && (numEnemyTitansInR75 - numAlliedTitansInR75 - numTitans <= 0))
     {
-        if ((currentPop <= currentPopCap - 2) || (foodSupply < 1000) || (goldSupply < 1000) || ((woodSupply < 800)))
+        if ((currentPop <= currentPopCap - 2) || (foodSupply < 1000) || (goldSupply < 1000) || ((woodSupply < 800) && (numTrees > 14)))
         {
             count = 0;
             return;
@@ -1627,7 +1626,7 @@ rule rRagnorokPower
 
 //==============================================================================
 rule castHeavyGP
-    minInterval 13  //starts in cAge4
+    minInterval 11  //starts in cAge4
     inactive
 {
     aiEcho("castHeavyGP:");
@@ -1809,8 +1808,8 @@ rule rGaiaForestPower
     
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    bool JustCastIt = true;
-    if (JustCastIt == true)
+    int numTreesNearMB = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation, 40.0); //50? 60?
+    if (numTreesNearMB > 0)
     {
         aiPlanSetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0, true);
         aiEcho("Setting cGodPowerPlanAutoCast to true");
@@ -2042,7 +2041,7 @@ bool canAffordSpeedUpConstruction(int queryID = -1, int index = -1, int escrowID
 // We might want to add randomness as now every building is sped up ^^
 //==============================================================================
 rule rSpeedUpBuilding
-minInterval 10
+minInterval 6
 inactive
 {
 	// Set up a query
@@ -2110,7 +2109,7 @@ inactive
 // - No enemy army nearby otherwise they get killed, resurrected and killed again
 //==============================================================================
 rule rRecreation
-minInterval 15
+minInterval 1
 inactive
 {
 	static int deadQuery = -1;
@@ -2190,7 +2189,7 @@ inactive
 // This is gonna be ugly
 //==============================================================================
 rule rTsunami
-minInterval 25
+minInterval 5
 inactive
 {
 	static int enemyTownQuery = -1;
@@ -2257,7 +2256,7 @@ inactive
 			{
 				// Yay we did it!
 				aiEcho("Thanks WarriorMario for helping me out here ;)");
-			//	breakpoint;   // WHY??? :(
+				breakpoint;
 			}
 			
 		}
@@ -2266,7 +2265,7 @@ inactive
 }
 //==============================================================================
 rule rYearOfTheGoat
-minInterval 15
+minInterval 12
 inactive
 {
 	vector position = kbGetTownLocation()+ vector(2,2,2);// Little bit off the town position

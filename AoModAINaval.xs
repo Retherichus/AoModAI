@@ -54,6 +54,7 @@ void navalAge2Handler(int age=1)
 //==============================================================================
 void navalAge3Handler(int age=2)
 {
+    //aiEcho("Naval Age "+age+".");
 
     // Naval (build settlements on other islands etc...)
     if (gTransportMap == true)
@@ -261,6 +262,7 @@ rule NavalGoalMonitor
         {
 //            int numDocksBLTL = getNumUnits(cUnitTypeDock, cUnitStateAliveOrBuilding, -1, cMyID, centerBLTL, zMax/2);
             int numDocksBLTL = getNumUnits(cUnitTypeDock, cUnitStateAlive, -1, cMyID, centerBLTL, zMax/2);
+            //aiEcho("numDocksBLTL: "+numDocksBLTL);
             if (numDocksBLTL > 0)
             {
                 int dockIDBLTL = findUnitByIndex(cUnitTypeDock, 0, cUnitStateAlive, -1, cMyID, centerBLTL, zMax/2);
@@ -307,6 +309,7 @@ rule NavalGoalMonitor
             
 //            int numDocksBRTR = getNumUnits(cUnitTypeDock, cUnitStateAliveOrBuilding, -1, cMyID, centerBRTR, zMax/2);
             int numDocksBRTR = getNumUnits(cUnitTypeDock, cUnitStateAlive, -1, cMyID, centerBRTR, zMax/2);
+            //aiEcho("numDocksBRTR: "+numDocksBRTR);
             if (numDocksBRTR > 0)
             {
                 int dockIDBRTR = findUnitByIndex(cUnitTypeDock, 0, cUnitStateAlive, -1, cMyID, centerBRTR, zMax/2);
@@ -355,6 +358,7 @@ rule NavalGoalMonitor
         {
 //            int numDocksBLBR = getNumUnits(cUnitTypeDock, cUnitStateAliveOrBuilding, -1, cMyID, centerBLBR, xMax/2);
             int numDocksBLBR = getNumUnits(cUnitTypeDock, cUnitStateAlive, -1, cMyID, centerBLBR, xMax/2);
+            //aiEcho("numDocksBLBR: "+numDocksBLBR);
             if (numDocksBLBR > 0)
             {
                 int dockIDBLBR = findUnitByIndex(cUnitTypeDock, 0, cUnitStateAlive, -1, cMyID, centerBLBR, xMax/2);
@@ -401,6 +405,7 @@ rule NavalGoalMonitor
             
 //            int numDocksTLTR = getNumUnits(cUnitTypeDock, cUnitStateAliveOrBuilding, -1, cMyID, centerTLTR, xMax/2);
             int numDocksTLTR = getNumUnits(cUnitTypeDock, cUnitStateAlive, -1, cMyID, centerTLTR, xMax/2);
+            //aiEcho("numDocksTLTR: "+numDocksTLTR);
             if (numDocksTLTR > 0)
             {
                 int dockIDTLTR = findUnitByIndex(cUnitTypeDock, 0, cUnitStateAlive, -1, cMyID, centerTLTR, xMax/2);
@@ -561,6 +566,7 @@ rule NavalGoalMonitor
         minShips = maxShips;
         
     aiEcho("minShips: "+minShips+", maxShips: "+maxShips);
+    aiEcho("--,,--,,--,,--");
 
 //    gTargetNavySize = maxShips;   // Set the global var for forecasting
 
@@ -672,7 +678,10 @@ bool isFullyExplored(int areaGroupID=-1)    //returns true, if more than 80% of 
     if (areaGroupID==AGID)
         epsilon=epsilon+0.05;
 
+    //aiEcho("isFullyExplored: AGID="+areaGroupID+" numTiles="+numTiles+" numBlack="+numTilesBlack+".");
     float blackPct = numTilesBlack / numTiles;
+    //aiEcho("                 blackPct="+blackPct+".");
+    //aiEcho("                 epsilon="+epsilon);
 
     // we leave some tolerance => the island does not have to be *fully* explored
     if ( blackPct <= epsilon )
@@ -705,12 +714,14 @@ int setupExploreIsland()
     int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
     if (transportPUID < 0)
     {
+        //aiEcho("setupExploreIsland: no water transport unit type");
         return(-1);
     }
 
     // we don't have a transport yet, return...
     if ( kbUnitCount(cMyID, transportPUID, cUnitStateAlive) <= 0 )
     {
+        //aiEcho("setupExploreIsland: no water transport unit yet, return!");
         return(-2);
     }
 
@@ -721,6 +732,7 @@ int setupExploreIsland()
     int potentialIsland=-1;
     bool goon=false;
 
+    //aiEcho("    areaNum="+areaNum);
     // We cannot test all areas since this would take too long and can cause AoM to crash.
     // We therefore make 16 random guesses and hope to find an areagroup we havent been to yet.
     // If we cannot find an appropriate area we hope for better luck next time.
@@ -740,10 +752,12 @@ int setupExploreIsland()
 
         potentialIsland = getAreaGroupByArea(i);
 
+        //aiEcho("    potential island="+potentialIsland);
         // check if this is an area group we been to already
         for (j=0; < aiPlanGetNumberUserVariableValues(gExploreIslandsGoalID, cExploredAreaGroups))
         {
             int jAGID=aiPlanGetUserVariableInt(gExploreIslandsGoalID, cExploredAreaGroups, j);
+            //aiEcho("    jAGID="+jAGID);
 
             if (jAGID < 0)
                 break;
@@ -767,6 +781,7 @@ int setupExploreIsland()
     // we have no target area
     if ( targetAreaID < 0 )
     {
+        //aiEcho("setupExploreIsland: no target area found, return!");
         return(-3); // no transport possible, we have no target area
     }
 
@@ -789,6 +804,7 @@ int setupExploreIsland()
     aiPlanSetUserVariableInt(gExploreIslandsGoalID, cExploredAreaGroups, nextFreeSlot, potentialIsland);
 
     // TEST
+    //aiEcho("Already explored area groups are:");
 
 /* disabled
     for (j=0; <aiPlanGetNumberUserVariableValues(gExploreIslandsGoalID, cExploredAreaGroups))
@@ -811,6 +827,7 @@ int setupExploreIsland()
     int startAreaID=kbAreaGetIDByPosition(here);
    
     //Create transport plan to explore the other island.
+    //aiEcho("setupExploreIsland: creating transport plan!");
     aiPlanDestroy(gRemoteIslandExploreTrans);
     gRemoteIslandExploreTrans=createTransportPlan("Remote Explore Trans", startAreaID,
                                                 targetAreaID, false, transportPUID, 99, baseToUse);
@@ -823,6 +840,7 @@ int setupExploreIsland()
     else
         aiEcho("setupExploreIsland: cannot create transport plan! return"); 
 
+    //aiEcho("create new base for area group ID="+potentialIsland+".");
     // dunno if this is enough...
     vector center=kbAreaGetCenter(targetAreaID);
     gCurExploredIslandBase = kbBaseCreate(cMyID, "Island Base "+kbBaseGetNextID(), center, 50.0);
@@ -833,6 +851,7 @@ int setupExploreIsland()
         kbBaseSetMilitary(cMyID, gCurExploredIslandBase, true);
     }
 
+    //aiEcho("create new explore plan for area group ID="+potentialIsland+".");
 
     // destroy old explore plan
     aiPlanDestroy(gLandExplorePlanID);
@@ -906,6 +925,7 @@ rule exploreIslands
     // setup new explore plan
     if ( isFullyExplored(curAreaGroupID) == true )
     {
+        //aiEcho("exploreIslands: island is fully explored, setup new explore plan!");
         // setup new plan for another island
         int result=setupExploreIsland();
         if ( result == 1 )
@@ -931,6 +951,7 @@ rule exploreIslands
             numTries=numTries+1;
             if (numTries >= 3)
             {
+                //aiEcho("exploreIslands: disabling rule because we have all area groups explored!");
                 xsDisableSelf();
                 return;
             }

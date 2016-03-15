@@ -117,6 +117,7 @@ rule unPauseAge2
 
     if (gAge2ProgressionPlanID == -1)
     {
+        //aiEcho("Age 2 Progression Plan id("+gAge2ProgressionPlanID+") is invalid.");
         xsDisableSelf();
         return;
     }

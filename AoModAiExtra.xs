@@ -14,8 +14,7 @@
 //Below, you'll find the Plan handler. 
 //you don't really want to touch this.
 //==============================================================================
-mutable bool persWantForwardBase() {}
-extern int gForwardBaseID=-1;
+
 extern int fCitadelPlanID = -1;
 extern int gShiftingSandPlanID= -1;
 mutable void retreatHandler(int planID=-1) {}
@@ -23,49 +22,38 @@ mutable void relicHandler(int relicID=-1) {}
 mutable void wonderDeathHandler(int playerID=-1) { }
 extern bool ConfirmFish = false;          // Don't change this, It's for extra safety when fishing, and it'll enable itself if fish is found.
 extern int gGardenBuildLimit = 0;
-extern int HateChoice = -1;
-extern int gInitialWoodBaseID = -1;
+
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
 //Below, you'll find a few things I've set up,
 //you can turn these on/off as you please, by setting the final value to true or false.
 //There's also a small description on all of them, to make it a little easier to understand what happens when you set it to true.
 //==============================================================================
-extern bool mCanIDefendAllies = true;     // Allows the AI to defend his allies.
+
 extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''
 extern bool gAgeFaster = true;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
 extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
 extern bool bWallUp = true;              // This ensures that the Ai will build walls(almost always), regardless of personality.
-extern bool Age3Armory = false;           // Prevents the Ai from researching armory upgrades before reaching Heroic Age.
 
-
-extern bool OnlyOneMBDefRule = true;
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
 extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. (Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
-extern bool gEarlyMonuments = false;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
+extern bool gEarlyMonuments = true;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
 
 //For gAgefaster when true.
-extern int eMaxMilPop = 50;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
+extern int eMaxMilPop = 30;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
 
 
 // If gSuperboom is set to true, the numbers below are what the Ai will attempt to gather in Archaic Age or untill X minutes have passed.
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 500;              // Food
-extern int eBoomGold = 100;              // Gold
-extern int eBoomWood = 250;              // Wood, duh.
-
-
-//Egyptians have their own, because they don't like wood as much.
-
-extern int egBoomGold = 250;              // Gold
-extern int egBoomWood = 0;              // Wood
-
+extern int eBoomFood = 600;              // Food
+extern int eBoomGold = 200;              // Gold
+extern int eBoomWood = 200;              // Wood, duh.
 
 // For RethFishEco, this affects Fishing Maps ONLY, if you have it enabled.
 // If the Ai fails to find any valid fishing spot for any reason, it'll scrap this fishing plan and return to normal resource distribution.
@@ -76,7 +64,7 @@ extern int eFBoomWood = 50;             // Wood, The Ai will automatically boost
 
 
 //Timer for gSuperboom & fishing
-extern int eBoomTimer = 5;                // Minutes this plan will remain active. It'll disable itself after X minutes set.(minus delay) 
+extern int eBoomTimer = 4;                // Minutes this plan will remain active. It'll disable itself after X minutes set.(minus delay) 
 extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Wood, this supports the Ai in building early fishing ships.
 
 
@@ -87,25 +75,24 @@ extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Woo
 
 // For RethEcoGoals, AoModAi do normally calculate the resources it needs, though.. we want it to keep some extra resources at all times, 
 // so, let's make it a little bit more ''static'' by setting resource goals a little closer to what Admiral Ai use.
-// Do note that anything you put in here will get added on top of the default goals, some values may appear to be very low but it really isn't.
 //==============================================================================
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 1000;             // Food
-extern int RethLGGAge2 = 600;              // Gold
-extern int RethLGWAge2 = 150;              // Wood
+extern int RethLGFAge2 = 900;             // Food
+extern int RethLGGAge2 = 700;              // Gold
+extern int RethLGWAge2 = 350;              // Wood
 
 //Age 3 (Heroic Age)
 
 extern int RethLGFAge3 = 1000;              // Food
 extern int RethLGGAge3 = 800;              // Gold
-extern int RethLGWAge3 = 550;              // Wood
+extern int RethLGWAge3 = 350;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLGFAge4 = 3000;              // Food
-extern int RethLGGAge4 = 2400;              // Gold
+extern int RethLGFAge4 = 1400;              // Food
+extern int RethLGGAge4 = 1000;              // Gold
 extern int RethLGWAge4 = 600;              // Wood
 
 
@@ -116,7 +103,7 @@ extern int RethLGWAge4 = 600;              // Wood
 //Age 2 (Classical Age)
 extern int RethLEFAge2 = 900;              // Food
 extern int RethLEGAge2 = 800;              // Gold
-extern int RethLEWAge2 = 50;              // Wood
+extern int RethLEWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -126,16 +113,16 @@ extern int RethLEWAge3 = 250;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLEFAge4 = 3000;              // Food
-extern int RethLEGAge4 = 2400;              // Gold
-extern int RethLEWAge4 = 600;              // Wood
+extern int RethLEFAge4 = 1400;              // Food
+extern int RethLEGAge4 = 1000;              // Gold
+extern int RethLEWAge4 = 500;              // Wood
 
 //==============================================================================
 //Norse
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 1000;             // Food
+extern int RethLNFAge2 = 900;             // Food
 extern int RethLNGAge2 = 700;              // Gold
 extern int RethLNWAge2 = 300;              // Wood
 
@@ -147,9 +134,9 @@ extern int RethLNWAge3 = 350;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLNFAge4 = 3000;              // Food
-extern int RethLNGAge4 = 2400;              // Gold
-extern int RethLNWAge4 = 700;              // Wood
+extern int RethLNFAge4 = 1400;              // Food
+extern int RethLNGAge4 = 1000;              // Gold
+extern int RethLNWAge4 = 600;              // Wood
 
 //==============================================================================
 //Atlantean
@@ -168,9 +155,9 @@ extern int RethLAWAge3 = 350;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLAFAge4 = 3000;              // Food
-extern int RethLAGAge4 = 2400;              // Gold
-extern int RethLAWAge4 = 700;              // Wood
+extern int RethLAFAge4 = 1400;              // Food
+extern int RethLAGAge4 = 1000;              // Gold
+extern int RethLAWAge4 = 600;              // Wood
 
 
 //==============================================================================
@@ -190,9 +177,9 @@ extern int RethLCWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLCFAge4 = 3000;              // Food
-extern int RethLCGAge4 = 2400;              // Gold
-extern int RethLCWAge4 = 700;              // Wood
+extern int RethLCFAge4 = 1400;              // Food
+extern int RethLCGAge4 = 1000;              // Gold
+extern int RethLCWAge4 = 600;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -222,9 +209,8 @@ void initRethlAge1(void)  // Am I doing this right??
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
-	   
-	   
-	   if (gHuntEarly == true && cRandomMapName != "Deep Jungle")
+	
+	   if (gHuntEarly == true)
 		{
 		if (cMyCulture == cCultureGreek)
 		aiSetMinNumberNeedForGatheringAggressvies(5);      // The number inside of ( ) represents the amount of villagers/units needed.
@@ -238,11 +224,10 @@ void initRethlAge1(void)  // Am I doing this right??
 		aiSetMinNumberNeedForGatheringAggressvies(5);			
         }
 		
-	  if ((cRandomMapName == "highlands") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad") || (cRandomMapName == "Deep Jungle")))
+	  if ((cRandomMapName == "highlands") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad")))
 	  {
 	  gTransportMap = false;
 	  }
-
 
 }
 
@@ -328,11 +313,6 @@ rule ActivateRethOverridesAge1
 		if (gHuntingDogsASAP == true)
 		xsEnableRule("HuntingDogsAsap");
 		
-		if (aiGetWorldDifficulty() > cDifficultyHard)
-		xsEnableRuleGroup("MassDonations");
-		
-		
-		
 		// Force Dock down.
 		if (gWaterMap == true && RethFishEco == true)
    {
@@ -356,7 +336,7 @@ rule ActivateRethOverridesAge1
     }
 	
 rule ActivateRethOverridesAge2
-   minInterval 30
+   minInterval 60
    active
 {
     if (kbGetAge() > cAge1)
@@ -376,12 +356,12 @@ rule ActivateRethOverridesAge2
 }
 
 rule ActivateRethOverridesAge3
-   minInterval 30
+   minInterval 60
    active
 {
     if (kbGetAge() > cAge2)
     {
-        
+            int mainBaseID = kbBaseGetMainID(cMyID);
 		if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Dabogong) == cTechStatusActive)
         xsEnableRuleGroup("Dabogong");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Hebo) == cTechStatusActive)
@@ -389,19 +369,13 @@ rule ActivateRethOverridesAge3
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Zhongkui) == cTechStatusActive)
         xsEnableRuleGroup("Zhongkui");
 		
-		
-		if (cMyCiv != cCivThor && Age3Armory == true)
-        xsEnableRuleGroup("ArmoryAge2");
-        if (cMyCiv == cCivThor && Age3Armory == true)
-        xsEnableRuleGroup("ArmoryThor");
-		
 		xsDisableSelf();
            
     }
 }
 
 rule ActivateRethOverridesAge4
-   minInterval 30
+   minInterval 5
    active
 {
     if (kbGetAge() > cAge3)
@@ -412,14 +386,8 @@ rule ActivateRethOverridesAge4
         xsEnableRuleGroup("Xiwangmu");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Chongli) == cTechStatusActive)
         xsEnableRuleGroup("Chongli");
-		if (cMyCulture == cCultureNorse)
-		xsEnableRule("getMediumArchers");	
     
 	   xsEnableRule("repairTitanGate");
-	    // Make sure none of the EM rules get stuck, it happens very rarely.
-		xsDisableRule("updateEMAge1");
-		xsDisableRule("updateEMAge2");
-		xsDisableRule("updateEMAge3");
 		
 		xsDisableSelf();
            
@@ -749,7 +717,7 @@ rule Helpme
 // buildGarden // Stolen from the Expansion. ):
 //==============================================================================
 rule buildGarden
-   minInterval 14
+   minInterval 11
    inactive
 {
 	if(cMyCulture != cCultureChinese)
@@ -821,77 +789,33 @@ rule buildGarden
 }
 
 //==============================================================================
-// Rule: ChooseGardenResource  // Redefined to fit this Ai better. (Reth)
+// Rule: ChooseGardenResource  // Stolen from the Expansion. ):
 //==============================================================================
 rule ChooseGardenResource
-minInterval 20
+minInterval 60
 inactive
 {
-    float FoodSupply = kbResourceGet(cResourceFood);
-    float WoodSupply = kbResourceGet(cResourceWood); 
-	float GoldSupply = kbResourceGet(cResourceGold);
-    float MyFavor = kbResourceGet(cResourceFavor); 
-	
 	int res  = cResourceGold;
 	string resname = "Gold";
-if (FoodSupply < 500)
-	{
-		res  = cResourceFood;
-		resname = "Food";
-	}	
-
-	if (WoodSupply < 200 && FoodSupply > 500 && GoldSupply > WoodSupply)
+	int need	   = aiGetCurrentResourceNeed(cResourceGold);
+	if(need < aiGetCurrentResourceNeed(cResourceWood))
 	{
 		res  = cResourceWood;
 		resname = "Wood";
 	}
-	
-if (GoldSupply < 400 && FoodSupply > 500 && WoodSupply > GoldSupply)
+	if(need < aiGetCurrentResourceNeed(cResourceFood))
 	{
-		res  = cResourceGold;
-		resname = "Gold";
-	}
-
-	if (MyFavor < 60 && FoodSupply > 600 && WoodSupply > 300 && GoldSupply > 600)
-	{
-		res  = cResourceFavor;
-		resname = "Favor";
-	}
-	
-	if (MyFavor < 30)
-	{
-		res  = cResourceFavor;
-		resname = "Favor";
-	}
-	
-else if (FoodSupply > 600 && WoodSupply > 300 && GoldSupply > 400 && MyFavor > 60)
-{	
-    int choice = -1;
-    choice = aiRandInt(3);     // 0-3
-    
-    switch(choice)
-    {
-        case 0:  // Food
-        {
 		res  = cResourceFood;
 		resname = "Food";
-        }
-        case 1:  // Wood
-        {
-		res  = cResourceWood;
-		resname = "Wood";
-        }
-        case 2:  // Gold
-        {
-		res  = cResourceGold;
-		resname = "Gold";
-        }	
-}
-}	
+	}
+	if(need < aiGetCurrentResourceNeed(cResourceFavor))
+	{
+		res  = cResourceFavor;
+		resname = "Favor";
+	}
 	aiEcho("Setting gardens to: " + resname);
 	kbSetGardenResource(res);
-    }		
-
+}
 
 //==============================================================================
 rule getEarthenWall
@@ -977,724 +901,3 @@ rule getGreatWall
         aiEcho("Getting Great Wall");
     }
 }
-//==============================================================================
-// getNumberUnits
-//==============================================================================
-int getNumberUnits(int unitType=-1, int playerID=-1, int state=cUnitStateAlive)
-{
-	int count=-1;
-   static int unitQueryID=-1;
-
-   //Create the query if we don't have it yet.
-   if (unitQueryID < 0)
-      unitQueryID=kbUnitQueryCreate("GetNumberOfUnitsQuery");
-   
-	//Define a query to get all matching units.
-	if (unitQueryID != -1)
-	{
-		kbUnitQuerySetPlayerID(unitQueryID, playerID);
-      kbUnitQuerySetUnitType(unitQueryID, unitType);
-      kbUnitQuerySetState(unitQueryID, state);
-	}
-	else
-   	return(0);
-
-	kbUnitQueryResetResults(unitQueryID);
-	return(kbUnitQueryExecute(unitQueryID));
-}
-//==============================================================================
-// RULE: buildManyBuildings (Age of Buildings strategy --- Poseidon ONLY)
-//==============================================================================
-rule buildManyBuildings
-   minInterval 30
-   active
-{
-//   float currentFood=kbResourceGet(cResourceFood);
-   float currentWood=kbResourceGet(cResourceWood);
-//   float currentGold=kbResourceGet(cResourceGold);
-//   float currentFavor=kbResourceGet(cResourceFavor);
-
-   static int unitQueryID=-1;
-
-   if (cMyCiv != cCivPoseidon)
-   {
-	xsDisableSelf();
-	return;
-   }
-  
-   int numberOfArcheryRange=kbUnitCount(cMyID, cUnitTypeArcheryRange, cUnitStateAlive);
-   int numberOfBarracks=kbUnitCount(cMyID, cUnitTypeBarracks, cUnitStateAlive);
-   int numberOfStables=kbUnitCount(cMyID, cUnitTypeStable, cUnitStateAlive);
-   int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAlive);
-   int numberSettlements=getNumberUnits(cUnitTypeAbstractSettlement, cMyID, cUnitStateAliveOrBuilding);
-
-   if (numberOfFortresses < 1 || numberSettlements < 2)
-      return;
-
-   if (kbGetAge() < 2)
-      return;
-
-   if (currentWood < 900)
-      return;
-
- if (numberOfArcheryRange < 15 || numberOfBarracks < 15 || numberOfStables < 15)
- {
-   int planID=aiPlanCreate("Build More Buildings", cPlanBuild);
-   if (planID >= 0)
-   {
-      int randSelect=aiRandInt(3);
-
-      if (randSelect == 0)
-	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeArcheryRange);
-      else if (randSelect == 1)
-	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeBarracks);
-      else
-	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeStable);
-
-      aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-      aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 0.0);
-      aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
-      aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
-      aiPlanSetBaseID(planID, kbBaseGetMainID(cMyID));
-      aiPlanSetDesiredPriority(planID, 20);
-      int builderTypeID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder,0);
-      aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
-      aiPlanSetEscrowID(planID, cRootEscrowID);
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Settlement Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSettlement);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-
-   kbUnitQueryResetResults(unitQueryID);
-   int numberFound=kbUnitQueryExecute(unitQueryID);
-   int unit=kbUnitQueryGetResult(unitQueryID, aiRandInt(numberFound));
-
-    int unitBaseID=kbBaseGetMainID(cMyID);
-    if (unit != -1)
-    {
-       //Get new base ID.
-       unitBaseID=kbUnitGetBaseID(unit);
-    }
-
-      aiPlanSetBaseID(planID, unitBaseID);
-
-      vector location = kbUnitGetPosition(unit);
-
-      vector backVector = kbBaseGetFrontVector(cMyID, unitBaseID);
-
-      float x = xsVectorGetX(backVector);
-      float z = xsVectorGetZ(backVector);
-      x = x * aiRandInt(40) - 20;
-      z = z * aiRandInt(40) - 20;
-
-      backVector = xsVectorSetX(backVector, x);
-      backVector = xsVectorSetZ(backVector, z);
-      backVector = xsVectorSetY(backVector, 0.0);
-//      vector location = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
-      location = location + backVector;
-      aiPlanSetVariableVector(planID, cBuildPlanInfluencePosition, 0, location);
-      aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-      aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionValue, 0, 1.0);
-
-      aiPlanSetActive(planID);
-   }
- }
-}
-
-//==============================================================================
-// tacticalHeroAttackMyth
-//==============================================================================
-rule tacticalHeroAttackMyth
-   minInterval 5
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-
-   if (aiGetWorldDifficulty() == cDifficultyEasy)
-   {
-	xsDisableSelf();
-	return;
-   }
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Hero Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeHero);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeMythUnit);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 24);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0)
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
-
-//==============================================================================
-// IHateMonks
-//==============================================================================
-rule IHateMonks
-   minInterval 6
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-
-   if (aiGetWorldDifficulty() == cDifficultyEasy)
-   {
-	xsDisableSelf();
-	return;
-   }
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Unit Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractArcher);
-		if ((cMyCulture == cCultureNorse) || (cMyCulture == cCultureEgyptian))
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeHeroChineseMonk);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 26);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0 && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeLogicalTypeLandMilitary) == true || cMyCulture == cCultureEgyptian))
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
-
-//==============================================================================
-// IHateSiege
-//==============================================================================
-rule IHateSiege
-   minInterval 6
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-
-   if (aiGetWorldDifficulty() == cDifficultyEasy)
-   {
-	xsDisableSelf();
-	return;
-   }
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Unit Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeAbstractSiegeWeapon);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0)
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
-
-//==============================================================================
-// IHateBuildingsHadesSpecial
-//==============================================================================
-rule IHateBuildingsHadesSpecial
-   minInterval 5
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-
-   if ((aiGetWorldDifficulty() == cDifficultyEasy) || (cMyCiv != cCivHades))
-   {
-	xsDisableSelf();
-	return;
-   }
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Siege Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeCrossbowman);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 34);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0)
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
-
-//==============================================================================
-// BanditMigdolRemoval // Valley of Kings special
-//==============================================================================
-rule BanditMigdolRemoval
-   minInterval 8
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-
-   if (cRandomMapName != "valley of kings")
-   {
-	xsDisableSelf();
-	return;
-   }
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Siege Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 8)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationAny);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBanditMigdol);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 42);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
-
-//==============================================================================
-// IHateVillagers
-//==============================================================================
-rule IHateVillagers
-   minInterval 5
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-
-   if (aiGetWorldDifficulty() == cDifficultyEasy)
-   {
-	xsDisableSelf();
-	return;
-   }
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Unit Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractArcher);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeAbstractVillager);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 20);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0)
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
-
-//==============================================================================
-// IHateUnderworldPassages
-//==============================================================================
-rule IHateUnderworldPassages
-   minInterval 8
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Siege Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationAny);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeTunnel);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 42);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0)
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
-
-
-//==============================================================================
-// IHateBuildingsBeheAndScarab
-//==============================================================================
-rule IHateBuildingsBeheAndScarab
-   minInterval 6
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-
-   if ((aiGetWorldDifficulty() == cDifficultyEasy) || (cMyCulture != cCultureAtlantean && cMyCulture != cCultureEgyptian))
-   {
-	xsDisableSelf();
-	return;
-   }
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Siege Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-			if (cMyCulture == cCultureEgyptian)
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeScarab);
-			if (cMyCulture == cCultureAtlantean)
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeBehemoth);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 26);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0)
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
-
-
-//==============================================================================
-// IHateBuildingsSiege
-//==============================================================================
-rule IHateBuildingsSiege
-   minInterval 5
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-
-   if (aiGetWorldDifficulty() == cDifficultyEasy)
-   {
-	xsDisableSelf();
-	return;
-   }
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Siege Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSiegeWeapon);			
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 34);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0)
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
-
-// TESTING GROUND
