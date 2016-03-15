@@ -8,193 +8,141 @@
 //==============================================================================
 
 
+
+void findWoodBase()
+{
+	// Loop through the neighbour areas of our main base
+	int forestArea = findClosestAreaWithUnits(kbGetTownAreaID(),cAreaTypeForest,cUnitTypeTree,10,3);
+	aiEcho("Town area: "+kbGetTownAreaID());
+	aiEcho("Forest area: "+forestArea);
+	aiEcho(""+movePointToPoint(kbGetTownLocation(),kbAreaGetCenter(forestArea),0.5));
+	// If we failed to find a wood area
+	if(forestArea == -1)
+	{
+		gWoodBaseID = kbBaseCreate(cMyID, "WoodBase",kbGetTownLocation(), 15.0);
+	}
+	else
+	{
+		gWoodBaseID = kbBaseCreate(cMyID, "WoodBase",movePointToPoint(kbGetTownLocation(),kbAreaGetCenter(forestArea),0.5), 15.0);
+	}
+}
 //==============================================================================
 rule updateWoodBreakdown
-    minInterval 10
-    inactive
-{   
-    aiEcho("updateWoodBreakdown: ");
- 
-    int mainBaseID = kbBaseGetMainID(cMyID);
-  
-    int randomBase = findUnit(cUnitTypeAbstractSettlement);
-    if (randomBase < 0)
-        return;
-    else
-    {
-        int randomBaseID = kbUnitGetBaseID(randomBase);
-    }
+   minInterval 12
+   inactive
+{
 
-    if ((aiRandInt(4) < 2) && (randomBaseID != mainBaseID))
-    {
-        randomBaseID = mainBaseID;
-    }
-        
-    int woodPriority=45;
-    if (cMyCulture == cCultureEgyptian)
-        woodPriority=40;
+   int woodPriority=50;
+   if (cMyCulture == cCultureEgyptian)
+	  woodPriority=55;
 
-    int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
-    int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
+   int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
+   int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
 
-      float woodSupply = kbResourceGet(cResourceWood);
-	  float goldSupply = kbResourceGet(cResourceGold);
-  
-    if ((woodSupply > goldSupply+1000) && (xsGetTime() > 20*60*1000))
-        woodGathererCount = 0;
-    
-    
-    bool reducedWoodGathererCount = false;
+   // If we have no need for wood, set plans=0 and exit
+   if (woodGathererCount <= 0)
+   {
+	  aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, 0);
+	  aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gInitialWoodBaseID);
+	  if (gWoodBaseID != gInitialWoodBaseID)
+		 aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);
+	  //echoEco("   No wood cutters needed.");
+	  return;
+   }
 
-    if (woodGathererCount <= 0) //always some units on wood, unless there are less than 15 trees
-    {
-            woodGathererCount = 1;
-            reducedWoodGathererCount = true;
-        }
-    
-    
-//Test
-    //if we lost a lot of villagers, keep them close to our settlements (=farming)
-    int minVillagers = 12;
-    if (cMyCulture == cCultureAtlantean)
-        minVillagers = 7;
-    else if (cMyCulture == cCultureGreek)
-        minVillagers = 14;
-    int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
-    if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
-    {
-        woodGathererCount = 0;
-    }
-//Test end
-  
-    // If we have no need for wood, set plans=0 and exit
-    if (woodGathererCount <= 0)
-    {
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, 0);
-        aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, mainBaseID);
-        if (gWoodBaseID != mainBaseID)
-            aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);
-        return;
-    }
-    
-    // If we're this far, we need some wood gatherers.  The number of plans we use will be the greater of 
-    // a) the ideal number for this number of gatherers, or
-    // b) the number of plans active that have resource sites, either main base or wood base.
+   // If we're this far, we need some wood gatherers.  The number of plans we use will be the greater of 
+   // a) the ideal number for this number of gatherers, or
+   // b) the number of plans active that have resource sites, either main base or wood base.
 
-    //Count of sites.
-    int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy);
-    
-    int numberWoodBaseSites = 0;
-    if ( (gWoodBaseID >= 0) && (gWoodBaseID != mainBaseID) )    // Count wood base if different
-        numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
+   //Count of sites.
+   int numberMainBaseSites=kbGetNumberValidResources(gInitialWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
+   int numberWoodBaseSites = 0;
+   if ( (gWoodBaseID >= 0) && (gWoodBaseID != gInitialWoodBaseID) ) // Count wood base if different
+	  numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
 
-    //Get the count of plans we currently have going.
-    int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
+   //Get the count of plans we currently have going.
+   int numWoodPlans=aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
-    int desiredWoodPlans = 2;
-    if (xsGetTime() < 14*60*1000)
-        desiredWoodPlans = 1;
-    
-    if (woodGathererCount < desiredWoodPlans)
-        desiredWoodPlans = woodGathererCount;
+   int desiredWoodPlans = 1 + (woodGathererCount/12);
 
-    if ((desiredWoodPlans < numWoodPlans) && (reducedWoodGathererCount == false))
-        desiredWoodPlans = numWoodPlans;    // Try to preserve existing plans
+   if (desiredWoodPlans < numWoodPlans)
+	  desiredWoodPlans = numWoodPlans;  // Try to preserve existing plans
 
-    // Three cases are possible:
-    // 1)  We have enough sites at our main base.  All should work in main base.
-    // 2)  We have some wood at main, but not enough.  Split the sites
-    // 3)  We have no wood at main...use woodBase
+   // Three cases are possible:
+   // 1)  We have enough sites at our main base.  All should work in main base.
+   // 2)  We have some wood at main, but not enough.  Split the sites
+   // 3)  We have no wood at main...use woodBase
 
-    if (numberMainBaseSites >= desiredWoodPlans) // case 1
-    {
-        // remove any breakdown for woodBaseID
-        if (gWoodBaseID != mainBaseID)
-            aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);
-        gWoodBaseID = mainBaseID;
-        aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, mainBaseID);
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
-        return;
-    }
+   if (numberMainBaseSites >= desiredWoodPlans) // case 1
+   {
+	  // remove any breakdown for woodBaseID
+	  if (gWoodBaseID != gInitialWoodBaseID)
+		 aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);
+	  gWoodBaseID = gInitialWoodBaseID;
+	  aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gInitialWoodBaseID);
+	  aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
+	  return;
+   }
 
-    if ( (numberMainBaseSites > 0) && (numberMainBaseSites < desiredWoodPlans) )  // case 2
-    {
-        aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numberMainBaseSites, woodPriority, 1.0, mainBaseID);
+   if ( (numberMainBaseSites > 0) && (numberMainBaseSites < desiredWoodPlans) )  // case 2
+   {
+	  aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numberMainBaseSites, woodPriority, 1.0, gInitialWoodBaseID);
 
-        if (numberWoodBaseSites > 0)  // We do have remote wood
-        {
-            if (gTransportMap == true)
-                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
-            else
-                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
-        }
-        else  // No remote wood...bummer.  Kill old breakdown, look for more
-        {
-            aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
-            //Try to find a new wood base.
-            if (gTransportMap == true)
-                gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, randomBaseID);
-            else
-                gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, mainBaseID);
+	  if (numberWoodBaseSites > 0)  // We do have remote wood
+	  {
+		 aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans-numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+		 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
+	  }
+	  else  // No remote wood...bummer.  Kill old breakdown, look for more
+	  {
+		 aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
+		 //Try to find a new wood base.
+		 gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, kbBaseGetMainID(cMyID));
+		 if (gWoodBaseID >= 0)
+		 {
+			aiEcho("   New wood base is "+gWoodBaseID);
+			aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);  // We can have the full amount
+			 aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans-numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+		 }
+		 else
+		 {
+			aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, numberMainBaseSites);   // That's all we get
+		 }
+	  }
+	  return;
+   }
 
-            if (gWoodBaseID >= 0)
-            {
-                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
-                if (gTransportMap == true)
-                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
-                else
-                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
-            }
-            else
-            {
-                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, numberMainBaseSites);   // That's all we get
-            }
-        }
-        return;
-    }
+   if (numberMainBaseSites < 1)  // case 3
+   {
+	  aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy,gInitialWoodBaseID);
 
-    if (numberMainBaseSites < 1)  // case 3
-    {
-        aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy,mainBaseID);
-
-        if (numberWoodBaseSites >= desiredWoodPlans)  // We have enough remote wood
-        {
-            aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gWoodBaseID);
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
-        }
-        else if (numberWoodBaseSites > 0)   // We have some, but not enough
-        {
-            aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numberWoodBaseSites, woodPriority, 1.0, gWoodBaseID);
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, numberWoodBaseSites);
-        }
-        else  // We have none, try elsewhere
-        {
-            int oldWoodBase=gWoodBaseID;
-            aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
-            //Try to find a new wood base.
-            if (gTransportMap == true)
-                gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, randomBaseID);
-            else
-                gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, mainBaseID);
-
-            if((gWoodBaseID < 0) && (gTransportMap == true))
-            {            
-                // try to find a wood base on another island
-                gWoodBaseID = newResourceBase(oldWoodBase, cResourceWood);
-            }
-
-            if (gWoodBaseID >= 0)
-            {
-                numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
-                if (numberWoodBaseSites < desiredWoodPlans)
-                    desiredWoodPlans = numberWoodBaseSites;
-                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      
-                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gWoodBaseID);
-            }
-        }
-        return;
-    }
+	  if (numberWoodBaseSites >= desiredWoodPlans)  // We have enough remote wood
+	  {
+		 aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gWoodBaseID);
+		 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
+	  }
+	  else if (numberWoodBaseSites > 0)   // We have some, but not enough
+	  {
+		 aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numberWoodBaseSites, woodPriority, 1.0, gWoodBaseID);
+		 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, numberWoodBaseSites);
+	  }
+	  else  // We have none, try elsewhere
+	  {
+		 aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
+		 //Try to find a new wood base.
+		 gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, kbBaseGetMainID(cMyID));
+		 if (gWoodBaseID >= 0)
+		 {
+			aiEcho("   New wood base is "+gWoodBaseID);
+			numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
+			if (numberWoodBaseSites < desiredWoodPlans)
+			   desiredWoodPlans = numberWoodBaseSites;
+			aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);  
+			 aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gWoodBaseID);
+		 }
+	  }
+	  return;
+   }
 }
 
 //==============================================================================
@@ -1486,7 +1434,8 @@ void initEcon() //setup the initial Econ stuff.
     //Set our bases.
     gFarmBaseID=kbBaseGetMainID(cMyID);
     gGoldBaseID=kbBaseGetMainID(cMyID);
-    gWoodBaseID=kbBaseGetMainID(cMyID);
+   	findWoodBase();
+	gInitialWoodBaseID = gWoodBaseID;
 	
     //Make a plan to manage the villager population.
     gCivPopPlanID=aiPlanCreate("civPop", cPlanTrain);

@@ -65,7 +65,7 @@ extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age hand
 
 
 // Trade globals
-extern int gMaxTradeCarts = 40;           // Max trade carts
+extern int gMaxTradeCarts = 25;           // Max trade carts
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -99,6 +99,7 @@ extern int gObeliskClearingPlanID = -1;   // Small attack plan used to remove en
 // Placeholder Reth
 include "AoModAiExtra.xs";
 include "StinnerV.xs";
+include "AoModAIBorrowedCode.xs";
 
 
 //==============================================================================
@@ -188,6 +189,7 @@ extern int gOtherBaseRingWallTeam1PlanID = -1;
 
 //extern float gOtherBaseWallRadius = 17.0;
 extern float gOtherBaseWallRadius = 24.0;
+
 
 extern int gBuildBuilding1AtOtherBasePlanID = -1;
 
@@ -1026,12 +1028,9 @@ rule updateEMAge2
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
             civPopTarget = 35;                                                // reserve pop slots for mil use.
         milPopTarget = getSoftPopCap() - civPopTarget;
-		
 		if (gAgeFaster == true && aiGetWorldDifficulty() == cDifficultyHard)
-		      {
-			  aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
 			 milPopTarget = eMaxMilPop;
-			 }
+			
     }
     else
     {
@@ -1077,7 +1076,7 @@ rule updateEMAge3
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-        civPopTarget = 65 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush
+        civPopTarget = 55 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush
         if (getSoftPopCap() > 115)
             civPopTarget = civPopTarget + 0.3 * (getSoftPopCap()-115);
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
@@ -1143,7 +1142,7 @@ rule updateEMAge4
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-      civPopTarget = 70;      // 55 of first 115
+      civPopTarget = 60;      // 55 of first 115
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -1153,10 +1152,10 @@ rule updateEMAge4
          civPopTarget = 35;
       milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);   }
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.90);   }
    else
  {
-      int num1 =aiRandInt(3);
+      int num1 =aiRandInt(1);
       int num2 =aiRandInt(9);
       civPopTarget = 45; 
       if (gGlutRatio > 1.0)
@@ -1167,9 +1166,9 @@ rule updateEMAge4
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;
         milPopTarget = getSoftPopCap() - civPopTarget;
-        kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-        kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.85);
-        kbUnitPickSetCostWeight(gLateUPID, num1+2.+num2);
+        kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.9);
+        kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.99);
+        kbUnitPickSetCostWeight(gLateUPID, num1+5.+num2);
 
    }
 
@@ -1937,7 +1936,13 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     inactive
 {
     static int ageStartTime = -1;
-    
+    int age = kbGetAge();
+	       if (age > cAge3)
+    {
+        xsDisableSelf();
+        xsEnableRule("econForecastAge4");
+        return;
+    }
     if (kbGetTechStatus(gAge4MinorGod) >=  cTechStatusResearching)	// On our way to age 4, hand off...
     {
         xsEnableRule("econForecastAge4");
@@ -2169,7 +2174,14 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     inactive
 {
     static int ageStartTime = -1;
-   
+	
+	int age = kbGetAge();
+       if (age > cAge2)
+    {
+        xsDisableSelf();
+        xsEnableRule("econForecastAge3");
+        return;
+    }
     if (kbGetTechStatus(gAge3MinorGod) >= cTechStatusResearching) 	// On our way to age 3, hand off...
     {
         xsEnableRule("econForecastAge3");
@@ -2955,9 +2967,9 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
     //Default init.
      kbUnitPickResetAll(upID);
     //1 Part Preference, 2 Parts CE, 2 Parts Cost.  Testing 1/10/4
-    kbUnitPickSetPreferenceWeight(upID, 1.0);
+    kbUnitPickSetPreferenceWeight(upID, 2.0);
     kbUnitPickSetCombatEfficiencyWeight(upID, 2.0);
-    kbUnitPickSetCostWeight(upID, 2.0);
+    kbUnitPickSetCostWeight(upID, 7.0);
     //Desired number units types, buildings.
     kbUnitPickSetDesiredNumberUnitTypes(upID, numberTypes, numberBuildings, true);
     //Min/Max units and Min/Max pop.
@@ -3911,7 +3923,7 @@ void init(void)
     if (towerOdds < 0.1)
         towerOdds = 0.1;                            // Now 0.1 - 1.4
             
-    towerOdds = (250+towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
+    towerOdds = (1250+towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
 
     result = -1;
     result = aiRandInt(101) - 1;   //-1..99
@@ -4400,7 +4412,8 @@ void init(void)
     
     xsEnableRule("defendPlanRule");
     xsEnableRule("mainBaseDefPlan1");
-    xsEnableRule("mainBaseDefPlan2");
+    if (OnlyOneMBDefRule == false)
+	xsEnableRule("mainBaseDefPlan2");
     
     xsEnableRule("findMySettlementsBeingBuilt");
     
@@ -5001,8 +5014,8 @@ void age2Handler(int age=1)
     {
         if (gBuildWallsAtMainBase == true)
         {
-            xsEnableRule("mainBaseAreaWallTeam1");
-			xsEnableRule("MBSecondaryWall");
+		xsEnableRule("mainBaseAreaWallTeam1");
+			
 			
 
          //   if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
@@ -5010,6 +5023,9 @@ void age2Handler(int age=1)
             
             if (aiGetGameMode() != cGameModeDeathmatch)
                 xsEnableRule("setUnitPicker");
+					           
+			if (aiGetWorldDifficulty() > cDifficultyHard)
+			xsEnableRule("MBSecondaryWall");
         }
         xsEnableRule("otherBaseRingWallTeam1");
         
@@ -5694,8 +5710,10 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 {
     aiEcho("findFish:");
 		if (xsGetTime() > 40*60*1000)  // Disable if we've tried for too long.
-        xsDisableSelf();
-	
+        {
+		xsDisableSelf();
+		return;
+	    }
 			// Disable early fishing for Nomad & Highland, to later be enabled.
 		
 		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") || (cRandomMapName == "vinlandsaga") || (cRandomMapName == "Deep Jungle"))
@@ -6233,6 +6251,10 @@ void attackChatCallback(int parm1=-1)
 
 
 
-
-
+rule EchoDebug
+minInterval 1
+active
+{
+aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+}
 

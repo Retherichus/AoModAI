@@ -2684,6 +2684,9 @@ rule otherBaseRingWallTeam1
     
     if (goldSupply < 200)
         return;
+		
+		if (aiGetWorldDifficulty() < cDifficultyNightmare)
+        gOtherBaseWallRadius = 19.0;
 
     float otherBaseWallRadius = gOtherBaseWallRadius;
     
@@ -2867,7 +2870,9 @@ rule otherBase1RingWallTeam
     
     if (goldSupply < 150)
         return;
-    
+    	if (aiGetWorldDifficulty() < cDifficultyNightmare)
+        gOtherBaseWallRadius = 19.0;
+	
     float otherBaseWallRadius = gOtherBaseWallRadius;
     
     int builderType = cUnitTypeAbstractVillager;
@@ -3026,6 +3031,8 @@ rule otherBase2RingWallTeam
     if (goldSupply < 150)
         return;
 
+    if (aiGetWorldDifficulty() < cDifficultyNightmare)
+    gOtherBaseWallRadius = 19.0;		
     float otherBaseWallRadius = gOtherBaseWallRadius;
     
     int builderType = cUnitTypeAbstractVillager;
@@ -3184,6 +3191,8 @@ rule otherBase3RingWallTeam
     if (goldSupply < 150)
         return;
 
+	if (aiGetWorldDifficulty() < cDifficultyNightmare)
+    gOtherBaseWallRadius = 19.0;	
     float otherBaseWallRadius = gOtherBaseWallRadius;
     
     int builderType = cUnitTypeAbstractVillager;
@@ -3341,7 +3350,9 @@ rule otherBase4RingWallTeam
 
     if (goldSupply < 150)
         return;    
-
+   
+    if (aiGetWorldDifficulty() < cDifficultyNightmare)
+    gOtherBaseWallRadius = 19.0;
     float otherBaseWallRadius = gOtherBaseWallRadius;
     
     int builderType = cUnitTypeAbstractVillager;

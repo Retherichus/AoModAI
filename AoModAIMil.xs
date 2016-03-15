@@ -4339,7 +4339,7 @@ rule setUnitPicker
             if (landUPupdate == false)
             {
                 // increase the number of buildings of the lateUPID
-                kbUnitPickSetDesiredNumberUnitTypes(gLateUPID, 3, 3, true);  // 3 unit types and 3 buildings.
+                kbUnitPickSetDesiredNumberUnitTypes(gLateUPID, 2, 6, true);  // 3 unit types and 3 buildings.
                 landUPupdate = true;
             }
         }

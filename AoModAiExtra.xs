@@ -24,6 +24,7 @@ mutable void wonderDeathHandler(int playerID=-1) { }
 extern bool ConfirmFish = false;          // Don't change this, It's for extra safety when fishing, and it'll enable itself if fish is found.
 extern int gGardenBuildLimit = 0;
 extern int HateChoice = -1;
+extern int gInitialWoodBaseID = -1;
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
 //Below, you'll find a few things I've set up,
@@ -40,6 +41,7 @@ extern bool bWallUp = true;              // This ensures that the Ai will build 
 extern bool Age3Armory = false;           // Prevents the Ai from researching armory upgrades before reaching Heroic Age.
 
 
+extern bool OnlyOneMBDefRule = true;
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
 extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. (Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
@@ -85,13 +87,14 @@ extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Woo
 
 // For RethEcoGoals, AoModAi do normally calculate the resources it needs, though.. we want it to keep some extra resources at all times, 
 // so, let's make it a little bit more ''static'' by setting resource goals a little closer to what Admiral Ai use.
+// Do note that anything you put in here will get added on top of the default goals, some values may appear to be very low but it really isn't.
 //==============================================================================
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 900;             // Food
-extern int RethLGGAge2 = 700;              // Gold
-extern int RethLGWAge2 = 350;              // Wood
+extern int RethLGFAge2 = 1000;             // Food
+extern int RethLGGAge2 = 600;              // Gold
+extern int RethLGWAge2 = 150;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -101,8 +104,8 @@ extern int RethLGWAge3 = 550;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLGFAge4 = 1400;              // Food
-extern int RethLGGAge4 = 1000;              // Gold
+extern int RethLGFAge4 = 3000;              // Food
+extern int RethLGGAge4 = 2400;              // Gold
 extern int RethLGWAge4 = 600;              // Wood
 
 
@@ -113,7 +116,7 @@ extern int RethLGWAge4 = 600;              // Wood
 //Age 2 (Classical Age)
 extern int RethLEFAge2 = 900;              // Food
 extern int RethLEGAge2 = 800;              // Gold
-extern int RethLEWAge2 = 100;              // Wood
+extern int RethLEWAge2 = 50;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -123,9 +126,9 @@ extern int RethLEWAge3 = 250;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLEFAge4 = 1400;              // Food
-extern int RethLEGAge4 = 1000;              // Gold
-extern int RethLEWAge4 = 500;              // Wood
+extern int RethLEFAge4 = 3000;              // Food
+extern int RethLEGAge4 = 2400;              // Gold
+extern int RethLEWAge4 = 600;              // Wood
 
 //==============================================================================
 //Norse
@@ -144,9 +147,9 @@ extern int RethLNWAge3 = 350;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLNFAge4 = 1400;              // Food
-extern int RethLNGAge4 = 1000;              // Gold
-extern int RethLNWAge4 = 600;              // Wood
+extern int RethLNFAge4 = 3000;              // Food
+extern int RethLNGAge4 = 2400;              // Gold
+extern int RethLNWAge4 = 700;              // Wood
 
 //==============================================================================
 //Atlantean
@@ -165,9 +168,9 @@ extern int RethLAWAge3 = 350;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLAFAge4 = 1400;              // Food
-extern int RethLAGAge4 = 1000;              // Gold
-extern int RethLAWAge4 = 600;              // Wood
+extern int RethLAFAge4 = 3000;              // Food
+extern int RethLAGAge4 = 2400;              // Gold
+extern int RethLAWAge4 = 700;              // Wood
 
 
 //==============================================================================
@@ -187,9 +190,9 @@ extern int RethLCWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLCFAge4 = 1400;              // Food
-extern int RethLCGAge4 = 1000;              // Gold
-extern int RethLCWAge4 = 600;              // Wood
+extern int RethLCFAge4 = 3000;              // Food
+extern int RethLCGAge4 = 2400;              // Gold
+extern int RethLCWAge4 = 700;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -413,6 +416,10 @@ rule ActivateRethOverridesAge4
 		xsEnableRule("getMediumArchers");	
     
 	   xsEnableRule("repairTitanGate");
+	    // Make sure none of the EM rules get stuck, it happens very rarely.
+		xsDisableRule("updateEMAge1");
+		xsDisableRule("updateEMAge2");
+		xsDisableRule("updateEMAge3");
 		
 		xsDisableSelf();
            
@@ -1691,4 +1698,3 @@ rule IHateBuildingsSiege
 }
 
 // TESTING GROUND
-
