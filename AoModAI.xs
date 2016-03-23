@@ -970,14 +970,14 @@ rule updateEMAge1       // i.e. cAge1
    {
       if (aiGetWorldDifficulty() == cDifficultyEasy)
       {
-         civPopTarget = 10;
+         civPopTarget = 25;
          milPopTarget = 10;
          if (cMyCulture == cCultureAtlantean)
-            civPopTarget = 12;   // Make up for oracles
+            civPopTarget = 27;   // Make up for oracles
       }
       else if (aiGetWorldDifficulty() == cDifficultyModerate)
       {
-         civPopTarget = 15;
+         civPopTarget = 40;
          milPopTarget = 30;
       }
       else if (aiGetWorldDifficulty() == cDifficultyHard)
@@ -1006,14 +1006,14 @@ rule updateEMAge2
 
     if (aiGetWorldDifficulty() == cDifficultyEasy)
     {
-        civPopTarget = 10;
+        civPopTarget = 25;
         if (cMyCulture == cCultureAtlantean)
-            civPopTarget = 12;   // Make up for oracles
+            civPopTarget = 27;   // Make up for oracles
         milPopTarget = 22 + (cvRushBoomSlider*10.99);   // + 10 in extreme 'rush'
     }
     else if (aiGetWorldDifficulty() == cDifficultyModerate)
     {
-        civPopTarget = 20 - (cvRushBoomSlider*3.99); // adds variance of +/- 3, smaller in rush
+        civPopTarget = 35 - (cvRushBoomSlider*3.99); // adds variance of +/- 3, smaller in rush
         if (aiGetGameMode() == cGameModeLightning)
             civPopTarget = 15;
         milPopTarget = 30 + (cvRushBoomSlider*10.99);   // +/- 10, bigger in rush, smaller in boom
@@ -1063,14 +1063,14 @@ rule updateEMAge3
     static int milPopTarget=-1;
     if (aiGetWorldDifficulty() == cDifficultyEasy)
     {
-        civPopTarget = 10 + aiRandInt(3);
+        civPopTarget = 25 + aiRandInt(3);
         if (cMyCulture == cCultureAtlantean)
-            civPopTarget = 12 + aiRandInt(3);   // Make up for oracles
+            civPopTarget = 27 + aiRandInt(3);   // Make up for oracles
         milPopTarget = 26 + aiRandInt(8);   
     }
     else if (aiGetWorldDifficulty() == cDifficultyModerate)
     {
-        civPopTarget = 30; 
+        civPopTarget = 40; 
         if (aiGetGameMode() == cGameModeLightning)
             civPopTarget = 15;
         milPopTarget = 40;
@@ -1129,21 +1129,21 @@ rule updateEMAge4
 
     if (aiGetWorldDifficulty() == cDifficultyEasy)
     {
-        civPopTarget = 20 + aiRandInt(3);
+        civPopTarget = 25 + aiRandInt(3);
         if (cMyCulture == cCultureAtlantean)
-            civPopTarget = 22 + aiRandInt(3);   // Make up for oracles
+            civPopTarget = 27 + aiRandInt(3);   // Make up for oracles
         milPopTarget = 26 + aiRandInt(8);  
     }
     else if (aiGetWorldDifficulty() == cDifficultyModerate)
     {
-        civPopTarget = 34; 
+        civPopTarget = 40; 
         if (aiGetGameMode() == cGameModeLightning)
             civPopTarget = 15;
         milPopTarget = 50;
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-      civPopTarget = 70;      // 55 of first 115
+      civPopTarget = 65;      // 55 of first 115
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -1153,7 +1153,7 @@ rule updateEMAge4
          civPopTarget = 35;
       milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.85);   }
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.90);   }
    else
  {
       int num1 =aiRandInt(3);
