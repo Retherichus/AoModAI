@@ -741,7 +741,7 @@ rule getHuntingDogs
         update = true;
     }
     
-    aiEcho("______:");    
+     
     aiEcho("getHuntingDogs:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)

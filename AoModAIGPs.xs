@@ -1425,7 +1425,7 @@ rule rPlaceTitanGate
         xsDisableSelf();
 */
     // TODO: does this work at all?
-        aiEcho("____-----____ couldn't create plan to place Titan Gate, retrying in 2 minutes");
+        aiEcho("couldn't create plan to place Titan Gate, retrying in 2 minutes");
         xsSetRuleMinIntervalSelf(127);
         return;
     }

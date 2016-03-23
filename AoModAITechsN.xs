@@ -83,7 +83,7 @@ rule getEyesInTheForest
 rule getThunderingHooves
     inactive
     minInterval 60 //starts in cAge2
-    group techsNorseMinorGodAge2
+    group Freyja
 {
     if (kbGetTechStatus(cTechThunderingHooves) == cTechStatusAvailable)
     {
@@ -101,7 +101,7 @@ rule getThunderingHooves
 rule getAuroraBorealis
     inactive
     minInterval 60 //starts in cAge2
-    group techsNorseMinorGodAge2
+    group Freyja
 {
     if (kbGetTechStatus(cTechAuroraBorealis) == cTechStatusAvailable)
     {
@@ -121,7 +121,7 @@ rule getAuroraBorealis
 rule getSafeguard
     inactive
     minInterval 60 //starts in cAge2
-    group techsNorseMinorGodAge2
+    group Heimdall
 {
     if (kbGetTechStatus(cTechSafeguard) > cTechStatusResearching)
     {
@@ -152,7 +152,7 @@ rule getSafeguard
 rule getElhrimnirKettle
     inactive
     minInterval 60 //starts in cAge2
-    group techsNorseMinorGodAge2
+    group Heimdall
 {
     if (kbGetTechStatus(cTechEldhrimnirKettle) == cTechStatusAvailable)
     {
@@ -170,7 +170,7 @@ rule getElhrimnirKettle
 rule getArcticWinds
     inactive
     minInterval 60 //starts in cAge2
-    group techsNorseMinorGodAge2
+    group Heimdall
 {
     if (kbGetTechStatus(cTechArcticWinds) == cTechStatusAvailable)
     {
@@ -191,7 +191,7 @@ rule getArcticWinds
 rule getHallOfThanes
     inactive
     minInterval 60 //starts in cAge2
-    group techsNorseMinorGodAge2
+    group Forseti
 {
     if (kbGetTechStatus(cTechHallofThanes) == cTechStatusAvailable)
     {
@@ -210,7 +210,7 @@ rule getHallOfThanes
 rule getHamarrtroll
     inactive
     minInterval 60 //starts in cAge2
-    group techsNorseMinorGodAge2
+    group Forseti
 {
     if (kbGetTechStatus(cTechHamarrtroll) == cTechStatusAvailable)
     {
@@ -229,7 +229,7 @@ rule getHamarrtroll
 rule getMithrilBreastplate
     inactive
     minInterval 60 //starts in cAge2
-    group techsNorseMinorGodAge2
+    group Forseti
 {
     if (kbGetTechStatus(cTechMithrilBreastplate) == cTechStatusAvailable)
     {
@@ -251,7 +251,7 @@ rule getMithrilBreastplate
 rule getRingGiver
     inactive
     minInterval 60 //starts in cAge3
-    group techsNorseMinorGodAge3
+    group Njord
 {
     if (kbGetTechStatus(cTechRingGiver) == cTechStatusAvailable)
     {
@@ -269,7 +269,7 @@ rule getRingGiver
 rule getLongSerpent
     inactive
     minInterval 60 //starts in cAge3
-    group techsNorseMinorGodAge3
+    group Njord
 {
     if (kbGetTechStatus(cTechLongSerpent) == cTechStatusAvailable)
     {
@@ -287,7 +287,7 @@ rule getLongSerpent
 rule getWrathOfTheDeep
     inactive
     minInterval 60 //starts in cAge3
-    group techsNorseMinorGodAge3
+    group Njord
 {
     if (kbGetTechStatus(cTechWrathOfTheDeep) == cTechStatusAvailable)
     {
@@ -307,7 +307,7 @@ rule getWrathOfTheDeep
 rule getRime
     inactive
     minInterval 60 //starts in cAge3
-    group techsNorseMinorGodAge3
+    group Skadi
 {
     if (kbGetTechStatus(cTechRime) == cTechStatusAvailable)
     {
@@ -325,7 +325,7 @@ rule getRime
 rule getWinterHarvest
     inactive
     minInterval 60 //starts in cAge3
-    group techsNorseMinorGodAge3
+    group Skadi
 {
     if (kbGetTechStatus(cTechWinterHarvest) == cTechStatusAvailable)
     {
@@ -344,7 +344,7 @@ rule getWinterHarvest
 rule getHuntressAxe
     inactive
     minInterval 60 //starts in cAge3
-    group techsNorseMinorGodAge3
+    group Skadi
 {
     if (kbGetTechStatus(cTechHuntressAxe) == cTechStatusAvailable)
     {
@@ -364,7 +364,7 @@ rule getHuntressAxe
 rule getSwineArray
     inactive
     minInterval 60 //starts in cAge3
-    group techsNorseMinorGodAge3
+    group Bragi
 {
     if (kbGetTechStatus(cTechSwineArray) == cTechStatusAvailable)
     {
@@ -383,7 +383,7 @@ rule getSwineArray
 rule getCallOfValhalla
     inactive
     minInterval 60 //starts in cAge3
-    group techsNorseMinorGodAge3
+    group Bragi
 {
     if (kbGetTechStatus(cTechCallOfValhalla) == cTechStatusAvailable)
     {
@@ -401,7 +401,7 @@ rule getCallOfValhalla
 rule getThurisazRune
     inactive
     minInterval 60 //starts in cAge3
-    group techsNorseMinorGodAge3
+    group Bragi
 {
     if (kbGetTechStatus(cTechThurisazRune) == cTechStatusAvailable)
     {
@@ -422,7 +422,7 @@ rule getThurisazRune
 rule getArcticGale
     inactive
     minInterval 60 //starts in cAge4
-    group techsNorseMinorGodAge4
+    group Baldr
 {
     if (kbGetTechStatus(cTechArcticGale) == cTechStatusAvailable)
     {
@@ -441,7 +441,7 @@ rule getArcticGale
 rule getSonsOfSleipnir
     inactive
     minInterval 60 //starts in cAge4
-    group techsNorseMinorGodAge4
+    group Baldr
 {
     if (kbGetTechStatus(cTechSonsofSleipnir) == cTechStatusAvailable)
     {
@@ -459,7 +459,7 @@ rule getSonsOfSleipnir
 rule getDwarvenAuger
     inactive
     minInterval 60 //starts in cAge4
-    group techsNorseMinorGodAge4
+    group Baldr
 {
     if (kbGetTechStatus(cTechDwarvenAuger) == cTechStatusAvailable)
     {
@@ -479,7 +479,7 @@ rule getDwarvenAuger
 rule getBerserkergang
     inactive
     minInterval 60 //starts in cAge4
-    group techsNorseMinorGodAge4
+    group Tyr
 {
     if (kbGetTechStatus(cTechBerserkergang) == cTechStatusAvailable)
     {
@@ -498,7 +498,7 @@ rule getBerserkergang
 rule getBravery
     inactive
     minInterval 60 //starts in cAge4
-    group techsNorseMinorGodAge4
+    group Tyr
 {
     if (kbGetTechStatus(cTechBravery) == cTechStatusAvailable)
     {
@@ -517,7 +517,7 @@ rule getBravery
 rule getRampage
     inactive
     minInterval 60 //starts in cAge4
-    group techsNorseMinorGodAge4
+    group Hel
 {
     if (kbGetTechStatus(cTechRampage) == cTechStatusAvailable)
     {
@@ -535,7 +535,7 @@ rule getRampage
 rule getGraniteBlood
     inactive
     minInterval 60 //starts in cAge4
-    group techsNorseMinorGodAge4
+    group Hel
 {
     if (kbGetTechStatus(cTechGraniteBlood) == cTechStatusAvailable)
     {

@@ -25,7 +25,6 @@ extern int gTransportUnit=-1;
 //==============================================================================
 void preInitMap()
 {
-    //aiEcho("Map Specific Init.");
     aiEcho("preInitMap:");    
 
     int transport = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
@@ -59,7 +58,8 @@ void preInitMap()
       (cRandomMapName == "tos_northamerica-v1-1") ||  
       (cRandomMapName == "Yellow River") || 	  
       (cRandomMapName == "vesuvius-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||
-      (cRandomMapName == "river styx"))
+      (cRandomMapName == "river styx") ||
+	  (cRandomMapName == "black sea"))
     {
         // on these maps, the players are on different islands.
         // we therefore have to consider water transport
@@ -67,7 +67,6 @@ void preInitMap()
         gTransportMap = true;
         gWaterMap = true;
         xsEnableRule("fishing");
-        //aiEcho("This is a transport map.");
     }
     else if ((cRandomMapName == "mediterranean") ||
       (cRandomMapName == "alternate-mediterranean") ||
@@ -101,7 +100,6 @@ void preInitMap()
         gTransportMap=false;
         xsEnableRule("fishing");
 
-        //aiEcho("This is a water map.");
     }
     else if ((cRandomMapName == "alfheim") ||
       (cRandomMapName == "alternate-alfheim") ||
@@ -173,7 +171,6 @@ void preInitMap()
         gNumBoatsToMaintain = 0;
         xsDisableRule("findFish"); 
         xsDisableRule("fishing");
-        //aiEcho("This is a land map.");
     }
     else
     // king of the hill
@@ -351,7 +348,6 @@ void initMapSpecific()
         gShimoKingID = findUnit(gShimoKingUnitTypeID);
         if ( gShimoKingID >= 0 )
         {
-            //aiEcho("This is a shimo map, defend our king "+kbGetUnitTypeName(gShimoKingUnitTypeID));
             // TODO: no idea so far, what we could do on such map. Sadly, we cannot garrison our king. No way from
             // script level :-(
             // create defend plan?
@@ -675,7 +671,6 @@ rule nomadSearchMode
     aiEcho("nomadSearchMode:");
 
     //Make plans to explore with the initial villagers and goats.
-    //aiEcho("Making nomad explore plans.");
     gNomadExplorePlanID1=aiPlanCreate("Nomad Explore 1", cPlanExplore);
     if (gNomadExplorePlanID1 >= 0)
     {
@@ -990,7 +985,6 @@ bool mapPreventsRush()  //TODO: this are not all maps that prevent rushes.
 //==============================================================================
 bool mapPreventsWalls() //some maps do not allow walls or it doesn't make sense to build walls there
 {
-    //aiEcho("mapPreventsWalls:");
     if ( 
         cRandomMapName == "acropolis" ||
         cRandomMapName == "alternate-acropolis" ||

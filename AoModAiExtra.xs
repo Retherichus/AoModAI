@@ -14,7 +14,8 @@
 //Below, you'll find the Plan handler. 
 //you don't really want to touch this.
 //==============================================================================
-
+mutable bool persWantForwardBase() {}
+extern int gForwardBaseID=-1;
 extern int fCitadelPlanID = -1;
 extern int gShiftingSandPlanID= -1;
 mutable void retreatHandler(int planID=-1) {}
@@ -22,16 +23,19 @@ mutable void relicHandler(int relicID=-1) {}
 mutable void wonderDeathHandler(int playerID=-1) { }
 extern bool ConfirmFish = false;          // Don't change this, It's for extra safety when fishing, and it'll enable itself if fish is found.
 extern int gGardenBuildLimit = 0;
-
+extern int HateChoice = -1;
+extern int gInitialWoodBaseID = -1;
+extern int gLandExplorePlanID2=-1;
+extern int gLandScoutSpecialUlfsark = -1;
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
 //Below, you'll find a few things I've set up,
 //you can turn these on/off as you please, by setting the final value to true or false.
 //There's also a small description on all of them, to make it a little easier to understand what happens when you set it to true.
 //==============================================================================
-
+extern bool mCanIDefendAllies = true;     // Allows the AI to defend his allies.
 extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''
-extern bool gAgeFaster = true;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
+extern bool gAgeFaster = false;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
 extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
@@ -39,10 +43,11 @@ extern bool bWallUp = true;              // This ensures that the Ai will build 
 extern bool Age3Armory = false;           // Prevents the Ai from researching armory upgrades before reaching Heroic Age.
 
 
+extern bool OnlyOneMBDefRule = true;
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
 extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. (Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
-extern bool gEarlyMonuments = true;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
+extern bool gEarlyMonuments = false;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
 
 //For gAgefaster when true.
@@ -53,9 +58,9 @@ extern int eMaxMilPop = 50;               // Max military pop cap during Classic
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 500;              // Food
+extern int eBoomFood = 650;              // Food
 extern int eBoomGold = 100;              // Gold
-extern int eBoomWood = 250;              // Wood, duh.
+extern int eBoomWood = 200;              // Wood, duh.
 
 
 //Egyptians have their own, because they don't like wood as much.
@@ -74,7 +79,7 @@ extern int eFBoomWood = 50;             // Wood, The Ai will automatically boost
 
 //Timer for gSuperboom & fishing
 extern int eBoomTimer = 5;                // Minutes this plan will remain active. It'll disable itself after X minutes set.(minus delay) 
-extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Wood, this supports the Ai in building early fishing ships.
+extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wood, this supports the Ai in building early fishing ships.
 
 
 
@@ -84,25 +89,26 @@ extern int eFishTimer = 2;                // Minutes the Ai will go heavy on Woo
 
 // For RethEcoGoals, AoModAi do normally calculate the resources it needs, though.. we want it to keep some extra resources at all times, 
 // so, let's make it a little bit more ''static'' by setting resource goals a little closer to what Admiral Ai use.
+// Do note that anything you put in here will get added on top of the default goals, some values may appear to be very low but it really isn't.
 //==============================================================================
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 900;             // Food
-extern int RethLGGAge2 = 700;              // Gold
-extern int RethLGWAge2 = 450;              // Wood
+extern int RethLGFAge2 = 700;             // Food
+extern int RethLGGAge2 = 450;              // Gold
+extern int RethLGWAge2 = 150;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLGFAge3 = 1000;              // Food
-extern int RethLGGAge3 = 800;              // Gold
-extern int RethLGWAge3 = 550;              // Wood
+extern int RethLGFAge3 = 1300;              // Food
+extern int RethLGGAge3 = 1700;              // Gold
+extern int RethLGWAge3 = 600;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLGFAge4 = 1400;              // Food
-extern int RethLGGAge4 = 1000;              // Gold
-extern int RethLGWAge4 = 600;              // Wood
+extern int RethLGFAge4 = 3000;              // Food
+extern int RethLGGAge4 = 2400;              // Gold
+extern int RethLGWAge4 = 1200;              // Wood
 
 
 //==============================================================================
@@ -110,63 +116,63 @@ extern int RethLGWAge4 = 600;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLEFAge2 = 900;              // Food
-extern int RethLEGAge2 = 800;              // Gold
-extern int RethLEWAge2 = 100;              // Wood
+extern int RethLEFAge2 = 700;              // Food
+extern int RethLEGAge2 = 600;              // Gold
+extern int RethLEWAge2 = 50;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLEFAge3 = 1000;              // Food
-extern int RethLEGAge3 = 1000;              // Gold
-extern int RethLEWAge3 = 250;              // Wood
+extern int RethLEFAge3 = 1300;              // Food
+extern int RethLEGAge3 = 1700;              // Gold
+extern int RethLEWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLEFAge4 = 1400;              // Food
-extern int RethLEGAge4 = 1000;              // Gold
-extern int RethLEWAge4 = 500;              // Wood
+extern int RethLEFAge4 = 3000;              // Food
+extern int RethLEGAge4 = 2400;              // Gold
+extern int RethLEWAge4 = 600;              // Wood
 
 //==============================================================================
 //Norse
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 1000;             // Food
-extern int RethLNGAge2 = 700;              // Gold
-extern int RethLNWAge2 = 300;              // Wood
+extern int RethLNFAge2 = 700;             // Food
+extern int RethLNGAge2 = 500;              // Gold
+extern int RethLNWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLNFAge3 = 1000;              // Food
-extern int RethLNGAge3 = 1000;              // Gold
-extern int RethLNWAge3 = 350;              // Wood
+extern int RethLNFAge3 = 1200;              // Food
+extern int RethLNGAge3 = 1700;              // Gold
+extern int RethLNWAge3 = 750;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLNFAge4 = 1400;              // Food
-extern int RethLNGAge4 = 1000;              // Gold
-extern int RethLNWAge4 = 600;              // Wood
+extern int RethLNFAge4 = 3000;              // Food
+extern int RethLNGAge4 = 2400;              // Gold
+extern int RethLNWAge4 = 1000;              // Wood
 
 //==============================================================================
 //Atlantean
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 900;              // Food
-extern int RethLAGAge2 = 700;              // Gold
-extern int RethLAWAge2 = 300;              // Wood
+extern int RethLAFAge2 = 700;              // Food
+extern int RethLAGAge2 = 450;              // Gold
+extern int RethLAWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLAFAge3 = 1000;              // Food
-extern int RethLAGAge3 = 1000;              // Gold
-extern int RethLAWAge3 = 350;              // Wood
+extern int RethLAFAge3 = 1700;              // Food
+extern int RethLAGAge3 = 1400;              // Gold
+extern int RethLAWAge3 = 800;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLAFAge4 = 1400;              // Food
-extern int RethLAGAge4 = 1000;              // Gold
-extern int RethLAWAge4 = 600;              // Wood
+extern int RethLAFAge4 = 3000;              // Food
+extern int RethLAGAge4 = 2400;              // Gold
+extern int RethLAWAge4 = 1000;              // Wood
 
 
 //==============================================================================
@@ -174,21 +180,21 @@ extern int RethLAWAge4 = 600;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLCFAge2 = 900;              // Food
-extern int RethLCGAge2 = 700;              // Gold
-extern int RethLCWAge2 = 400;              // Wood
+extern int RethLCFAge2 = 700;              // Food
+extern int RethLCGAge2 = 450;              // Gold
+extern int RethLCWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLCFAge3 = 1000;              // Food
-extern int RethLCGAge3 = 1000;              // Gold
+extern int RethLCFAge3 = 1300;              // Food
+extern int RethLCGAge3 = 1700;              // Gold
 extern int RethLCWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLCFAge4 = 1400;              // Food
-extern int RethLCGAge4 = 1000;              // Gold
-extern int RethLCWAge4 = 600;              // Wood
+extern int RethLCFAge4 = 3000;              // Food
+extern int RethLCGAge4 = 2400;              // Gold
+extern int RethLCWAge4 = 1000;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -324,6 +330,11 @@ rule ActivateRethOverridesAge1
 		if (gHuntingDogsASAP == true)
 		xsEnableRule("HuntingDogsAsap");
 		
+		if (aiGetWorldDifficulty() > cDifficultyHard)
+		xsEnableRuleGroup("MassDonations");
+		
+		
+		/*
 		// Force Dock down.
 		if (gWaterMap == true && RethFishEco == true)
    {
@@ -340,7 +351,7 @@ rule ActivateRethOverridesAge1
          aiPlanSetActive(buildDock);
       }
    }
-		
+	*/	
 		
 		xsDisableSelf();
            
@@ -353,12 +364,37 @@ rule ActivateRethOverridesAge2
     if (kbGetAge() > cAge1)
     {
 		initRethlAge2();
+		//CHINESE MINOR GOD SPECIFIC
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Change) == cTechStatusActive)
         xsEnableRuleGroup("Change");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Huangdi) == cTechStatusActive)
         xsEnableRuleGroup("Huangdi");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Sunwukong) == cTechStatusActive)
         xsEnableRuleGroup("Sunwukong");
+		
+		//EGYPTIAN MINOR GOD SPECIFIC
+        if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge2Bast) == cTechStatusActive)
+        xsEnableRuleGroup("Bast");
+        if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge2Ptah) == cTechStatusActive)
+        xsEnableRuleGroup("Ptah");
+        if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge2Anubis) == cTechStatusActive)
+        xsEnableRuleGroup("Anubis");
+		
+		//Norse MINOR GOD SPECIFIC
+        if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge2Forseti) == cTechStatusActive)
+        xsEnableRuleGroup("Forseti");
+        if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge2Freyja) == cTechStatusActive)
+        xsEnableRuleGroup("Freyja");
+        if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge2Heimdall) == cTechStatusActive)
+        xsEnableRuleGroup("Heimdall");
+		
+		//Atlantean MINOR GOD SPECIFIC
+        if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge2Leto) == cTechStatusActive)
+        xsEnableRuleGroup("Leto");
+        if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge2Prometheus) == cTechStatusActive)
+        xsEnableRuleGroup("Prometheus");
+        if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge2Okeanus) == cTechStatusActive)
+        xsEnableRuleGroup("Oceanus");
 		
 		xsDisableSelf();
 		
@@ -372,7 +408,7 @@ rule ActivateRethOverridesAge3
 {
     if (kbGetAge() > cAge2)
     {
-        
+        //CHINESE MINOR GOD SPECIFIC
 		if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Dabogong) == cTechStatusActive)
         xsEnableRuleGroup("Dabogong");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Hebo) == cTechStatusActive)
@@ -380,6 +416,29 @@ rule ActivateRethOverridesAge3
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Zhongkui) == cTechStatusActive)
         xsEnableRuleGroup("Zhongkui");
 		
+        //EGYPTIAN MINOR GOD SPECIFIC
+		if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge3Nephthys) == cTechStatusActive)
+        xsEnableRuleGroup("Nephthys");
+        if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge3Sekhmet) == cTechStatusActive)
+        xsEnableRuleGroup("Sekhmet");
+        if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge3Hathor) == cTechStatusActive)
+        xsEnableRuleGroup("Hathor");		
+		
+		//Norse MINOR GOD SPECIFIC
+        if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge3Skadi) == cTechStatusActive)
+        xsEnableRuleGroup("Skadi");
+        if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge3Njord) == cTechStatusActive)
+        xsEnableRuleGroup("Njord");
+        if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge3Bragi) == cTechStatusActive)
+        xsEnableRuleGroup("Bragi");
+		
+		//Atlantean MINOR GOD SPECIFIC
+        if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge3Rheia) == cTechStatusActive)
+        xsEnableRuleGroup("Rheia");
+        if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge3Theia) == cTechStatusActive)
+        xsEnableRuleGroup("Theia");
+        if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge3Hyperion) == cTechStatusActive)
+        xsEnableRuleGroup("Hyperion");		
 		
 		if (cMyCiv != cCivThor && Age3Armory == true)
         xsEnableRuleGroup("ArmoryAge2");
@@ -397,16 +456,46 @@ rule ActivateRethOverridesAge4
 {
     if (kbGetAge() > cAge3)
     {
+	
+        //CHINESE MINOR GOD SPECIFIC	
 	    if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Aokuang) == cTechStatusActive)
         xsEnableRuleGroup("Aokuang");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Xiwangmu) == cTechStatusActive)
         xsEnableRuleGroup("Xiwangmu");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Chongli) == cTechStatusActive)
         xsEnableRuleGroup("Chongli");
+		
+        //Egyptian MINOR GOD SPECIFIC	
+	    if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Horus) == cTechStatusActive)
+        xsEnableRuleGroup("Horus");
+        if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Osiris) == cTechStatusActive)
+        xsEnableRuleGroup("Osiris");
+        if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Thoth) == cTechStatusActive)
+        xsEnableRuleGroup("Thoth");		
+		
+		//Norse MINOR GOD SPECIFIC
+        if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge4Tyr) == cTechStatusActive)
+        xsEnableRuleGroup("Tyr");
+        if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge4Baldr) == cTechStatusActive)
+        xsEnableRuleGroup("Baldr");
+        if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge4Hel) == cTechStatusActive)
+        xsEnableRuleGroup("Hel");
+		
+		//Atlantean MINOR GOD SPECIFIC
+        if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge4Atlas) == cTechStatusActive)
+        xsEnableRuleGroup("Atlas");
+        if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge4Helios) == cTechStatusActive)
+        xsEnableRuleGroup("Helios");
+        if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge4Hekate) == cTechStatusActive)
+        xsEnableRuleGroup("Hekate");				
+		
+		
+		
 		if (cMyCulture == cCultureNorse)
 		xsEnableRule("getMediumArchers");	
     
-	   xsEnableRule("repairTitanGate");
+	    xsEnableRule("repairTitanGate");
+
 		
 		xsDisableSelf();
            
@@ -1101,7 +1190,7 @@ rule buildManyBuildings
 // tacticalHeroAttackMyth
 //==============================================================================
 rule tacticalHeroAttackMyth
-   minInterval 6
+   minInterval 5
    active
 {
    static int unitQueryID=-1;
@@ -1154,7 +1243,7 @@ rule tacticalHeroAttackMyth
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0 && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeLogicalTypeLandMilitary) == true || cMyCulture == cCultureEgyptian))
+	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
@@ -1166,7 +1255,7 @@ rule tacticalHeroAttackMyth
 // IHateMonks
 //==============================================================================
 rule IHateMonks
-   minInterval 7
+   minInterval 6
    active
 {
    static int unitQueryID=-1;
@@ -1187,8 +1276,8 @@ rule IHateMonks
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
 		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractArcher);
-		if (cMyCulture == cCultureNorse)
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractCavalry);
+		if ((cMyCulture == cCultureNorse) || (cMyCulture == cCultureEgyptian))
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
 
@@ -1253,7 +1342,7 @@ rule IHateSiege
    if (unitQueryID != -1)
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractCavalry);
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
 
@@ -1275,7 +1364,7 @@ rule IHateSiege
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 28);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
    }
 
    int numberFoundTemp = 0;
@@ -1286,7 +1375,7 @@ rule IHateSiege
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0 && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeLogicalTypeLandMilitary) == true || cMyCulture == cCultureEgyptian))
+	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
@@ -1298,7 +1387,7 @@ rule IHateSiege
 // IHateBuildingsHadesSpecial
 //==============================================================================
 rule IHateBuildingsHadesSpecial
-   minInterval 6
+   minInterval 5
    active
 {
    static int unitQueryID=-1;
@@ -1312,13 +1401,338 @@ rule IHateBuildingsHadesSpecial
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeCrossbowman);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 34);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+//==============================================================================
+// BanditMigdolRemoval // Valley of Kings special
+//==============================================================================
+rule BanditMigdolRemoval
+   minInterval 8
+   active
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+   if (cRandomMapName != "valley of kings")
+   {
+	xsDisableSelf();
+	return;
+   }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 8)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationAny);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBanditMigdol);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 42);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+//==============================================================================
+// IHateVillagers
+//==============================================================================
+rule IHateVillagers
+   minInterval 5
+   active
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+   if (aiGetWorldDifficulty() == cDifficultyEasy)
+   {
+	xsDisableSelf();
+	return;
+   }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
    unitQueryID=kbUnitQueryCreate("My Unit Query");
    
    //Define a query to get all matching units
    if (unitQueryID != -1)
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeCrossbowman);
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractArcher);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeAbstractVillager);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 20);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp > 0)
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+//==============================================================================
+// IHateUnderworldPassages
+//==============================================================================
+rule IHateUnderworldPassages
+   minInterval 8
+   active
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeTunnel);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 42);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp > 0)
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+
+//==============================================================================
+// IHateBuildingsBeheAndScarab
+//==============================================================================
+rule IHateBuildingsBeheAndScarab
+   minInterval 6
+   active
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+   if ((aiGetWorldDifficulty() == cDifficultyEasy) || (cMyCulture != cCultureAtlantean && cMyCulture != cCultureEgyptian))
+   {
+	xsDisableSelf();
+	return;
+   }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			if (cMyCulture == cCultureEgyptian)
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeScarab);
+			if (cMyCulture == cCultureAtlantean)
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeBehemoth);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 26);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+
+//==============================================================================
+// IHateBuildingsSiege
+//==============================================================================
+rule IHateBuildingsSiege
+   minInterval 5
+   active
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+   if (aiGetWorldDifficulty() == cDifficultyEasy)
+   {
+	xsDisableSelf();
+	return;
+   }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSiegeWeapon);			
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
 
@@ -1358,3 +1772,109 @@ rule IHateBuildingsHadesSpecial
 	   }
    }
 }
+
+
+
+/*
+// PART 4: Borrowed code.
+// Borrowed code from the Stardard AI to support a more stable WoodBase.
+TEST, DO YOU EVEN IGNORE ME?
+float vec2LenSq(vector vec2 = cInvalidVector)
+{
+	return((xsVectorGetX(vec2)*xsVectorGetX(vec2))+(xsVectorGetZ(vec2)*xsVectorGetZ(vec2)));
+}
+
+float vec2Cross(vector v0 = cInvalidVector, vector v1 = cInvalidVector)
+{
+	return(xsVectorGetX(v0)*xsVectorGetZ(v1) - xsVectorGetZ(v0)*xsVectorGetX(v1));
+}
+
+vector movePointToPoint(vector v0= cInvalidVector, vector v1 = cInvalidVector, float percentage = -1.0)
+{
+	float x = xsVectorGetX(v0);
+	float z = xsVectorGetZ(v0);
+	return(xsVectorSet(x + percentage*(xsVectorGetX(v1)-x),0.0,z + percentage*(xsVectorGetZ(v1)-z)));
+}
+
+
+
+bool vec2Equal(vector v0 = cInvalidVector, vector v1 = cInvalidVector)
+{
+	if(xsVectorGetX(v0)!=xsVectorGetX(v1))
+	{
+		return(false);
+	}
+	if(xsVectorGetZ(v0)!=xsVectorGetZ(v1))
+	{
+		return(false);
+	}
+	return(true);
+}
+
+
+bool pointInRangeOfPoint(vector v0 = cInvalidVector, vector v1 = cInvalidVector, float range = -1.0)
+{
+	return(vec2LenSq(v0-v1)<=range*range);
+}
+
+int getNumberUnitsInArea(int areaID =-1,int unitType =-1)
+{
+	int num = kbAreaGetNumberUnits(areaID);
+	int retNum = 0;
+	for(i=0;<num)
+	{
+		if(kbUnitIsType(kbAreaGetUnitID(areaID,i),unitType))
+		{
+			retNum++;
+		}
+	}
+	return(num);
+}
+
+int findClosestAreaWithUnits(int areaID = -1,int type=-1, int unitType = -1, int numUnits=-1, int recursion = 3)
+{
+	aiEcho("Looking around area: "+areaID);
+	vector position   = kbAreaGetCenter(areaID);
+	int numBorderAreas   = kbAreaGetNumberBorderAreas(areaID);
+	int borderArea   = -1;
+	int closestArea   = -1;
+	int numRequiredUnits = -1;
+	int num  = -1;
+	float distance   = 0;
+	float lastDistance   = 999999;
+	// Check for the closest
+	for(i=0;< numBorderAreas)
+	{
+		borderArea = kbAreaGetBorderAreaID(areaID,i);
+		if(getNumberUnitsInArea(borderArea,unitType)>=numUnits&&kbAreaGetType(borderArea)==type)
+		{
+			distance = vec2LenSq(position-kbAreaGetCenter(borderArea));
+			if(distance<lastDistance)
+			{
+				lastDistance = distance;
+				closestArea  = borderArea;
+			}
+		}
+	}
+	if(closestArea != -1)
+	{
+		return(closestArea);
+	}
+	if(recursion!=0)
+	{
+		for(i=0;< numBorderAreas)
+		{
+			borderArea = findClosestAreaWithUnits(kbAreaGetBorderAreaID(areaID,i),type,unitType,numUnits,recursion-1);
+			distance   = vec2LenSq(position-kbAreaGetCenter(borderArea));
+			if(distance<lastDistance)
+			{
+				lastDistance = distance;
+				closestArea  = borderArea;
+			}
+		}
+	}
+	return(closestArea);
+}
+*/
+// TESTING GROUND
+

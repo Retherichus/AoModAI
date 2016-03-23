@@ -814,9 +814,7 @@ rule getForgeOfOlympus
     {
         //cTechForgeofOlympus is researched, reactivate the attack goal
         aiPlanSetVariableBool(gLandAttackGoalID, cGoalPlanIdleAttack, 0, false);
-        aiEcho("____________________");
         aiEcho("reactivating attack goal");
-        aiEcho("____________________");
         xsDisableSelf();
         return;
     }
@@ -825,9 +823,7 @@ rule getForgeOfOlympus
     {
         //set the gLandAttackGoalID to idle so that no armory techs get researched
         aiPlanSetVariableBool(gLandAttackGoalID, cGoalPlanIdleAttack, 0, true);
-        aiEcho("____________________");
         aiEcho("setting gLandAttackGoalID to idle");
-        aiEcho("____________________");
         xsSetRuleMinIntervalSelf(10);
     }
     
