@@ -41,7 +41,7 @@ extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will ta
 extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
 extern bool bWallUp = true;              // This ensures that the Ai will build walls(almost always), regardless of personality.
 extern bool Age3Armory = false;           // Prevents the Ai from researching armory upgrades before reaching Heroic Age.
-
+extern bool OneMBDefPlanOnly = true;      // Only allow one active "idle defense plan for Mainbase (6 units else 12 if set to false)"
 
 extern bool OnlyOneMBDefRule = true;
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 

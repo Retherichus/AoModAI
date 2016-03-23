@@ -484,11 +484,11 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 26;
+    int desiredFarmers = 28;
     if (mapRequires2FarmPlans() == true)
-        desiredFarmers = 30;
+        desiredFarmers = 32;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 13;
+        desiredFarmers = 14;
 		
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)

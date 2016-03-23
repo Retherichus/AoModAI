@@ -175,7 +175,7 @@ rule maintainAirScouts
                 {
                     if (foodSupply > 400)
                     {
-                        aiPlanSetVariableInt(trainPlanIndexID, cTrainPlanNumberToMaintain, 0, 2);
+                        aiPlanSetVariableInt(trainPlanIndexID, cTrainPlanNumberToMaintain, 0, 1);
                     }
                     else if (foodSupply > 200)
                     {

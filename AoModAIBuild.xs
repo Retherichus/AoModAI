@@ -5454,6 +5454,8 @@ rule fixJammedDropsiteBuildPlans
     {
         if (cMyCulture == cCultureGreek)
             dropsiteTypeID = cUnitTypeStorehouse;
+        if (cMyCulture == cCultureChinese)
+            dropsiteTypeID = cUnitTypeStoragePit;			
         else
         {
             if (i == 0)

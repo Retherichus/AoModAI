@@ -2626,7 +2626,8 @@ void initEgyptian(void)
             aiPlanSetEconomy(eOsiris, true);
             aiPlanAddUnitType(eOsiris, cUnitTypePharaohofOsiris, 1, 1, 1);
             aiPlanSetVariableInt(eOsiris, cEmpowerPlanTargetTypeID, 0, cUnitTypeAbstractSettlement);
-            aiPlanSetActive(eOsiris);
+            aiPlanSetDesiredPriority(eOsiris, 50);
+			aiPlanSetActive(eOsiris);
             }
         }
 		
@@ -2639,7 +2640,9 @@ void initEgyptian(void)
             aiPlanSetEconomy(Pempowermarket, true);
             aiPlanAddUnitType(Pempowermarket, cUnitTypePharaohSecondary, 1, 1, 1);
             aiPlanSetVariableInt(Pempowermarket, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
-            aiPlanSetActive(Pempowermarket);
+            aiPlanSetDesiredPriority(Pempowermarket, 50);
+			aiPlanSetActive(Pempowermarket);
+			
             }
         }
 
@@ -2792,7 +2795,7 @@ void initAtlantean(void)
 
    
     if (aiGetWorldDifficulty() != cDifficultyEasy)
-    createSimpleMaintainPlan(cUnitTypeOnager, 3, false, kbBaseGetMainID(cMyID));
+    createSimpleMaintainPlan(cUnitTypeOnager, 4, false, kbBaseGetMainID(cMyID));
 
    gLandScout=cUnitTypeOracleScout;
     gWaterScout=cUnitTypeFishingShipAtlantean;
@@ -3917,7 +3920,7 @@ void init(void)
     if (towerOdds < 0.1)
         towerOdds = 0.1;                            // Now 0.1 - 1.4
             
-    towerOdds = (250+towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
+    towerOdds = (2500+towerOdds * 100.0);         // Now 10.0 - 140.0, numbers over 100 guarantee towering
 
     result = -1;
     result = aiRandInt(101) - 1;   //-1..99
@@ -3928,7 +3931,7 @@ void init(void)
     {
         gBuildTowers = true;
         gTargetNumTowers = towerOdds / 10;    // Up to 14 for a mil/econ balanced player
-        gTargetNumTowers = gTargetNumTowers * (1+(cvMilitaryEconSlider/2));  // +/- 50% based on mil/econ
+        gTargetNumTowers = gTargetNumTowers * (40+(cvMilitaryEconSlider/2));  // +/- 50% based on mil/econ
         
         if (gTargetNumTowers > 20)  //max 10 towers
             gTargetNumTowers = 20;
@@ -4740,7 +4743,7 @@ void age2Handler(int age=1)
             aiPlanSetActive(barracks2PlanID);
         }
         
-        //Always want 3 priests
+        //Always want 4 priests
         if (cMyCiv != cCivRa)
             gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypePriest, 4, false, kbBaseGetMainID(cMyID));
 	
@@ -4751,7 +4754,7 @@ void age2Handler(int age=1)
         //If we're Ra, create some more priests and empower with them.
         if (cMyCiv == cCivRa)
         {
-            gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypePriest, 4, true, kbBaseGetMainID(cMyID));
+            gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypePriest, 5, true, kbBaseGetMainID(cMyID));
             int ePlanID=aiPlanCreate("Mining Camp Empower", cPlanEmpower);
             if (ePlanID >= 0)
             {

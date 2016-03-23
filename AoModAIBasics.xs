@@ -1243,8 +1243,10 @@ int getEconPop(void)    //Returns the unit count of villagers, dwarves, fishing 
         retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipGreek, cUnitStateAlive);
     else if (cMyCulture == cCultureEgyptian)
         retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipEgyptian, cUnitStateAlive);
-    else
+    else if (cMyCulture == cCultureAtlantean)
         retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipAtlantean, cUnitStateAlive);   
+	else
+        retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipChinese, cUnitStateAlive);   	
     
     return(retVal);
 }
@@ -2222,6 +2224,17 @@ void taskMilUnitTrainAtBase(int baseID = -1)
                 puid = cUnitTypeTridentSoldier;
             }
         }
+        else if (cMyCulture == cCultureChinese)
+        {
+            if ((kbGetAge() > cAge3) && (randomUnit > 0))
+            {
+                puid = cUnitTypeFireLance;
+            }
+            else
+            {
+                puid = cUnitTypeWarChariot;
+            }
+        }		
     }
     else
     {

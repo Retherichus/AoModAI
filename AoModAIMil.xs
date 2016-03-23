@@ -1547,7 +1547,12 @@ rule mainBaseDefPlan2   //Make a second defend plan that protects the main base
     minInterval 73 //starts in cAge1
     inactive
 {
-    aiEcho("mainBaseDefPlan2:");
+    if (OneMBDefPlanOnly == true)
+	 {
+       xsDisableSelf();
+       return;
+    }
+	aiEcho("mainBaseDefPlan2:");
 
     if (kbGetAge() < cAge2)
         return;
