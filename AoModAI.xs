@@ -1415,9 +1415,6 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     float favorSupply = kbResourceGet(cResourceFavor);
 
     float foodMultiplier = 1.2;      // Because food is so much slower to gather, inflate need
-	if (foodSupply > 5000)
-	foodMultiplier = 0.8;
-	
     gFoodForecast = gFoodForecast * foodMultiplier;
 
     float goldShortage = gGoldForecast - goldSupply;
@@ -1581,7 +1578,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 
 	
     float neededWoodGatherers = desiredWoodUnits;
-    if (woodSupply > goldSupply+1500)
+    if (woodSupply > goldSupply+1000)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -1680,11 +1677,11 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     }
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
-    int minVillagers = 16;
+    int minVillagers = 15;
     if (cMyCulture == cCultureAtlantean)
         minVillagers = 7;
     else if (cMyCulture == cCultureGreek)
-        minVillagers = 16;
+        minVillagers = 15;
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
     {
@@ -2803,6 +2800,8 @@ void initAtlantean(void)
    gLandScout=cUnitTypeOracleScout;
     gWaterScout=cUnitTypeFishingShipAtlantean;
     gAirScout=-1;
+    // Use hero oracle for gathering relics
+//    gGatherRelicType = cUnitTypeOracleHero;
     gGatherRelicType = cUnitTypeHero;   //use any hero       
     aiSetMinNumberNeedForGatheringAggressvies(2);      // Rather than 8
 
@@ -2810,6 +2809,7 @@ void initAtlantean(void)
     int exploreID=-1;
     int i = 0;
     
+//    for (i=0; <3)
     for (i = 0; < 2)
     {
         exploreID = aiPlanCreate("Explore_SpecialAtlantean"+i, cPlanExplore);
@@ -2823,6 +2823,7 @@ void initAtlantean(void)
             aiPlanSetActive(exploreID);
         }
 
+//        if (i==2)
         if (i == 1)
             gLandExplorePlanID=exploreID;
     }  
@@ -2960,9 +2961,9 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
     //Default init.
      kbUnitPickResetAll(upID);
     //1 Part Preference, 2 Parts CE, 2 Parts Cost.  Testing 1/10/4
-    kbUnitPickSetPreferenceWeight(upID, 2.0);
-    kbUnitPickSetCombatEfficiencyWeight(upID, 4.0);
-    kbUnitPickSetCostWeight(upID, 7.0);
+    kbUnitPickSetPreferenceWeight(upID, 1.0);
+    kbUnitPickSetCombatEfficiencyWeight(upID, 2.0);
+    kbUnitPickSetCostWeight(upID, 2.0);
     //Desired number units types, buildings.
     kbUnitPickSetDesiredNumberUnitTypes(upID, numberTypes, numberBuildings, true);
     //Min/Max units and Min/Max pop.
@@ -3288,7 +3289,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.2);
                 }
                 else if (upRand == 1)
                 {
@@ -3301,7 +3302,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.2);
                 }
                 else
                 {
@@ -3314,7 +3315,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.3);
                 }
                 break;
             }
@@ -3332,7 +3333,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
 
                 }
                 else if (upRand == 1)
@@ -3347,7 +3348,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                  kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.3);
                 }
                 else
                 {
@@ -3361,7 +3362,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                  kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.2);
                 }
                 break;
             }
@@ -3378,7 +3379,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.2);
                 }
                 else if (upRand == 1)
                 {
@@ -3391,7 +3392,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.2);
                 }
                 else
                 {
@@ -3404,7 +3405,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.2);
                 }
                 break;
             }
@@ -3526,7 +3527,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.3); // Override as AbstractArcher does not work.
                 }
                 else if (upRand == 1)
                 {
@@ -3538,7 +3538,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.6); // Override as AbstractArcher does not work.
                 }
                 else
                 {
@@ -3550,7 +3549,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.4); // Override as AbstractArcher does not work.
                 }
                 break;			
         }
@@ -3567,7 +3565,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.4); // Override as AbstractArcher does not work.
                 }
                 else if (upRand == 1)
                 {
@@ -3579,7 +3576,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.6); // Override as AbstractArcher does not work.
                 }
                 else
                 {
@@ -3591,7 +3587,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.3); // Override as AbstractArcher does not work.
                 }
                 break;			
         }
@@ -3608,7 +3603,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.3); // Override as AbstractArcher does not work.
                 }
                 else if (upRand == 1)
                 {
@@ -3620,7 +3614,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.4); // Override as AbstractArcher does not work.
                 }
                 else
                 {
@@ -3632,7 +3625,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 //                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.6); // Override as AbstractArcher does not work.
                 }
                 break;			
         }
@@ -4173,8 +4165,8 @@ void init(void)
     {
         minPop=40+aiRandInt(20);
         maxPop=70;
-        if (aiGetWorldDifficulty() > cDifficultyModerate)
-            maxPop = 100;
+        if (aiGetWorldDifficulty() > cDifficultyHard)
+            maxPop = 90;
 
         //If we're on KOTH, make the attack groups smaller.
         if (cvRandomMapName == "king of the hill")
@@ -5709,7 +5701,7 @@ void resignHandler(int result =-1)
 //==============================================================================
 rule findFish   //We don't know if this is a water map...if you see fish, it is.
 //    minInterval 11 //starts in cAge1
-    minInterval 8 //starts in cAge1
+    minInterval 5 //starts in cAge1
     active
 {
  xsSetRuleMinIntervalSelf(25);
@@ -5759,7 +5751,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
             createSimpleMaintainPlan(gWaterScout, gMaintainNumberWaterScouts, true, kbBaseGetMainID(cMyID));
 
         //Fire up.
-        if (gMaintainWaterXPortPlanID < 0 && gTransportMap == true)
+        if (gMaintainWaterXPortPlanID < 0)
             gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 1, false, kbBaseGetMainID(cMyID));
 
 
