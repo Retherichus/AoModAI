@@ -352,22 +352,22 @@ rule getDemonSlayer
 //==============================================================================
 // RULE: getUnbridledAnger
 //==============================================================================
-//rule getUnbridledAnger
- //   inactive
-  //  minInterval 27
- //   group Zhongkui
-// {
- //   if (kbGetTechStatus(cTechUnbridledAnger) == cTechStatusAvailable)
-//    {
-//        int x=-1;
- //       x = aiPlanCreate("UnbridledAnger", cPlanResearch);
-//        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechUnbridledAnger);
- //       aiPlanSetDesiredPriority(x, 10);
- //       aiPlanSetActive(x);
-//        xsDisableSelf();
-//        aiEcho("Getting UnbridledAnger");
-//    }
-//}
+rule getUnbridledAnger
+    inactive
+    minInterval 27
+    group Zhongkui
+ {
+    if (kbGetTechStatus(cTechUnbrideledAnger) == cTechStatusAvailable)
+      {
+          int x=-1;
+        x = aiPlanCreate("UnbridledAnger", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechUnbrideledAnger);
+        aiPlanSetDesiredPriority(x, 10);
+        aiPlanSetActive(x);
+        xsDisableSelf();
+        aiEcho("Getting Unbridled Anger");
+      }
+  }
 
 
 // Hebo

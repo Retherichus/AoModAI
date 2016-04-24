@@ -166,485 +166,147 @@ rule findOtherSettlements
 
 //==============================================================================
 rule NavalGoalMonitor
-    minInterval 13 //starts in cAge2
-    group NavalClassical
-    inactive
+   minInterval 13
+   group NavalClassical
+   inactive
 {
-    aiEcho("NavalGoalMonitor:");
+   //Don't do anything in the first age.
+   if ((kbGetAge() < 1) || (aiGetMostHatedPlayerID() < 0))
+	  return;
 
-    //Don't do anything in the first age.
-    if ((kbGetAge() < cAge2) || (aiGetMostHatedPlayerID() < 0))
-        return;
 
-    
-    int numMyShips = 0;
-    int numMyMilShips = 0;
-    int numAlliedMilShips = 0;
-    int numEnemyMilShips = 0;
-    static int reduceCount = 0;
-    int doomedID = -1;
-    
-    //Test to increase effectiveness on anatolia
-    //TODO: rework it as there could be docks on either side of the map!!!
-    if (cRandomMapName == "anatolia")
-    {
-        static int reduceCountBLTL = 0;
-        static int reduceCountBRTR = 0;
-        static int reduceCountBLBR = 0;
-        static int reduceCountTLTR = 0;
-        
-        static vector centerToUse = cInvalidVector;
-        static float radiusToUse = 0.0;
-        static int lastUsedDock = -1;
-        if (lastUsedDock == -1)
-        {
-            int dockIDInFishPlan = aiPlanGetVariableInt(gFishPlanID, cFishPlanDockID, 0);
-            if (dockIDInFishPlan != -1)
-            {
-                lastUsedDock = dockIDInFishPlan;
-            }
-        }
-        
-        float xMax = kbGetMapXSize();
-        float zMax = kbGetMapZSize();
-        
-        //TODO: check if it works
-        //add waypoints to gWaterExploreID
-        static bool firstRun = true;
-        if (firstRun == true)
-        {
-            vector bottomLeft = vector(0, 0, 0);
-            vector topLeft = vector(0, 0, 0);
-            topLeft = xsVectorSetZ(topLeft, zMax);
-            vector topRight = vector(0, 0, 0);
-            topRight = xsVectorSetX(topRight, xMax);
-            topRight = xsVectorSetZ(topRight, zMax);
-            vector bottomRight = vector(0, 0, 0);
-            bottomRight = xsVectorSetX(bottomRight, xMax);
-            aiEcho("bottomLeft: "+bottomLeft);
-            aiEcho("topLeft: "+topLeft);
-            aiEcho("topRight: "+topRight);
-            aiEcho("bottomRight: "+bottomRight);
-            aiPlanAddWaypoint(gWaterExploreID, bottomLeft);
-            aiPlanAddWaypoint(gWaterExploreID, topLeft);
-            aiPlanAddWaypoint(gWaterExploreID, topRight);
-            aiPlanAddWaypoint(gWaterExploreID, bottomRight);
-            firstRun = false;
-        }
-        
-        //BL = bottom left, TL = top left, BR = bottom right, TR = top right
-        vector centerBLTL = vector(5, 0, 0);
-        centerBLTL = xsVectorSetZ(centerBLTL, zMax/2);
-        
-        vector centerBRTR = vector(0, 0, 0);
-        centerBRTR = xsVectorSetX(centerBRTR, xMax - 5);
-        centerBRTR = xsVectorSetZ(centerBRTR, zMax/2);
-        
-        vector centerBLBR = vector(0, 0, 5);
-        centerBLBR = xsVectorSetX(centerBLBR, xMax/2);
-        
-        vector centerTLTR = vector(0, 0, 0);
-        centerTLTR = xsVectorSetX(centerTLTR, xMax/2);
-        centerTLTR = xsVectorSetZ(centerTLTR, zMax - 5);
-        
-        int areaBLTL = kbAreaGetIDByPosition(centerBLTL);
-        int areaBRTR = kbAreaGetIDByPosition(centerBRTR);
-        int areaBLBR = kbAreaGetIDByPosition(centerBLBR);
-        int areaTLTR = kbAreaGetIDByPosition(centerTLTR);
-        
-        int areaTypeBLTL = kbAreaGetType(areaBLTL);
-        int areaTypeBRTR = kbAreaGetType(areaBRTR);
-        int areaTypeBLBR = kbAreaGetType(areaBLBR);
-        int areaTypeTLTR = kbAreaGetType(areaTLTR);
-        
-        if ((areaTypeBLTL == cAreaTypeWater) || (areaTypeBRTR == cAreaTypeWater))
-        {
-//            int numDocksBLTL = getNumUnits(cUnitTypeDock, cUnitStateAliveOrBuilding, -1, cMyID, centerBLTL, zMax/2);
-            int numDocksBLTL = getNumUnits(cUnitTypeDock, cUnitStateAlive, -1, cMyID, centerBLTL, zMax/2);
-            if (numDocksBLTL > 0)
-            {
-                int dockIDBLTL = findUnitByIndex(cUnitTypeDock, 0, cUnitStateAlive, -1, cMyID, centerBLTL, zMax/2);
-                
-                int numMyShipsBLTL = getNumUnits(cUnitTypeShip, cUnitStateAlive, -1, cMyID, centerBLTL, zMax/2);
-                int numMyMilShipsBLTL = getNumUnits(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cMyID, centerBLTL, zMax/2);
-                int numAlliedMilShipsBLTL = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, centerBLTL, zMax/2);
-                int numEnemyMilShipsBLTL = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, centerBLTL, zMax/2);
-                
-                if ((numMyMilShipsBLTL + numAlliedMilShipsBLTL > numEnemyMilShipsBLTL + 1) && (numMyMilShipsBLTL > 1))
-                {
-                    reduceCountBLTL = reduceCountBLTL + 1;
-                }
-                else
-                {
-                    reduceCountBLTL = 0;
-                }
-                
-                aiEcho("reduceCountBLTL: "+reduceCountBLTL);
-                if (reduceCountBLTL > 9)
-                {
-                    //For now just delete one ship, idle units first    //TODO: create an attack plan to lose ships
-                    doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, cActionIdle, cMyID, centerBLTL, zMax/2);
-                    if (doomedID < 0)
-                        doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cMyID, centerBLTL, zMax/2);
-            
-                    aiEcho("!!!!!!!");
-                    aiEcho("reduceCountBLTL > 9, deleting a military ship: "+doomedID);
-                    aiEcho("!!!!!!!");
-                    aiTaskUnitDelete(doomedID);
-                    reduceCountBLTL = 0;
-                }
-                
-                if ((numMyMilShipsBLTL > numMyMilShips) || (numMyShipsBLTL > numMyShips))
-                {
-                    numMyShips = numMyShipsBLTL;
-                    numMyMilShips = numMyMilShipsBLTL;
-                    numAlliedMilShips = numAlliedMilShipsBLTL;
-                    numEnemyMilShips = numEnemyMilShipsBLTL;
-                    centerToUse = centerBLTL;
-                    radiusToUse = zMax/2;
-                }
-            }
-            
-//            int numDocksBRTR = getNumUnits(cUnitTypeDock, cUnitStateAliveOrBuilding, -1, cMyID, centerBRTR, zMax/2);
-            int numDocksBRTR = getNumUnits(cUnitTypeDock, cUnitStateAlive, -1, cMyID, centerBRTR, zMax/2);
-            if (numDocksBRTR > 0)
-            {
-                int dockIDBRTR = findUnitByIndex(cUnitTypeDock, 0, cUnitStateAlive, -1, cMyID, centerBRTR, zMax/2);
-                
-                int numMyShipsBRTR = getNumUnits(cUnitTypeShip, cUnitStateAlive, -1, cMyID, centerBRTR, zMax/2);
-                int numMyMilShipsBRTR = getNumUnits(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cMyID, centerBRTR, zMax/2);
-                int numAlliedMilShipsBRTR = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, centerBRTR, zMax/2);
-                int numEnemyMilShipsBRTR = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, centerBRTR, zMax/2);
-            
-                if ((numMyMilShipsBRTR + numAlliedMilShipsBRTR > numEnemyMilShipsBRTR + 1) && (numMyMilShipsBRTR > 1))
-                {
-                    reduceCountBRTR = reduceCountBRTR + 1;
-                }
-                else
-                {
-                    reduceCountBRTR = 0;
-                }
-                    
-                aiEcho("reduceCountBRTR: "+reduceCountBRTR);
-                if (reduceCountBRTR > 9)
-                {
-                    //For now just delete one ship, idle units first    //TODO: create an attack plan to lose ships
-                    doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, cActionIdle, cMyID, centerBRTR, zMax/2);
-                    if (doomedID < 0)
-                        doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cMyID, centerBRTR, zMax/2);
-            
-                    aiEcho("!!!!!!!");
-                    aiEcho("reduceCountBRTR > 9, deleting a military ship: "+doomedID);
-                    aiEcho("!!!!!!!");
-                    aiTaskUnitDelete(doomedID);
-                    reduceCountBRTR = 0;
-                } 
-                
-                if ((numMyMilShipsBRTR > numMyMilShips) || (numMyShipsBRTR > numMyShips) || (numDocksBLTL < 1))
-                {
-                    numMyShips = numMyShipsBRTR;
-                    numMyMilShips = numMyMilShipsBRTR;
-                    numAlliedMilShips = numAlliedMilShipsBRTR;
-                    numEnemyMilShips = numEnemyMilShipsBRTR;
-                    centerToUse = centerBRTR;
-                    radiusToUse = zMax/2;
-                }
-            }
-        }
-        else if ((areaTypeBLBR == cAreaTypeWater) || (areaTypeTLTR == cAreaTypeWater))
-        {
-//            int numDocksBLBR = getNumUnits(cUnitTypeDock, cUnitStateAliveOrBuilding, -1, cMyID, centerBLBR, xMax/2);
-            int numDocksBLBR = getNumUnits(cUnitTypeDock, cUnitStateAlive, -1, cMyID, centerBLBR, xMax/2);
-            if (numDocksBLBR > 0)
-            {
-                int dockIDBLBR = findUnitByIndex(cUnitTypeDock, 0, cUnitStateAlive, -1, cMyID, centerBLBR, xMax/2);
-                
-                int numMyShipsBLBR = getNumUnits(cUnitTypeShip, cUnitStateAlive, -1, cMyID, centerBLBR, xMax/2);
-                int numMyMilShipsBLBR = getNumUnits(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cMyID, centerBLBR, xMax/2);
-                int numAlliedMilShipsBLBR = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, centerBLBR, xMax/2);
-                int numEnemyMilShipsBLBR = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, centerBLBR, xMax/2);
-                
-                if ((numMyMilShipsBLBR + numAlliedMilShipsBLBR > numEnemyMilShipsBLBR + 1) && (numMyMilShipsBLBR > 1))
-                {
-                    reduceCountBLBR = reduceCountBLBR + 1;
-                }
-                else
-                {
-                    reduceCountBLBR = 0;
-                }
-                
-                aiEcho("reduceCountBLBR: "+reduceCountBLBR);
-                if (reduceCountBLBR > 9)
-                {
-                    //For now just delete one ship, idle units first    //TODO: create an attack plan to lose ships
-                    doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, cActionIdle, cMyID, centerBLBR, xMax/2);
-                    if (doomedID < 0)
-                        doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cMyID, centerBLBR, xMax/2);
-            
-                    aiEcho("!!!!!!!");
-                    aiEcho("reduceCountBLBR > 9, deleting a military ship: "+doomedID);
-                    aiEcho("!!!!!!!");
-                    aiTaskUnitDelete(doomedID);
-                    reduceCountBLBR = 0;
-                }
-                
-                if ((numMyMilShipsBLBR > numMyMilShips) || (numMyShipsBLBR > numMyShips))
-                {
-                    numMyShips = numMyShipsBLBR;
-                    numMyMilShips = numMyMilShipsBLBR;
-                    numAlliedMilShips = numAlliedMilShipsBLBR;
-                    numEnemyMilShips = numEnemyMilShipsBLBR;
-                    centerToUse = centerBLBR;
-                    radiusToUse = xMax/2;
-                }
-            }
-            
-//            int numDocksTLTR = getNumUnits(cUnitTypeDock, cUnitStateAliveOrBuilding, -1, cMyID, centerTLTR, xMax/2);
-            int numDocksTLTR = getNumUnits(cUnitTypeDock, cUnitStateAlive, -1, cMyID, centerTLTR, xMax/2);
-            if (numDocksTLTR > 0)
-            {
-                int dockIDTLTR = findUnitByIndex(cUnitTypeDock, 0, cUnitStateAlive, -1, cMyID, centerTLTR, xMax/2);
-                
-                int numMyShipsTLTR = getNumUnits(cUnitTypeShip, cUnitStateAlive, -1, cMyID, centerTLTR, xMax/2);
-                int numMyMilShipsTLTR = getNumUnits(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cMyID, centerTLTR, xMax/2);
-                int numAlliedMilShipsTLTR = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, centerTLTR, xMax/2);
-                int numEnemyMilShipsTLTR = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, centerTLTR, xMax/2);
-              
-                if ((numMyMilShipsTLTR + numAlliedMilShipsTLTR > numEnemyMilShipsTLTR + 1) && (numMyMilShipsTLTR > 1))
-                {
-                    reduceCountTLTR = reduceCountTLTR + 1;
-                }
-                else
-                {
-                    reduceCountTLTR = 0;
-                }
-                
-                aiEcho("reduceCountTLTR: "+reduceCountTLTR);
-                if (reduceCountTLTR > 9)
-                {
-                    //For now just delete one ship, idle units first    //TODO: create an attack plan to lose ships
-                    doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, cActionIdle, cMyID, centerTLTR, xMax/2);
-                    if (doomedID < 0)
-                        doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cMyID, centerTLTR, xMax/2);
-            
-                    aiEcho("!!!!!!!");
-                    aiEcho("reduceCountTLTR > 9, deleting a military ship: "+doomedID);
-                    aiEcho("!!!!!!!");
-                    aiTaskUnitDelete(doomedID);
-                    reduceCountTLTR = 0;
-                }
-                
-                if ((numMyMilShipsTLTR > numMyMilShips) || (numMyShipsTLTR > numMyShips) || (numDocksBLBR < 1))
-                {
-                    numMyShips = numMyShipsTLTR;
-                    numMyMilShips = numMyMilShipsTLTR;
-                    numAlliedMilShips = numAlliedMilShipsTLTR;
-                    numEnemyMilShips = numEnemyMilShipsTLTR;
-                    centerToUse = centerTLTR;
-                    radiusToUse = xMax/2;
-                }
-            }
-        }
-        
-        if (equal(centerToUse, cInvalidVector) == false)
-        {
-            int dockIDToUse = findUnitByIndex(cUnitTypeDock, 0, cUnitStateAlive, -1, cMyID, centerToUse, radiusToUse);
-            aiEcho("dockIDToUse: "+dockIDToUse);
-            if (dockIDToUse != -1)
-            {
-                aiEcho("lastUsedDock: "+lastUsedDock);
-                if (lastUsedDock != dockIDToUse)
-                {
-                    aiEcho("lastUsedDock != dockIDToUse, killing old gFishPlanID and restarting fishing rule");
-                    lastUsedDock = dockIDToUse;
-                    aiPlanDestroy(gFishPlanID);
-                    gFishPlanID = -1;
-                    gDockToUse = dockIDToUse;
-                    xsEnableRule("fishing");
-                }
-            }
-        }
-    }
-    else    //all other maps
-    {
-        numMyShips = kbUnitCount(cMyID, cUnitTypeShip, cUnitStateAlive);
-        numMyMilShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
-        numAlliedMilShips = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationAlly);
-        numEnemyMilShips = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy);
-        
-        if ((numMyMilShips + numAlliedMilShips > numEnemyMilShips + 1) && (numMyMilShips > 1))
-        {
-            reduceCount = reduceCount + 1;
-        }
-        else
-        {
-            reduceCount = 0;
-        }
-        
-        aiEcho("reduceCount: "+reduceCount);
-        if (reduceCount > 9)
-        {
-            //For now just delete one ship, idle units first    //TODO: create an attack plan to lose ships
-            doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, cActionIdle, cMyID);
-            if (doomedID < 0)
-                doomedID = findUnit(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cMyID);
-            
-            aiEcho("!!!!!!!");
-            aiEcho("ReduceCount > 9, deleting a military ship: "+doomedID);
-            aiEcho("!!!!!!!");
-            aiTaskUnitDelete(doomedID);
-            reduceCount = 0;
-        }
-    }
 
-    aiEcho("numMyShips: "+numMyShips);
-    aiEcho("numMyMilShips: "+numMyMilShips);
-    aiEcho("numAlliedMilShips: "+numAlliedMilShips);
-    aiEcho("numEnemyMilShips: "+numEnemyMilShips);
+   //See if we have any enemy warships running around.
+   int numberEnemyWarships=0;
+   //Find the largest warship count for any of our enemies.
+   for (i=0; < cNumberPlayers)
+   {
+	  if ((kbIsPlayerEnemy(i) == true) &&
+		 (kbIsPlayerResigned(i) == false) &&
+		 (kbHasPlayerLost(i) == false))
+	  {
+		 int tempNumberEnemyWarships=kbUnitCount(i, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+		 if ( aiGetWorldDifficulty() > cDifficultyModerate )
+		 {
+			tempNumberEnemyWarships = tempNumberEnemyWarships + kbUnitCount(i, cUnitTypeFishingShipGreek, cUnitStateAlive)/2;
+			tempNumberEnemyWarships = tempNumberEnemyWarships + kbUnitCount(i, cUnitTypeFishingShipNorse, cUnitStateAlive)/2;
+			tempNumberEnemyWarships = tempNumberEnemyWarships + kbUnitCount(i, cUnitTypeFishingShipAtlantean, cUnitStateAlive)/2;
+			tempNumberEnemyWarships = tempNumberEnemyWarships + kbUnitCount(i, cUnitTypeFishingShipEgyptian, cUnitStateAlive)/2;
+		 }
+		 //int tempNumberEnemyDocks=kbUnitCount(i, cUnitTypeDock, cUnitStateAlive);
+		 if (tempNumberEnemyWarships > numberEnemyWarships)
+			numberEnemyWarships=tempNumberEnemyWarships;
+	  }
+   }
+   //Figure out the min/max number of warships we want.
+   int minShips=0;
+   int maxShips=0;
+   if (numberEnemyWarships > 0)
+   {
+	  //Build at most 2 ships on easy.
+	  if (aiGetWorldDifficulty() == cDifficultyEasy)
+	  {
+		 minShips=1;
+		 maxShips=2;
+	  }
+	  //Build at most "6" ships on moderate.
+	  else if (aiGetWorldDifficulty() == cDifficultyModerate)
+	  {
+		 minShips=numberEnemyWarships/2;
+		 maxShips=numberEnemyWarships*3/4;
+		 if (minShips < 1)
+			minShips=1;
+		 if (maxShips < 1)
+			maxShips=1;
+		 if (minShips > 3)
+			minShips=3;
+		 if (maxShips > 6)
+			maxShips=6;
+	  }
+	  //Build the "same" number (within reason) on Hard/Titan.
+	  else
+	  {
+		 minShips=numberEnemyWarships*3/4;
+		 maxShips=numberEnemyWarships;
+		 if (minShips < 1)
+			minShips=1;
+		 if (maxShips < 1)
+			maxShips=1;
+		 if (minShips > 5)
+			minShips=5;
+		 if (maxShips > 8)
+			maxShips=8;
+	  }
+   }
 
-        
-    //Figure out the min/max number of warships we want.
-    int minShips = 0;
-//    int maxShips = 0;
-    int maxShips = 1;
-    if (numEnemyMilShips > 0)
-    {
-        //Build at most 2 ships on easy.
-        if (aiGetWorldDifficulty() == cDifficultyEasy)
-        {
-            minShips = 1;
-            maxShips = 2;
-        }
-        //Build at most "6" ships on moderate.
-        else if (aiGetWorldDifficulty() == cDifficultyModerate)
-        {
-            minShips = (numEnemyMilShips - numAlliedMilShips + 1) * 0.5;
-            maxShips = (numEnemyMilShips - numAlliedMilShips + 1) * 0.75;
-            if (minShips < 1)
-                minShips = 1;
-            if (maxShips < 1)
-                maxShips = 1;
-            if (minShips > 3)
-                minShips = 3;
-            if (maxShips > 6)
-                maxShips = 6;
-        } 
-        //Build the "same" number (within reason) on Hard/Titan.
-        else
-        {
-            minShips = (numEnemyMilShips - numAlliedMilShips + 1) * 0.75;
-            maxShips = (numEnemyMilShips - numAlliedMilShips + 1);
-            if (minShips < 1)
-                minShips = 1;
-            if (maxShips < 1)
-                maxShips = 1;
-            if (minShips > 5)
-                minShips = 5;
-            if (maxShips > 8)
-                maxShips = 8;
-        }
-    }
-    
-    //If this is enabled on KOTH, that means we have the water version.  Pretend the enemy
-    //has lots of boats so that we will have lots, too.
-    if (cvRandomMapName == "king of the hill")
-    {
-        minShips = 6;
-        maxShips = 12;
-    }
+   //If this is enabled on KOTH, that means we have the water version.  Pretend the enemy
+   //has lots of boats so that we will have lots, too.
+   if (cvRandomMapName == "king of the hill")
+   {
+	  minShips=6;
+	  maxShips=12;
+   }
 
-    //  At 2-3 pop each, don't let this take up most of our military space.
-    if (maxShips > aiGetMilitaryPop() / 5)
-        maxShips = aiGetMilitaryPop() / 5;
+   //  At 2-3 pop each, don't let this take up most of our military space.
+   if ( maxShips > aiGetMilitaryPop()/5 )
+	  maxShips = aiGetMilitaryPop()/5;
 
-    if (minShips > maxShips)
-        minShips = maxShips;
-        
-    aiEcho("minShips: "+minShips+", maxShips: "+maxShips);
+   if ( minShips > maxShips)
+	  minShips = maxShips;
 
-//    gTargetNavySize = maxShips;   // Set the global var for forecasting
+   // gTargetNavySize = maxShips;   // Set the global var for forecasting
 
-    //If we already have a Naval UP, just set the numbers and be done.  If we don't
-    //want anything, just set 1 since we've already done it before.
-    if (gNavalUPID >= 0)
-    {
-        if (maxShips <= 0)
-        {
-            kbUnitPickSetMinimumNumberUnits(gNavalUPID, 1);
-            kbUnitPickSetMaximumNumberUnits(gNavalUPID, 1);
-        }
-        else
-        {
-            if (maxShips < 3)
-            {
-                kbUnitPickSetDesiredNumberUnitTypes(gNavalUPID, maxShips, 2, true);
-            }
-            else
-            {
-                kbUnitPickSetDesiredNumberUnitTypes(gNavalUPID, 3, 2, true);
-            }
-            kbUnitPickSetMinimumNumberUnits(gNavalUPID, minShips);
-            kbUnitPickSetMaximumNumberUnits(gNavalUPID, maxShips);
-        }
-        
-        if (numEnemyMilShips < 1)
-        {
-            kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeHammerShip, 0.0);
-//            aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanIdleAttack, 0, true);
-        }
-        else
-        {
-            kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeHammerShip, 1.0);
-//            aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanIdleAttack, 0, false);
-        }
-        
-        return;
-    }
+   //If we already have a Naval UP, just set the numbers and be done.  If we don't
+   //want anything, just set 1 since we've already done it before.
+   if (gNavalUPID >= 0)
+   {
+	  if (maxShips <= 0)
+	  {
+		 kbUnitPickSetMinimumNumberUnits(gNavalUPID, 1);
+		 kbUnitPickSetMaximumNumberUnits(gNavalUPID, 1);
+	  }
+	  else
+	  {
+		 kbUnitPickSetMinimumNumberUnits(gNavalUPID, minShips);
+		 kbUnitPickSetMaximumNumberUnits(gNavalUPID, maxShips);
+	  }
+	  return;
+   }
 
-    //Else, we don't have a Naval attack goal yet.  If we don't want any ships,
-    //just return.
-    if (maxShips <= 0)
-        return;
-    
-    //Else, create the Naval attack goal.
-    aiEcho("Creating NavalAttackGoal for "+maxShips+" ships");
-    gNavalUPID=kbUnitPickCreate("Naval");
-    if (gNavalUPID < 0)
-    {
-        xsDisableSelf();
-        return;
-    }
-    
-    //Fill in the UP.
-    kbUnitPickResetAll(gNavalUPID);
-    kbUnitPickSetPreferenceWeight(gNavalUPID, 2.0);
-    kbUnitPickSetCombatEfficiencyWeight(gNavalUPID, 4.0);
-    kbUnitPickSetCostWeight(gNavalUPID, 7.0);
-    
-    if (maxShips < 3)
-    {
-        kbUnitPickSetDesiredNumberUnitTypes(gNavalUPID, maxShips, 2, true);
-    }
-    else
-    {
-        kbUnitPickSetDesiredNumberUnitTypes(gNavalUPID, 3, 2, true);
-    }
-    
-    kbUnitPickSetMinimumNumberUnits(gNavalUPID, minShips);
-    kbUnitPickSetMaximumNumberUnits(gNavalUPID, maxShips);
-    kbUnitPickSetAttackUnitType(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary);
-    kbUnitPickSetGoalCombatEfficiencyType(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary);
-    kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary, 1.0);
-    kbUnitPickSetMovementType(gNavalUPID, cMovementTypeWater);
-    //Create the attack goal.
-    gNavalAttackGoalID=createSimpleAttackGoal("Naval Attack", -1, gNavalUPID, -1, kbGetAge(), -1, -1, false);
-    if (gNavalAttackGoalID < 0)
-    {
-        xsDisableSelf();
-        return;
-    }
-    aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanAutoUpdateBase, 0, false);
-    aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanSetAreaGroups, 0, false);
+   //Else, we don't have a Naval attack goal yet.  If we don't want any ships,
+   //just return.
+   if (maxShips <= 0)
+	  return;
+	
+   //Else, create the Naval attack goal.
+   aiEcho("Creating NavalAttackGoal for "+maxShips+" ships since I've seen "+numberEnemyWarships+" for Player "+aiGetMostHatedPlayerID()+".");
+   gNavalUPID=kbUnitPickCreate("Naval");
+   if (gNavalUPID < 0)
+   {
+	  xsDisableSelf();
+	  return;
+   }
+   //Fill in the UP.
+   kbUnitPickResetAll(gNavalUPID);
+   kbUnitPickSetPreferenceWeight(gNavalUPID, 2.0);
+   kbUnitPickSetCombatEfficiencyWeight(gNavalUPID, 4.0);
+   kbUnitPickSetCostWeight(gNavalUPID, 7.0);
+   kbUnitPickSetDesiredNumberUnitTypes(gNavalUPID, 3, 2, true);
+   kbUnitPickSetMinimumNumberUnits(gNavalUPID, minShips);
+   kbUnitPickSetMaximumNumberUnits(gNavalUPID, maxShips);
+   kbUnitPickSetAttackUnitType(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary);
+   kbUnitPickSetGoalCombatEfficiencyType(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary);
+   kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary, 1.0);
+   kbUnitPickSetMovementType(gNavalUPID, cMovementTypeWater);
+   //Create the attack goal.
+   gNavalAttackGoalID=createSimpleAttackGoal("Naval Attack", -1, gNavalUPID, -1, kbGetAge(), -1, -1, false);
+   if (gNavalAttackGoalID < 0)
+   {
+	  xsDisableSelf();
+	  return;
+   }
+   aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanAutoUpdateBase, 0, false);
+   aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanSetAreaGroups, 0, false);
 }
 
 //==============================================================================

@@ -708,6 +708,7 @@ rule monitorAttPlans
 //                        if ((aiPlanGetNoMoreUnits(attackPlanID) == true) || (numEnemyTitansNearMBInR85 > 0))
                         if ((aiPlanGetNoMoreUnits(attackPlanID) == true) || (numAttEnemyTitansNearMBInR85 > 0))
                         {
+                            if (DisallowPullBack == false) 
                             pullBackUnits(attackPlanID, attPlanRetreatPosition);
                             if ((killSettlementAttPlanCount >= 4) || (attPlanDistance < 25.0))
                             {
@@ -741,6 +742,7 @@ rule monitorAttPlans
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+                        if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killSettlementAttPlanCount = 0;
                     }
@@ -846,6 +848,7 @@ rule monitorAttPlans
                         {
                             aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                             aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+                            if (DisallowPullBack == false) 
                             pullBackUnits(attackPlanID, attPlanRetreatPosition);
                             killSettlementAttPlanCount = 0;
                         }
@@ -855,6 +858,7 @@ rule monitorAttPlans
                         {
                             aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                             aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);                            
+                            if (DisallowPullBack == false)
                             pullBackUnits(attackPlanID, attPlanRetreatPosition);
                             killSettlementAttPlanCount = 0; 
                         }
@@ -876,6 +880,7 @@ rule monitorAttPlans
                     }
                     else
                     {
+                        if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         if ((killRandomAttPlanCount >= 4) || (attPlanDistance < 25.0))
                         {
@@ -902,6 +907,7 @@ rule monitorAttPlans
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+                        if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killRandomAttPlanCount = 0;
                     }
@@ -970,6 +976,7 @@ rule monitorAttPlans
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+                        if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killRandomAttPlanCount = 0;
                         if (numMilUnitsInPlan < 3)
@@ -992,6 +999,7 @@ rule monitorAttPlans
                     }
                     else
                     {
+                        if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         if ((killRaidAttPlanCount >= 4) || (attPlanDistance < 25.0))
                         {
@@ -1032,6 +1040,7 @@ rule monitorAttPlans
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+                        if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killRaidAttPlanCount = 0;
                     }
@@ -1080,6 +1089,7 @@ rule monitorAttPlans
                     }
                     else
                     {
+                        if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         if ((killLandAttPlanCount >= 4) || (attPlanDistance < 25.0))
                         {
@@ -1104,6 +1114,7 @@ rule monitorAttPlans
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+                        if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killLandAttPlanCount = 0;
                     }
@@ -1174,6 +1185,7 @@ rule monitorAttPlans
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+                        if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killLandAttPlanCount = 0;
                         
@@ -4266,12 +4278,12 @@ rule createLandAttack
 
     if (numEnemySettlements < 1)
     {
-        aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.5, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.8);
+        aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.5, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.9);
         aiPlanSetVariableInt(landAttackPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeNone);
     }
     else
     {
-        aiPlanAddUnitType(landAttackPlanID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
+        aiPlanAddUnitType(landAttackPlanID, cUnitTypeAbstractSiegeWeapon, 0, 2, 3);
         if (numRagnorokHeroes < 10)
             aiPlanAddUnitType(landAttackPlanID, cUnitTypeHero, 0, 1, 1);
         
@@ -4368,7 +4380,7 @@ rule setUnitPicker
 
 //==============================================================================
 rule defendBaseUnderAttack
-    minInterval 4 //starts in cAge2, activated in baseAttackTracker rule
+    minInterval 10 //starts in cAge2, activated in baseAttackTracker rule
     inactive
 {
     aiEcho("defendBaseUnderAttack: ");
@@ -4432,10 +4444,10 @@ rule defendBaseUnderAttack
                     aiEcho("destroying current gDefendPlanID and restarting defendPlanRule");
                     gBaseUnderAttackID = -1;
                     
-                    xsSetRuleMinInterval("defendPlanRule", 8);
+                    xsSetRuleMinInterval("defendPlanRule", 11);
                     xsEnableRule("defendPlanRule");
                     
-                    xsSetRuleMinIntervalSelf(9);
+                    xsSetRuleMinIntervalSelf(12);
                     xsDisableSelf();
                     return;
                 }
@@ -4449,7 +4461,7 @@ rule defendBaseUnderAttack
                         aiEcho("destroying gBaseUnderAttackDefPlanID as it has been active for more than 3 Minutes and there are less than 3 enemies");
                     gBaseUnderAttackID = -1;
                     gBaseUnderAttackDefPlanID = -1;
-                    xsSetRuleMinIntervalSelf(9);
+                    xsSetRuleMinIntervalSelf(12);
                     xsDisableSelf();
                     return;
                 }

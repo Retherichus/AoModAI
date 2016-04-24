@@ -72,7 +72,7 @@ extern int egBoomWood = 0;              // Wood
 // For RethFishEco, this affects Fishing Maps ONLY, if you have it enabled.
 // If the Ai fails to find any valid fishing spot for any reason, it'll scrap this fishing plan and return to normal resource distribution.
 
-extern int eFBoomFood = 0;              // Food
+extern int eFBoomFood = 50;              // Food
 extern int eFBoomGold = 0;              // Gold
 extern int eFBoomWood = 50;             // Wood, The Ai will automatically boost it, if it's too low.
 
@@ -106,9 +106,9 @@ extern int RethLGWAge3 = 600;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLGFAge4 = 3000;              // Food
-extern int RethLGGAge4 = 2400;              // Gold
-extern int RethLGWAge4 = 1200;              // Wood
+extern int RethLGFAge4 = 4000;              // Food
+extern int RethLGGAge4 = 3400;              // Gold
+extern int RethLGWAge4 = 2200;              // Wood
 
 
 //==============================================================================
@@ -128,9 +128,9 @@ extern int RethLEWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLEFAge4 = 3000;              // Food
-extern int RethLEGAge4 = 2400;              // Gold
-extern int RethLEWAge4 = 600;              // Wood
+extern int RethLEFAge4 = 4000;              // Food
+extern int RethLEGAge4 = 3400;              // Gold
+extern int RethLEWAge4 = 1200;              // Wood
 
 //==============================================================================
 //Norse
@@ -149,9 +149,9 @@ extern int RethLNWAge3 = 750;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLNFAge4 = 3000;              // Food
-extern int RethLNGAge4 = 2400;              // Gold
-extern int RethLNWAge4 = 1000;              // Wood
+extern int RethLNFAge4 = 4000;              // Food
+extern int RethLNGAge4 = 3400;              // Gold
+extern int RethLNWAge4 = 2000;              // Wood
 
 //==============================================================================
 //Atlantean
@@ -170,9 +170,9 @@ extern int RethLAWAge3 = 800;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLAFAge4 = 3000;              // Food
-extern int RethLAGAge4 = 2400;              // Gold
-extern int RethLAWAge4 = 1000;              // Wood
+extern int RethLAFAge4 = 4000;              // Food
+extern int RethLAGAge4 = 3400;              // Gold
+extern int RethLAWAge4 = 2000;              // Wood
 
 
 //==============================================================================
@@ -192,9 +192,9 @@ extern int RethLCWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLCFAge4 = 3000;              // Food
-extern int RethLCGAge4 = 2400;              // Gold
-extern int RethLCWAge4 = 1000;              // Wood
+extern int RethLCFAge4 = 4000;              // Food
+extern int RethLCGAge4 = 3400;              // Gold
+extern int RethLCWAge4 = 2000;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -239,13 +239,13 @@ void initRethlAge1(void)  // Am I doing this right??
 		if (cMyCulture == cCultureChinese)
 		aiSetMinNumberNeedForGatheringAggressvies(5);			
         }
-		
-	  if ((cRandomMapName == "highlands") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad") || (cRandomMapName == "Deep Jungle")))
-	  {
-	  gTransportMap = false;
-	  }
-
-
+      
+	   // Don't build transport ships on these maps!
+	   if ((cRandomMapName == "highlands") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad") || (cRandomMapName == "Deep Jungle") || (cRandomMapName == "Mediterranean") || (cRandomMapName == "mediterranean")))
+	   {
+	   gTransportMap=false;
+	   aiEcho("Not going to waste pop slots on Transport ships.");
+	   }
 }
 
 //==============================================================================
@@ -511,6 +511,11 @@ rule DockDefenseMonitor
    inactive
 {  
 
+   	   if (gWaterMap == false)
+	   {
+	   xsDisableSelf();
+	   return;
+	   }
    
    // Add some defense for the dock
    
@@ -531,14 +536,13 @@ rule DockDefenseMonitor
 			if (cMyCulture == cCultureChinese)
 			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeJunk);
             
-			aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 2); 
+			aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 1); 
             aiPlanSetActive(planID);
-            aiPlanSetDesiredPriority(planID, 50);
+            aiPlanSetDesiredPriority(planID, 20);
 			xsDisableSelf();
          }
       }
-	   if (gWaterMap == false)
-	   xsDisableSelf();
+
 	  
 }	  
 
