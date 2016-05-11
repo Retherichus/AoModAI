@@ -7,7 +7,7 @@ rule getOmniscience
     minInterval 24 //starts in cAge4
     inactive
 {
-    aiEcho("getOmniscience:");
+    if (ShowAiEcho == true) aiEcho("getOmniscience:");
     //If we can afford it twice over, then get it.
     float goldCost=kbTechCostPerResource(cTechOmniscience, cResourceGold) * 2.0;
     float currentGold=kbResourceGet(cResourceGold);
@@ -22,7 +22,7 @@ rule getOmniscience
         aiPlanSetDesiredPriority(voePID, 25);
         aiPlanSetEscrowID(voePID, cMilitaryEscrowID);
         aiPlanSetActive(voePID);
-        //aiEcho("getting Omniscience!");
+        //if (ShowAiEcho == true) aiEcho("getting Omniscience!");
     }
     xsDisableSelf();
 }
@@ -41,7 +41,7 @@ rule getMasons
         return;
     }
     
-    aiEcho("getMasons:");
+    if (ShowAiEcho == true) aiEcho("getMasons:");
 
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -88,7 +88,7 @@ rule getMasons
 //            aiPlanSetEscrowID(masonsID, cEconomyEscrowID);
             aiPlanSetEscrowID(masonsID, cMilitaryEscrowID);
             aiPlanSetActive(masonsID);
-            aiEcho("getting masons upgrade");
+            if (ShowAiEcho == true) aiEcho("getting masons upgrade");
 //            xsSetRuleMinIntervalSelf(11);
         }
     }
@@ -107,7 +107,7 @@ rule getArchitects
         return;
     }
     
-    aiEcho("getArchitects:");
+    if (ShowAiEcho == true) aiEcho("getArchitects:");
 
     if (kbGetAge() < cAge3)
         return;
@@ -219,7 +219,7 @@ rule getArchitects
 //            aiPlanSetEscrowID(architectsID, cEconomyEscrowID);
             aiPlanSetEscrowID(architectsID, cMilitaryEscrowID);
             aiPlanSetActive(architectsID);
-            aiEcho("getting architects upgrade");
+            if (ShowAiEcho == true) aiEcho("getting architects upgrade");
 //            xsSetRuleMinIntervalSelf(11);
         }
     }
@@ -238,7 +238,7 @@ rule getFortifiedTownCenter
         return;
     }
     
-    aiEcho("getFortifiedTownCenter:");
+    if (ShowAiEcho == true) aiEcho("getFortifiedTownCenter:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
         return;
@@ -267,7 +267,7 @@ rule getFortifiedTownCenter
         aiPlanSetDesiredPriority(planID, 100);
         aiPlanSetEscrowID(planID, cMilitaryEscrowID);
         aiPlanSetActive(planID);
-        aiEcho("getting FortifiedTownCenter");
+        if (ShowAiEcho == true) aiEcho("getting FortifiedTownCenter");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -284,7 +284,7 @@ rule getEnclosedDeck
         return;
     }
     
-    aiEcho("getEnclosedDeck:");
+    if (ShowAiEcho == true) aiEcho("getEnclosedDeck:");
     
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -322,7 +322,7 @@ rule getEnclosedDeck
         aiPlanSetDesiredPriority(enclosedDeckID, 60);      
         aiPlanSetEscrowID(enclosedDeckID, cEconomyEscrowID);
         aiPlanSetActive(enclosedDeckID);
-        aiEcho("getting enclosed deck upgrade");
+        if (ShowAiEcho == true) aiEcho("getting enclosed deck upgrade");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -339,7 +339,7 @@ rule getPurseSeine
         return;
     }
     
-    aiEcho("getPurseSeine:");
+    if (ShowAiEcho == true) aiEcho("getPurseSeine:");
     
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -377,7 +377,7 @@ rule getPurseSeine
         aiPlanSetDesiredPriority(purseSeineID, 45);      
         aiPlanSetEscrowID(purseSeineID, cEconomyEscrowID);
         aiPlanSetActive(purseSeineID);
-        aiEcho("getting purse Seine upgrade");
+        if (ShowAiEcho == true) aiEcho("getting purse Seine upgrade");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -394,7 +394,7 @@ rule getSaltAmphora
         return;
     }
     
-    aiEcho("getSaltAmphora:");
+    if (ShowAiEcho == true) aiEcho("getSaltAmphora:");
     
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -423,7 +423,7 @@ rule getSaltAmphora
         aiPlanSetDesiredPriority(saltAmphoraID, 80);      
         aiPlanSetEscrowID(saltAmphoraID, cEconomyEscrowID);
         aiPlanSetActive(saltAmphoraID);
-        aiEcho("getting salt amphora");
+        if (ShowAiEcho == true) aiEcho("getting salt amphora");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -447,7 +447,7 @@ rule getHusbandry
         update = true;
     }
     
-    aiEcho("getHusbandry:");      
+    if (ShowAiEcho == true) aiEcho("getHusbandry:");      
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
     {
@@ -491,7 +491,7 @@ rule getHusbandry
         aiPlanSetDesiredPriority(husbandryPlanID, 99);
         aiPlanSetEscrowID(husbandryPlanID, cEconomyEscrowID);
         aiPlanSetActive(husbandryPlanID);
-        aiEcho("getting husbandry");
+        if (ShowAiEcho == true) aiEcho("getting husbandry");
         xsSetRuleMinIntervalSelf(173);
         update = false;
     }
@@ -518,7 +518,7 @@ rule getPickaxe
         update = true;
     }
     
-    aiEcho("getPickaxe:");        
+    if (ShowAiEcho == true) aiEcho("getPickaxe:");        
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
     {
@@ -571,7 +571,7 @@ rule getPickaxe
         aiPlanSetDesiredPriority(pickAxePlanID, 80);
         aiPlanSetEscrowID(pickAxePlanID, cEconomyEscrowID);
         aiPlanSetActive(pickAxePlanID);
-        aiEcho("getting pickaxe");
+        if (ShowAiEcho == true) aiEcho("getting pickaxe");
         xsSetRuleMinIntervalSelf(15);
         update = false;
     }
@@ -598,7 +598,7 @@ rule getHandaxe
         update = true;
     }
     
-    aiEcho("getHandaxe:");
+    if (ShowAiEcho == true) aiEcho("getHandaxe:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
     {
@@ -649,7 +649,7 @@ rule getHandaxe
         aiPlanSetDesiredPriority(handAxePlanID, 75);
         aiPlanSetEscrowID(handAxePlanID, cEconomyEscrowID);
         aiPlanSetActive(handAxePlanID);
-        aiEcho("getting handaxe");
+        if (ShowAiEcho == true) aiEcho("getting handaxe");
         xsSetRuleMinIntervalSelf(15);
         update = false;
     }
@@ -675,7 +675,7 @@ rule getPlow
         update = true;
     }
     
-    aiEcho("getPlow:");
+    if (ShowAiEcho == true) aiEcho("getPlow:");
     
     if (kbGetAge() < cAge2)
     {
@@ -716,7 +716,7 @@ rule getPlow
         aiPlanSetDesiredPriority(plowPlanID, 100);      // Do it ASAP!
         aiPlanSetEscrowID(plowPlanID, cEconomyEscrowID);
         aiPlanSetActive(plowPlanID);
-        aiEcho("getting Plow");
+        if (ShowAiEcho == true) aiEcho("getting Plow");
         xsSetRuleMinIntervalSelf(241);
         update = false;
     }
@@ -742,7 +742,7 @@ rule getHuntingDogs
     }
     
      
-    aiEcho("getHuntingDogs:");
+    if (ShowAiEcho == true) aiEcho("getHuntingDogs:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
     {
@@ -778,7 +778,7 @@ rule getHuntingDogs
     int count = 0;
     int mainBaseID = kbBaseGetMainID(cMyID);
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
-    aiEcho("numAggressivePlans: "+numAggressivePlans);
+    if (ShowAiEcho == true) aiEcho("numAggressivePlans: "+numAggressivePlans);
     if (numAggressivePlans > 0)
         count = numAggressivePlans;
     
@@ -796,7 +796,7 @@ rule getHuntingDogs
             int resourceID = aiPlanGetVariableInt(foodGatherPlanID, cGatherPlanResourceID, 0);
             if (resourceID == cResourceFood)
             {
-                //aiEcho("*___hunting dogs check");
+                //if (ShowAiEcho == true) aiEcho("*___hunting dogs check");
                 int dropsiteID = aiPlanGetVariableInt(foodGatherPlanID, cGatherPlanDropsiteID, 0);
 //                if (cMyCulture == cCultureNorse)
                 if ((cMyCulture == cCultureNorse) || (cMyCulture == cCultureAtlantean))
@@ -810,9 +810,9 @@ rule getHuntingDogs
                         {
                             dropsiteID = unitID;
                             if (cMyCulture == cCultureNorse)
-                                aiEcho("unit is an ox cart, ID is: "+dropsiteID+", breaking off");
+                                if (ShowAiEcho == true) aiEcho("unit is an ox cart, ID is: "+dropsiteID+", breaking off");
                             else if (cMyCulture == cCultureAtlantean)
-                                aiEcho("unit is an Atlantean villager, ID is: "+dropsiteID+", breaking off");
+                                if (ShowAiEcho == true) aiEcho("unit is an Atlantean villager, ID is: "+dropsiteID+", breaking off");
                             break;
                         }
                     }
@@ -820,14 +820,14 @@ rule getHuntingDogs
                 if (dropsiteID != -1)
                 {
                     vector dropsiteLocation = kbUnitGetPosition(dropsiteID);
-                    aiEcho("dropsiteLocation: "+dropsiteLocation);
+                    if (ShowAiEcho == true) aiEcho("dropsiteLocation: "+dropsiteLocation);
                     float distance = 15.0;
                     if (cMyCulture == cCultureNorse)
                         distance = 20.0;
                     int numHuntAnimals = getNumUnits(cUnitTypeHuntable, cUnitStateAlive, -1, 0, dropsiteLocation, distance + 2);
                     int numWildCrops = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, dropsiteLocation, distance);
-                    aiEcho("numHuntAnimals: "+numHuntAnimals);
-                    aiEcho("numWildCrops: "+numWildCrops);
+                    if (ShowAiEcho == true) aiEcho("numHuntAnimals: "+numHuntAnimals);
+                    if (ShowAiEcho == true) aiEcho("numWildCrops: "+numWildCrops);
                     if ((numHuntAnimals > 0) && (numWildCrops < 1))
                         count = count + 1;
                 }
@@ -851,7 +851,7 @@ rule getHuntingDogs
         aiPlanSetDesiredPriority(huntingDogsPlanID, 100);
         aiPlanSetEscrowID(huntingDogsPlanID, cEconomyEscrowID);
         aiPlanSetActive(huntingDogsPlanID);
-        aiEcho("getting hunting dogs");
+        if (ShowAiEcho == true) aiEcho("getting hunting dogs");
         xsSetRuleMinIntervalSelf(167);
         update = false;
     }
@@ -870,7 +870,7 @@ rule getBowSaw
         return;
     }
     
-    aiEcho("getBowSaw:");
+    if (ShowAiEcho == true) aiEcho("getBowSaw:");
     
     if (kbGetAge() < cAge2)
     {
@@ -911,7 +911,7 @@ rule getBowSaw
     
     if (kbGetAge() < cAge3)
     {
-        if ((foodSupply < 350) || (goldSupply < 250))
+        if ((foodSupply < 300) || (goldSupply < 200))
             return;
     }
     
@@ -930,8 +930,8 @@ rule getBowSaw
         aiPlanSetDesiredPriority(bowSawPlanID, 75);
         aiPlanSetEscrowID(bowSawPlanID, cEconomyEscrowID);
         aiPlanSetActive(bowSawPlanID);
-        aiEcho("getting BowSaw");
-        xsSetRuleMinIntervalSelf(181);
+        if (ShowAiEcho == true) aiEcho("getting BowSaw");
+        xsSetRuleMinIntervalSelf(25);
     }
 }
 
@@ -948,7 +948,7 @@ rule getShaftMine
         return;
     }
     
-    aiEcho("getShaftMine:");
+    if (ShowAiEcho == true) aiEcho("getShaftMine:");
 
     if (kbGetAge() < cAge2)
     {
@@ -1026,7 +1026,7 @@ rule getShaftMine
         aiPlanSetDesiredPriority(shaftMinePlanID, 80);
         aiPlanSetEscrowID(shaftMinePlanID, cEconomyEscrowID);
         aiPlanSetActive(shaftMinePlanID);
-        aiEcho("getting ShaftMine");
+        if (ShowAiEcho == true) aiEcho("getting ShaftMine");
         xsSetRuleMinIntervalSelf(25);
     }
 }
@@ -1051,7 +1051,7 @@ rule getIrrigation
         update = true;
     }
     
-    aiEcho("getIrrigation:");
+    if (ShowAiEcho == true) aiEcho("getIrrigation:");
     
     if (kbGetAge() < cAge3)
     {
@@ -1092,7 +1092,7 @@ rule getIrrigation
         aiPlanSetDesiredPriority(irrigationPlanID, 100);
         aiPlanSetEscrowID(irrigationPlanID, cEconomyEscrowID);
         aiPlanSetActive(irrigationPlanID);
-        aiEcho("getting Irrigation");
+        if (ShowAiEcho == true) aiEcho("getting Irrigation");
         xsSetRuleMinIntervalSelf(241);
         update = false;
     }
@@ -1110,7 +1110,7 @@ rule getQuarry
         return;
     }
     
-    aiEcho("getQuarry:");
+    if (ShowAiEcho == true) aiEcho("getQuarry:");
     
     if (kbGetAge() < cAge3)
     {
@@ -1185,7 +1185,7 @@ rule getQuarry
         aiPlanSetDesiredPriority(quarryPlanID, 75);
         aiPlanSetEscrowID(quarryPlanID, cEconomyEscrowID);
         aiPlanSetActive(quarryPlanID);
-        aiEcho("getting Quarry");
+        if (ShowAiEcho == true) aiEcho("getting Quarry");
         xsSetRuleMinIntervalSelf(25);
     }
 }
@@ -1202,7 +1202,7 @@ rule getCarpenters
         return;
     }
     
-    aiEcho("getCarpenters:");
+    if (ShowAiEcho == true) aiEcho("getCarpenters:");
     
     if (kbGetAge() < cAge3)
     {
@@ -1259,7 +1259,7 @@ rule getCarpenters
         aiPlanSetDesiredPriority(carpentersPlanID, 70);
         aiPlanSetEscrowID(carpentersPlanID, cEconomyEscrowID);
         aiPlanSetActive(carpentersPlanID);
-        aiEcho("getting Carpenters");
+        if (ShowAiEcho == true) aiEcho("getting Carpenters");
         xsSetRuleMinIntervalSelf(25);
     }
 }
@@ -1283,7 +1283,7 @@ rule getFloodControl
         update = true;
     }
     
-    aiEcho("getFloodControl:");
+    if (ShowAiEcho == true) aiEcho("getFloodControl:");
     
     if (kbGetAge() < cAge4)
     {
@@ -1324,7 +1324,7 @@ rule getFloodControl
         aiPlanSetDesiredPriority(floodControlPlanID, 100);
         aiPlanSetEscrowID(floodControlPlanID, cEconomyEscrowID);
         aiPlanSetActive(floodControlPlanID);
-        aiEcho("getting FloodControl");
+        if (ShowAiEcho == true) aiEcho("getting FloodControl");
         xsSetRuleMinIntervalSelf(241);
         update = false;
     }
@@ -1342,7 +1342,7 @@ rule getAmbassadors
         return;
     }
     
-    aiEcho("getAmbassadors:");
+    if (ShowAiEcho == true) aiEcho("getAmbassadors:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -1363,7 +1363,7 @@ rule getAmbassadors
         aiPlanSetEscrowID(x, cEconomyEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting Ambassadors");
+        if (ShowAiEcho == true) aiEcho("Getting Ambassadors");
     }
 }
 
@@ -1380,7 +1380,7 @@ rule getTaxCollectors
         return;
     }
 
-    aiEcho("getTaxCollectors:");
+    if (ShowAiEcho == true) aiEcho("getTaxCollectors:");
 
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -1416,7 +1416,7 @@ rule getTaxCollectors
         aiPlanSetEscrowID(x, cEconomyEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(11);
-        aiEcho("Getting TaxCollectors");
+        if (ShowAiEcho == true) aiEcho("Getting TaxCollectors");
     }
 }
 
@@ -1434,7 +1434,7 @@ rule getHeroicFleet
         return;
     }
     
-    aiEcho("getHeroicFleet:");
+    if (ShowAiEcho == true) aiEcho("getHeroicFleet:");
     
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -1455,7 +1455,7 @@ rule getHeroicFleet
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting HeroicFleet");
+        if (ShowAiEcho == true) aiEcho("Getting HeroicFleet");
     }
 }
 
@@ -1472,7 +1472,7 @@ rule getCrenellations
         return;
     }
 
-    aiEcho("getCrenellations:");
+    if (ShowAiEcho == true) aiEcho("getCrenellations:");
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -1508,7 +1508,7 @@ rule getCrenellations
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(11);
-        aiEcho("Getting crenellations");
+        if (ShowAiEcho == true) aiEcho("Getting crenellations");
     }
 }
 
@@ -1526,7 +1526,7 @@ rule getSignalFires
         return;
     }
     
-    aiEcho("getSignalFires:");
+    if (ShowAiEcho == true) aiEcho("getSignalFires:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -1547,7 +1547,7 @@ rule getSignalFires
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
 //        xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting signal fires");
+        if (ShowAiEcho == true) aiEcho("Getting signal fires");
     }
 }
 
@@ -1564,7 +1564,7 @@ rule getBoilingOil
         return;
     }
     
-    aiEcho("getBoilingOil:");
+    if (ShowAiEcho == true) aiEcho("getBoilingOil:");
  
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -1588,7 +1588,7 @@ rule getBoilingOil
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting boiling oil");
+        if (ShowAiEcho == true) aiEcho("Getting boiling oil");
     }
 }
 
@@ -1605,7 +1605,7 @@ rule getCarrierPigeons
         return;
     }
     
-    aiEcho("getCarrierPigeons:");
+    if (ShowAiEcho == true) aiEcho("getCarrierPigeons:");
   
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -1627,7 +1627,7 @@ rule getCarrierPigeons
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
 //        xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting carrier pigeons");
+        if (ShowAiEcho == true) aiEcho("Getting carrier pigeons");
     }
 }
 
@@ -1643,7 +1643,7 @@ rule getWatchTower
         return;
     }
     
-    aiEcho("getWatchTower:");
+    if (ShowAiEcho == true) aiEcho("getWatchTower:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -1656,7 +1656,7 @@ rule getWatchTower
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting Watch Tower");
+        if (ShowAiEcho == true) aiEcho("Getting Watch Tower");
     }
 }
 
@@ -1675,7 +1675,7 @@ rule getGuardTower
         return;
     }
 
-    aiEcho("getGuardTower:");
+    if (ShowAiEcho == true) aiEcho("getGuardTower:");
 
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -1713,7 +1713,7 @@ rule getGuardTower
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
 //        xsSetRuleMinIntervalSelf(11);
-        aiEcho("Getting Guard Tower");
+        if (ShowAiEcho == true) aiEcho("Getting Guard Tower");
     }
 }
 
@@ -1730,7 +1730,7 @@ rule getBallistaTower
         return;
     }
     
-    aiEcho("getBallistaTower:");
+    if (ShowAiEcho == true) aiEcho("getBallistaTower:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -1748,7 +1748,7 @@ rule getBallistaTower
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting Ballista Tower");
+        if (ShowAiEcho == true) aiEcho("Getting Ballista Tower");
     }
 }
 
@@ -1769,7 +1769,7 @@ rule getStoneWall
         return;
     }
 
-    aiEcho("getStoneWall:");
+    if (ShowAiEcho == true) aiEcho("getStoneWall:");
 
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -1807,7 +1807,7 @@ rule getStoneWall
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
 //        xsSetRuleMinIntervalSelf(11);
-        aiEcho("Getting Stone Wall");
+        if (ShowAiEcho == true) aiEcho("Getting Stone Wall");
     }
 }
 
@@ -1829,7 +1829,7 @@ rule getFortifiedWall
         return;
     }
     
-    aiEcho("getFortifiedWall:");
+    if (ShowAiEcho == true) aiEcho("getFortifiedWall:");
 
     if (kbGetTechStatus(cTechStoneWall) < cTechStatusResearching)
     {
@@ -1865,7 +1865,7 @@ rule getFortifiedWall
         aiPlanSetDesiredPriority(x, 90);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting Fortified Wall");
+        if (ShowAiEcho == true) aiEcho("Getting Fortified Wall");
     }
 }
 
@@ -1882,7 +1882,7 @@ rule getCitadelWall
         return;
     }
     
-    aiEcho("getCitadelWall:");
+    if (ShowAiEcho == true) aiEcho("getCitadelWall:");
 
     if (kbGetTechStatus(cTechFortifiedWall) < cTechStatusResearching)
     {
@@ -1904,7 +1904,7 @@ rule getCitadelWall
         aiPlanSetDesiredPriority(x, 80);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting Citadel Wall");
+        if (ShowAiEcho == true) aiEcho("Getting Citadel Wall");
     }
 }
 
@@ -1921,7 +1921,7 @@ rule getBronzeWall
         return;
     }
     
-    aiEcho("getBronzeWall:");
+    if (ShowAiEcho == true) aiEcho("getBronzeWall:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -1951,7 +1951,7 @@ rule getBronzeWall
         aiPlanSetDesiredPriority(x, 95);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting Bronze Wall");
+        if (ShowAiEcho == true) aiEcho("Getting Bronze Wall");
     }
 }
 
@@ -1968,7 +1968,7 @@ rule getIronWall
         return;
     }
     
-    aiEcho("getIronWall:");
+    if (ShowAiEcho == true) aiEcho("getIronWall:");
 
     if (kbGetTechStatus(cTechBronzeWall) < cTechStatusResearching)
     {
@@ -2000,7 +2000,7 @@ rule getIronWall
         aiPlanSetDesiredPriority(x, 90);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting IronWall");
+        if (ShowAiEcho == true) aiEcho("Getting IronWall");
     }
 }
 
@@ -2016,7 +2016,7 @@ rule getOreichalkosWall
         return;
     }
     
-    aiEcho("getOreichalkosWall:");
+    if (ShowAiEcho == true) aiEcho("getOreichalkosWall:");
 
     if (kbGetTechStatus(cTechIronWall) < cTechStatusResearching)
     {
@@ -2039,7 +2039,7 @@ rule getOreichalkosWall
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting OreichalkosWall");
+        if (ShowAiEcho == true) aiEcho("Getting OreichalkosWall");
     }
 }
 
@@ -2055,7 +2055,7 @@ rule getHandsOfThePharaoh
         return;
     }
     
-    aiEcho("getHandsOfThePharaoh:");
+    if (ShowAiEcho == true) aiEcho("getHandsOfThePharaoh:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -2068,7 +2068,7 @@ rule getHandsOfThePharaoh
         aiPlanSetEscrowID(x, cEconomyEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting HandsOfThePharaoh");
+        if (ShowAiEcho == true) aiEcho("Getting HandsOfThePharaoh");
     }
 }
 
@@ -2085,7 +2085,7 @@ rule getAxeOfMuspell
         return;
     }
     
-    aiEcho("getAxeOfMuspell:");
+    if (ShowAiEcho == true) aiEcho("getAxeOfMuspell:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -2107,7 +2107,7 @@ rule getAxeOfMuspell
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(307);
-        aiEcho("Getting AxeOfMuspell");
+        if (ShowAiEcho == true) aiEcho("Getting AxeOfMuspell");
     }
 }
 
@@ -2124,7 +2124,7 @@ rule getBeastSlayer
         return;
     }
     
-    aiEcho("getBeastSlayer:");
+    if (ShowAiEcho == true) aiEcho("getBeastSlayer:");
 
     float foodSupply = kbResourceGet(cResourceFood);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -2176,7 +2176,7 @@ rule getBeastSlayer
         aiPlanSetDesiredPriority(x, 70);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting BeastSlayer");
+        if (ShowAiEcho == true) aiEcho("Getting BeastSlayer");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -2194,7 +2194,7 @@ rule getMediumInfantry
         return;
     }
 
-    aiEcho("getMediumInfantry:");
+    if (ShowAiEcho == true) aiEcho("getMediumInfantry:");
     
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -2249,7 +2249,7 @@ rule getMediumInfantry
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting MediumInfantry");
+        if (ShowAiEcho == true) aiEcho("Getting MediumInfantry");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -2267,7 +2267,7 @@ rule getMediumCavalry
         return;
     }
 
-    aiEcho("getMediumCavalry:");
+    if (ShowAiEcho == true) aiEcho("getMediumCavalry:");
     
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -2323,7 +2323,7 @@ rule getMediumCavalry
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting MediumCavalry");
+        if (ShowAiEcho == true) aiEcho("Getting MediumCavalry");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -2341,7 +2341,7 @@ rule getMediumArchers
         return;
     }
     
-    aiEcho("getMediumArchers:");   
+    if (ShowAiEcho == true) aiEcho("getMediumArchers:");   
 
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -2394,7 +2394,7 @@ rule getMediumArchers
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting MediumArchers");
+        if (ShowAiEcho == true) aiEcho("Getting MediumArchers");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -2412,7 +2412,7 @@ rule getChampionInfantry
         return;
     }
     
-    aiEcho("getChampionInfantry:");
+    if (ShowAiEcho == true) aiEcho("getChampionInfantry:");
 
 //    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
@@ -2436,7 +2436,7 @@ rule getChampionInfantry
         aiPlanSetDesiredPriority(x, 98);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting ChampionInfantry");
+        if (ShowAiEcho == true) aiEcho("Getting ChampionInfantry");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -2454,7 +2454,7 @@ rule getChampionCavalry
         return;
     }
     
-    aiEcho("getChampionCavalry:");
+    if (ShowAiEcho == true) aiEcho("getChampionCavalry:");
 
 //    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
@@ -2478,7 +2478,7 @@ rule getChampionCavalry
         aiPlanSetDesiredPriority(x, 98);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting ChampionCavalry");
+        if (ShowAiEcho == true) aiEcho("Getting ChampionCavalry");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -2496,7 +2496,7 @@ rule getChampionArchers
         return;
     }
     
-    aiEcho("getChampionArchers:");
+    if (ShowAiEcho == true) aiEcho("getChampionArchers:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -2517,7 +2517,7 @@ rule getChampionArchers
         aiPlanSetDesiredPriority(x, 98);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting ChampionArchers");
+        if (ShowAiEcho == true) aiEcho("Getting ChampionArchers");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -2534,7 +2534,7 @@ rule getDraftHorses
         return;
     }
     
-    aiEcho("getDraftHorses:");
+    if (ShowAiEcho == true) aiEcho("getDraftHorses:");
     
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -2573,7 +2573,7 @@ rule getDraftHorses
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting DraftHorses");
+        if (ShowAiEcho == true) aiEcho("Getting DraftHorses");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -2590,7 +2590,7 @@ rule getEngineers
         return;
     }
     
-    aiEcho("getEngineers:");
+    if (ShowAiEcho == true) aiEcho("getEngineers:");
     
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -2619,7 +2619,7 @@ rule getEngineers
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting Engineers");
+        if (ShowAiEcho == true) aiEcho("Getting Engineers");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -2636,7 +2636,7 @@ rule getCoinage
         return;
     }
     
-    aiEcho("getCoinage:");
+    if (ShowAiEcho == true) aiEcho("getCoinage:");
 /*    
 //test    
     if (cMyCulture == cCultureAtlantean)
@@ -2667,7 +2667,7 @@ rule getCoinage
             aiPlanSetDesiredPriority(tradeUpgradePlanID, 100);      // Do it ASAP!
             aiPlanSetEscrowID(tradeUpgradePlanID, cEconomyEscrowID);
             aiPlanSetActive(tradeUpgradePlanID);
-            aiEcho("Getting coinage upgrade.");
+            if (ShowAiEcho == true) aiEcho("Getting coinage upgrade.");
             xsSetRuleMinIntervalSelf(307);
         }
     }
@@ -2689,15 +2689,9 @@ rule researchCopperShields
         return;
     }
 
-    aiEcho("researchCopperShields:");
+    if (ShowAiEcho == true) aiEcho("researchCopperShields:");
     
-//test    
-    if (cMyCulture == cCultureAtlantean)
-    {
-        xsDisableSelf();
-        return;
-    }
-//test end      
+   
 
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
@@ -2741,7 +2735,7 @@ rule researchCopperShields
         aiPlanSetDesiredPriority(x, 99);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching CopperShields");
+        if (ShowAiEcho == true) aiEcho("researching CopperShields");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -2755,15 +2749,9 @@ rule researchCopperMail
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
 
-    aiEcho("researchCopperMail:");
+    if (ShowAiEcho == true) aiEcho("researchCopperMail:");
     
-//test    
-    if (cMyCulture == cCultureAtlantean)
-    {
-        xsDisableSelf();
-        return;
-    }
-//test end      
+  
     
     int techID = cTechCopperMail;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
@@ -2813,7 +2801,7 @@ rule researchCopperMail
         aiPlanSetDesiredPriority(x, 99);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching CopperMail");
+        if (ShowAiEcho == true) aiEcho("researching CopperMail");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -2827,15 +2815,9 @@ rule researchCopperWeapons
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
 
-    aiEcho("researchCopperWeapons:");
+    if (ShowAiEcho == true) aiEcho("researchCopperWeapons:");
     
-//test    
-    if (cMyCulture == cCultureAtlantean)
-    {
-        xsDisableSelf();
-        return;
-    }
-//test end      
+
 
     int techID = cTechCopperWeapons;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
@@ -2894,7 +2876,7 @@ rule researchCopperWeapons
         aiPlanSetDesiredPriority(x, 99);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching CopperWeapons");
+        if (ShowAiEcho == true) aiEcho("researching CopperWeapons");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -2909,7 +2891,7 @@ rule researchCopperShieldsThor
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
 
-    aiEcho("researchCopperShieldsThor:");
+    if (ShowAiEcho == true) aiEcho("researchCopperShieldsThor:");
 
     int techID = cTechCopperShieldsThor;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
@@ -2949,7 +2931,7 @@ rule researchCopperShieldsThor
         aiPlanSetDesiredPriority(x, 99);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching CopperShieldsThor");
+        if (ShowAiEcho == true) aiEcho("researching CopperShieldsThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -2963,7 +2945,7 @@ rule researchCopperMailThor
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
  
-    aiEcho("researchCopperMailThor:");
+    if (ShowAiEcho == true) aiEcho("researchCopperMailThor:");
 
     int techID = cTechCopperMailThor;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
@@ -3002,7 +2984,7 @@ rule researchCopperMailThor
         aiPlanSetDesiredPriority(x, 99);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching CopperMailThor");
+        if (ShowAiEcho == true) aiEcho("researching CopperMailThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3023,7 +3005,7 @@ rule researchCopperWeaponsThor
         return;
     }
     
-    aiEcho("researchCopperWeaponsThor:");
+    if (ShowAiEcho == true) aiEcho("researchCopperWeaponsThor:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3064,7 +3046,7 @@ rule researchCopperWeaponsThor
         aiPlanSetDesiredPriority(x, 99);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching CopperWeaponsThor");
+        if (ShowAiEcho == true) aiEcho("researching CopperWeaponsThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3082,7 +3064,7 @@ rule researchBronzeShieldsThor
         return;
     }
     
-    aiEcho("researchBronzeShieldsThor:");
+    if (ShowAiEcho == true) aiEcho("researchBronzeShieldsThor:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3124,7 +3106,7 @@ rule researchBronzeShieldsThor
         aiPlanSetDesiredPriority(x, 98);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching BronzeShieldsThor");
+        if (ShowAiEcho == true) aiEcho("researching BronzeShieldsThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3142,7 +3124,7 @@ rule researchBronzeMailThor
         return;
     }
     
-    aiEcho("researchBronzeMailThor:");
+    if (ShowAiEcho == true) aiEcho("researchBronzeMailThor:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3182,7 +3164,7 @@ rule researchBronzeMailThor
         aiPlanSetDesiredPriority(x, 98);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching BronzeMailThor");
+        if (ShowAiEcho == true) aiEcho("researching BronzeMailThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3200,7 +3182,7 @@ rule researchBronzeWeaponsThor
         return;
     }
     
-    aiEcho("researchBronzeWeaponsThor:");
+    if (ShowAiEcho == true) aiEcho("researchBronzeWeaponsThor:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3249,7 +3231,7 @@ rule researchBronzeWeaponsThor
         aiPlanSetDesiredPriority(x, 98);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching BronzeWeaponsThor");
+        if (ShowAiEcho == true) aiEcho("researching BronzeWeaponsThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3267,7 +3249,7 @@ rule researchIronShieldsThor
         return;
     }
     
-    aiEcho("researchIronShieldsThor:");
+    if (ShowAiEcho == true) aiEcho("researchIronShieldsThor:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3297,7 +3279,7 @@ rule researchIronShieldsThor
         aiPlanSetDesiredPriority(x, 97);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching IronShieldsThor");
+        if (ShowAiEcho == true) aiEcho("researching IronShieldsThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3315,7 +3297,7 @@ rule researchIronMailThor
         return;
     }
     
-    aiEcho("researchIronMailThor:");
+    if (ShowAiEcho == true) aiEcho("researchIronMailThor:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3344,7 +3326,7 @@ rule researchIronMailThor
         aiPlanSetDesiredPriority(x, 97);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching IronMailThor");
+        if (ShowAiEcho == true) aiEcho("researching IronMailThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3362,7 +3344,7 @@ rule researchIronWeaponsThor
         return;
     }
 
-    aiEcho("researchIronWeaponsThor:");
+    if (ShowAiEcho == true) aiEcho("researchIronWeaponsThor:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3399,7 +3381,7 @@ rule researchIronWeaponsThor
         aiPlanSetDesiredPriority(x, 97);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching IronWeaponsThor");
+        if (ShowAiEcho == true) aiEcho("researching IronWeaponsThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3417,7 +3399,7 @@ rule researchBurningPitchThor
         return;
     }
 
-    aiEcho("researchBurningPitchThor:");
+    if (ShowAiEcho == true) aiEcho("researchBurningPitchThor:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3454,7 +3436,7 @@ rule researchBurningPitchThor
         aiPlanSetDesiredPriority(x, 97);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching BurningPitchThor");
+        if (ShowAiEcho == true) aiEcho("researching BurningPitchThor");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3472,7 +3454,7 @@ rule researchDragonscaleShields
         return;
     }
     
-    aiEcho("researchDragonscaleShields:");
+    if (ShowAiEcho == true) aiEcho("researchDragonscaleShields:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3501,7 +3483,7 @@ rule researchDragonscaleShields
         aiPlanSetDesiredPriority(x, 96);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching DragonscaleShields");
+        if (ShowAiEcho == true) aiEcho("researching DragonscaleShields");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3519,7 +3501,7 @@ rule researchMeteoricIronMail
         return;
     }
 
-    aiEcho("researchMeteoricIronMail:");
+    if (ShowAiEcho == true) aiEcho("researchMeteoricIronMail:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3547,7 +3529,7 @@ rule researchMeteoricIronMail
         aiPlanSetDesiredPriority(x, 96);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching MeteoricIronMail");
+        if (ShowAiEcho == true) aiEcho("researching MeteoricIronMail");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3565,7 +3547,7 @@ rule researchHammerOfTheGods
         return;
     }
 
-    aiEcho("researchHammerOfTheGods:");
+    if (ShowAiEcho == true) aiEcho("researchHammerOfTheGods:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3600,7 +3582,7 @@ rule researchHammerOfTheGods
         aiPlanSetDesiredPriority(x, 96);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("researching HammerOfTheGods");
+        if (ShowAiEcho == true) aiEcho("researching HammerOfTheGods");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3618,7 +3600,7 @@ rule getMediumAxemen
         return;
     }
 
-    aiEcho("getMediumAxemen:");
+    if (ShowAiEcho == true) aiEcho("getMediumAxemen:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3648,7 +3630,7 @@ rule getMediumAxemen
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting MediumAxemen");
+        if (ShowAiEcho == true) aiEcho("Getting MediumAxemen");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3666,7 +3648,7 @@ rule getMediumSpearmen
         return;
     }
 
-    aiEcho("getMediumSpearmen:");
+    if (ShowAiEcho == true) aiEcho("getMediumSpearmen:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3696,7 +3678,7 @@ rule getMediumSpearmen
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting MediumSpearmen");
+        if (ShowAiEcho == true) aiEcho("Getting MediumSpearmen");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3714,7 +3696,7 @@ rule getMediumSlingers
         return;
     }
 
-    aiEcho("getMediumSlingers:");
+    if (ShowAiEcho == true) aiEcho("getMediumSlingers:");
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
@@ -3745,7 +3727,7 @@ rule getMediumSlingers
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting MediumSlingers");
+        if (ShowAiEcho == true) aiEcho("Getting MediumSlingers");
         xsSetRuleMinIntervalSelf(307);
     }
 }
@@ -3756,7 +3738,7 @@ rule getSecretsOfTheTitan
     minInterval 17 //starts in cAge4
     inactive
 {
-    aiEcho("getSecretsOfTheTitan:");
+    if (ShowAiEcho == true) aiEcho("getSecretsOfTheTitan:");
     
     if ((gAge4MinorGod == cTechAge4Hephaestus) && (kbGetTechStatus(cTechForgeofOlympus) < cTechStatusResearching))
         return;
@@ -3776,7 +3758,7 @@ rule getSecretsOfTheTitan
         aiPlanSetDesiredPriority(titanPID, 100);
         aiPlanSetEscrowID(titanPID, cMilitaryEscrowID);
         aiPlanSetActive(titanPID);
-        aiEcho("getting secrets of the titans");
+        if (ShowAiEcho == true) aiEcho("getting secrets of the titans");
         xsDisableSelf();
     }
 }

@@ -34,7 +34,7 @@ rule getPigSticker
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
         aiPlanSetDesiredPriority(x, 40);
         aiPlanSetActive(x);
-        aiEcho("Getting PigSticker");
+        if (ShowAiEcho == true) aiEcho("Getting PigSticker");
     }
 }
 
@@ -53,7 +53,7 @@ rule getLoneWanderer
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting LoneWanderer");
+        if (ShowAiEcho == true) aiEcho("Getting LoneWanderer");
     }
 }
 
@@ -72,7 +72,7 @@ rule getEyesInTheForest
         aiPlanSetDesiredPriority(x, 20);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting EyesInTheForest");
+        if (ShowAiEcho == true) aiEcho("Getting EyesInTheForest");
     }
 }
 
@@ -85,6 +85,11 @@ rule getThunderingHooves
     minInterval 60 //starts in cAge2
     group Freyja
 {
+    float foodSupply = kbResourceGet(cResourceFood);
+
+    if (kbGetAge() < cAge3 && foodSupply < 1000)
+	return;
+	
     if (kbGetTechStatus(cTechThunderingHooves) == cTechStatusAvailable)
     {
         int x=-1;
@@ -93,7 +98,7 @@ rule getThunderingHooves
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting ThunderingHooves");
+        if (ShowAiEcho == true) aiEcho("Getting ThunderingHooves");
     }
 }
 
@@ -103,6 +108,10 @@ rule getAuroraBorealis
     minInterval 60 //starts in cAge2
     group Freyja
 {
+    float goldSupply = kbResourceGet(cResourceGold);
+
+    if (kbGetAge() < cAge3 && goldSupply < 650)
+	return;
     if (kbGetTechStatus(cTechAuroraBorealis) == cTechStatusAvailable)
     {
         int x=-1;
@@ -111,7 +120,7 @@ rule getAuroraBorealis
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting AuroraBorealis");
+        if (ShowAiEcho == true) aiEcho("Getting AuroraBorealis");
     }
 }
 
@@ -144,7 +153,7 @@ rule getSafeguard
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(300);
-        aiEcho("Getting Safeguard");
+        if (ShowAiEcho == true) aiEcho("Getting Safeguard");
     }
 }
 
@@ -154,6 +163,10 @@ rule getElhrimnirKettle
     minInterval 60 //starts in cAge2
     group Heimdall
 {
+    float foodSupply = kbResourceGet(cResourceFood);
+
+    if (kbGetAge() < cAge3 && foodSupply < 1000)
+	return;
     if (kbGetTechStatus(cTechEldhrimnirKettle) == cTechStatusAvailable)
     {
         int x=-1;
@@ -162,7 +175,7 @@ rule getElhrimnirKettle
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting ElhrimnirKettle");
+        if (ShowAiEcho == true) aiEcho("Getting ElhrimnirKettle");
     }
 }
 
@@ -172,6 +185,10 @@ rule getArcticWinds
     minInterval 60 //starts in cAge2
     group Heimdall
 {
+    float woodSupply = kbResourceGet(cResourceWood);
+
+    if (kbGetAge() < cAge3 && woodSupply < 450)
+	return;
     if (kbGetTechStatus(cTechArcticWinds) == cTechStatusAvailable)
     {
         int x=-1;
@@ -180,7 +197,7 @@ rule getArcticWinds
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting ArcticWinds");
+        if (ShowAiEcho == true) aiEcho("Getting ArcticWinds");
     }
 }
 
@@ -193,6 +210,10 @@ rule getHallOfThanes
     minInterval 60 //starts in cAge2
     group Forseti
 {
+    float woodSupply = kbResourceGet(cResourceWood);
+	
+    if (kbGetAge() < cAge3 && woodSupply < 550)
+	return;
     if (kbGetTechStatus(cTechHallofThanes) == cTechStatusAvailable)
     {
         int x=-1;
@@ -201,7 +222,7 @@ rule getHallOfThanes
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting HallOfThanes");
+        if (ShowAiEcho == true) aiEcho("Getting HallOfThanes");
     }
 }
 
@@ -212,6 +233,10 @@ rule getHamarrtroll
     minInterval 60 //starts in cAge2
     group Forseti
 {
+    float woodSupply = kbResourceGet(cResourceWood);
+	
+    if (kbGetAge() < cAge3 && woodSupply < 650)
+	return;
     if (kbGetTechStatus(cTechHamarrtroll) == cTechStatusAvailable)
     {
         int x=-1;
@@ -220,7 +245,7 @@ rule getHamarrtroll
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Hamarrtroll");
+        if (ShowAiEcho == true) aiEcho("Getting Hamarrtroll");
     }
 }
 
@@ -231,6 +256,10 @@ rule getMithrilBreastplate
     minInterval 60 //starts in cAge2
     group Forseti
 {
+    float goldSupply = kbResourceGet(cResourceGold);
+	
+    if (kbGetAge() < cAge3 && goldSupply < 650)
+	return;
     if (kbGetTechStatus(cTechMithrilBreastplate) == cTechStatusAvailable)
     {
         int x=-1;
@@ -239,7 +268,7 @@ rule getMithrilBreastplate
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting MithrilBreastplate");
+        if (ShowAiEcho == true) aiEcho("Getting MithrilBreastplate");
     }
 }
 
@@ -261,7 +290,7 @@ rule getRingGiver
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting RingGiver");
+        if (ShowAiEcho == true) aiEcho("Getting RingGiver");
     }
 }
 
@@ -279,7 +308,7 @@ rule getLongSerpent
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting LongSerpent");
+        if (ShowAiEcho == true) aiEcho("Getting LongSerpent");
     }
 }
 
@@ -297,7 +326,7 @@ rule getWrathOfTheDeep
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting WrathOfTheDeep");
+        if (ShowAiEcho == true) aiEcho("Getting WrathOfTheDeep");
     }
 }
 
@@ -317,7 +346,7 @@ rule getRime
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Rime");
+        if (ShowAiEcho == true) aiEcho("Getting Rime");
     }
 }
 
@@ -335,7 +364,7 @@ rule getWinterHarvest
         aiPlanSetDesiredPriority(x, 20);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting WinterHarvest");
+        if (ShowAiEcho == true) aiEcho("Getting WinterHarvest");
     }
 }
 
@@ -354,7 +383,7 @@ rule getHuntressAxe
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting HuntressAxe");
+        if (ShowAiEcho == true) aiEcho("Getting HuntressAxe");
     }
 }
 
@@ -374,7 +403,7 @@ rule getSwineArray
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting SwineArray");
+        if (ShowAiEcho == true) aiEcho("Getting SwineArray");
     }
 }
 
@@ -393,7 +422,7 @@ rule getCallOfValhalla
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting CallOfValhalla");
+        if (ShowAiEcho == true) aiEcho("Getting CallOfValhalla");
     }
 }
 
@@ -411,7 +440,7 @@ rule getThurisazRune
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting ThurisazRune");
+        if (ShowAiEcho == true) aiEcho("Getting ThurisazRune");
     }
 }
 
@@ -432,7 +461,7 @@ rule getArcticGale
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting ArcticGale");
+        if (ShowAiEcho == true) aiEcho("Getting ArcticGale");
     }
 }
 
@@ -451,7 +480,7 @@ rule getSonsOfSleipnir
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting SonsOfSleipnir");
+        if (ShowAiEcho == true) aiEcho("Getting SonsOfSleipnir");
     }
 }
 
@@ -469,7 +498,7 @@ rule getDwarvenAuger
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting DwarvenAuger");
+        if (ShowAiEcho == true) aiEcho("Getting DwarvenAuger");
     }
 }
 
@@ -489,7 +518,7 @@ rule getBerserkergang
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Berserkergang");
+        if (ShowAiEcho == true) aiEcho("Getting Berserkergang");
     }
 }
 
@@ -508,7 +537,7 @@ rule getBravery
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Bravery");
+        if (ShowAiEcho == true) aiEcho("Getting Bravery");
     }
 }
 
@@ -527,7 +556,7 @@ rule getRampage
         aiPlanSetDesiredPriority(x, 20);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Rampage");
+        if (ShowAiEcho == true) aiEcho("Getting Rampage");
     }
 }
 
@@ -545,6 +574,6 @@ rule getGraniteBlood
         aiPlanSetDesiredPriority(x, 20);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting GraniteBlood");
+        if (ShowAiEcho == true) aiEcho("Getting GraniteBlood");
     }
 }

@@ -20,7 +20,7 @@ rule getFloodOfTheNile
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting FloodOfTheNile");
+        if (ShowAiEcho == true) aiEcho("Getting FloodOfTheNile");
     }
 }
 
@@ -40,7 +40,7 @@ rule getSkinOfTheRhino
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting SkinOfTheRhino");
+        if (ShowAiEcho == true) aiEcho("Getting SkinOfTheRhino");
     }
 }
 
@@ -60,7 +60,7 @@ rule getFeral
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Feral");
+        if (ShowAiEcho == true) aiEcho("Getting Feral");
     }
 }
 
@@ -74,6 +74,10 @@ rule getFeetOfTheJackal
     minInterval 27
     group Anubis
 {
+    float goldSupply = kbResourceGet(cResourceGold);
+
+    if (kbGetAge() < cAge3 && goldSupply < 650)
+	return;
     if (kbGetTechStatus(cTechFeetoftheJackal) == cTechStatusAvailable)
     {
         int x=-1;
@@ -82,7 +86,7 @@ rule getFeetOfTheJackal
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting FeetOfTheJackal");
+        if (ShowAiEcho == true) aiEcho("Getting FeetOfTheJackal");
     }
 }
 
@@ -94,6 +98,10 @@ rule getSerpentSpear
     minInterval 29
     group Anubis
 {
+    float foodSupply = kbResourceGet(cResourceFood);
+
+    if (kbGetAge() < cAge3 && foodSupply < 1000)
+	return;
     if (kbGetTechStatus(cTechSerpentSpear) == cTechStatusAvailable)
     {
         int x=-1;
@@ -102,7 +110,7 @@ rule getSerpentSpear
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting SerpentSpear");
+        if (ShowAiEcho == true) aiEcho("Getting SerpentSpear");
     }
 }
 
@@ -114,6 +122,10 @@ rule getNecropolis
     minInterval 31
     group Anubis
 {
+    float goldSupply = kbResourceGet(cResourceGold);
+
+    if (kbGetAge() < cAge3 && goldSupply < 650)
+	return;
     if (kbGetTechStatus(cTechNecropolis) == cTechStatusAvailable)
     {
         int x=-1;
@@ -122,7 +134,7 @@ rule getNecropolis
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Necropolis");
+        if (ShowAiEcho == true) aiEcho("Getting Necropolis");
     }
 }
 
@@ -143,7 +155,7 @@ rule getAdzeOfWepwawet
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting AdzeOfWepwawet");
+        if (ShowAiEcho == true) aiEcho("Getting AdzeOfWepwawet");
     }
 }
 
@@ -163,7 +175,7 @@ rule getSacredCats
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting SacredCats");
+        if (ShowAiEcho == true) aiEcho("Getting SacredCats");
     }
 }
 
@@ -183,7 +195,7 @@ rule getCriosphinx
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Criosphinx");
+        if (ShowAiEcho == true) aiEcho("Getting Criosphinx");
     }
 }
 
@@ -203,7 +215,7 @@ rule getHieracosphinx
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Hieracosphinx");
+        if (ShowAiEcho == true) aiEcho("Getting Hieracosphinx");
     }
 }
 
@@ -224,7 +236,7 @@ rule getShaduf
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Shaduf");
+        if (ShowAiEcho == true) aiEcho("Getting Shaduf");
     }
 }
 
@@ -236,6 +248,10 @@ rule getScallopedAxe
     minInterval 29
     group Ptah
 {
+    float foodSupply = kbResourceGet(cResourceFood);
+
+    if (kbGetAge() < cAge3 && foodSupply < 1000)
+	return;
     if (kbGetTechStatus(cTechScallopedAxe) == cTechStatusAvailable)
     {
         int x=-1;
@@ -244,7 +260,7 @@ rule getScallopedAxe
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting ScallopedAxe");
+        if (ShowAiEcho == true) aiEcho("Getting ScallopedAxe");
     }
 }
 
@@ -264,7 +280,7 @@ rule getLeatherFrameShield
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting LeatherFrameShield");
+        if (ShowAiEcho == true) aiEcho("Getting LeatherFrameShield");
     }
 }
 
@@ -276,6 +292,10 @@ rule getElectrumBullets
     minInterval 33
     group Ptah
 {
+    float goldSupply = kbResourceGet(cResourceGold);
+
+    if (kbGetAge() < cAge3 && goldSupply < 650)
+	return;
     if (kbGetTechStatus(cTechElectrumBullets) == cTechStatusAvailable)
     {
         int x=-1;
@@ -284,7 +304,7 @@ rule getElectrumBullets
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting ElectrumBullets");
+        if (ShowAiEcho == true) aiEcho("Getting ElectrumBullets");
     }
 }
 
@@ -306,7 +326,7 @@ rule getSundriedMudBrick
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting SundriedMudBrick");
+        if (ShowAiEcho == true) aiEcho("Getting SundriedMudBrick");
     }
 }
 
@@ -326,7 +346,7 @@ rule getMedjay
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Medjay");
+        if (ShowAiEcho == true) aiEcho("Getting Medjay");
     }
 }
 
@@ -346,7 +366,7 @@ rule getCrocodopolis
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Crocodopolis");
+        if (ShowAiEcho == true) aiEcho("Getting Crocodopolis");
     }
 }
 
@@ -367,7 +387,7 @@ rule getBoneBow
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting BoneBow");
+        if (ShowAiEcho == true) aiEcho("Getting BoneBow");
     }
 }
 
@@ -387,7 +407,7 @@ rule getSlingsOfTheSun
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting SlingsOfTheSun");
+        if (ShowAiEcho == true) aiEcho("Getting SlingsOfTheSun");
     }
 }
 
@@ -407,7 +427,7 @@ rule getStonesOfRedLinen
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting StonesOfRedLinen");
+        if (ShowAiEcho == true) aiEcho("Getting StonesOfRedLinen");
     }
 }
 
@@ -427,7 +447,7 @@ rule getRamOfTheWestWind
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting RamOfTheWestWind");
+        if (ShowAiEcho == true) aiEcho("Getting RamOfTheWestWind");
     }
 }
 
@@ -448,7 +468,7 @@ rule getSpiritOfMaat
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting SpiritOfMaat");
+        if (ShowAiEcho == true) aiEcho("Getting SpiritOfMaat");
     }
 }
 
@@ -468,7 +488,7 @@ rule getFuneralRites
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting FuneralRites");
+        if (ShowAiEcho == true) aiEcho("Getting FuneralRites");
     }
 }
 
@@ -488,7 +508,7 @@ rule getCityOfTheDead
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting CityOfTheDead");
+        if (ShowAiEcho == true) aiEcho("Getting CityOfTheDead");
     }
 }
 
@@ -510,7 +530,7 @@ rule getAxeOfVengeance
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting AxeOfVengeance");
+        if (ShowAiEcho == true) aiEcho("Getting AxeOfVengeance");
     }
 }
 
@@ -530,7 +550,7 @@ rule getGreatestOfFifty
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting GreatestOfFifty");
+        if (ShowAiEcho == true) aiEcho("Getting GreatestOfFifty");
     }
 }
 
@@ -550,7 +570,7 @@ rule getSpearOnTheHorizon
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting SpearOnTheHorizon");
+        if (ShowAiEcho == true) aiEcho("Getting SpearOnTheHorizon");
     }
 }
 
@@ -571,7 +591,7 @@ rule getAtefCrown
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting AtefCrown");
+        if (ShowAiEcho == true) aiEcho("Getting AtefCrown");
     }
 }
 
@@ -591,7 +611,7 @@ rule getDesertWind
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting DesertWind");
+        if (ShowAiEcho == true) aiEcho("Getting DesertWind");
     }
 }
 
@@ -611,7 +631,7 @@ rule getFuneralBarge
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting FuneralBarge");
+        if (ShowAiEcho == true) aiEcho("Getting FuneralBarge");
     }
 }
 
@@ -632,7 +652,7 @@ rule getValleyOfTheKings
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting ValleyOfTheKings");
+        if (ShowAiEcho == true) aiEcho("Getting ValleyOfTheKings");
     }
 }
 
@@ -652,6 +672,6 @@ rule getTusksOfApedemak
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting TusksOfApedemak");
+        if (ShowAiEcho == true) aiEcho("Getting TusksOfApedemak");
     }
 }

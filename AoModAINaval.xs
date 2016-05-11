@@ -17,7 +17,7 @@ extern int gRemoteIslandExploreTrans=-1;
 //==============================================================================
 void initNaval()
 {
-    aiEcho("Naval Init.");
+    if (ShowAiEcho == true) aiEcho("Naval Init.");
    
     //Get our initial location.
     vector here=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
@@ -38,7 +38,7 @@ void initNaval()
 //==============================================================================
 void navalAge2Handler(int age=1)
 {
-    aiEcho("Naval Age "+age+".");
+    if (ShowAiEcho == true) aiEcho("Naval Age "+age+".");
 
     // Naval (scout other islands etc...)
     if (gTransportMap == true)
@@ -65,14 +65,14 @@ void navalAge3Handler(int age=2)
 //==============================================================================
 void navalAge4Handler(int age=3)
 {
-    aiEcho("Naval Age "+age+".");
+    if (ShowAiEcho == true) aiEcho("Naval Age "+age+".");
 }
 
 //==============================================================================
 int initNavalUnitPicker(string name="BUG", int minShips=5,
    int maxShips=20, int numberBuildings=1, bool bWantSiegeShips=false)
 {
-    aiEcho("initNavalUnitPicker:");
+    if (ShowAiEcho == true) aiEcho("initNavalUnitPicker:");
     
     //Create it.
     int upID=kbUnitPickCreate(name);
@@ -134,7 +134,7 @@ rule findOtherSettlements
     group NavalHeroic
     inactive
 {
-    aiEcho("findOtherSettlements:");
+    if (ShowAiEcho == true) aiEcho("findOtherSettlements:");
         
     //Get our initial location.
     vector here=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
@@ -279,7 +279,7 @@ rule NavalGoalMonitor
 	  return;
 	
    //Else, create the Naval attack goal.
-   aiEcho("Creating NavalAttackGoal for "+maxShips+" ships since I've seen "+numberEnemyWarships+" for Player "+aiGetMostHatedPlayerID()+".");
+   if (ShowAiEcho == true) aiEcho("Creating NavalAttackGoal for "+maxShips+" ships since I've seen "+numberEnemyWarships+" for Player "+aiGetMostHatedPlayerID()+".");
    gNavalUPID=kbUnitPickCreate("Naval");
    if (gNavalUPID < 0)
    {
@@ -312,7 +312,7 @@ rule NavalGoalMonitor
 //==============================================================================
 bool isFullyExplored(int areaGroupID=-1)    //returns true, if more than 80% of the specified areagroup is nonblack.
 {
-    aiEcho("isFullyExplored:");
+    if (ShowAiEcho == true) aiEcho("isFullyExplored:");
 
     float numTilesBlack = 0;
     float numTiles = 0;
@@ -362,7 +362,7 @@ bool isFullyExplored(int areaGroupID=-1)    //returns true, if more than 80% of 
 //==============================================================================
 int setupExploreIsland()
 {
-    aiEcho("setupExploreIsland:");
+    if (ShowAiEcho == true) aiEcho("setupExploreIsland:");
 
     int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
     if (transportPUID < 0)
@@ -455,7 +455,7 @@ int setupExploreIsland()
 /* disabled
     for (j=0; <aiPlanGetNumberUserVariableValues(gExploreIslandsGoalID, cExploredAreaGroups))
     {
-        aiEcho("   AGID="+aiPlanGetUserVariableInt(gExploreIslandsGoalID, cExploredAreaGroups, j));
+        if (ShowAiEcho == true) aiEcho("   AGID="+aiPlanGetUserVariableInt(gExploreIslandsGoalID, cExploredAreaGroups, j));
     }
 */
 
@@ -483,7 +483,7 @@ int setupExploreIsland()
         aiPlanSetActive(gRemoteIslandExploreTrans, true);
     }
     else
-        aiEcho("setupExploreIsland: cannot create transport plan! return"); 
+        if (ShowAiEcho == true) aiEcho("setupExploreIsland: cannot create transport plan! return"); 
 
     // dunno if this is enough...
     vector center=kbAreaGetCenter(targetAreaID);
@@ -547,7 +547,7 @@ rule exploreIslands
     group NavalClassical
     inactive
 {
-    aiEcho("exploreIslands:");
+    if (ShowAiEcho == true) aiEcho("exploreIslands:");
     static int numTries=0;
 
     // only the captain does this, everyting else costs too much

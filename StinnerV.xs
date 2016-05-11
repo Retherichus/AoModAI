@@ -153,7 +153,7 @@ if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSuprema
 	       float foodSupply = kbResourceGet(cResourceFood);
 	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && foodSupply > 5000)
 		   {
-		             aiEcho("Tributing 1000 food to one of my allies!");
+		             if (ShowAiEcho == true) aiEcho("Tributing 1000 food to one of my allies!");
 	  aiTribute(i, cResourceFood, 1000);
 	  }  	
  }
@@ -181,7 +181,7 @@ if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSuprema
 	       float woodSupply = kbResourceGet(cResourceWood);
 	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && woodSupply > 3500)
 		   {
-		             aiEcho("Tributing 750 wood to one of my allies!");
+		             if (ShowAiEcho == true) aiEcho("Tributing 750 wood to one of my allies!");
 	  aiTribute(i, cResourceWood, 750);
 	  return;
 	  }  	
@@ -210,7 +210,7 @@ if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSuprema
 	       float goldSupply = kbResourceGet(cResourceGold);
 	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && goldSupply > 5000)
 		   {
-		             aiEcho("Tributing 1000 gold to one of my allies!");
+		             if (ShowAiEcho == true) aiEcho("Tributing 1000 gold to one of my allies!");
 	  aiTribute(i, cResourceGold, 1000);
 	  return;
 	  }  	
@@ -838,7 +838,7 @@ int BuildingUnits12=kbUnitQueryExecute(BuildingunitQueryID12);
    }
 	
 
-	aiEcho("Player: "+HateChoice+" has a total of "+TotalUnits+" units and "+TotalBuildings+" buildings that is visible to me.. MHP set!");
+	if (ShowAiEcho == true) aiEcho("Player: "+HateChoice+" has a total of "+TotalUnits+" units and "+TotalBuildings+" buildings that is visible to me.. MHP set!");
    xsEnableRule("LockOn");
    xsDisableSelf();
 }
@@ -895,11 +895,11 @@ if (kbIsPlayerEnemy(MHP) && kbIsPlayerValid(MHP))
    int MHPTotalUnits1 = MHPUnits1;
    
    if (MHPTotalUnits1 > 30)
-   aiEcho("Locking on player "+MHP+"!");
+   if (ShowAiEcho == true) aiEcho("Locking on player "+MHP+"!");
    
    if (MHPTotalUnits1 < 30)
    {
-   aiEcho("Player "+MHP+" has less than 30 units or is an invalid target, I will try to find new hate target.");
+   if (ShowAiEcho == true) aiEcho("Player "+MHP+" has less than 30 units or is an invalid target, I will try to find new hate target.");
    xsEnableRule("CountEnemyUnitsOnMap");
    xsDisableSelf();
    return;  

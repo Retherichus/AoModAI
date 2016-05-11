@@ -25,7 +25,7 @@ extern int gTransportUnit=-1;
 //==============================================================================
 void preInitMap()
 {
-    aiEcho("preInitMap:");    
+    if (ShowAiEcho == true) aiEcho("preInitMap:");    
 
     int transport = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
     // Decide if we have a water map.
@@ -176,7 +176,7 @@ void preInitMap()
     // king of the hill
     // the unknown
     {
-        aiEcho("This is an unknown map.");
+        if (ShowAiEcho == true) aiEcho("This is an unknown map.");
         xsEnableRule("findFish");
     }
 
@@ -226,7 +226,7 @@ void preInitMap()
 //==============================================================================
 void initMapSpecific()
 {
-    aiEcho("initMapSpecific:");
+    if (ShowAiEcho == true) aiEcho("initMapSpecific:");
 
     kbSetForwardBasePosition(findForwardBasePos());
 
@@ -266,7 +266,7 @@ void initMapSpecific()
         nearCenter = (nearCenter + kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) / 2.0;    // Halfway between start and center
         nearCenter = (nearCenter + kbGetMapCenter()) / 2.0;   // 3/4 of the way to map center
         aiTaskUnitMove(transportID, nearCenter);
-        aiEcho("Sending transport "+transportID+" to near map center at "+nearCenter);
+        if (ShowAiEcho == true) aiEcho("Sending transport "+transportID+" to near map center at "+nearCenter);
         xsEnableRule("vinlandsagaFailsafe");  // In case something prevents transport from reaching, turn on the explore plan.
         //Turn off fishing.
         xsDisableRule("fishing");
@@ -281,7 +281,7 @@ void initMapSpecific()
     //Make a scout plan to find the plenty vault
     else if (cvMapSubType == KOTHMAP)
     {
-        aiEcho("looking for KOTH plenty Vault");
+        if (ShowAiEcho == true) aiEcho("looking for KOTH plenty Vault");
         int KOTHunitQueryID = kbUnitQueryCreate("findPlentyVault");
         kbUnitQuerySetPlayerRelation(KOTHunitQueryID, cPlayerRelationAny);
         kbUnitQuerySetUnitType(KOTHunitQueryID, cUnitTypePlentyVaultKOTH);
@@ -308,14 +308,14 @@ void initMapSpecific()
         kbBaseSetEconomy(cMyID, base, true);
         kbBaseSetMilitary(cMyID, base, true);
         kbBaseSetActive(cMyID, base, true); 
-        aiEcho("num="+num);
+        if (ShowAiEcho == true) aiEcho("num="+num);
         for ( i=0; < num)
         {
-            aiEcho("adding unit "+i);
+            if (ShowAiEcho == true) aiEcho("adding unit "+i);
             kbBaseAddUnit(cMyID, base, kbUnitQueryGetResult(query, i));
         }
         gVinlandsagaInitialBaseID=kbBaseGetMainID(cMyID);
-        aiEcho("Initial Base="+gVinlandsagaInitialBaseID);
+        if (ShowAiEcho == true) aiEcho("Initial Base="+gVinlandsagaInitialBaseID);
 
         int transportPUID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
 
@@ -325,7 +325,7 @@ void initMapSpecific()
         nearCenter = (nearCenter + kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) / 2.0;    // Halfway between start and center
         nearCenter = (nearCenter + kbGetMapCenter()) / 2.0;   // 3/4 of the way to map center
         aiTaskUnitMove(gTransportUnit, nearCenter);
-        aiEcho("Sending transport "+gTransportUnit+" to near map center at "+nearCenter);
+        if (ShowAiEcho == true) aiEcho("Sending transport "+gTransportUnit+" to near map center at "+nearCenter);
         xsEnableRule("vinlandsagaFailsafe");  // In case something prevents transport from reaching, turn on the explore plan.
 
         //Enable the rule that looks for the mainland.
@@ -355,7 +355,7 @@ void initMapSpecific()
             int myFortress=findUnit(cUnitTypeAbstractFortress);
         }
         else
-            aiEcho("Assumed Shimo map, but did not find king :-(");
+            if (ShowAiEcho == true) aiEcho("Assumed Shimo map, but did not find king :-(");
     }
 }
 
@@ -364,7 +364,7 @@ rule findVinlandsagaBase
     minInterval 10 //starts in cAge1
     inactive
 {
-    aiEcho("findVinlandsagaBase:");
+    if (ShowAiEcho == true) aiEcho("findVinlandsagaBase:");
 
     //Save our initial base ID.
     gVinlandsagaInitialBaseID=kbBaseGetMainID(cMyID);
@@ -392,11 +392,11 @@ rule findVinlandsagaBase
     if (mainlandGroupID < 0)
         return;
 
-    aiEcho("findVinlandsagaBase: Found the mainland, AGID="+mainlandGroupID+".");
+    if (ShowAiEcho == true) aiEcho("findVinlandsagaBase: Found the mainland, AGID="+mainlandGroupID+".");
 
     // stop the transport right away
     int transportID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0));
-    aiEcho("Stopping transport "+transportID);
+    if (ShowAiEcho == true) aiEcho("Stopping transport "+transportID);
     aiTaskUnitMove(transportID, kbUnitGetPosition(transportID));
 
     //Create the mainland base.
@@ -420,11 +420,11 @@ rule vinlandsagaFailsafe
     minInterval 60 //starts in cAge1
     inactive
 {
-    aiEcho("vinlandsagaFailsafe:");
+    if (ShowAiEcho == true) aiEcho("vinlandsagaFailsafe:");
 
     //Make a plan to explore with the initial transport.
     gVinlandsagaTransportExplorePlanID=aiPlanCreate("Vinlandsaga Transport Explore", cPlanExplore);
-    aiEcho("Transport explore plan: "+gVinlandsagaTransportExplorePlanID);
+    if (ShowAiEcho == true) aiEcho("Transport explore plan: "+gVinlandsagaTransportExplorePlanID);
     if (gVinlandsagaTransportExplorePlanID >= 0)
     {
         aiPlanAddUnitType(gVinlandsagaTransportExplorePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 1, 1, 1);
@@ -441,7 +441,7 @@ rule vinlandsagaEnableFishing
     minInterval 10 //starts in cAge1
     inactive
 {
-    aiEcho("vinlandsagaEnableFishing:");    
+    if (ShowAiEcho == true) aiEcho("vinlandsagaEnableFishing:");    
 
     //See how many wood dropsites we have.
     static int wdQueryID=-1;
@@ -494,7 +494,7 @@ rule vinlandsagaEnableFishing
 //==============================================================================
 void vinlandsagaBaseCallback(int parm1=-1)
 {
-    aiEcho("VinlandsagaBaseCallback:");
+    if (ShowAiEcho == true) aiEcho("VinlandsagaBaseCallback:");
 
     //Get our water transport type.
     int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
@@ -566,7 +566,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
                 aiPlanAddUnitType(planID, cUnitTypeOxCart, 0, 1, 4);
             aiPlanAddUnitType(planID, cUnitTypeHerdable, 0, 2, 2);
         }
-        aiEcho("Transport plan ID is "+planID);
+        if (ShowAiEcho == true) aiEcho("Transport plan ID is "+planID);
     }
 
     //change the farming baseID
@@ -588,7 +588,7 @@ rule transportAllUnits
     inactive
     minInterval 5 //starts in cAge1
 {
-    aiEcho("transportAllUnits:");    
+    if (ShowAiEcho == true) aiEcho("transportAllUnits:");    
 
     int num = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID);
     if ( num <= 0 )
@@ -626,7 +626,7 @@ rule transportAllUnits
 //==============================================================================
 void nomadBuildSettlementCallBack(int parm1=-1)
 {
-    aiEcho("nomadBuildSettlementCallBack:");
+    if (ShowAiEcho == true) aiEcho("nomadBuildSettlementCallBack:");
 
     //Find our one settlement.and make it the main base.
     int settlementID=findUnit(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
@@ -668,7 +668,7 @@ rule nomadSearchMode
     inactive
     minInterval 1 //starts in cAge1
 {
-    aiEcho("nomadSearchMode:");
+    if (ShowAiEcho == true) aiEcho("nomadSearchMode:");
 
     //Make plans to explore with the initial villagers and goats.
     gNomadExplorePlanID1=aiPlanCreate("Nomad Explore 1", cPlanExplore);
@@ -710,7 +710,7 @@ rule nomadSearchMode
 
     xsEnableRule("nomadBuildMode");
     xsDisableSelf();
-    aiEcho("Enabling nomadBuildMode");
+    if (ShowAiEcho == true) aiEcho("Enabling nomadBuildMode");
 }
 
 //==============================================================================
@@ -718,7 +718,7 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
     inactive
     minInterval 1 //starts in cAge1
 {
-     aiEcho("nomadBuildMode:");
+     if (ShowAiEcho == true) aiEcho("nomadBuildMode:");
 
      int count = -1;   // How many settlements found?
 
@@ -747,7 +747,7 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
         return;     // No settlements seen, give up
 
     // Settlements seen, check if you have a builder close by
-    aiEcho("Found "+count+" settlements.");
+    if (ShowAiEcho == true) aiEcho("Found "+count+" settlements.");
     int i = -1;
     int settlement = -1;
     int foundSettlement = -1;
@@ -755,16 +755,16 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
     for (i=0; < count)
     {
         settlement = kbUnitQueryGetResult(settlementQuery, i);
-        aiEcho("    Checking settlement "+settlement+" at "+kbUnitGetPosition(settlement));
+        if (ShowAiEcho == true) aiEcho("    Checking settlement "+settlement+" at "+kbUnitGetPosition(settlement));
         kbUnitQuerySetPosition(builderQuery, kbUnitGetPosition(settlement));
         kbUnitQueryResetResults(builderQuery);
         if ( kbUnitQueryExecute(builderQuery) > 0)   // Builder nearby
         {
             foundSettlement = settlement;
-            aiEcho("        Builder found, we'll use "+settlement);
+            if (ShowAiEcho == true) aiEcho("        Builder found, we'll use "+settlement);
             break;
         }
-        aiEcho("        No builders nearby.");
+        if (ShowAiEcho == true) aiEcho("        No builders nearby.");
     }
    
     // If we found a usable settlement, build on it.  Otherwise, keep this rule active
@@ -773,14 +773,14 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
    
     // We have one, let's use it and monitor for completion
     
-    aiEcho("Making main base.");
+    if (ShowAiEcho == true) aiEcho("Making main base.");
     int newBaseID=kbBaseCreate(cMyID, "Base"+kbBaseGetNextID(), kbUnitGetPosition(settlement), 75.0);
     if (newBaseID > -1)
     {
         //Figure out the front vector.
         vector baseFront=xsVectorNormalize(kbGetMapCenter()-kbUnitGetPosition(settlement));
         kbBaseSetFrontVector(cMyID, newBaseID, baseFront);
-        aiEcho("Setting front vector to "+baseFront);
+        if (ShowAiEcho == true) aiEcho("Setting front vector to "+baseFront);
         //Military gather point.
 //        vector militaryGatherPoint=kbUnitGetPosition(settlement)+baseFront*40.0;
         vector militaryGatherPoint=kbUnitGetPosition(settlement)+baseFront*18.0;
@@ -798,9 +798,9 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
     }
 //    EnableRule("buildSettlements");
 
-    aiEcho("Main base is "+newBaseID+" "+kbBaseGetMainID(cMyID));
+    if (ShowAiEcho == true) aiEcho("Main base is "+newBaseID+" "+kbBaseGetMainID(cMyID));
 
-    aiEcho("Creating simple build plan");
+    if (ShowAiEcho == true) aiEcho("Creating simple build plan");
 
     gNomadSettlementBuildPlanID=aiPlanCreate("Nomad settlement build", cPlanBuild);
     if (gNomadSettlementBuildPlanID < 0)
@@ -826,14 +826,14 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
     aiPlanSetActive(gNomadSettlementBuildPlanID);
 
 
-    aiEcho("Killing explore plans.");
+    if (ShowAiEcho == true) aiEcho("Killing explore plans.");
     aiPlanDestroy(gNomadExplorePlanID1);
     aiPlanDestroy(gNomadExplorePlanID2);
     aiPlanDestroy(gNomadExplorePlanID3);
 
     xsEnableRule("nomadMonitor");
     xsDisableSelf();
-    aiEcho("Activating nomad monitor rule");
+    if (ShowAiEcho == true) aiEcho("Activating nomad monitor rule");
 }
 
 //==============================================================================
@@ -841,7 +841,7 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
     inactive
     minInterval 1 //starts in cAge1
 {
-    aiEcho("nomadMonitor:");
+    if (ShowAiEcho == true) aiEcho("nomadMonitor:");
 
     if ( (aiPlanGetState(gNomadSettlementBuildPlanID) >= 0) && (aiPlanGetState(gNomadSettlementBuildPlanID) != cPlanStateDone) )
         return;     // Plan exists, is not finished
@@ -849,7 +849,7 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
     // plan is done or died.  Check if we have a settlement
     if (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) > 0) // AliveOrBuilding in case state isn't updated instantly
     {  // We have a settlement, go normal
-        aiEcho("Settlement is finished, normal start.");
+        if (ShowAiEcho == true) aiEcho("Settlement is finished, normal start.");
         xsDisableSelf();
         xsEnableRule("earlySettlementTracker");
         //Turn on fishing.
@@ -863,8 +863,8 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
         {
             // Set main base
             int oldMainBase = kbBaseGetMainID(cMyID);
-            aiEcho("Old main base was "+oldMainBase);
-            aiEcho("Killing early gather plans.");
+            if (ShowAiEcho == true) aiEcho("Old main base was "+oldMainBase);
+            if (ShowAiEcho == true) aiEcho("Killing early gather plans.");
             aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, oldMainBase);
             aiRemoveResourceBreakdown(cResourceFood, cAIResourceSubTypeEasy, oldMainBase);
             aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, oldMainBase);
@@ -887,12 +887,12 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
                 kbBaseDestroy(cMyID, oldMainBase);
                 kbBaseSetMain(cMyID, kbUnitGetBaseID(tc),true);
             }
-            aiEcho("TC is in base "+kbUnitGetBaseID(tc));
-            aiEcho("New main base is "+kbBaseGetMainID(cMyID));
+            if (ShowAiEcho == true) aiEcho("TC is in base "+kbUnitGetBaseID(tc));
+            if (ShowAiEcho == true) aiEcho("New main base is "+kbBaseGetMainID(cMyID));
             vector front = cInvalidVector;
             front = xsVectorNormalize(kbGetMapCenter()-kbUnitGetPosition(tc));
             kbBaseSetFrontVector(cMyID, kbBaseGetMainID(cMyID), front);
-            aiEcho("Front vector is "+front);
+            if (ShowAiEcho == true) aiEcho("Front vector is "+front);
             gFarmBaseID = kbBaseGetMainID(cMyID);
             // Fix herdable plans
             aiPlanDestroy(gHerdPlanID);
@@ -924,7 +924,7 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
     }
     else
     {  // No settlement, restart chain
-        aiEcho("No settlement exists, restart nomad chain.");
+        if (ShowAiEcho == true) aiEcho("No settlement exists, restart nomad chain.");
         xsEnableRule("nomadSearchMode");
         xsDisableSelf();
     }
@@ -936,7 +936,7 @@ rule getKingOfTheHillVault
     minInterval 107 //starts in cAge1
     inactive
 {
-    aiEcho("getKingOfTheHillVault:");
+    if (ShowAiEcho == true) aiEcho("getKingOfTheHillVault:");
 
     //If we already have a attack goals, then quit.
     if (aiPlanGetIDByTypeAndVariableType(cPlanGoal, cGoalPlanGoalType, cGoalPlanGoalTypeAttack, true) >= 0)
@@ -966,7 +966,7 @@ rule getKingOfTheHillVault
 //==============================================================================
 bool mapPreventsRush()  //TODO: this are not all maps that prevent rushes.
 {
-    aiEcho("mapPreventsRush:");
+    if (ShowAiEcho == true) aiEcho("mapPreventsRush:");
     
     if ((cRandomMapName == "vinlandsaga") ||
       (cRandomMapName == "river nile") ||
@@ -1006,7 +1006,7 @@ bool mapPreventsWalls() //some maps do not allow walls or it doesn't make sense 
 //==============================================================================
 bool mapPreventsHousesAtTowers()
 {
-    aiEcho("mapPreventsHousesAtTowers:");
+    if (ShowAiEcho == true) aiEcho("mapPreventsHousesAtTowers:");
     
     if ( cRandomMapName == "amazonas" ||
         cRandomMapName == "acropolis" ||
@@ -1019,7 +1019,7 @@ bool mapPreventsHousesAtTowers()
 //==============================================================================
 bool mapRestrictsMarketAttack()
 {
-    aiEcho("mapRestrictsMarketAttack:");
+    if (ShowAiEcho == true) aiEcho("mapRestrictsMarketAttack:");
     
     if ((cRandomMapName == "highland")
      || (cRandomMapName == "watering hole") //TODO: Test if this is really better!
@@ -1034,7 +1034,7 @@ bool mapRestrictsMarketAttack()
 //==============================================================================
 bool mapRequires2FarmPlans()
 {
-    aiEcho("mapRequires2FarmPlans:");
+    if (ShowAiEcho == true) aiEcho("mapRequires2FarmPlans:");
     
     if ((cRandomMapName == "savannah")
      || (cRandomMapName == "tundra")

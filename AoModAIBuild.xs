@@ -8,7 +8,7 @@ rule norseInfantryBuild
     minInterval 6 //starts in cAge2
     inactive
 {
-    aiEcho("norseInfantryBuild:");
+    if (ShowAiEcho == true) aiEcho("norseInfantryBuild:");
     
     int count=-1;
     static int unitQueryID=-1;
@@ -75,7 +75,7 @@ rule repairTitanGate
     minInterval 35 //starts in cAge5
     inactive
 {
-    aiEcho("repairTitanGate:");
+    if (ShowAiEcho == true) aiEcho("repairTitanGate:");
     
     int buildingID = -1;
 
@@ -138,13 +138,13 @@ rule repairTitanGate
         aiPlanSetActive(planID);
 //new test
         xsEnableRule("tacticalTitan");
-        aiEcho("enabling tacticalTitan rule");
+        if (ShowAiEcho == true) aiEcho("enabling tacticalTitan rule");
 
 //new test end
         xsDisableSelf();
     }
     else
-        aiEcho("       ======< No Gates found.  No AI plan launched.>=======");
+        if (ShowAiEcho == true) aiEcho("       ======< No Gates found.  No AI plan launched.>=======");
 }
 
 //==============================================================================
@@ -152,7 +152,7 @@ rule repairBuildings1
     minInterval 487 //starts in cAge1, is set to 13 after 8 minutes
     inactive
 {
-    aiEcho("repairBuildings1: ");
+    if (ShowAiEcho == true) aiEcho("repairBuildings1: ");
         
     static bool update = false;
     if (update == false)
@@ -306,7 +306,7 @@ rule repairBuildings2
     minInterval 491 //starts in cAge1, is set to 23 after 8 minutes
     inactive
 {
-    aiEcho("repairBuildings2: ");
+    if (ShowAiEcho == true) aiEcho("repairBuildings2: ");
         
     static bool update = false;
     if (update == false)
@@ -462,7 +462,7 @@ rule buildMonuments
     minInterval 117 //starts in cAge2, cAge3, cAge4
     inactive
 {
-    aiEcho("buildMonuments:");
+    if (ShowAiEcho == true) aiEcho("buildMonuments:");
 
     static int lastQty = 0;
 
@@ -552,7 +552,7 @@ rule buildHouse
     minInterval 11 //starts in cAge1
     inactive
 {
-    aiEcho("buildHouse:");
+    if (ShowAiEcho == true) aiEcho("buildHouse:");
     
     static int unitQueryID=-1;
 
@@ -587,7 +587,7 @@ rule buildHouse
                 {
                     aiPlanDestroy(housePlanID);
                     aiTaskUnitDelete(houseID);
-                    aiEcho("destroying house with ID: "+houseID);
+                    if (ShowAiEcho == true) aiEcho("destroying house with ID: "+houseID);
                     count = 0; 
                 }
                 else
@@ -783,7 +783,7 @@ rule buildSettlements
     minInterval 15 //starts in cAge3
     inactive
 {
-    aiEcho("buildSettlements:");
+    if (ShowAiEcho == true) aiEcho("buildSettlements:");
 
 	if (AllyTcLimit == true && aiGetWorldDifficulty() > cDifficultyHard)
         {
@@ -884,7 +884,7 @@ rule buildSettlements
                 return;
         }
     }
-    aiEcho("Creating another settlement goal.");
+    if (ShowAiEcho == true) aiEcho("Creating another settlement goal.");
 
     int numBuilders = 3;
     if (cMyCulture == cCultureAtlantean)
@@ -925,7 +925,7 @@ rule ModifiedbuildSettlements
             return;
         }
 		
-    aiEcho("buildSettlements:");
+    if (ShowAiEcho == true) aiEcho("buildSettlements:");
 
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
@@ -1018,7 +1018,7 @@ rule ModifiedbuildSettlements
                 return;
         }
     }
-    aiEcho("Creating another settlement goal.");
+    if (ShowAiEcho == true) aiEcho("Creating another settlement goal.");
 
     int numBuilders = 3;
     if (cMyCulture == cCultureAtlantean)
@@ -1038,7 +1038,7 @@ rule buildSettlementsEarly  //age 1/2 handler
     minInterval 16 //starts in cAge2
     inactive
 {
-    aiEcho("buildSettlementsEarly:");
+    if (ShowAiEcho == true) aiEcho("buildSettlementsEarly:");
     
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals = aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
@@ -1069,7 +1069,7 @@ rule buildSettlementsEarly  //age 1/2 handler
     if ((cvRandomMapName == "nomad") && (numberSettlements == 0))
         return;		// Skip if we're still in nomad startup mode
 
-    aiEcho("Creating another early settlement goal.");
+    if (ShowAiEcho == true) aiEcho("Creating another early settlement goal.");
 
     int numBuilders = 3;
     if (cMyCulture == cCultureAtlantean)
@@ -1135,7 +1135,7 @@ rule dockMonitor
 //    minInterval 61 //starts in cAge1
     minInterval 15 //starts in cAge1
 {
-    aiEcho("dockMonitor:");
+    if (ShowAiEcho == true) aiEcho("dockMonitor:");
     
     if (gWaterMap == false)
     {
@@ -1152,14 +1152,14 @@ rule dockMonitor
     else
     {
         gDockBaseID = kbUnitGetBaseID(randomBase);
-        aiEcho("gDockBaseID is #"+gDockBaseID);
+        if (ShowAiEcho == true) aiEcho("gDockBaseID is #"+gDockBaseID);
     }
 
     int numDocks = kbUnitCount(cMyID, cUnitTypeDock, cUnitStateAliveOrBuilding);
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
     if (numDocks < numSettlements)
     {
-        aiEcho("we have less docks than settlements, setting minInterval to 23");
+        if (ShowAiEcho == true) aiEcho("we have less docks than settlements, setting minInterval to 23");
         xsSetRuleMinIntervalSelf(23);
     }
 
@@ -1173,14 +1173,14 @@ rule dockMonitor
     // everything ok. we have enough docks
     if ((gTransportMap == false) && (numDocks >= desiredDocks))
     {
-        aiEcho("gTransportMap == false and we have at least 1 dock, returning");
+        if (ShowAiEcho == true) aiEcho("gTransportMap == false and we have at least 1 dock, returning");
         return;
     }
 
     if (((numDocks >= kbGetAge()+1) && (numDocks >= numSettlements))
       || (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, cUnitTypeDock) >= 0))
     {
-        aiEcho("(numDocks >= kbGetAge()+1 AND numDocks >= numSettlements) or another dockplan already active, returning");
+        if (ShowAiEcho == true) aiEcho("(numDocks >= kbGetAge()+1 AND numDocks >= numSettlements) or another dockplan already active, returning");
         return;
     }
 
@@ -1203,7 +1203,7 @@ rule dockMonitor
         dockPos = dockPos2;
     }
 
-    aiEcho("dockPos x="+xsVectorGetX(dockPos)+" z="+xsVectorGetZ(dockPos));
+    if (ShowAiEcho == true) aiEcho("dockPos x="+xsVectorGetX(dockPos)+" z="+xsVectorGetZ(dockPos));
 
     int builderType = cUnitTypeAbstractVillager;
     if (cMyCulture == cCultureNorse)
@@ -1212,7 +1212,7 @@ rule dockMonitor
     int buildDock = aiPlanCreate("BuildDock", cPlanBuild);
     if (buildDock >= 0)
     {
-        aiEcho("dockMonitor: Building dock at base #"+gDockBaseID);
+        if (ShowAiEcho == true) aiEcho("dockMonitor: Building dock at base #"+gDockBaseID);
         //BP Type and Priority.
         aiPlanSetVariableInt(buildDock, cBuildPlanBuildingTypeID, 0, cUnitTypeDock);
         aiPlanSetDesiredPriority(buildDock, 100);
@@ -1232,7 +1232,7 @@ rule makeWonder
     minInterval 61 //starts in cAge4
     inactive       //  Activated on reaching age 4 if game isn't conquest
 {
-    aiEcho("makeWonder:");
+    if (ShowAiEcho == true) aiEcho("makeWonder:");
     
     int   targetArea = -1;
     vector target = cInvalidVector;     // Will be used to center the building placement behind the town.
@@ -1287,7 +1287,7 @@ rule mainBaseAreaWallTeam1
     minInterval 23 //starts in cAge2
     inactive
 {
-    aiEcho("mainBaseAreaWallTeam1:");
+    if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam1:");
 
     static bool alreadyStarted = false;
     int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
@@ -1458,9 +1458,9 @@ rule mainBaseAreaWallTeam1
                                 bz = bz * 1.1;
 /*
                                 if (gBackAreaID == mainArea)
-                                    aiEcho("gBackAreaID is the same as the mainArea,");
+                                    if (ShowAiEcho == true) aiEcho("gBackAreaID is the same as the mainArea,");
                                 else
-                                    aiEcho("gBackAreaID is the same as the savedBackAreaID,");
+                                    if (ShowAiEcho == true) aiEcho("gBackAreaID is the same as the savedBackAreaID,");
 */
                                 continue;
                             }
@@ -1536,9 +1536,9 @@ rule mainBaseAreaWallTeam1
                                 bz = bz * 1.1;
 /*
                                 if (gHouseAreaID == mainArea)
-                                    aiEcho("gHouseAreaID is the same as the mainArea,");
+                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID is the same as the mainArea,");
                                 else
-                                    aiEcho("gHouseAreaID is the same as the gBackAreaID,");
+                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID is the same as the gBackAreaID,");
 */
                                 continue;
                             }
@@ -1547,9 +1547,9 @@ rule mainBaseAreaWallTeam1
                                 gHouseAreaID = -1;   //only add it if it's not the mainArea or the gBackAreaID
 /*
                                 if (gHouseAreaID == mainArea)
-                                    aiEcho("no need to add the gHouseAreaID as it's the same as the mainArea");
+                                    if (ShowAiEcho == true) aiEcho("no need to add the gHouseAreaID as it's the same as the mainArea");
                                 else
-                                    aiEcho("no need to add the gHouseAreaID as it's the same as the gBackAreaID");
+                                    if (ShowAiEcho == true) aiEcho("no need to add the gHouseAreaID as it's the same as the gBackAreaID");
 */
                                 break;
                             }
@@ -1650,7 +1650,7 @@ rule mainBaseAreaWallTeam1
                 else
                 {
                     if (needToSave == true)
-                        aiEcho("adding area: "+firstRingID+" as it's within gMainBaseAreaWallRadius");
+                        if (ShowAiEcho == true) aiEcho("adding area: "+firstRingID+" as it's within gMainBaseAreaWallRadius");
                 }
 */
             }
@@ -1729,18 +1729,18 @@ rule mainBaseAreaWallTeam1
 /*
                                 if (gHouseAreaID == secondRingID)
                                 {
-                                    aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
+                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
                                 }
                                 else
                                 {
                                     if (areaType == cAreaTypeForest)
-                                        aiEcho("adding area: "+secondRingID+" as it's a forest area and within gMainBaseAreaWallRadius * 1.2");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a forest area and within gMainBaseAreaWallRadius * 1.2");
                                     else if (areaType == cAreaTypeGold)
-                                        aiEcho("adding area: "+secondRingID+" as it's a gold area and within gMainBaseAreaWallRadius * 1.4");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a gold area and within gMainBaseAreaWallRadius * 1.4");
                                     else if (areaType == cAreaTypeSettlement)
-                                        aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gMainBaseAreaWallRadius * 1.4");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gMainBaseAreaWallRadius * 1.4");
                                     else
-                                        aiEcho("adding area: "+secondRingID+" as it's within gMainBaseAreaWallRadius * 1.4");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's within gMainBaseAreaWallRadius * 1.4");
                                 }
 */
                                 aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, secondRingID);
@@ -1752,9 +1752,9 @@ rule mainBaseAreaWallTeam1
             }
         }
 /*
-        aiEcho("    Area list:");
+        if (ShowAiEcho == true) aiEcho("    Area list:");
         for (l = 0; < numAreasAdded)
-            aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, l));
+            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, l));
 */
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
@@ -1784,7 +1784,7 @@ rule MBSecondaryWall
    if (aiGetWorldDifficulty() < cDifficultyNightmare)
   {
     xsDisableSelf();
-	aiEcho("I will not build a secondary MB wall on Hard or lower.");
+	if (ShowAiEcho == true) aiEcho("I will not build a secondary MB wall on Hard or lower.");
 	return; // Disable and go back.
   }  
    
@@ -1802,7 +1802,7 @@ rule MBSecondaryWall
 	if (goldSupply < 350)
 	   return;   
 	
-	aiEcho("Secondary Wall plan launched");
+	if (ShowAiEcho == true) aiEcho("Secondary Wall plan launched");
 
     static bool alreadyStarted = false;
     int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
@@ -1972,9 +1972,9 @@ rule MBSecondaryWall
                                 bz = bz * 1.1;
 /*
                                 if (gBackAreaID == mainArea)
-                                    aiEcho("gBackAreaID is the same as the mainArea,");
+                                    if (ShowAiEcho == true) aiEcho("gBackAreaID is the same as the mainArea,");
                                 else
-                                    aiEcho("gBackAreaID is the same as the savedBackAreaID,");
+                                    if (ShowAiEcho == true) aiEcho("gBackAreaID is the same as the savedBackAreaID,");
 */
                                 continue;
                             }
@@ -2050,9 +2050,9 @@ rule MBSecondaryWall
                                 bz = bz * 1.1;
 /*
                                 if (gHouseAreaID == mainArea)
-                                    aiEcho("gHouseAreaID is the same as the mainArea,");
+                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID is the same as the mainArea,");
                                 else
-                                    aiEcho("gHouseAreaID is the same as the gBackAreaID,");
+                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID is the same as the gBackAreaID,");
 */
                                 continue;
                             }
@@ -2061,9 +2061,9 @@ rule MBSecondaryWall
                                 gHouseAreaID = -1;   //only add it if it's not the mainArea or the gBackAreaID
 /*
                                 if (gHouseAreaID == mainArea)
-                                    aiEcho("no need to add the gHouseAreaID as it's the same as the mainArea");
+                                    if (ShowAiEcho == true) aiEcho("no need to add the gHouseAreaID as it's the same as the mainArea");
                                 else
-                                    aiEcho("no need to add the gHouseAreaID as it's the same as the gBackAreaID");
+                                    if (ShowAiEcho == true) aiEcho("no need to add the gHouseAreaID as it's the same as the gBackAreaID");
 */
                                 break;
                             }
@@ -2164,7 +2164,7 @@ rule MBSecondaryWall
                 else
                 {
                     if (needToSave == true)
-                        aiEcho("adding area: "+firstRingID+" as it's within gSecondaryMainBaseAreaWallRadius");
+                        if (ShowAiEcho == true) aiEcho("adding area: "+firstRingID+" as it's within gSecondaryMainBaseAreaWallRadius");
                 }
 */
             }
@@ -2243,18 +2243,18 @@ rule MBSecondaryWall
 /*
                                 if (gHouseAreaID == secondRingID)
                                 {
-                                    aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
+                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
                                 }
                                 else
                                 {
                                     if (areaType == cAreaTypeForest)
-                                        aiEcho("adding area: "+secondRingID+" as it's a forest area and within gSecondaryMainBaseAreaWallRadius * 1.2");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a forest area and within gSecondaryMainBaseAreaWallRadius * 1.2");
                                     else if (areaType == cAreaTypeGold)
-                                        aiEcho("adding area: "+secondRingID+" as it's a gold area and within gSecondaryMainBaseAreaWallRadius * 1.4");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a gold area and within gSecondaryMainBaseAreaWallRadius * 1.4");
                                     else if (areaType == cAreaTypeSettlement)
-                                        aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gSecondaryMainBaseAreaWallRadius * 1.4");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gSecondaryMainBaseAreaWallRadius * 1.4");
                                     else
-                                        aiEcho("adding area: "+secondRingID+" as it's within gSecondaryMainBaseAreaWallRadius * 1.4");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's within gSecondaryMainBaseAreaWallRadius * 1.4");
                                 }
 */
                                 aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, secondRingID);
@@ -2266,9 +2266,9 @@ rule MBSecondaryWall
             }
         }
 /*
-        aiEcho("    Area list:");
+        if (ShowAiEcho == true) aiEcho("    Area list:");
         for (l = 0; < numAreasAdded)
-            aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, l));
+            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, l));
 */
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
@@ -2296,7 +2296,7 @@ rule mainBaseAreaWallTeam2
     minInterval 29 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
     inactive
 {
-    aiEcho("mainBaseAreaWallTeam2:");
+    if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
 
     if ((cMyCulture == cCultureAtlantean) && (xsGetTime() < 15*60*1000))
         return;
@@ -2470,7 +2470,7 @@ rule mainBaseAreaWallTeam2
                 else
                 {
                     if (needToSave == true)
-                        aiEcho("adding area: "+firstRingID+" as it's within gMainBaseAreaWallRadius");
+                        if (ShowAiEcho == true) aiEcho("adding area: "+firstRingID+" as it's within gMainBaseAreaWallRadius");
                 }
 */
             }
@@ -2549,18 +2549,18 @@ rule mainBaseAreaWallTeam2
 /*
                                 if (gHouseAreaID == secondRingID)
                                 {
-                                    aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
+                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
                                 }
                                 else
                                 {
                                     if (areaType == cAreaTypeForest)
-                                        aiEcho("adding area: "+secondRingID+" as it's a forest area and within gMainBaseAreaWallRadius * 1.2");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a forest area and within gMainBaseAreaWallRadius * 1.2");
                                     else if (areaType == cAreaTypeGold)
-                                        aiEcho("adding area: "+secondRingID+" as it's a gold area and within gMainBaseAreaWallRadius * 1.4");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a gold area and within gMainBaseAreaWallRadius * 1.4");
                                     else if (areaType == cAreaTypeSettlement)
-                                        aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gMainBaseAreaWallRadius * 1.4");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gMainBaseAreaWallRadius * 1.4");
                                     else
-                                        aiEcho("adding area: "+secondRingID+" as it's within gMainBaseAreaWallRadius * 1.4");
+                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's within gMainBaseAreaWallRadius * 1.4");
                                 }
 */
                                 aiPlanSetVariableInt(mainBaseAreaWallTeam2PlanID, cBuildWallPlanAreaIDs, numAreasAdded, secondRingID);
@@ -2572,9 +2572,9 @@ rule mainBaseAreaWallTeam2
             }
         }
 /*
-        aiEcho("    Area list:");
+        if (ShowAiEcho == true) aiEcho("    Area list:");
         for (l = 0; < numAreasAdded)
-            aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam2PlanID, cBuildWallPlanAreaIDs, l));
+            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam2PlanID, cBuildWallPlanAreaIDs, l));
 */
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam2PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
@@ -2598,7 +2598,7 @@ rule otherBaseRingWallTeam1
     minInterval 19 //starts in cAge2
     inactive
 {
-    aiEcho("otherBaseRingWallTeam1:");
+    if (ShowAiEcho == true) aiEcho("otherBaseRingWallTeam1:");
   
     float goldSupply = kbResourceGet(cResourceGold);
     
@@ -2622,28 +2622,28 @@ rule otherBaseRingWallTeam1
     vector otherBaseLocation = kbBaseGetLocation(cMyID, otherBaseID);
     int numFarmsInR12 = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, -1, cMyID, otherBaseLocation, 12.0);
     int numFarmsInR25 = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, -1, cMyID, otherBaseLocation, 25.0);
-    aiEcho("numFarmsInR12: "+numFarmsInR12);
-    aiEcho("numFarmsInR25: "+numFarmsInR25);
+    if (ShowAiEcho == true) aiEcho("numFarmsInR12: "+numFarmsInR12);
+    if (ShowAiEcho == true) aiEcho("numFarmsInR25: "+numFarmsInR25);
     if (numFarmsInR25 - numFarmsInR12 > 0)
     {
         for (i = numFarmsInR25 - 1; >= 0)
         {
             int farmIDInR25 = findUnitByIndex(cUnitTypeFarm, i, cUnitStateAliveOrBuilding, -1, cMyID, otherBaseLocation, 25.0);
-            aiEcho("farmIDInR25: "+farmIDInR25);
+            if (ShowAiEcho == true) aiEcho("farmIDInR25: "+farmIDInR25);
             if (farmIDInR25 != -1)
             {
                 vector farmPosition = kbUnitGetPosition(farmIDInR25);
-                aiEcho("farmPosition: "+farmPosition);
+                if (ShowAiEcho == true) aiEcho("farmPosition: "+farmPosition);
                 float distance = xsVectorLength(otherBaseLocation - farmPosition);
                 if (distance > 12.0)
                 {
                     aiTaskUnitDelete(farmIDInR25);
-                    aiEcho("deleting farm with ID: "+farmIDInR25);
+                    if (ShowAiEcho == true) aiEcho("deleting farm with ID: "+farmIDInR25);
                     
                 }
                 else
                 {
-                    aiEcho("distance <= 12.0, breaking off");
+                    if (ShowAiEcho == true) aiEcho("distance <= 12.0, breaking off");
                     break;
                 }
             }
@@ -2727,8 +2727,8 @@ rule otherBaseRingWallTeam1
         float mainX = xsVectorGetX(mainCenter);
         float mainZ = xsVectorGetZ(mainCenter);
         mainArea = kbAreaGetIDByPosition(mainCenter);
-        aiEcho("otherBaseRingWallTeam1:");
-        aiEcho("My main area is "+mainArea+", at "+mainCenter);
+        if (ShowAiEcho == true) aiEcho("otherBaseRingWallTeam1:");
+        if (ShowAiEcho == true) aiEcho("My main area is "+mainArea+", at "+mainCenter);
         aiPlanSetVariableInt(otherBaseWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
         numAreasAdded = numAreasAdded + 1;
       
@@ -2767,9 +2767,9 @@ rule otherBaseRingWallTeam1
             if (areaType == cAreaTypeGold)
             {
                 int numGoldMinesByRadius = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, areaCenter, 15.0, true);             
-                aiEcho("numGoldMinesByRadius: "+numGoldMinesByRadius);
+                if (ShowAiEcho == true) aiEcho("numGoldMinesByRadius: "+numGoldMinesByRadius);
                 int numGoldMinesByArea = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, cInvalidVector, -1, true, firstRingID);
-                aiEcho("numGoldMinesByArea: "+numGoldMinesByArea);
+                if (ShowAiEcho == true) aiEcho("numGoldMinesByArea: "+numGoldMinesByArea);
                 int numGoldMines = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, cInvalidVector, -1, true, firstRingID);
                 if (numGoldMines > 0)
                 {
@@ -2802,9 +2802,9 @@ rule otherBaseRingWallTeam1
             }
         }
 /*
-        aiEcho("    Area list:");
+        if (ShowAiEcho == true) aiEcho("    Area list:");
         for (l = 0; < numAreasAdded)
-            aiEcho("        "+aiPlanGetVariableInt(otherBaseWallTeam1PlanID, cBuildWallPlanAreaIDs, l));
+            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(otherBaseWallTeam1PlanID, cBuildWallPlanAreaIDs, l));
 */
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(otherBaseWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
@@ -2828,7 +2828,7 @@ rule otherBase1RingWallTeam
     minInterval 11 //starts in cAge2, activated in otherBasesDefPlans rule
     inactive
 {
-    aiEcho("otherBase1RingWallTeam:");
+    if (ShowAiEcho == true) aiEcho("otherBase1RingWallTeam:");
     
     float goldSupply = kbResourceGet(cResourceGold);
     
@@ -2963,9 +2963,9 @@ rule otherBase1RingWallTeam
             }
         }
 /*
-        aiEcho("    Area list:");
+        if (ShowAiEcho == true) aiEcho("    Area list:");
         for (l = 0; < numAreasAdded)
-            aiEcho("        "+aiPlanGetVariableInt(otherBase1WallTeamPlanID, cBuildWallPlanAreaIDs, l));
+            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(otherBase1WallTeamPlanID, cBuildWallPlanAreaIDs, l));
 */
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(otherBase1WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
@@ -2989,7 +2989,7 @@ rule otherBase2RingWallTeam
     minInterval 11 //starts in cAge2, activated in otherBasesDefPlans rule
     inactive
 {
-    aiEcho("otherBase2RingWallTeam:");
+    if (ShowAiEcho == true) aiEcho("otherBase2RingWallTeam:");
     
     float goldSupply = kbResourceGet(cResourceGold);
     
@@ -3124,9 +3124,9 @@ rule otherBase2RingWallTeam
             }
         }
 /*
-        aiEcho("    Area list:");
+        if (ShowAiEcho == true) aiEcho("    Area list:");
         for (l = 0; < numAreasAdded)
-            aiEcho("        "+aiPlanGetVariableInt(otherBase2WallTeamPlanID, cBuildWallPlanAreaIDs, l));
+            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(otherBase2WallTeamPlanID, cBuildWallPlanAreaIDs, l));
 */
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(otherBase2WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
@@ -3150,7 +3150,7 @@ rule otherBase3RingWallTeam
     minInterval 11 //starts in cAge2, activated in otherBasesDefPlans rule
     inactive
 {
-    aiEcho("otherBase3RingWallTeam:");
+    if (ShowAiEcho == true) aiEcho("otherBase3RingWallTeam:");
     
     float goldSupply = kbResourceGet(cResourceGold);
     
@@ -3285,9 +3285,9 @@ rule otherBase3RingWallTeam
             }
         }
 /*
-        aiEcho("    Area list:");
+        if (ShowAiEcho == true) aiEcho("    Area list:");
         for (l = 0; < numAreasAdded)
-            aiEcho("        "+aiPlanGetVariableInt(otherBase3WallTeamPlanID, cBuildWallPlanAreaIDs, l));
+            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(otherBase3WallTeamPlanID, cBuildWallPlanAreaIDs, l));
 */
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(otherBase3WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
@@ -3311,7 +3311,7 @@ rule otherBase4RingWallTeam
     minInterval 11 //starts in cAge2, activated in otherBasesDefPlans rule
     inactive
 {
-    aiEcho("otherBase4RingWallTeam:");
+    if (ShowAiEcho == true) aiEcho("otherBase4RingWallTeam:");
     
     float goldSupply = kbResourceGet(cResourceGold);
     
@@ -3446,9 +3446,9 @@ rule otherBase4RingWallTeam
             }
         }
 /*
-        aiEcho("    Area list:");
+        if (ShowAiEcho == true) aiEcho("    Area list:");
         for (l = 0; < numAreasAdded)
-            aiEcho("        "+aiPlanGetVariableInt(otherBase4WallTeamPlanID, cBuildWallPlanAreaIDs, l));
+            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(otherBase4WallTeamPlanID, cBuildWallPlanAreaIDs, l));
 */
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(otherBase4WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
@@ -3473,7 +3473,7 @@ rule buildSkyPassages
     minInterval 137 //starts in cAge1
     inactive
 {
-    aiEcho("buildSkyPassages:");
+    if (ShowAiEcho == true) aiEcho("buildSkyPassages:");
     
     // Make sure we have a sky passage at home, and one near the nearest TC of 
     // our Most Hated Player.  
@@ -3595,7 +3595,7 @@ rule buildFortress
     minInterval 19 //starts in cAge3
     inactive
 {
-    aiEcho("buildFortress:");
+    if (ShowAiEcho == true) aiEcho("buildFortress:");
 
     if ((kbGetAge() > cAge3) && (gAge4MinorGod == cTechAge4Hephaestus) && (kbGetTechStatus(cTechForgeofOlympus) < cTechStatusResearching))
         return;
@@ -3634,7 +3634,7 @@ rule buildFortress
     {
         int otherBaseID = kbUnitGetBaseID(otherBaseUnitID);
         vector location = kbUnitGetPosition(otherBaseUnitID);
-        aiEcho("location: "+location);
+        if (ShowAiEcho == true) aiEcho("location: "+location);
         
         bool planActive = false;
         int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
@@ -3645,9 +3645,9 @@ rule buildFortress
                 int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
                 if (aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == bigBuildingID)
                 {
-                    aiEcho("buildPlanIndexID: "+buildPlanIndexID);
+                    if (ShowAiEcho == true) aiEcho("buildPlanIndexID: "+buildPlanIndexID);
                     vector buildPlanCenterPos = aiPlanGetVariableVector(buildPlanIndexID, cBuildPlanCenterPosition, 0);
-                    aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
+                    if (ShowAiEcho == true) aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
                     if ((aiPlanGetBaseID(buildPlanIndexID) == otherBaseID) || (equal(location, buildPlanCenterPos) == true))
                     {
                         planActive = true;
@@ -3659,19 +3659,19 @@ rule buildFortress
                     int alliedSettlementAtBuildPlanPos = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly, buildPlanCenterPos, 15.0);
                     if ((enemySettlementAtBuildPlanPos > 0) || (alliedSettlementAtBuildPlanPos > 0))
                     {
-                        aiEcho("destroying fortressBuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
+                        if (ShowAiEcho == true) aiEcho("destroying fortressBuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
                         aiPlanDestroy(buildPlanIndexID);
                     }
                 }
             }
         }
         
-        aiEcho("planActive: "+planActive);
+        if (ShowAiEcho == true) aiEcho("planActive: "+planActive);
         
         
         if (planActive == true)
         {
-            aiEcho("plan to build fortress at otherBaseID "+otherBaseID+" already exists, returning");
+            if (ShowAiEcho == true) aiEcho("plan to build fortress at otherBaseID "+otherBaseID+" already exists, returning");
             return;
         }
         
@@ -3686,7 +3686,7 @@ rule buildFortress
                 requiredResource = 350;
             if ((currentWood < requiredResource) || (currentGold < requiredResource) || (currentFavor < 15))
             {
-                aiEcho("buildFortress: not enough resources");
+                if (ShowAiEcho == true) aiEcho("buildFortress: not enough resources");
                 return;
             }
             
@@ -3827,7 +3827,7 @@ rule buildFortress
         }
         
         aiPlanSetActive(planID);
-        aiEcho("buildFortress: attempting to build at base: #"+otherBaseID);
+        if (ShowAiEcho == true) aiEcho("buildFortress: attempting to build at base: #"+otherBaseID);
     }
 }
 
@@ -3837,7 +3837,7 @@ rule buildTowerAtOtherBase
     minInterval 61 //starts in cAge2
     inactive
 {
-    aiEcho("buildTowerAtOtherBase: ");
+    if (ShowAiEcho == true) aiEcho("buildTowerAtOtherBase: ");
 
     int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
     
@@ -3878,7 +3878,7 @@ rule buildTowerAtOtherBase
 
         if (otherBaseID == mainBaseID)
         {
-            aiEcho("otherBaseID == mainBaseID, returning");
+            if (ShowAiEcho == true) aiEcho("otherBaseID == mainBaseID, returning");
             return;
         }
     }
@@ -3887,14 +3887,14 @@ rule buildTowerAtOtherBase
     if (otherBaseID != mainBaseID)
     {
         //return, if more than 2 towers near other base 
-        aiEcho("numTowersNearBase #"+otherBaseID+": "+numTowersNearBase);
+        if (ShowAiEcho == true) aiEcho("numTowersNearBase #"+otherBaseID+": "+numTowersNearBase);
         if ((numTowersNearBase > 1) && (kbGetAge() == cAge2))
             return;
         else if (numTowersNearBase > 4)
             return;
 
         baseID = otherBaseID;
-        aiEcho("building tower at base: #"+otherBaseID);
+        if (ShowAiEcho == true) aiEcho("building tower at base: #"+otherBaseID);
     }
     
     bool planActive = false;
@@ -3906,9 +3906,9 @@ rule buildTowerAtOtherBase
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if (aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeTower)
             {
-                aiEcho("buildPlanIndexID: "+buildPlanIndexID);
+                if (ShowAiEcho == true) aiEcho("buildPlanIndexID: "+buildPlanIndexID);
                 vector buildPlanCenterPos = aiPlanGetVariableVector(buildPlanIndexID, cBuildPlanCenterPosition, 0);
-                aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
+                if (ShowAiEcho == true) aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
                 if ((aiPlanGetBaseID(buildPlanIndexID) == otherBaseID) || (equal(otherBaseLocation, buildPlanCenterPos) == true))
                 {
                     planActive = true;
@@ -3920,19 +3920,19 @@ rule buildTowerAtOtherBase
                 int alliedSettlementAtBuildPlanPos = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly, buildPlanCenterPos, 15.0);
                 if ((enemySettlementAtBuildPlanPos > 0) || (alliedSettlementAtBuildPlanPos > 0))
                 {
-                    aiEcho("destroying towerBuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
+                    if (ShowAiEcho == true) aiEcho("destroying towerBuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
                     aiPlanDestroy(buildPlanIndexID);
                 }
             }
         }
     }
     
-    aiEcho("planActive: "+planActive);
+    if (ShowAiEcho == true) aiEcho("planActive: "+planActive);
     
     
     if (planActive == true)
     {
-        aiEcho("plan to build tower at otherBaseID "+otherBaseID+" already exists, returning");
+        if (ShowAiEcho == true) aiEcho("plan to build tower at otherBaseID "+otherBaseID+" already exists, returning");
         return;
     }
     
@@ -3965,7 +3965,7 @@ rule buildTowerAtOtherBase
         aiPlanSetEscrowID(buildTowerAtOtherBasePlanID, cMilitaryEscrowID);
         aiPlanSetBaseID(buildTowerAtOtherBasePlanID, baseID);
         aiPlanSetActive(buildTowerAtOtherBasePlanID);
-        aiEcho("building tower at our other base: "+otherBaseID+" near otherBaseLocation: "+otherBaseLocation);
+        if (ShowAiEcho == true) aiEcho("building tower at our other base: "+otherBaseID+" near otherBaseLocation: "+otherBaseLocation);
     }
 }
 
@@ -3975,7 +3975,7 @@ rule buildBuildingsAtOtherBase
     minInterval 31 //starts in cAge2
     inactive
 {	
-    aiEcho("buildBuildingsAtOtherBase:");
+    if (ShowAiEcho == true) aiEcho("buildBuildingsAtOtherBase:");
  
     float woodSupply = kbResourceGet(cResourceWood);
     float goldSupply = kbResourceGet(cResourceGold);
@@ -3991,7 +3991,7 @@ rule buildBuildingsAtOtherBase
         int otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
         if (otherBaseID == mainBaseID)
         {
-            aiEcho("otherBaseID == mainBaseID, returning");
+            if (ShowAiEcho == true) aiEcho("otherBaseID == mainBaseID, returning");
             return;
         }
     }
@@ -4010,7 +4010,7 @@ rule buildBuildingsAtOtherBase
 	
         
     vector location = kbUnitGetPosition(otherBaseUnitID);
-    aiEcho("location: "+location);
+    if (ShowAiEcho == true) aiEcho("location: "+location);
 
     //return if we already have a building1 at the other base
     int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
@@ -4061,11 +4061,11 @@ rule buildBuildingsAtOtherBase
     int numWoodDeadInR20 = getNumUnits(cUnitTypeWood, cUnitStateDead, -1, 0, location, 20.0);
     float woodAmountInR20 = kbGetAmountValidResources(otherBaseID, cResourceWood, cAIResourceSubTypeEasy, 20.0);
     
-    aiEcho("numTreesAliveInR20: "+numTreesAliveInR20);
-    aiEcho("numWoodAliveInR20: "+numWoodAliveInR20);
-    aiEcho("numTreesDeadInR20: "+numTreesDeadInR20);
-    aiEcho("numWoodDeadInR20: "+numWoodDeadInR20);
-    aiEcho("woodAmountInR20: "+woodAmountInR20);
+    if (ShowAiEcho == true) aiEcho("numTreesAliveInR20: "+numTreesAliveInR20);
+    if (ShowAiEcho == true) aiEcho("numWoodAliveInR20: "+numWoodAliveInR20);
+    if (ShowAiEcho == true) aiEcho("numTreesDeadInR20: "+numTreesDeadInR20);
+    if (ShowAiEcho == true) aiEcho("numWoodDeadInR20: "+numWoodDeadInR20);
+    if (ShowAiEcho == true) aiEcho("woodAmountInR20: "+woodAmountInR20);
    
     
     if ((xsVectorGetX(location) < buffer) || (xsVectorGetZ(location) < buffer)
@@ -4089,9 +4089,9 @@ rule buildBuildingsAtOtherBase
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if (aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == building1ID)
             {
-                aiEcho("buildPlanIndexID: "+buildPlanIndexID);
+                if (ShowAiEcho == true) aiEcho("buildPlanIndexID: "+buildPlanIndexID);
                 vector buildPlanCenterPos = aiPlanGetVariableVector(buildPlanIndexID, cBuildPlanCenterPosition, 0);
-                aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
+                if (ShowAiEcho == true) aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
                 if ((aiPlanGetBaseID(buildPlanIndexID) == otherBaseID) || (equal(location, buildPlanCenterPos) == true))
                 {
                     planActive = true;
@@ -4103,19 +4103,19 @@ rule buildBuildingsAtOtherBase
                 int alliedSettlementAtBuildPlanPos = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly, buildPlanCenterPos, 15.0);
                 if ((enemySettlementAtBuildPlanPos > 0) || (alliedSettlementAtBuildPlanPos > 0))
                 {
-                    aiEcho("destroying building1BuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
+                    if (ShowAiEcho == true) aiEcho("destroying building1BuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
                     aiPlanDestroy(buildPlanIndexID);
                 }
             }
         }
     }
     
-    aiEcho("planActive: "+planActive);
+    if (ShowAiEcho == true) aiEcho("planActive: "+planActive);
     
     
     if (planActive == true)
     {
-        aiEcho("plan to build building1ID at otherBaseID "+otherBaseID+" already exists, returning");
+        if (ShowAiEcho == true) aiEcho("plan to build building1ID at otherBaseID "+otherBaseID+" already exists, returning");
         return;
     }
 
@@ -4148,7 +4148,7 @@ rule buildBuildingsAtOtherBase
         aiPlanSetBaseID(buildBuilding1AtOtherBasePlanID, otherBaseID);
         aiPlanSetActive(buildBuilding1AtOtherBasePlanID);
         gBuildBuilding1AtOtherBasePlanID = buildBuilding1AtOtherBasePlanID;	
-        aiEcho("buildBuilding1AtOtherBasePlan set active: "+gBuildBuilding1AtOtherBasePlanID);
+        if (ShowAiEcho == true) aiEcho("buildBuilding1AtOtherBasePlan set active: "+gBuildBuilding1AtOtherBasePlanID);
     }
 }
 
@@ -4156,7 +4156,7 @@ rule buildBuildingsAtOtherBase2
     minInterval 31 //starts in cAge2
     inactive
 {	
-    aiEcho("buildBuildingsAtOtherBase2:");
+    if (ShowAiEcho == true) aiEcho("buildBuildingsAtOtherBase2:");
 	if (aiGetWorldDifficulty() < cDifficultyNightmare && kbGetAge() < 3)
 	return; // Wait untill age 3 for Hard difficulty and lower.
  
@@ -4174,7 +4174,7 @@ rule buildBuildingsAtOtherBase2
         int otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
         if (otherBaseID == mainBaseID)
         {
-            aiEcho("otherBaseID == mainBaseID, returning");
+            if (ShowAiEcho == true) aiEcho("otherBaseID == mainBaseID, returning");
             return;
         }
     }
@@ -4201,7 +4201,7 @@ rule buildBuildingsAtOtherBase2
 	
         
     vector location = kbUnitGetPosition(otherBaseUnitID);
-    aiEcho("location: "+location);
+    if (ShowAiEcho == true) aiEcho("location: "+location);
 
     //return if we already have a building1 at the other base
     int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
@@ -4247,9 +4247,9 @@ rule buildBuildingsAtOtherBase2
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if (aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == building1ID)
             {
-                aiEcho("buildPlanIndexID: "+buildPlanIndexID);
+                if (ShowAiEcho == true) aiEcho("buildPlanIndexID: "+buildPlanIndexID);
                 vector buildPlanCenterPos = aiPlanGetVariableVector(buildPlanIndexID, cBuildPlanCenterPosition, 0);
-                aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
+                if (ShowAiEcho == true) aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
                 if ((aiPlanGetBaseID(buildPlanIndexID) == otherBaseID) || (equal(location, buildPlanCenterPos) == true))
                 {
                     planActive = true;
@@ -4261,19 +4261,19 @@ rule buildBuildingsAtOtherBase2
                 int alliedSettlementAtBuildPlanPos = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly, buildPlanCenterPos, 15.0);
                 if ((enemySettlementAtBuildPlanPos > 0) || (alliedSettlementAtBuildPlanPos > 0))
                 {
-                    aiEcho("destroying building1BuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
+                    if (ShowAiEcho == true) aiEcho("destroying building1BuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
                     aiPlanDestroy(buildPlanIndexID);
                 }
             }
         }
     }
     
-    aiEcho("planActive: "+planActive);
+    if (ShowAiEcho == true) aiEcho("planActive: "+planActive);
     
     
     if (planActive == true)
     {
-        aiEcho("plan to build building1ID at otherBaseID "+otherBaseID+" already exists, returning");
+        if (ShowAiEcho == true) aiEcho("plan to build building1ID at otherBaseID "+otherBaseID+" already exists, returning");
         return;
     }
 
@@ -4301,7 +4301,7 @@ rule buildBuildingsAtOtherBase2
         aiPlanSetBaseID(buildBuilding1AtOtherBasePlanID, otherBaseID);
         aiPlanSetActive(buildBuilding1AtOtherBasePlanID);
         gBuildBuilding1AtOtherBasePlanID = buildBuilding1AtOtherBasePlanID;	
-        aiEcho("buildBuilding1AtOtherBasePlan set active: "+gBuildBuilding1AtOtherBasePlanID);
+        if (ShowAiEcho == true) aiEcho("buildBuilding1AtOtherBasePlan set active: "+gBuildBuilding1AtOtherBasePlanID);
     }
 }
 
@@ -4312,7 +4312,7 @@ rule buildMirrorTower
     minInterval 29 //starts in cAge4
     inactive
 {
-    aiEcho("buildMirrorTower:");
+    if (ShowAiEcho == true) aiEcho("buildMirrorTower:");
     
     float currentWood = kbResourceGet(cResourceWood);
     float currentGold = kbResourceGet(cResourceGold);
@@ -4338,7 +4338,7 @@ rule buildMirrorTower
 
         if (otherBaseID == mainBaseID)
         {
-            aiEcho("otherBaseID == mainBaseID, returning");
+            if (ShowAiEcho == true) aiEcho("otherBaseID == mainBaseID, returning");
             return;
         }
     }
@@ -4347,12 +4347,12 @@ rule buildMirrorTower
     if (otherBaseID != mainBaseID)
     {
         //return, if there's at least 1 mirror tower near other base 
-        aiEcho("numMirrorTowersNearBase #"+otherBaseID+": "+numMirrorTowersNearBase);
+        if (ShowAiEcho == true) aiEcho("numMirrorTowersNearBase #"+otherBaseID+": "+numMirrorTowersNearBase);
         if (numMirrorTowersNearBase > 0)
             return;
 
         baseID = otherBaseID;
-        aiEcho("building mirror tower at base: #"+otherBaseID);
+        if (ShowAiEcho == true) aiEcho("building mirror tower at base: #"+otherBaseID);
     }
     
     bool planActive = false;
@@ -4364,9 +4364,9 @@ rule buildMirrorTower
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if (aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeTowerMirror)
             {
-                aiEcho("buildPlanIndexID: "+buildPlanIndexID);
+                if (ShowAiEcho == true) aiEcho("buildPlanIndexID: "+buildPlanIndexID);
                 vector buildPlanCenterPos = aiPlanGetVariableVector(buildPlanIndexID, cBuildPlanCenterPosition, 0);
-                aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
+                if (ShowAiEcho == true) aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
                 if ((aiPlanGetBaseID(buildPlanIndexID) == otherBaseID) || (equal(otherBaseLocation, buildPlanCenterPos) == true))
                 {
                     planActive = true;
@@ -4378,19 +4378,19 @@ rule buildMirrorTower
                 int alliedSettlementAtBuildPlanPos = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly, buildPlanCenterPos, 15.0);
                 if ((enemySettlementAtBuildPlanPos > 0) || (alliedSettlementAtBuildPlanPos > 0))
                 {
-                    aiEcho("destroying mirrorTowerBuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
+                    if (ShowAiEcho == true) aiEcho("destroying mirrorTowerBuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
                     aiPlanDestroy(buildPlanIndexID);
                 }
             }
         }
     }
     
-    aiEcho("planActive: "+planActive);
+    if (ShowAiEcho == true) aiEcho("planActive: "+planActive);
     
 
     if (planActive == true)
     {
-        aiEcho("plan to build mirror tower at otherBaseID "+otherBaseID+" already exists, returning");
+        if (ShowAiEcho == true) aiEcho("plan to build mirror tower at otherBaseID "+otherBaseID+" already exists, returning");
         return;
     }
         
@@ -4414,7 +4414,7 @@ rule buildMirrorTower
         aiPlanSetBaseID(buildMirrorTowerPlanID, baseID);
         aiPlanSetActive(buildMirrorTowerPlanID);
         count = count + 1;
-        aiEcho("building mirror tower at our other base: "+otherBaseID+" near otherBaseLocation: "+otherBaseLocation);
+        if (ShowAiEcho == true) aiEcho("building mirror tower at our other base: "+otherBaseID+" near otherBaseLocation: "+otherBaseLocation);
     }
 }
 
@@ -4423,7 +4423,7 @@ rule buildInitialTemple //and rebuild it if destroyed
     inactive
     minInterval 41 //starts in cAge1
 {
-    aiEcho("buildInitialTemple:");
+    if (ShowAiEcho == true) aiEcho("buildInitialTemple:");
     
     if (gTransportMap == true)
     {
@@ -4448,8 +4448,8 @@ rule buildInitialTemple //and rebuild it if destroyed
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if ((aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeTemple) && (aiPlanGetBaseID(buildPlanIndexID) == mainBaseID))
             {
-                aiEcho("buildPlanIndexID: "+buildPlanIndexID);
-                aiEcho("plan to build temple at mainBaseID "+mainBaseID+" already exists, returning");
+                if (ShowAiEcho == true) aiEcho("buildPlanIndexID: "+buildPlanIndexID);
+                if (ShowAiEcho == true) aiEcho("plan to build temple at mainBaseID "+mainBaseID+" already exists, returning");
                 return;
             }
         }
@@ -4529,7 +4529,7 @@ rule buildArmory
 //    minInterval 17 //starts in cAge2
     minInterval 25 //starts in cAge1
 {
-    aiEcho("buildArmory:");
+    if (ShowAiEcho == true) aiEcho("buildArmory:");
     
     if (gTransportMap == true)
     {
@@ -4615,7 +4615,7 @@ rule fixUnfinishedWalls
 //    minInterval 77 //starts in cAge2
     minInterval 83 //starts in cAge2
 {
-    aiEcho("fixUnfinishedWalls:");
+    if (ShowAiEcho == true) aiEcho("fixUnfinishedWalls:");
 
     int numUnfinishedWalls = getNumUnits(cUnitTypeAbstractWall, cUnitStateBuilding, -1, cMyID);
     if (numUnfinishedWalls < 1)
@@ -4815,7 +4815,7 @@ rule destroyUnnecessaryDropsites
 //    minInterval 83 //starts in cAge2
     minInterval 97 //starts in cAge2
 {
-    aiEcho("destroyUnnecessaryDropsites:");
+    if (ShowAiEcho == true) aiEcho("destroyUnnecessaryDropsites:");
     
     int mainBaseID = kbBaseGetMainID(cMyID);
     int otherBaseUnitID = findUnit(cUnitTypeAbstractSettlement);
@@ -4933,7 +4933,7 @@ rule findMySettlementsBeingBuilt
     minInterval 479 //starts in cAge1, is set to 7 after 8 minutes
     inactive
 {
-    aiEcho("findMySettlementsBeingBuilt: ");
+    if (ShowAiEcho == true) aiEcho("findMySettlementsBeingBuilt: ");
         
     static bool update = false;
     if (update == false)
@@ -5002,7 +5002,7 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
     minInterval 59 //starts in cAge2
     inactive
 {    
-    aiEcho("rebuildDropsites:");
+    if (ShowAiEcho == true) aiEcho("rebuildDropsites:");
     
     float woodSupply = kbResourceGet(cResourceWood);
     if (woodSupply < 150)
@@ -5040,8 +5040,8 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
 //                    dropsiteTypeID = cUnitTypeLumberCamp;
             }
             
-            aiEcho("gatherPlanID: "+gatherPlanID);
-            aiEcho("resource: "+resource);
+            if (ShowAiEcho == true) aiEcho("gatherPlanID: "+gatherPlanID);
+            if (ShowAiEcho == true) aiEcho("resource: "+resource);
             int mainBaseID = kbBaseGetMainID(cMyID);
             int baseID = aiPlanGetBaseID(gatherPlanID);
             float distance = 20.0;
@@ -5049,7 +5049,7 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
             if (resource == cResourceGold)
             {
                 int numGoldMinesInR50 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, location, 50.0);
-                aiEcho("numGoldMinesInR50: "+numGoldMinesInR50);
+                if (ShowAiEcho == true) aiEcho("numGoldMinesInR50: "+numGoldMinesInR50);
                 if (numGoldMinesInR50 > 0)
                 {
                     int randomGoldMine = findUnitByIndex(cUnitTypeGold, aiRandInt(numGoldMinesInR50), cUnitStateAlive, -1, 0, location, 50.0);
@@ -5067,14 +5067,14 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
             }
                 
             int numDropsitesInRange = getNumUnits(dropsiteTypeID, cUnitStateAliveOrBuilding, -1, cMyID, location, distance);
-            aiEcho("numDropsitesInRange"+distance+": "+numDropsitesInRange);
+            if (ShowAiEcho == true) aiEcho("numDropsitesInRange"+distance+": "+numDropsitesInRange);
             if (numDropsitesInRange < 1)
             {
                 int numEnemyMilUnitsInR50 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, location, 50.0, true);
                 int numEnemyMilBuildingsInR50 = getNumUnitsByRel(cUnitTypeMilitaryBuilding, cUnitStateAlive, -1, cPlayerRelationEnemy, location, 50.0);
                 if ((numEnemyMilUnitsInR50 < 1) && (numEnemyMilBuildingsInR50 < 1))
                 {
-                    aiEcho("found a location: "+location+", breaking off");
+                    if (ShowAiEcho == true) aiEcho("found a location: "+location+", breaking off");
                     break;
                 }
                 else
@@ -5093,7 +5093,7 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
     
     if (equal(location, cInvalidVector) == true)
     {
-        aiEcho("no location to build a dropsite, returning");
+        if (ShowAiEcho == true) aiEcho("no location to build a dropsite, returning");
         return;
     }
     
@@ -5105,7 +5105,7 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
             int buildPlanID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if ((aiPlanGetVariableInt(buildPlanID, cBuildPlanBuildingTypeID, 0) == dropsiteTypeID) && (aiPlanGetBaseID(buildPlanID) == baseID))
             {
-                aiEcho("plan to build dropsite at baseID "+baseID+" already exists, returning");
+                if (ShowAiEcho == true) aiEcho("plan to build dropsite at baseID "+baseID+" already exists, returning");
                 return;
             }
         }
@@ -5131,9 +5131,9 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
         aiPlanSetActive(buildDropsitePlanID);
         count = count + 1;
         if (baseID == mainBaseID)
-            aiEcho("building dropsite near our resource: "+resource+" near location: "+location);
+            if (ShowAiEcho == true) aiEcho("building dropsite near our resource: "+resource+" near location: "+location);
         else
-            aiEcho("building dropsite near our base: "+baseID+" near location: "+location);
+            if (ShowAiEcho == true) aiEcho("building dropsite near our base: "+baseID+" near location: "+location);
     }
 }
 
@@ -5147,7 +5147,7 @@ rule buildGoldMineTower
 	if (kbGetAge() < cAge3 && goldSupply < 750)
 	return; // We need the gold to advance quicker.
 	
-	aiEcho("buildGoldMineTower:");
+	if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
  
     int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
     
@@ -5178,14 +5178,14 @@ rule buildGoldMineTower
     if ((numTowers > 15) && (kbGetAge() == 2))
         return;
 
-    aiEcho("buildGoldMineTower:");
+    if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
     
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     vector location = cInvalidVector;
        
     int numGoldMinesInR90 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 90.0);
-    aiEcho("numGoldMinesInR90: "+numGoldMinesInR90);
+    if (ShowAiEcho == true) aiEcho("numGoldMinesInR90: "+numGoldMinesInR90);
     if (numGoldMinesInR90 > 0)
     {
         for (i = 0; < numGoldMinesInR90)
@@ -5195,7 +5195,7 @@ rule buildGoldMineTower
             {
                 location = kbUnitGetPosition(goldMineID);
                 int numTowersNearLocation = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, location, 12.0);
-                aiEcho("numTowersNearLocation: "+location+": "+numTowersNearLocation);
+                if (ShowAiEcho == true) aiEcho("numTowersNearLocation: "+location+": "+numTowersNearLocation);
                 if (numTowersNearLocation < 1)
                     break;
                 else
@@ -5206,7 +5206,7 @@ rule buildGoldMineTower
     
     if (equal(location, cInvalidVector) == true)
     {
-        aiEcho("no location to build a tower, returning");
+        if (ShowAiEcho == true) aiEcho("no location to build a tower, returning");
         return;
     }
 
@@ -5219,7 +5219,7 @@ rule buildGoldMineTower
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if ((aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeTower) && (equal(location, aiPlanGetVariableVector(buildPlanIndexID, cBuildPlanCenterPosition, 0)) == true))
             {
-                aiEcho("plan to build tower near gold mine at location "+location+" already exists, returning");
+                if (ShowAiEcho == true) aiEcho("plan to build tower near gold mine at location "+location+" already exists, returning");
                 return;
             }
         }
@@ -5256,7 +5256,7 @@ rule buildGoldMineTower
 
         aiPlanSetActive(buildGoldMineTowerPlanID);
         count = count + 1;
-        aiEcho("building tower near gold mine at location: "+location);
+        if (ShowAiEcho == true) aiEcho("building tower near gold mine at location: "+location);
     }
 }
 
@@ -5266,7 +5266,7 @@ rule buildMBTower
     minInterval 73 //starts in cAge2
     inactive
 {
-    aiEcho("buildMBTower:");
+    if (ShowAiEcho == true) aiEcho("buildMBTower:");
     
     int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
     
@@ -5330,10 +5330,10 @@ rule buildMBTower
     float fxOrig = fx;
     float fzOrig = fz;
     
-    aiEcho("mainBaseLocation: "+mainBaseLocation);
-    aiEcho("frontVector: "+frontVector);
-    aiEcho("fx: "+fx);
-    aiEcho("fz: "+fz);
+    if (ShowAiEcho == true) aiEcho("mainBaseLocation: "+mainBaseLocation);
+    if (ShowAiEcho == true) aiEcho("frontVector: "+frontVector);
+    if (ShowAiEcho == true) aiEcho("fx: "+fx);
+    if (ShowAiEcho == true) aiEcho("fz: "+fz);
     
     //Towers should be placed in a radius of 20m around a point 15m in front of our main base
     fx = fxOrig * 15;
@@ -5343,7 +5343,7 @@ rule buildMBTower
     frontVector = xsVectorSetY(frontVector, 0.0);
     vector location = mainBaseLocation + frontVector;
     vector centerLocation = location;
-    aiEcho("centerLocation: "+centerLocation);
+    if (ShowAiEcho == true) aiEcho("centerLocation: "+centerLocation);
     
     for (i = 0; < 3)
     {
@@ -5382,25 +5382,25 @@ rule buildMBTower
     if ((numTowersNearFront < 2) && (numTowersNearFront <= numTowersNearLeft) && (numTowersNearFront <= numTowersNearRight))
     {
         location = frontLocation;
-        aiEcho("using frontLocation");
+        if (ShowAiEcho == true) aiEcho("using frontLocation");
     }
     else
     {
         if ((numTowersNearLeft < 2) && (numTowersNearLeft <= numTowersNearRight))
         {
             location = leftLocation;
-            aiEcho("using leftLocation");
+            if (ShowAiEcho == true) aiEcho("using leftLocation");
         }
         else
         {
             if (numTowersNearLeft < 2)
             {
                 location = rightLocation;
-                aiEcho("using rightLocation");
+                if (ShowAiEcho == true) aiEcho("using rightLocation");
             }
             else
             {
-                aiEcho("returning, as there are 2 towers near the front, left and right location");
+                if (ShowAiEcho == true) aiEcho("returning, as there are 2 towers near the front, left and right location");
                 return;
             }
         }
@@ -5410,7 +5410,7 @@ rule buildMBTower
     if (cMyCulture == cCultureNorse)
         builderType = cUnitTypeAbstractInfantry;
     
-    aiEcho("using location: "+location);
+    if (ShowAiEcho == true) aiEcho("using location: "+location);
 
     //Build a tower near our main base
     static int count = 1;
@@ -5430,7 +5430,7 @@ rule buildMBTower
         aiPlanSetBaseID(buildMBTowerPlanID, mainBaseID);
         aiPlanSetActive(buildMBTowerPlanID);
         count = count + 1;
-        aiEcho("building tower at our main base: "+mainBaseID+" near location: "+location);
+        if (ShowAiEcho == true) aiEcho("building tower at our main base: "+mainBaseID+" near location: "+location);
     }
 }
 
@@ -5440,7 +5440,7 @@ rule fixJammedDropsiteBuildPlans
     minInterval 97 //starts in cAge1
     inactive
 {
-    aiEcho("fixJammedDropsiteBuildPlans:");
+    if (ShowAiEcho == true) aiEcho("fixJammedDropsiteBuildPlans:");
 	
     static int SHBuildPlanID = -1;
     static int LCBuildPlanID = -1;
@@ -5465,26 +5465,26 @@ rule fixJammedDropsiteBuildPlans
         }
         
         dropsiteBuildPlanID = aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, dropsiteTypeID, true);
-        aiEcho("dropsiteBuildPlanID: "+dropsiteBuildPlanID);
+        if (ShowAiEcho == true) aiEcho("dropsiteBuildPlanID: "+dropsiteBuildPlanID);
         if (dropsiteBuildPlanID != -1)
         {
             int numBuildersInPlan = aiPlanGetNumberUnits(dropsiteBuildPlanID, cUnitTypeAbstractVillager);
-            aiEcho("numBuildersInPlan: "+numBuildersInPlan);
+            if (ShowAiEcho == true) aiEcho("numBuildersInPlan: "+numBuildersInPlan);
             if (numBuildersInPlan > 5)
             {
-                aiEcho("*!*!*!*!*!*!*!* fixJammedDropsiteBuildPlans:");
+                if (ShowAiEcho == true) aiEcho("*!*!*!*!*!*!*!* fixJammedDropsiteBuildPlans:");
                 if (cMyCulture == cCultureGreek)
                 {
                     if (dropsiteBuildPlanID == SHBuildPlanID)
                     {
                         aiPlanDestroy(dropsiteBuildPlanID);
-                        aiEcho("dropsiteBuildPlanID == SHBuildPlanID");
-                        aiEcho("destroying dropsiteBuildPlanID: "+dropsiteBuildPlanID);
+                        if (ShowAiEcho == true) aiEcho("dropsiteBuildPlanID == SHBuildPlanID");
+                        if (ShowAiEcho == true) aiEcho("destroying dropsiteBuildPlanID: "+dropsiteBuildPlanID);
                     }
                     else
                     {
                         SHBuildPlanID = dropsiteBuildPlanID;
-                        aiEcho("saving SHBuildPlanID");
+                        if (ShowAiEcho == true) aiEcho("saving SHBuildPlanID");
                     }
                 }
                 else    //Egyptian
@@ -5494,13 +5494,13 @@ rule fixJammedDropsiteBuildPlans
                         if (dropsiteBuildPlanID == LCBuildPlanID)
                         {
                             aiPlanDestroy(dropsiteBuildPlanID);
-                            aiEcho("dropsiteBuildPlanID == LCBuildPlanID");
-                            aiEcho("destroying dropsiteBuildPlanID: "+dropsiteBuildPlanID);
+                            if (ShowAiEcho == true) aiEcho("dropsiteBuildPlanID == LCBuildPlanID");
+                            if (ShowAiEcho == true) aiEcho("destroying dropsiteBuildPlanID: "+dropsiteBuildPlanID);
                         }
                         else
                         {
                             LCBuildPlanID = dropsiteBuildPlanID;
-                            aiEcho("saving LCBuildPlanID");
+                            if (ShowAiEcho == true) aiEcho("saving LCBuildPlanID");
                         }
                     }
                     else
@@ -5508,17 +5508,17 @@ rule fixJammedDropsiteBuildPlans
                         if (dropsiteBuildPlanID == MCBuildPlanID)
                         {
                             aiPlanDestroy(dropsiteBuildPlanID);
-                            aiEcho("dropsiteBuildPlanID == MCBuildPlanID");
-                            aiEcho("destroying dropsiteBuildPlanID: "+dropsiteBuildPlanID);
+                            if (ShowAiEcho == true) aiEcho("dropsiteBuildPlanID == MCBuildPlanID");
+                            if (ShowAiEcho == true) aiEcho("destroying dropsiteBuildPlanID: "+dropsiteBuildPlanID);
                         }
                         else
                         {
                             LCBuildPlanID = dropsiteBuildPlanID;
-                            aiEcho("saving MCBuildPlanID");
+                            if (ShowAiEcho == true) aiEcho("saving MCBuildPlanID");
                         }
                     }
                 }
-                aiEcho("*!*!*!*!*!*!*!*");
+                if (ShowAiEcho == true) aiEcho("*!*!*!*!*!*!*!*");
             }
         }
     }
@@ -5529,7 +5529,7 @@ rule buildExtraFarms
     minInterval 29 //gets activated in updateFoodBreakdown
     inactive
 {
-    aiEcho("buildExtraFarms:");
+    if (ShowAiEcho == true) aiEcho("buildExtraFarms:");
     
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
@@ -5620,21 +5620,21 @@ rule rebuildMarket  // If market dies, restart
     minInterval 19 //starts in cAge3, activated in tradeWithCaravans, after market is built
     inactive
 {
-    aiEcho("rebuildMarket:");
+    if (ShowAiEcho == true) aiEcho("rebuildMarket:");
     
-    aiEcho("gTradeMarketUnitID: "+gTradeMarketUnitID);
+    if (ShowAiEcho == true) aiEcho("gTradeMarketUnitID: "+gTradeMarketUnitID);
     if ((gTradeMarketUnitID != -1) && (kbUnitGetCurrentHitpoints(gTradeMarketUnitID) <= 0))
     {
-        aiEcho("gTradeMarketUnitID has been destroyed or is -1");
+        if (ShowAiEcho == true) aiEcho("gTradeMarketUnitID has been destroyed or is -1");
         if (gTradePlanID != -1)
         {
             aiPlanDestroy(gTradePlanID);
             gTradePlanID = -1;
-            aiEcho("killing gTradePlanID");
+            if (ShowAiEcho == true) aiEcho("killing gTradePlanID");
         }
         
         int activeTradePlans = aiPlanGetNumber(cPlanTrade, -1, true);
-        aiEcho("activeTradePlans: "+activeTradePlans);
+        if (ShowAiEcho == true) aiEcho("activeTradePlans: "+activeTradePlans);
         if (activeTradePlans > 0)
         {
             for (i = 0; < activeTradePlans)
@@ -5643,7 +5643,7 @@ rule rebuildMarket  // If market dies, restart
                 if (tradePlanIndexID != -1)
                 {
                     aiPlanDestroy(tradePlanIndexID);
-                    aiEcho("destroying tradePlanIndexID: "+tradePlanIndexID);
+                    if (ShowAiEcho == true) aiEcho("destroying tradePlanIndexID: "+tradePlanIndexID);
                 }
             }
         }
@@ -5660,10 +5660,13 @@ rule makeExtraMarket    //If it takes more than 5 minutes to place our trade mar
 //    minInterval 31 //starts in cAge3, activated in tradeWithCaravans
     minInterval 37 //starts in cAge3, activated in tradeWithCaravans
 {
-//    xsSetRuleMinIntervalSelf(31);
+
+    if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa)
+	return;
+	
     xsSetRuleMinIntervalSelf(37);
     static int ruleStartTime = -1;
-    aiEcho("*!*!*!*!*!*makeExtraMarket:");
+    if (ShowAiEcho == true) aiEcho("*!*!*!*!*!*makeExtraMarket:");
     if (ruleStartTime == -1)
         ruleStartTime = xsGetTime();
     
@@ -5672,7 +5675,7 @@ rule makeExtraMarket    //If it takes more than 5 minutes to place our trade mar
     int mainBaseAreaID = kbAreaGetIDByPosition(mainBaseLocation);
     
     int numMarketsNearMB = getNumUnits(cUnitTypeMarket, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
-    aiEcho("numMarketsNearMB: "+numMarketsNearMB);
+    if (ShowAiEcho == true) aiEcho("numMarketsNearMB: "+numMarketsNearMB);
     
     if ((gExtraMarketUnitID != -1) && (kbUnitGetCurrentHitpoints(gExtraMarketUnitID) <= 0))
     {
@@ -5686,7 +5689,7 @@ rule makeExtraMarket    //If it takes more than 5 minutes to place our trade mar
             for (i = 0; < numMarketsNearMB)
             {
                 int marketIDNearMB = findUnitByIndex(cUnitTypeMarket, i, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
-                aiEcho("marketIDNearMB: "+marketIDNearMB);
+                if (ShowAiEcho == true) aiEcho("marketIDNearMB: "+marketIDNearMB);
                 if (marketIDNearMB == -1)
                     continue;
         
@@ -5695,13 +5698,13 @@ rule makeExtraMarket    //If it takes more than 5 minutes to place our trade mar
                 
                 if ((marketIDNearMB == gExtraMarketUnitID) && (kbUnitGetCurrentHitpoints(marketIDNearMB) > 0))
                 {
-                    aiEcho("marketIDNearMB == gTradeMarketUnitID");
+                    if (ShowAiEcho == true) aiEcho("marketIDNearMB == gTradeMarketUnitID");
                     continue;
                 }
                 else
                 {
                     gExtraMarketUnitID = marketIDNearMB;
-                    aiEcho("setting gExtraMarketUnitID to: "+marketIDNearMB);
+                    if (ShowAiEcho == true) aiEcho("setting gExtraMarketUnitID to: "+marketIDNearMB);
                 }
             
             }

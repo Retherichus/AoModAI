@@ -11,7 +11,7 @@
 //==============================================================================
 void persDecidePersonality(void)
 {
-    aiEcho("persDecidePersonality:");
+    if (ShowAiEcho == true) aiEcho("persDecidePersonality:");
 
 // This AI randomly chooses from one of the six other personalities, and sets the 
 // variables accordingly.
@@ -27,7 +27,7 @@ void persDecidePersonality(void)
     {
         case 0:  // Defensive Boomer (protector)
         {
-            aiEcho("Choosing personality:  Defensive Boomer (Protector)");
+            if (ShowAiEcho == true) aiEcho("Choosing personality:  Defensive Boomer (Protector)");
             cvRushBoomSlider = -0.9;
             cvMilitaryEconSlider = 0.3;
             cvOffenseDefenseSlider = -0.9;
@@ -36,7 +36,7 @@ void persDecidePersonality(void)
         }
         case 1:  // Defensive Rusher (defender)
         {
-            aiEcho("Choosing personality:  Defensive Rusher (Defender)");
+            if (ShowAiEcho == true) aiEcho("Choosing personality:  Defensive Rusher (Defender)");
             cvRushBoomSlider = 0.9;
             cvMilitaryEconSlider = 0.9;
             cvOffenseDefenseSlider = -0.9;
@@ -45,7 +45,7 @@ void persDecidePersonality(void)
         }
         case 2:  // Economic Boomer (builder)
         {
-            aiEcho("Choosing personality:  Economic Boomer (Builder)");
+            if (ShowAiEcho == true) aiEcho("Choosing personality:  Economic Boomer (Builder)");
             cvRushBoomSlider = -0.9;
             cvMilitaryEconSlider = -0.9;
             cvOffenseDefenseSlider = 0.0;
@@ -54,7 +54,7 @@ void persDecidePersonality(void)
         }
         case 3:  // Balanced
         {
-            aiEcho("Choosing personality:  Balanced (Standard)");
+            if (ShowAiEcho == true) aiEcho("Choosing personality:  Balanced (Standard)");
             cvRushBoomSlider = 0.0;            
             cvMilitaryEconSlider = 0.0;
             cvOffenseDefenseSlider = 0.0;
@@ -63,7 +63,7 @@ void persDecidePersonality(void)
         }
         case 4:  // Aggressive Boomer (conqueror)
         {
-            aiEcho("Choosing personality:  Aggressive Boomer (Conqueror)");
+            if (ShowAiEcho == true) aiEcho("Choosing personality:  Aggressive Boomer (Conqueror)");
             cvRushBoomSlider = -0.9;
             cvMilitaryEconSlider = 0.3;
             cvOffenseDefenseSlider = 0.9;
@@ -72,7 +72,7 @@ void persDecidePersonality(void)
         }
         case 5:  // Aggressive Rusher (attacker)
         {
-            aiEcho("Choosing personality:  Aggressive Rusher (Attacker)");
+            if (ShowAiEcho == true) aiEcho("Choosing personality:  Aggressive Rusher (Attacker)");
             cvRushBoomSlider = 0.9;
             cvMilitaryEconSlider = 0.9;
             cvOffenseDefenseSlider = 0.9;
@@ -81,6 +81,6 @@ void persDecidePersonality(void)
         }
     }
 
-    aiEcho("RushBoom "+cvRushBoomSlider+", MilitaryEcon "+cvMilitaryEconSlider+", OffenseDefense "+cvOffenseDefenseSlider);
+    if (ShowAiEcho == true) aiEcho("RushBoom "+cvRushBoomSlider+", MilitaryEcon "+cvMilitaryEconSlider+", OffenseDefense "+cvOffenseDefenseSlider);
 
 }

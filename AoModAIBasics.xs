@@ -200,7 +200,7 @@ extern float PI = 3.141592;
 int getAreaGroupByArea(int areaID=-1)   //this is such shit, but there is no other possibility
                                         //as far as I can see :-(
 {
-   aiEcho("getAreaGroupByArea:");    
+   if (ShowAiEcho == true) aiEcho("getAreaGroupByArea:");    
    
    vector loc = kbAreaGetCenter(areaID);
    return (kbAreaGroupGetIDByPosition(loc));
@@ -209,7 +209,7 @@ int getAreaGroupByArea(int areaID=-1)   //this is such shit, but there is no oth
 //==============================================================================
 bool equal(vector left=cInvalidVector, vector right=cInvalidVector) //true if the given vectors are equal
 {
-   //aiEcho("equal:");    
+   //if (ShowAiEcho == true) aiEcho("equal:");    
   
    float lx = xsVectorGetX( left );
    float ly = xsVectorGetY( left );
@@ -238,11 +238,11 @@ bool equal(vector left=cInvalidVector, vector right=cInvalidVector) //true if th
 bool  configQuery( int queryID = -1, int unitType = -1, int action = -1, int state = -1, int player = -1, 
                     vector center = cInvalidVector, bool sort = false, float radius = -1, bool seeable = false, int areaID = -1 )
 {
-    //aiEcho("configQuery:");    
+    //if (ShowAiEcho == true) aiEcho("configQuery:");    
 
     if ( queryID == -1)
     {
-        aiEcho("Invalid query ID");
+        if (ShowAiEcho == true) aiEcho("Invalid query ID");
         return(false);
     }
 
@@ -287,11 +287,11 @@ bool  configQuery( int queryID = -1, int unitType = -1, int action = -1, int sta
 bool  configQueryRelation( int queryID = -1, int unitType = -1, int action = -1, int state = -1, int playerRelation = -1, 
                             vector center = cInvalidVector, bool sort = false, float radius = -1, bool seeable = false, int areaID = -1 )
 {
-    //aiEcho("configQueryRelation:");
+    //if (ShowAiEcho == true) aiEcho("configQueryRelation:");
 
     if ( queryID == -1)
     {
-        aiEcho("Invalid query ID");
+        if (ShowAiEcho == true) aiEcho("Invalid query ID");
         return(false);
     }
 
@@ -332,7 +332,7 @@ bool  configQueryRelation( int queryID = -1, int unitType = -1, int action = -1,
 //==============================================================================
 vector guessEnemyLocation()
 {
-    aiEcho("guessEnemyLocation:");
+    if (ShowAiEcho == true) aiEcho("guessEnemyLocation:");
 
     static vector enemyLoc = cInvalidVector;
     // don't guess again.
@@ -360,7 +360,7 @@ vector guessEnemyLocation()
 //==============================================================================
 bool isOnMyIsland(vector there=cInvalidVector)
 {
-    aiEcho("isOnMyIsland:");
+    if (ShowAiEcho == true) aiEcho("isOnMyIsland:");
 
     //Get our initial location.
     vector here=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
@@ -372,7 +372,7 @@ bool isOnMyIsland(vector there=cInvalidVector)
 //==============================================================================
 bool hasWaterNeighbor(int areaID = -1)    // True if the test area has a water area neighbor
 {
-    aiEcho("hasWaterNeighbor:");
+    if (ShowAiEcho == true) aiEcho("hasWaterNeighbor:");
 
     int areaCount = -1;
     int areaIndex = -1;
@@ -390,7 +390,7 @@ bool hasWaterNeighbor(int areaID = -1)    // True if the test area has a water a
         }
     }
     if (hasWater == true)
-        aiEcho("    "+areaID+" has a water neighbor.");
+        if (ShowAiEcho == true) aiEcho("    "+areaID+" has a water neighbor.");
 
     return(hasWater);
 }
@@ -398,7 +398,7 @@ bool hasWaterNeighbor(int areaID = -1)    // True if the test area has a water a
 //==============================================================================
 int verifyVinlandsagaBase(int goalAreaID = -1, int recurseCount = 3)    //verify that this area borders water, find another if it doesn't.
 {
-    aiEcho("verifyVinlandsagaBase:");
+    if (ShowAiEcho == true) aiEcho("verifyVinlandsagaBase:");
 
     int newAreaID = goalAreaID;      // New area will be the one we use.  By default,
                                     // we'll start with the one passed to us.
@@ -409,18 +409,18 @@ int verifyVinlandsagaBase(int goalAreaID = -1, int recurseCount = 3)    //verify
 
 /*
     if (recurseCount == 3)     // 3 more levels allowed
-        aiEcho("***** Beginning verifyVinlandsagaBase "+goalAreaID);
+        if (ShowAiEcho == true) aiEcho("***** Beginning verifyVinlandsagaBase "+goalAreaID);
     else if (recurseCount == 2)
-        aiEcho("    "+goalAreaID);
+        if (ShowAiEcho == true) aiEcho("    "+goalAreaID);
     else if (recurseCount == 1)
-        aiEcho("        "+goalAreaID);
+        if (ShowAiEcho == true) aiEcho("        "+goalAreaID);
     else if (recurseCount == 0)
-        aiEcho("           "+goalAreaID);
+        if (ShowAiEcho == true) aiEcho("           "+goalAreaID);
 */
 
     if (hasWaterNeighbor(goalAreaID) == true)    // Simple case
     {
-        //aiEcho("Target area "+goalAreaID+" has a water neighbor...using it.");
+        //if (ShowAiEcho == true) aiEcho("Target area "+goalAreaID+" has a water neighbor...using it.");
         return(goalAreaID);
     }
     int recurseLevel = 0;
@@ -428,8 +428,8 @@ int verifyVinlandsagaBase(int goalAreaID = -1, int recurseCount = 3)    //verify
     {
         for (recurseLevel=0; < recurseCount)
         {
-            //aiEcho("Area "+goalAreaID+" has "+kbAreaGetNumberBorderAreas(goalAreaID)+" neighbors.");
-            //aiEcho("Testing "+(recurseLevel+1)+" layers around area "+goalAreaID);
+            //if (ShowAiEcho == true) aiEcho("Area "+goalAreaID+" has "+kbAreaGetNumberBorderAreas(goalAreaID)+" neighbors.");
+            //if (ShowAiEcho == true) aiEcho("Testing "+(recurseLevel+1)+" layers around area "+goalAreaID);
             // Test each area that borders each border area.  
             for (index=0; < kbAreaGetNumberBorderAreas(goalAreaID))  // Get each border area
             {
@@ -443,7 +443,7 @@ int verifyVinlandsagaBase(int goalAreaID = -1, int recurseCount = 3)    //verify
     }
 
     if (recurseCount == 3)     // Sigh, just fail and return -1.
-        aiEcho("Couldn't find a water-bordered area.");
+        if (ShowAiEcho == true) aiEcho("Couldn't find a water-bordered area.");
     return(-1);
 }
 
@@ -455,7 +455,7 @@ int verifyVinlandsagaBase(int goalAreaID = -1, int recurseCount = 3)    //verify
 //==============================================================================
 float _pow(float n = 0,int x = 0) 
 {
-    //aiEcho("_pow:");
+    //if (ShowAiEcho == true) aiEcho("_pow:");
 
     float r = n;
     for (i = 1; < x) 
@@ -467,7 +467,7 @@ float _pow(float n = 0,int x = 0)
 
 float _atan(float n = 0) 
 {
-    //aiEcho("_atan:");
+    //if (ShowAiEcho == true) aiEcho("_atan:");
 
     float m = n;
     if (n > 1)
@@ -495,7 +495,7 @@ float _atan(float n = 0)
 
 float _atan2(float z = 0,float x = 0) 
 {
-    //aiEcho("_atan2:");
+    //if (ShowAiEcho == true) aiEcho("_atan2:");
 
     if (x > 0) 
         return (_atan(z / x));
@@ -516,7 +516,7 @@ float _atan2(float z = 0,float x = 0)
 
 float _fact(float n = 0) 
 {
-    //aiEcho("_fact:");
+    //if (ShowAiEcho == true) aiEcho("_fact:");
 
     float r = 1;
     for (i = 1; <= n) 
@@ -528,7 +528,7 @@ float _fact(float n = 0)
 
 float _cos(float n = 0) 
 {
-    //aiEcho("_cos:");
+    //if (ShowAiEcho == true) aiEcho("_cos:");
 
     float r = 1;
     for (i = 1; < 100) 
@@ -547,7 +547,7 @@ float _cos(float n = 0)
 
 float _sin(float n = 0) 
 {
-    //aiEcho("_sin:");
+    //if (ShowAiEcho == true) aiEcho("_sin:");
 
     float r = n;
     for (i = 1; < 100) 
@@ -567,7 +567,7 @@ float _sin(float n = 0)
 //==============================================================================
 vector findForwardBasePos()
 {
-    aiEcho("findForwardBasePos:");
+    if (ShowAiEcho == true) aiEcho("findForwardBasePos:");
     
     static vector forwardBasePos = cInvalidVector;
     // don't calculate again.
@@ -588,8 +588,8 @@ vector findForwardBasePos()
         float s = _sin(q+p);
         float x = xsVectorGetX(enemyPos) + (c * radius);
         float z = xsVectorGetZ(enemyPos) + (s * radius);
-        //aiEcho("findForwardBase: x="+x);
-        //aiEcho("findForwardBase: z="+z);
+        //if (ShowAiEcho == true) aiEcho("findForwardBase: x="+x);
+        //if (ShowAiEcho == true) aiEcho("findForwardBase: z="+z);
         forwardBasePos = xsVectorSetX(forwardBasePos, x);
         forwardBasePos = xsVectorSetZ(forwardBasePos, z);
 
@@ -638,7 +638,7 @@ vector findForwardBasePos()
 //==============================================================================
 int getPlayerForIsland(int AGID=-1)
 {
-    aiEcho("getPlayerForIsland:");
+    if (ShowAiEcho == true) aiEcho("getPlayerForIsland:");
 
     int hasMost=-1;
     int max=0;
@@ -662,7 +662,7 @@ int getPlayerForIsland(int AGID=-1)
 int findUnit(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, 
                 int playerID = cMyID, vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    //aiEcho("findUnit:");
+    //if (ShowAiEcho == true) aiEcho("findUnit:");
 
     int count = -1;
     static int unitQueryID = -1;
@@ -691,7 +691,7 @@ int findUnit(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1,
 int findUnitByRel(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, int playerRelation = cPlayerRelationSelf,
                          vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    //aiEcho("findUnitByRel:");
+    //if (ShowAiEcho == true) aiEcho("findUnitByRel:");
 
     int count = -1;
     static int unitQueryID = -1;
@@ -720,7 +720,7 @@ int findUnitByRel(int unitTypeID = -1, int state = cUnitStateAlive, int action =
 int findUnitByIndex(int unitTypeID = -1, int index = 0, int state = cUnitStateAlive, int action = -1, int playerID = cMyID, 
                         vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    //aiEcho("findUnitByIndex:");
+    //if (ShowAiEcho == true) aiEcho("findUnitByIndex:");
 
     int count = -1;
     static int unitQueryID = -1;
@@ -749,7 +749,7 @@ int findUnitByRelByIndex(int unitTypeID = -1, int index = 0, int state = cUnitSt
                             int playerRelation = cPlayerRelationSelf, vector center = cInvalidVector, float radius = -1, 
                                 bool seeable = false, int areaID = -1)
 {
-    //aiEcho("findUnitByRelByIndex:");
+    //if (ShowAiEcho == true) aiEcho("findUnitByRelByIndex:");
     
     int count = -1;
     static int unitQueryID = -1;
@@ -777,7 +777,7 @@ int findUnitByRelByIndex(int unitTypeID = -1, int index = 0, int state = cUnitSt
 int getNumUnits(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, 
                  int playerID = cMyID, vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    //aiEcho("getNumUnits:");
+    //if (ShowAiEcho == true) aiEcho("getNumUnits:");
 
     int count = -1;
     static int unitQueryID = -1;
@@ -803,7 +803,7 @@ int getNumUnits(int unitTypeID = -1, int state = cUnitStateAlive, int action = -
 int getNumUnitsByRel(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, int playerRelation = cPlayerRelationSelf,
                         vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    //aiEcho("getNumUnitsByRel:");
+    //if (ShowAiEcho == true) aiEcho("getNumUnitsByRel:");
     
     int count = -1;
     static int unitQueryID = -1;
@@ -826,7 +826,7 @@ int getNumUnitsByRel(int unitTypeID = -1, int state = cUnitStateAlive, int actio
 //==============================================================================
 vector getMainBaseMilitaryGatherPoint()
 {
-    aiEcho("******** getMainBaseMilitaryGatherPoint");
+    if (ShowAiEcho == true) aiEcho("******** getMainBaseMilitaryGatherPoint");
 
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
@@ -843,7 +843,7 @@ vector getMainBaseMilitaryGatherPoint()
         if (gatherPointUnitIDNearMainBase < 0)
         {
             radius = radius + 20.0;
-            //aiEcho("increasing radius to find gatherPointUnitIDNearMainBase");
+            //if (ShowAiEcho == true) aiEcho("increasing radius to find gatherPointUnitIDNearMainBase");
         }
         else
         {
@@ -857,7 +857,7 @@ vector getMainBaseMilitaryGatherPoint()
         vector baseFront = xsVectorNormalize(kbGetMapCenter() - mainBaseLocation);
         militaryGatherPoint = mainBaseLocation + baseFront * 18;
     }
-    //aiEcho("our military gather point is: "+militaryGatherPoint);
+    //if (ShowAiEcho == true) aiEcho("our military gather point is: "+militaryGatherPoint);
     return(militaryGatherPoint);
 }
 
@@ -865,56 +865,56 @@ vector getMainBaseMilitaryGatherPoint()
 //==============================================================================
 int getMainBaseUnitIDForPlayer(int playerID = -1)
 {
-    //aiEcho("getMainBaseUnitIDForPlayer: "+playerID);
+    //if (ShowAiEcho == true) aiEcho("getMainBaseUnitIDForPlayer: "+playerID);
     
     int numSettlements = kbUnitCount(playerID, cUnitTypeAbstractSettlement, cUnitStateAlive);
     if (numSettlements < 1)
     {
-        //aiEcho("no enemy settlements (sighted yet), returning -1");
+        //if (ShowAiEcho == true) aiEcho("no enemy settlements (sighted yet), returning -1");
         return(-1);
     }    
     
     int mainBaseUnitID = -1;
 
     int mainBaseID = kbBaseGetMainID(playerID); //For some reason the mainBaseID of enemies usually isn't a settlement base!
-    //aiEcho("mainBaseID: "+mainBaseID);
+    //if (ShowAiEcho == true) aiEcho("mainBaseID: "+mainBaseID);
     vector mainBaseLocation = kbBaseGetLocation(playerID, mainBaseID);  //doesn't actually return the settlement position
-    //aiEcho("mainBaseLocation: "+mainBaseLocation);
+    //if (ShowAiEcho == true) aiEcho("mainBaseLocation: "+mainBaseLocation);
     float radius = 15.0;
     for (i = 0; < 4)
     {
         mainBaseUnitID = findUnitByIndex(cUnitTypeAbstractSettlement, 0, cUnitStateAlive, -1, playerID, mainBaseLocation, radius);
         if (mainBaseUnitID < 0)
         {
-            //aiEcho("no settlement found, increasing radius by 15.0");
+            //if (ShowAiEcho == true) aiEcho("no settlement found, increasing radius by 15.0");
             radius = radius + 15.0;
         }
         else
         {
-            //aiEcho("mainBaseUnitID found, breaking off");
+            //if (ShowAiEcho == true) aiEcho("mainBaseUnitID found, breaking off");
             break;
         }
     }
     
     if (mainBaseUnitID < 0)
     {
-        //aiEcho("mainBaseUnitID < 0, checking all settlements");
+        //if (ShowAiEcho == true) aiEcho("mainBaseUnitID < 0, checking all settlements");
         for (i = 0; < numSettlements)
         {
             int settlementID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive, -1, playerID);
-            //aiEcho("settlementID: "+settlementID);
+            //if (ShowAiEcho == true) aiEcho("settlementID: "+settlementID);
             if (settlementID != -1)
             {
                 vector settlementLocation = kbUnitGetPosition(settlementID);
-                //aiEcho("settlementLocation "+settlementLocation);
+                //if (ShowAiEcho == true) aiEcho("settlementLocation "+settlementLocation);
                 int numTowersInR50 = getNumUnits(cUnitTypeTower, cUnitStateAlive, -1, playerID, settlementLocation, 50.0);
                 int numFarmsInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, playerID, settlementLocation, 30.0);
-                //aiEcho("numTowersInR50: "+numTowersInR50);
-                //aiEcho("numFarmsInR30: "+numFarmsInR30);
+                //if (ShowAiEcho == true) aiEcho("numTowersInR50: "+numTowersInR50);
+                //if (ShowAiEcho == true) aiEcho("numFarmsInR30: "+numFarmsInR30);
             
                 if ((numTowersInR50 > 3) || (numFarmsInR30 > 6))    //TODO: rework and improve the main base detection!
                 {
-                    //aiEcho("This is probably the mainBase as numTowersInR50 > 3 or numFarmsInR30 > 6");
+                    //if (ShowAiEcho == true) aiEcho("This is probably the mainBase as numTowersInR50 > 3 or numFarmsInR30 > 6");
                     mainBaseUnitID = settlementID;
                     break;
                 }
@@ -922,14 +922,14 @@ int getMainBaseUnitIDForPlayer(int playerID = -1)
         }
     }
     
-    //aiEcho("mainBaseUnitID: "+mainBaseUnitID+" for player:"+playerID);
+    //if (ShowAiEcho == true) aiEcho("mainBaseUnitID: "+mainBaseUnitID+" for player:"+playerID);
     return(mainBaseUnitID);
 }
 
 //==============================================================================
 int findNumUnitsInBase(int playerID = 0, int baseID = -1, int unitTypeID = -1, int state = cUnitStateAliveOrBuilding)
 {
-    aiEcho("findNumUnitsInBase:");
+    if (ShowAiEcho == true) aiEcho("findNumUnitsInBase:");
 
     int count = -1;
     static int unitQueryID = -1;
@@ -957,7 +957,7 @@ int findNumUnitsInBase(int playerID = 0, int baseID = -1, int unitTypeID = -1, i
 //==============================================================================
 int getPlanPopSlots(int planID=-1)  //Returns the total pop slots taken by units in this plan
 {
-    aiEcho("getPlanPopSlots:");
+    if (ShowAiEcho == true) aiEcho("getPlanPopSlots:");
 
     int unitCount = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
     return(3 * unitCount);
@@ -968,9 +968,9 @@ int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
     int unitPickerID=-1, int repeat=-1, int minAge=-1, int maxAge=-1,
     int baseID=-1, bool allowRetreat=false)
 {
-    aiEcho("CreateSimpleAttackGoal:  Name="+name+", AttackPlayerID="+attackPlayerID+".");
-    //aiEcho("  UnitPickerID="+unitPickerID+", Repeat="+repeat+", baseID="+baseID+".");
-    //aiEcho("  MinAge="+minAge+", maxAge="+maxAge+", allowRetreat="+allowRetreat+".");
+    if (ShowAiEcho == true) aiEcho("CreateSimpleAttackGoal:  Name="+name+", AttackPlayerID="+attackPlayerID+".");
+    //if (ShowAiEcho == true) aiEcho("  UnitPickerID="+unitPickerID+", Repeat="+repeat+", baseID="+baseID+".");
+    //if (ShowAiEcho == true) aiEcho("  MinAge="+minAge+", maxAge="+maxAge+", allowRetreat="+allowRetreat+".");
 
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
@@ -1021,7 +1021,7 @@ int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
     // Handle OkToAttack control variable
     if (cvOkToAttack == false)     
     {
-        //aiEcho("CreateSimpleAttackPlan:  Setting attack "+goalID+" to idle.");
+        //if (ShowAiEcho == true) aiEcho("CreateSimpleAttackPlan:  Setting attack "+goalID+" to idle.");
         aiPlanSetVariableBool(goalID, cGoalPlanIdleAttack, 0, true);       // Prevent attacks
     }
 
@@ -1033,9 +1033,9 @@ int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
 int createBaseGoal(string name="BUG", int goalType=-1, int attackPlayerID=-1,
     int repeat=-1, int minAge=-1, int maxAge=-1, int parentBaseID=-1)
 {
-    aiEcho("CreateBaseGoal:  Name="+name+", AttackPlayerID="+attackPlayerID+".");
-    //aiEcho("  GoalType="+goalType+", Repeat="+repeat+", parentBaseID="+parentBaseID+".");
-    //aiEcho("  MinAge="+minAge+", maxAge="+maxAge+".");
+    if (ShowAiEcho == true) aiEcho("CreateBaseGoal:  Name="+name+", AttackPlayerID="+attackPlayerID+".");
+    //if (ShowAiEcho == true) aiEcho("  GoalType="+goalType+", Repeat="+repeat+", parentBaseID="+parentBaseID+".");
+    //if (ShowAiEcho == true) aiEcho("  MinAge="+minAge+", maxAge="+maxAge+".");
 
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
@@ -1076,8 +1076,8 @@ int createBaseGoal(string name="BUG", int goalType=-1, int attackPlayerID=-1,
 int createCallbackGoal(string name="BUG", string callbackName="BUG", int repeat=-1,
     int minAge=-1, int maxAge=-1, bool autoUpdate=false)
 {
-    aiEcho("CreateCallbackGoal:  Name="+name+", CallbackName="+callbackName+".");
-    //aiEcho("  Repeat="+repeat+", MinAge="+minAge+", maxAge="+maxAge+".");
+    if (ShowAiEcho == true) aiEcho("CreateCallbackGoal:  Name="+name+", CallbackName="+callbackName+".");
+    //if (ShowAiEcho == true) aiEcho("  Repeat="+repeat+", MinAge="+minAge+", maxAge="+maxAge+".");
 
     //Get the callbackFID.
     int callbackFID=xsGetFunctionID(callbackName);
@@ -1112,8 +1112,8 @@ int createBuildBuildingGoal(string name="BUG", int buildingTypeID=-1, int repeat
     int minAge=-1, int maxAge=-1, int baseID=-1, int numberUnits=1, int builderUnitTypeID=-1,
     bool autoUpdate=true, int pri=90, int buildingPlacementID = -1)
 {
-    aiEcho("CreateBuildBuildingGoal:  Name="+name+", BuildingType="+kbGetUnitTypeName(buildingTypeID)+".");
-    //aiEcho("  Repeat="+repeat+", MinAge="+minAge+", maxAge="+maxAge+".");
+    if (ShowAiEcho == true) aiEcho("CreateBuildBuildingGoal:  Name="+name+", BuildingType="+kbGetUnitTypeName(buildingTypeID)+".");
+    //if (ShowAiEcho == true) aiEcho("  Repeat="+repeat+", MinAge="+minAge+", maxAge="+maxAge+".");
 
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
@@ -1153,8 +1153,8 @@ int createBuildSettlementGoal(string name="BUG", int minAge=-1, int maxAge=-1, i
 {
     int buildingTypeID = cUnitTypeSettlementLevel1;
 
-    aiEcho("CreateBuildSettlementGoal:  Name="+name+", BuildingType="+kbGetUnitTypeName(buildingTypeID)+".");
-    //aiEcho("  MinAge="+minAge+", maxAge="+maxAge+".");
+    if (ShowAiEcho == true) aiEcho("CreateBuildSettlementGoal:  Name="+name+", BuildingType="+kbGetUnitTypeName(buildingTypeID)+".");
+    //if (ShowAiEcho == true) aiEcho("  MinAge="+minAge+", maxAge="+maxAge+".");
 
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
@@ -1192,9 +1192,9 @@ int createBuildSettlementGoal(string name="BUG", int minAge=-1, int maxAge=-1, i
 int createTransportPlan(string name="BUG", int startAreaID=-1, int goalAreaID=-1,
     bool persistent=false, int transportPUID=-1, int pri=-1, int baseID=-1)
 {
-    aiEcho("CreateTransportPlan:  Name="+name+", Priority="+pri+".");
-    //aiEcho("  StartAreaID="+startAreaID+", GoalAreaID="+goalAreaID+", Persistent="+persistent+".");
-    //aiEcho("  TransportType="+kbGetUnitTypeName(transportPUID)+", BaseID="+baseID+".");
+    if (ShowAiEcho == true) aiEcho("CreateTransportPlan:  Name="+name+", Priority="+pri+".");
+    //if (ShowAiEcho == true) aiEcho("  StartAreaID="+startAreaID+", GoalAreaID="+goalAreaID+", Persistent="+persistent+".");
+    //if (ShowAiEcho == true) aiEcho("  TransportType="+kbGetUnitTypeName(transportPUID)+", BaseID="+baseID+".");
 
     //Create the plan.
     int planID=aiPlanCreate(name, cPlanTransport);
@@ -1227,7 +1227,7 @@ int createTransportPlan(string name="BUG", int startAreaID=-1, int goalAreaID=-1
 //==============================================================================
 int getEconPop(void)    //Returns the unit count of villagers, dwarves, fishing boats, trade carts and oxcarts
 {
-    aiEcho("getEconPop:");
+    if (ShowAiEcho == true) aiEcho("getEconPop:");
 
     int retVal = 0;
 
@@ -1254,7 +1254,7 @@ int getEconPop(void)    //Returns the unit count of villagers, dwarves, fishing 
 //==============================================================================
 int getMilPop(void) //Returns the pop slots used by military units
 {
-    aiEcho("getMilPop:");
+    if (ShowAiEcho == true) aiEcho("getMilPop:");
 
     return(kbGetPop() - getEconPop());
 }
@@ -1262,7 +1262,7 @@ int getMilPop(void) //Returns the pop slots used by military units
 //==============================================================================
 vector findBestSettlement(int playerID=0)   //Will find the closet settlement of the given playerID
 {
-    aiEcho("findBestSettlement:");
+    if (ShowAiEcho == true) aiEcho("findBestSettlement:");
 
     int count=-1;
     int numberFound=-1;
@@ -1314,7 +1314,7 @@ vector findBestSettlement(int playerID=0)   //Will find the closet settlement of
 //==============================================================================
 void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
 {
-    aiEcho("claimSettlement:");    
+    if (ShowAiEcho == true) aiEcho("claimSettlement:");    
     
     int baseID=-1;
     int startAreaID=-1;
@@ -1399,7 +1399,7 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
 //==============================================================================
 bool findASettlement()  //Will find an unclaimed settlement
 {
-    //aiEcho("findASettlement:");
+    //if (ShowAiEcho == true) aiEcho("findASettlement:");
 
     int count=-1;
     static int unitQueryID=-1;
@@ -1428,7 +1428,7 @@ bool findASettlement()  //Will find an unclaimed settlement
 //==============================================================================
 int findBiggestBorderArea(int areaID=-1)    //given an area ID, find the biggest border area in tiles
 {
-    aiEcho("findBiggestBorderArea:");
+    if (ShowAiEcho == true) aiEcho("findBiggestBorderArea:");
 
     if (areaID == -1)
         return(-1);
@@ -1456,7 +1456,7 @@ int findBiggestBorderArea(int areaID=-1)    //given an area ID, find the biggest
 //==============================================================================
 int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 {
-    aiEcho("newResourceBase:");
+    if (ShowAiEcho == true) aiEcho("newResourceBase:");
 
     int queryUnitID=cUnitTypeGold;
     if (resourceID==cResourceWood)
@@ -1471,7 +1471,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 
     if ( numResults <= 0 )
     {
-        //aiEcho("newResourceBase: no resources found, return!");
+        //if (ShowAiEcho == true) aiEcho("newResourceBase: no resources found, return!");
         return(-1);
     }
     vector there = kbUnitGetPosition(kbUnitQueryGetResult(resourceQueryID, 0)); // just take the closest
@@ -1480,7 +1480,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
     // see updateGoldBreakdown and updateWoodBreakdown
     if ( isOnMyIsland(there) )
     {
-        //aiEcho("newResourceBase: resource found on my island, return!");
+        //if (ShowAiEcho == true) aiEcho("newResourceBase: resource found on my island, return!");
         return(-1);
     }
 
@@ -1493,7 +1493,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
         // been there, done that
         if ( equal(gTransportToGoldPos, there) )
         {
-            //aiEcho("newResourceBase: already transported vills to gold position, return!");
+            //if (ShowAiEcho == true) aiEcho("newResourceBase: already transported vills to gold position, return!");
             return(-1);
         }
     }
@@ -1503,7 +1503,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
         // been there, done that
         if ( equal(gTransportToWoodPos, there) )
         {
-            //aiEcho("newResourceBase: already transported vills to wood position, return!");
+            //if (ShowAiEcho == true) aiEcho("newResourceBase: already transported vills to wood position, return!");
             return(-1);
         }
     }
@@ -1520,7 +1520,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
     int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
     if (transportPUID < 0)
     {
-        //aiEcho("newResourceBase: no transport unit type, return!");
+        //if (ShowAiEcho == true) aiEcho("newResourceBase: no transport unit type, return!");
         return(-1);
     }
 
@@ -1556,7 +1556,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
         kbBaseSetEconomy(cMyID, newBaseID, true);
         //Set the resource distance limit.
         kbBaseSetMaximumResourceDistance(cMyID, newBaseID, gMaximumBaseResourceDistance);
-        //aiEcho("newResourceBase at location:"+there);
+        //if (ShowAiEcho == true) aiEcho("newResourceBase at location:"+there);
     }
 
     int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
@@ -1583,7 +1583,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 //==============================================================================
 void setTownLocation(void)
 {
-    aiEcho("setTownLocation:");    
+    if (ShowAiEcho == true) aiEcho("setTownLocation:");    
     
     static int tcQueryID=-1;
     //If we don't have a query ID, create it.
@@ -1612,7 +1612,7 @@ void setTownLocation(void)
 //==============================================================================
 int createSimpleMaintainPlan(int puid=-1, int number=1, bool economy=true, int baseID=-1)
 {
-    aiEcho("createSimpleMaintainPlan:");    
+    if (ShowAiEcho == true) aiEcho("createSimpleMaintainPlan:");    
 
     //Create the plan name.
     string planName="Military";
@@ -1651,7 +1651,7 @@ int createSimpleMaintainPlan(int puid=-1, int number=1, bool economy=true, int b
 bool createSimpleBuildPlan(int puid=-1, int number=1, int pri=100,
     bool military=false, bool economy=true, int escrowID=-1, int baseID=-1, int numberBuilders=1)
 {
-    aiEcho("createSimpleBuildPlan:");    
+    if (ShowAiEcho == true) aiEcho("createSimpleBuildPlan:");    
 
     //Create the right number of plans.
     for (i=0; < number)
@@ -1682,7 +1682,7 @@ bool createSimpleBuildPlan(int puid=-1, int number=1, int pri=100,
 //==============================================================================
 int getSoftPopCap(void) //Calculate our pop limit if we had all houses built
 {
-    //aiEcho("getSoftPopCap:");    
+    //if (ShowAiEcho == true) aiEcho("getSoftPopCap:");    
 
     int houseProtoID = cUnitTypeHouse;
     if (cMyCulture == cCultureAtlantean)
@@ -1711,7 +1711,7 @@ float adjustSigmoid(float var=0.0, float fraction=0.0,  float lowerLimit=0.0, fl
     // A fraction of +.5 means increase it by the lesser of 50% of its original value, or 50% of the space remaining.
     // A fraction of -.5 means decrease it by the lesser of 50% of its original value, or 50% of the distance from the upper limit.
 
-    //aiEcho("adjustSigmoid:");    
+    //if (ShowAiEcho == true) aiEcho("adjustSigmoid:");    
 
     float spaceAbove = upperLimit - var;
 
@@ -1740,13 +1740,13 @@ float adjustSigmoid(float var=0.0, float fraction=0.0,  float lowerLimit=0.0, fl
 //==============================================================================
 void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
 {
-    aiEcho("pullBackUnits:");    
+    if (ShowAiEcho == true) aiEcho("pullBackUnits:");    
     if (DisallowPullBack == true)
 	return;
     int numUnitsInPlan = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
     if (numUnitsInPlan > 0)
     {
-        //aiEcho("*_!_*_!_*_!_pullBackUnits: ");
+        //if (ShowAiEcho == true) aiEcho("*_!_*_!_*_!_pullBackUnits: ");
         //Limited the maximum number of loops
         int min = 0;
         int max = 3;
@@ -1762,13 +1762,13 @@ void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
                 numUnitsInPlan = max;
             for (i = 0; < numUnitsInPlan)
             {
-                //aiEcho("i = "+i);
+                //if (ShowAiEcho == true) aiEcho("i = "+i);
                 unitID = aiPlanGetUnitByIndex(planID, i);
                 if (unitID != -1)
                 {
-                    //aiEcho("unitPosition: "+kbUnitGetPosition(unitID));
+                    //if (ShowAiEcho == true) aiEcho("unitPosition: "+kbUnitGetPosition(unitID));
                     aiTaskUnitMove(unitID, retreatPosition);
-                    aiEcho("pulling unit: "+unitID+" back to retreatPosition: "+retreatPosition);
+                    if (ShowAiEcho == true) aiEcho("pulling unit: "+unitID+" back to retreatPosition: "+retreatPosition);
                 }
             }
         }
@@ -1779,13 +1779,13 @@ void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
                 min = numUnitsInPlan - max;
             for (i = numUnitsInPlan - 1; >= min)
             {
-                //aiEcho("i = "+i);
+                //if (ShowAiEcho == true) aiEcho("i = "+i);
                 unitID = aiPlanGetUnitByIndex(planID, i);
                 if (unitID != -1)
                 {
-                    //aiEcho("unitPosition: "+kbUnitGetPosition(unitID));
+                    //if (ShowAiEcho == true) aiEcho("unitPosition: "+kbUnitGetPosition(unitID));
                     aiTaskUnitMove(unitID, retreatPosition);
-                    aiEcho("pulling unit: "+unitID+" back to retreatPosition: "+retreatPosition);
+                    if (ShowAiEcho == true) aiEcho("pulling unit: "+unitID+" back to retreatPosition: "+retreatPosition);
                 }
             }
         }
@@ -1796,13 +1796,13 @@ void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
 //==============================================================================
 void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVector)
 {
-    aiEcho("keepUnitsWithinRange:");    
+    if (ShowAiEcho == true) aiEcho("keepUnitsWithinRange:");    
 
     int numUnitsInPlan = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
     if (numUnitsInPlan > 0)
     {
         
-        aiEcho("planID: "+planID);
+        if (ShowAiEcho == true) aiEcho("planID: "+planID);
         //Limited the maximum number of loops
         int min = 0;
         int max = 16;
@@ -1810,10 +1810,10 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
             max = 9;
         
         float engageRange = aiPlanGetVariableFloat(planID, cDefendPlanEngageRange, 0);
-        aiEcho("engageRange: "+engageRange);
+        if (ShowAiEcho == true) aiEcho("engageRange: "+engageRange);
         if (engageRange < 35.0)
             engageRange = 25.0;
-        aiEcho("modified engageRange: "+engageRange);
+        if (ShowAiEcho == true) aiEcho("modified engageRange: "+engageRange);
         
         int unitID = -1;
         int actionType = -1;
@@ -1841,14 +1841,14 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
                     continue;
                 
                 actionType = kbUnitGetActionType(unitID);
-                //aiEcho("unitID: "+unitID+" has actionType: "+actionType);
+                //if (ShowAiEcho == true) aiEcho("unitID: "+unitID+" has actionType: "+actionType);
                 if ((actionType != cActionHandAttack) && (actionType != cActionRangedAttack) && (actionType != cActionLightningAttack))
                     continue;
                 
                 unitPosition = kbUnitGetPosition(unitID);
-                aiEcho("unitPosition: "+unitPosition);
+                if (ShowAiEcho == true) aiEcho("unitPosition: "+unitPosition);
                 distance = xsVectorLength(unitPosition - retreatPosition);
-                aiEcho("distance: "+distance);
+                if (ShowAiEcho == true) aiEcho("distance: "+distance);
                 
                 modifier = -1.0;
                 if (kbUnitIsType(unitID, cUnitTypeAbstractArcher) == true)
@@ -1863,13 +1863,13 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
                 if (minDistance < 10.0)
                     minDistance = 10.0;
                 multiplier = minDistance / distance;
-                aiEcho("multiplier: "+multiplier);
+                if (ShowAiEcho == true) aiEcho("multiplier: "+multiplier);
                 directionalVector = unitPosition - retreatPosition;
-                aiEcho("directionalVector: "+directionalVector);
+                if (ShowAiEcho == true) aiEcho("directionalVector: "+directionalVector);
                 desiredPosition = unitPosition - directionalVector * multiplier;
-                aiEcho("desiredPosition: "+desiredPosition);
+                if (ShowAiEcho == true) aiEcho("desiredPosition: "+desiredPosition);
                 aiTaskUnitMove(unitID, desiredPosition);
-                aiEcho("sending unit: "+unitID+" back to position: "+desiredPosition);
+                if (ShowAiEcho == true) aiEcho("sending unit: "+unitID+" back to position: "+desiredPosition);
             }
         }
         else
@@ -1887,14 +1887,14 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
                     continue;
                 
                 actionType = kbUnitGetActionType(unitID);
-                //aiEcho("unitID: "+unitID+" has actionType: "+actionType);
+                //if (ShowAiEcho == true) aiEcho("unitID: "+unitID+" has actionType: "+actionType);
                 if ((actionType != cActionHandAttack) && (actionType != cActionRangedAttack) && (actionType != cActionLightningAttack))
                     continue;
                 
                 unitPosition = kbUnitGetPosition(unitID);
-                aiEcho("unitPosition: "+unitPosition);
+                if (ShowAiEcho == true) aiEcho("unitPosition: "+unitPosition);
                 distance = xsVectorLength(unitPosition - retreatPosition);
-                aiEcho("distance: "+distance);
+                if (ShowAiEcho == true) aiEcho("distance: "+distance);
                 
                 modifier = -1.0;
                 if (kbUnitIsType(unitID, cUnitTypeAbstractArcher) == true)
@@ -1909,13 +1909,13 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
                 if (minDistance < 10.0)
                     minDistance = 10.0;
                 multiplier = minDistance / distance;
-                aiEcho("multiplier: "+multiplier);
+                if (ShowAiEcho == true) aiEcho("multiplier: "+multiplier);
                 directionalVector = unitPosition - retreatPosition;
-                aiEcho("directionalVector: "+directionalVector);
+                if (ShowAiEcho == true) aiEcho("directionalVector: "+directionalVector);
                 desiredPosition = unitPosition - directionalVector * multiplier;
-                aiEcho("desiredPosition: "+desiredPosition);
+                if (ShowAiEcho == true) aiEcho("desiredPosition: "+desiredPosition);
                 aiTaskUnitMove(unitID, desiredPosition);
-                aiEcho("sending unit: "+unitID+" back to position: "+desiredPosition);
+                if (ShowAiEcho == true) aiEcho("sending unit: "+unitID+" back to position: "+desiredPosition);
             }
         }
         
@@ -1925,11 +1925,11 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
 //==============================================================================
 int getNumPlayersByRel(bool ally = true)
 {
-    aiEcho("**!!**!!** getNumPlayersByRel:");
+    if (ShowAiEcho == true) aiEcho("**!!**!!** getNumPlayersByRel:");
     if (ally == true)
-        aiEcho("ally");
+        if (ShowAiEcho == true) aiEcho("ally");
     else
-        aiEcho("enemy");
+        if (ShowAiEcho == true) aiEcho("enemy");
         
     int numPlayersByRel = 0;
     int playerID = -1;
@@ -1954,7 +1954,7 @@ int getNumPlayersByRel(bool ally = true)
             numPlayersByRel = numPlayersByRel + 1;
         }
     }
-    aiEcho("numPlayersByRel: "+numPlayersByRel);
+    if (ShowAiEcho == true) aiEcho("numPlayersByRel: "+numPlayersByRel);
     
     return(numPlayersByRel);
 }
@@ -1962,7 +1962,7 @@ int getNumPlayersByRel(bool ally = true)
 //==============================================================================
 vector calcMonumentPos(int which=-1)
 {
-    aiEcho("calcMonumentPos:");
+    if (ShowAiEcho == true) aiEcho("calcMonumentPos:");
 
     vector basePos=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
     vector towardCenter=kbGetMapCenter()-basePos;
@@ -1984,11 +1984,11 @@ vector calcMonumentPos(int which=-1)
 //==============================================================================
 void taskMilUnitTrainAtBase(int baseID = -1)
 {
-    aiEcho("taskMilUnitTrainAtBase: "+baseID);
+    if (ShowAiEcho == true) aiEcho("taskMilUnitTrainAtBase: "+baseID);
         
     if (baseID == -1)
     {
-        aiEcho("no baseID specified, returning");
+        if (ShowAiEcho == true) aiEcho("no baseID specified, returning");
         return;
     }
     
@@ -2045,7 +2045,7 @@ void taskMilUnitTrainAtBase(int baseID = -1)
     int hero1ID = -1;
     int hero2ID = -1;
     int settlementIDNearBase = findUnitByIndex(cUnitTypeAbstractSettlement, 0, cUnitStateAlive, -1, cMyID, baseLocation, 15.0);
-    aiEcho("settlementIDNearBase: "+settlementIDNearBase);
+    if (ShowAiEcho == true) aiEcho("settlementIDNearBase: "+settlementIDNearBase);
     if ((settlementIDNearBase != -1) && (cMyCulture == cCultureGreek))
     {
         if (cMyCiv == cCivZeus)
@@ -2072,11 +2072,11 @@ void taskMilUnitTrainAtBase(int baseID = -1)
         if ((settlementIDNearBase != -1) && (cMyCulture != cCultureAtlantean))
         {
             override = true;
-            aiEcho("setting override = true");
+            if (ShowAiEcho == true) aiEcho("setting override = true");
         }
         else
         {
-            aiEcho("No building available, returning");
+            if (ShowAiEcho == true) aiEcho("No building available, returning");
             return;
         }
     }
@@ -2105,7 +2105,7 @@ void taskMilUnitTrainAtBase(int baseID = -1)
             if ((numHero1 < 1) || (numHero2 < 1))
             {
                 override = true;
-                aiEcho("setting override = true");
+                if (ShowAiEcho == true) aiEcho("setting override = true");
             }
         }
         
@@ -2115,7 +2115,7 @@ void taskMilUnitTrainAtBase(int baseID = -1)
     else
     {
         //shouldn't happen anyway
-        aiEcho("strange, no building available, returning");
+        if (ShowAiEcho == true) aiEcho("strange, no building available, returning");
         return;
     }
     
@@ -2241,14 +2241,14 @@ void taskMilUnitTrainAtBase(int baseID = -1)
         if (override == false)
         {
             //shouldn't happen anyway
-            aiEcho("strange building ID: "+buildingToUse+", returning");
+            if (ShowAiEcho == true) aiEcho("strange building ID: "+buildingToUse+", returning");
             return;
         }
     }
     
     if (puid == -1)
     {
-        aiEcho("puid == -1, returning");
+        if (ShowAiEcho == true) aiEcho("puid == -1, returning");
         return;
     }
     
@@ -2257,11 +2257,11 @@ void taskMilUnitTrainAtBase(int baseID = -1)
     {
         //train a unit via aiTaskUnitTrain
         aiTaskUnitTrain(buildingToUse, puid);
-        aiEcho("Trying to train a unit with puid: "+puid+" at building with ID: "+buildingToUse);
+        if (ShowAiEcho == true) aiEcho("Trying to train a unit with puid: "+puid+" at building with ID: "+buildingToUse);
     }
     else
     {
-        aiEcho("a unit with puid: "+puid+" is already being trained near baseID: "+baseID);
+        if (ShowAiEcho == true) aiEcho("a unit with puid: "+puid+" is already being trained near baseID: "+baseID);
     }
 }
 

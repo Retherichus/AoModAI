@@ -38,7 +38,7 @@ rule getVaultsOfErebus
         aiPlanSetDesiredPriority(voePID, 50);
         aiPlanSetEscrowID(voePID, cEconomyEscrowID);
         aiPlanSetActive(voePID);
-        aiEcho("Getting vaults of erebus");
+        if (ShowAiEcho == true) aiEcho("Getting vaults of erebus");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -83,7 +83,7 @@ rule getLordOfHorses
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting LordOfHorses");
+        if (ShowAiEcho == true) aiEcho("Getting LordOfHorses");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -125,7 +125,7 @@ rule getOlympicParentage
         aiPlanSetDesiredPriority(opPID, 25);
         aiPlanSetEscrowID(opPID, cMilitaryEscrowID);
         aiPlanSetActive(opPID);
-        aiEcho("Getting Olympic Parentage");
+        if (ShowAiEcho == true) aiEcho("Getting Olympic Parentage");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -173,7 +173,7 @@ rule getLabyrinthOfMinos
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting LabyrinthOfMinos");
+        if (ShowAiEcho == true) aiEcho("Getting LabyrinthOfMinos");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -217,7 +217,7 @@ rule getWingedMessenger
         aiPlanSetEscrowID(x, cEconomyEscrowID);
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetActive(x);
-        aiEcho("Getting WingedMessenger");
+        if (ShowAiEcho == true) aiEcho("Getting WingedMessenger");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -262,7 +262,7 @@ rule getSylvanLore
         aiPlanSetDesiredPriority(x, 40);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting SylvanLore");
+        if (ShowAiEcho == true) aiEcho("Getting SylvanLore");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -327,7 +327,7 @@ rule getWillOfKronos
         aiPlanSetDesiredPriority(x, 30);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting WillOfKronos");
+        if (ShowAiEcho == true) aiEcho("Getting WillOfKronos");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -399,7 +399,7 @@ rule getDivineBlood
         aiPlanSetDesiredPriority(x, 60);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting DivineBlood");
+        if (ShowAiEcho == true) aiEcho("Getting DivineBlood");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -459,7 +459,7 @@ rule getGoldenApples
 //        aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetEscrowID(x, cEconomyEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting GoldenApples");
+        if (ShowAiEcho == true) aiEcho("Getting GoldenApples");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -521,7 +521,7 @@ rule getRoarOfOrthus
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting RoarOfOrthus");
+        if (ShowAiEcho == true) aiEcho("Getting RoarOfOrthus");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -554,7 +554,7 @@ rule getTempleOfHealing
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting TempleOfHealing");
+        if (ShowAiEcho == true) aiEcho("Getting TempleOfHealing");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -600,7 +600,7 @@ rule getOracle
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting Oracle");
+        if (ShowAiEcho == true) aiEcho("Getting Oracle");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -644,7 +644,7 @@ rule getBacchanalia
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting Bacchanalia");
+        if (ShowAiEcho == true) aiEcho("Getting Bacchanalia");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -711,7 +711,7 @@ rule getAnastrophe
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting Anastrophe");
+        if (ShowAiEcho == true) aiEcho("Getting Anastrophe");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -752,7 +752,7 @@ rule getFlamesOfTyphon
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting FlamesOfTyphon");
+        if (ShowAiEcho == true) aiEcho("Getting FlamesOfTyphon");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -796,7 +796,7 @@ rule getTrierarch
         aiPlanSetDesiredPriority(x, 30);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting Trierarch");
+        if (ShowAiEcho == true) aiEcho("Getting Trierarch");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -814,7 +814,7 @@ rule getForgeOfOlympus
     {
         //cTechForgeofOlympus is researched, reactivate the attack goal
         aiPlanSetVariableBool(gLandAttackGoalID, cGoalPlanIdleAttack, 0, false);
-        aiEcho("reactivating attack goal");
+        if (ShowAiEcho == true) aiEcho("reactivating attack goal");
         xsDisableSelf();
         return;
     }
@@ -823,7 +823,7 @@ rule getForgeOfOlympus
     {
         //set the gLandAttackGoalID to idle so that no armory techs get researched
         aiPlanSetVariableBool(gLandAttackGoalID, cGoalPlanIdleAttack, 0, true);
-        aiEcho("setting gLandAttackGoalID to idle");
+        if (ShowAiEcho == true) aiEcho("setting gLandAttackGoalID to idle");
         xsSetRuleMinIntervalSelf(10);
     }
     
@@ -838,7 +838,7 @@ rule getForgeOfOlympus
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting ForgeOfOlympus");
+        if (ShowAiEcho == true) aiEcho("Getting ForgeOfOlympus");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -905,7 +905,7 @@ rule getWeaponOfTheTitans
         aiPlanSetDesiredPriority(x, 80);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting WeaponOfTheTitans");
+        if (ShowAiEcho == true) aiEcho("Getting WeaponOfTheTitans");
         xsSetRuleMinIntervalSelf(11);
     }
 }
@@ -948,7 +948,7 @@ rule getHandOfTalos
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting HandOfTalos");
+        if (ShowAiEcho == true) aiEcho("Getting HandOfTalos");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -993,7 +993,7 @@ rule getShoulderOfTalos
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting ShoulderOfTalos");
+        if (ShowAiEcho == true) aiEcho("Getting ShoulderOfTalos");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -1036,7 +1036,7 @@ rule getAthenianWall
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting AthenianWall");
+        if (ShowAiEcho == true) aiEcho("Getting AthenianWall");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -1075,7 +1075,7 @@ rule getMonstrousRage
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting MonstrousRage");
+        if (ShowAiEcho == true) aiEcho("Getting MonstrousRage");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -1115,7 +1115,7 @@ rule getFaceOfTheGorgon
         aiPlanSetDesiredPriority(x, 40);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting FaceOfTheGorgon");
+        if (ShowAiEcho == true) aiEcho("Getting FaceOfTheGorgon");
         xsSetRuleMinIntervalSelf(300);
     }
 }

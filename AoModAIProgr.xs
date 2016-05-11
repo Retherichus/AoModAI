@@ -11,13 +11,13 @@
 //==============================================================================
 void initProgress()
 {
-    aiEcho("Progress Init.");
+    if (ShowAiEcho == true) aiEcho("Progress Init.");
 }
 
 //==============================================================================
 int chooseMinorGod(int age = -1, int mythUnitPref = -1, int godPowerPref = -1)
 {
-    aiEcho("chooseMinorGod:");
+    if (ShowAiEcho == true) aiEcho("chooseMinorGod:");
     
     //So, I know there are only 2 choices in minor god selection.
     int minorGodA=kbTechTreeGetMinorGodChoices(0, age);
@@ -85,7 +85,7 @@ int chooseMinorGod(int age = -1, int mythUnitPref = -1, int godPowerPref = -1)
 //==============================================================================
 void progressAge2Handler(int age=1)
 {
-    aiEcho("Progress Age "+age+".");
+    if (ShowAiEcho == true) aiEcho("Progress Age "+age+".");
     xsEnableRule("age2Progress");
     if (cMyCulture == cCultureEgyptian)
         xsEnableRule("buildMonuments");
@@ -94,7 +94,7 @@ void progressAge2Handler(int age=1)
 //==============================================================================
 void progressAge3Handler(int age=2)
 {
-    aiEcho("Progress Age "+age+".");
+    if (ShowAiEcho == true) aiEcho("Progress Age "+age+".");
     xsEnableRule("age3Progress");
     if (cMyCulture == cCultureEgyptian)
         xsEnableRule("buildMonuments");
@@ -103,7 +103,7 @@ void progressAge3Handler(int age=2)
 //==============================================================================
 void progressAge4Handler(int age=3)
 {
-    aiEcho("Progress Age "+age+".");
+    if (ShowAiEcho == true) aiEcho("Progress Age "+age+".");
     if (cMyCulture == cCultureEgyptian)
         xsEnableRule("buildMonuments");
 }
@@ -113,7 +113,7 @@ rule unPauseAge2
     minInterval 91 //starts in cAge1
     inactive
 {
-    aiEcho("unPauseAge2:");
+    if (ShowAiEcho == true) aiEcho("unPauseAge2:");
 
     if (gAge2ProgressionPlanID == -1)
     {
@@ -132,7 +132,7 @@ rule age1Progress
     minInterval 10 //starts in cAge1
     inactive
 {
-    aiEcho("age1Progress:");
+    if (ShowAiEcho == true) aiEcho("age1Progress:");
 
     if (gAge2MinorGod == -1)
         gAge2MinorGod=chooseMinorGod(cAge2, -1, -1);
@@ -163,7 +163,7 @@ rule age2Progress
     minInterval 10 //starts in cAge2
     inactive
 {
-    aiEcho("age2Progress:");
+    if (ShowAiEcho == true) aiEcho("age2Progress:");
 
     if (gAge3MinorGod == -1)
         gAge3MinorGod=chooseMinorGod(cAge3, -1, -1);
@@ -186,7 +186,7 @@ rule age3Progress
     minInterval 10 //starts in cAge3
     inactive
 {
-    aiEcho("age3Progress:");
+    if (ShowAiEcho == true) aiEcho("age3Progress:");
 
     if (gAge4MinorGod == -1)
         gAge4MinorGod=chooseMinorGod(cAge4, -1, -1);

@@ -20,7 +20,7 @@ rule getChannels
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Channels");
+        if (ShowAiEcho == true) aiEcho("Getting Channels");
     }
 }
 
@@ -40,7 +40,7 @@ rule getFocus
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Focus");
+        if (ShowAiEcho == true) aiEcho("Getting Focus");
     }
 }
 
@@ -83,7 +83,7 @@ rule getSafePassage
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting SafePassage");
+        if (ShowAiEcho == true) aiEcho("Getting SafePassage");
         xsSetRuleMinIntervalSelf(300);
     }
 }
@@ -99,6 +99,10 @@ rule getHephaestusRevenge
     minInterval 27
     group Leto
 {
+    float goldSupply = kbResourceGet(cResourceGold);
+
+    if (kbGetAge() < cAge3 && goldSupply < 650)
+	return;
     if (kbGetTechStatus(cTechHephaestusRevenge) == cTechStatusAvailable)
     {
         int x=-1;
@@ -107,7 +111,7 @@ rule getHephaestusRevenge
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting HephaestusRevenge");
+        if (ShowAiEcho == true) aiEcho("Getting HephaestusRevenge");
     }
 }
 
@@ -119,6 +123,12 @@ rule getVolcanicForge
     minInterval 29
     group Leto
 {
+    float goldSupply = kbResourceGet(cResourceGold);
+    float foodSupply = kbResourceGet(cResourceFood);
+
+    if (kbGetAge() < cAge3 && goldSupply < 650 && foodSupply < 900)
+	return;
+	
     if (kbGetTechStatus(cTechVolcanicForge) == cTechStatusAvailable)
     {
         int x=-1;
@@ -127,7 +137,7 @@ rule getVolcanicForge
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting VolcanicForge");
+        if (ShowAiEcho == true) aiEcho("Getting VolcanicForge");
     }
 }
 
@@ -140,6 +150,10 @@ rule getBiteOfTheShark
     minInterval 27
     group Oceanus
 {
+    float foodSupply = kbResourceGet(cResourceFood);
+
+    if (kbGetAge() < cAge3 && foodSupply < 1000)
+	return;
     if (kbGetTechStatus(cTechBiteoftheShark) == cTechStatusAvailable)
     {
         int x=-1;
@@ -148,7 +162,7 @@ rule getBiteOfTheShark
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting BiteOfTheShark");
+        if (ShowAiEcho == true) aiEcho("Getting BiteOfTheShark");
     }
 }
 
@@ -160,6 +174,9 @@ rule getWeightlessMace
     minInterval 29
     group Oceanus
 {
+    float foodSupply = kbResourceGet(cResourceFood);
+    if (kbGetAge() < cAge3 && foodSupply < 1000)
+	return;
     if (kbGetTechStatus(cTechWeightlessMace) == cTechStatusAvailable)
     {
         int x=-1;
@@ -168,7 +185,7 @@ rule getWeightlessMace
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting WeightlessMace");
+        if (ShowAiEcho == true) aiEcho("Getting WeightlessMace");
     }
 }
 
@@ -181,6 +198,10 @@ rule getHeartOfTheTitans
     minInterval 27
     group Prometheus
 {
+    float goldSupply = kbResourceGet(cResourceGold);
+
+    if (kbGetAge() < cAge3 && goldSupply < 650)
+	return;
     if (kbGetTechStatus(cTechHeartoftheTitans) == cTechStatusAvailable)
     {
         int x=-1;
@@ -189,7 +210,7 @@ rule getHeartOfTheTitans
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting HeartOfTheTitans");
+        if (ShowAiEcho == true) aiEcho("Getting HeartOfTheTitans");
     }
 }
 
@@ -201,6 +222,10 @@ rule getAlluvialClay
     minInterval 29
     group Prometheus
 {
+    float goldSupply = kbResourceGet(cResourceGold);
+
+    if (kbGetAge() < cAge3 && goldSupply < 750)
+	return;
     if (kbGetTechStatus(cTechAlluvialClay) == cTechStatusAvailable)
     {
         int x=-1;
@@ -209,7 +234,7 @@ rule getAlluvialClay
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting AlluvialClay");
+        if (ShowAiEcho == true) aiEcho("Getting AlluvialClay");
     }
 }
 
@@ -232,7 +257,7 @@ rule getMailOfOrichalkos
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting MailOfOrichalkos");
+        if (ShowAiEcho == true) aiEcho("Getting MailOfOrichalkos");
     }
 }
 
@@ -252,7 +277,7 @@ rule getHornsOfConsecration
         aiPlanSetDesiredPriority(x, 20);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting HornsOfConsecration");
+        if (ShowAiEcho == true) aiEcho("Getting HornsOfConsecration");
     }
 }
 
@@ -272,7 +297,7 @@ rule getRheiasGift
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting RheiasGift");
+        if (ShowAiEcho == true) aiEcho("Getting RheiasGift");
     }
 }
 
@@ -294,7 +319,7 @@ rule getLemurianDescendants
         aiPlanSetDesiredPriority(x, 20);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting LemurianDescendants");
+        if (ShowAiEcho == true) aiEcho("Getting LemurianDescendants");
     }
 }
 
@@ -314,7 +339,7 @@ rule getPoseidonsSecret
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting PoseidonsSecret");
+        if (ShowAiEcho == true) aiEcho("Getting PoseidonsSecret");
     }
 }
 
@@ -334,7 +359,7 @@ rule getLanceOfStone
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting LanceOfStone");
+        if (ShowAiEcho == true) aiEcho("Getting LanceOfStone");
     }
 }
 
@@ -355,7 +380,7 @@ rule getHeroicRenewal
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting HeroicRenewal");
+        if (ShowAiEcho == true) aiEcho("Getting HeroicRenewal");
     }
 }
 
@@ -375,7 +400,7 @@ rule getGemino
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Gemino");
+        if (ShowAiEcho == true) aiEcho("Getting Gemino");
     }
 }
 
@@ -398,7 +423,7 @@ rule getTitanShield
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting TitanShield");
+        if (ShowAiEcho == true) aiEcho("Getting TitanShield");
     }
 }
 
@@ -418,7 +443,7 @@ rule getEyesOfAtlas
         aiPlanSetDesiredPriority(x, 20);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting EyesOfAtlas");
+        if (ShowAiEcho == true) aiEcho("Getting EyesOfAtlas");
     }
 }
 
@@ -438,7 +463,7 @@ rule getIoGuardian
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting IoGuardian");
+        if (ShowAiEcho == true) aiEcho("Getting IoGuardian");
     }
 }
 
@@ -460,7 +485,7 @@ rule getMythicRejuvenation
         aiPlanSetDesiredPriority(x, 25);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting MythicRejuvenation");
+        if (ShowAiEcho == true) aiEcho("Getting MythicRejuvenation");
     }
 }
 
@@ -480,7 +505,7 @@ rule getCelerity
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Celerity");
+        if (ShowAiEcho == true) aiEcho("Getting Celerity");
     }
 }
 
@@ -500,7 +525,7 @@ rule getAsperBlood
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting AsperBlood");
+        if (ShowAiEcho == true) aiEcho("Getting AsperBlood");
     }
 }
 
@@ -522,7 +547,7 @@ rule getHaloOfTheSun
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting HaloOfTheSun");
+        if (ShowAiEcho == true) aiEcho("Getting HaloOfTheSun");
     }
 }
 
@@ -542,6 +567,6 @@ rule getPetrified
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        aiEcho("Getting Petrified");
+        if (ShowAiEcho == true) aiEcho("Getting Petrified");
     }
 }
