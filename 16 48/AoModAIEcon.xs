@@ -3072,7 +3072,7 @@ rule sendIdleTradeUnitsToRandomBase
 //                //33% chance to use the alliedTradeDestinationID
                 //50% chance to use the alliedTradeDestinationID
 //                if ((alliedTradeDestinationID != -1) && (aiRandInt(3) == 0))
-                if ((alliedTradeDestinationID != -1) && (aiRandInt(2) == 0))
+                if ((alliedTradeDestinationID != -1) && (aiRandInt(3) > 0))
                 {
                     tradeDestinationID = alliedTradeDestinationID;
                     aiEcho("setting tradeDestinationID = alliedTradeDestinationID");

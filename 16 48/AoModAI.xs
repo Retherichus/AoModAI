@@ -2893,8 +2893,8 @@ void initChinese(void)
 	   }
 		
 		if(cMyCulture == cCultureChinese)
-	{   
-		createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 6, false, kbBaseGetMainID(cMyID));
+	{ 
+        xsEnableRule("DelayImmortalHero"); 	
 		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 3, false, kbBaseGetMainID(cMyID));
 		createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, 2, false, kbBaseGetMainID(cMyID));
 	}
@@ -2946,6 +2946,23 @@ void initChinese(void)
     if (cvAge4GodChoice != -1)
         gAge4MinorGod = cvAge4GodChoice;
 }
+}
+
+rule DelayImmortalHero
+minInterval 25
+inactive
+{
+
+    if (kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAlive) < 1)
+	return;
+
+	if(cMyCulture == cCultureChinese)
+    createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 6, false, kbBaseGetMainID(cMyID));
+	
+	
+	xsDisableSelf();
+	
+
 }
 //==============================================================================
 int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
@@ -3830,12 +3847,12 @@ void init(void)
         
     //Set the housing rebuild bound to 4 for the first age.
     if (cMyCulture == cCultureEgyptian)
-        gHouseAvailablePopRebuild=8;
+        gHouseAvailablePopRebuild=6;
     else if (cMyCulture == cCultureAtlantean)
-        gHouseAvailablePopRebuild=8;
+        gHouseAvailablePopRebuild=6;
     else
 //        gHouseAvailablePopRebuild=4;
-        gHouseAvailablePopRebuild=6;
+        gHouseAvailablePopRebuild=4;
 
     //Set the hard pop caps.
     if (aiGetGameMode() == cGameModeLightning)

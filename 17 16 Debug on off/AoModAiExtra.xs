@@ -27,6 +27,7 @@ extern int HateChoice = -1;
 extern int gInitialWoodBaseID = -1;
 extern int gLandExplorePlanID2=-1;
 extern int gLandScoutSpecialUlfsark = -1;
+extern bool ShowAiEcho = false;   
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
 //Below, you'll find a few things I've set up,
@@ -58,7 +59,7 @@ extern int eMaxMilPop = 50;               // Max military pop cap during Classic
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 650;              // Food
+extern int eBoomFood = 600;              // Food
 extern int eBoomGold = 150;              // Gold
 extern int eBoomWood = 200;              // Wood, duh.
 
@@ -216,10 +217,10 @@ void initRethlAge1(void)  // Am I doing this right??
 	// kbLookAtAllUnitsOnMap();   // Semi cheating!.. Disabled due to unstable results.
 	
 	if (aiIsMultiplayer() == false)
-	aiEcho("We're in a singleplayer/offline game, nothing can stop us here!");                 // Just to confirm game mode.
+	if (ShowAiEcho == true) aiEcho("We're in a singleplayer/offline game, nothing can stop us here!");                 // Just to confirm game mode.
 	
 	if (aiIsMultiplayer() == true)
-	aiEcho("We're in a multiplayer game, I will make sure not to use any De-sync sensitive Godpowers.");  // ^ Ditto, heh.
+	if (ShowAiEcho == true) aiEcho("We're in a multiplayer game, I will make sure not to use any De-sync sensitive Godpowers.");  // ^ Ditto, heh.
 	
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
@@ -237,14 +238,14 @@ void initRethlAge1(void)  // Am I doing this right??
 		if (cMyCulture == cCultureNorse)
 		aiSetMinNumberNeedForGatheringAggressvies(5);
 		if (cMyCulture == cCultureChinese)
-		aiSetMinNumberNeedForGatheringAggressvies(5);			
+		aiSetMinNumberNeedForGatheringAggressvies(4);			
         }
       
 	   // Don't build transport ships on these maps!
 	   if ((cRandomMapName == "highlands") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad") || (cRandomMapName == "Deep Jungle") || (cRandomMapName == "Mediterranean") || (cRandomMapName == "mediterranean")))
 	   {
 	   gTransportMap=false;
-	   aiEcho("Not going to waste pop slots on Transport ships.");
+	   if (ShowAiEcho == true) aiEcho("Not going to waste pop slots on Transport ships.");
 	   }
 }
 
@@ -311,7 +312,7 @@ void initRethlAge2(void)
 	gWaterMap=true;
 	ConfirmFish=true;
 	xsEnableRule("fishing");
-	aiEcho("Fishing enabled for Nomad and Highland map");
+	if (ShowAiEcho == true) aiEcho("Fishing enabled for Nomad and Highland map");
 	}
 
 	//  Enable Dock defense. 
@@ -323,8 +324,9 @@ xsEnableRule("DockDefenseMonitor");
 // RULE ActivateRethOverridesAge 1-4
 //==============================================================================
 rule ActivateRethOverridesAge1
-   minInterval 5
+   minInterval 1
    active
+   runImmediately
 {
         initRethlAge1();
 		if (gHuntingDogsASAP == true)
@@ -605,11 +607,18 @@ void relicHandler(int relicID = -1)
 // RULE HuntingDogsAsap
 //==============================================================================
 rule HuntingDogsAsap
-   minInterval 15
+   minInterval 4
    inactive
 {
    static int age2Count = 0;
 
+   int HuntingDogsUpgBuilding = cUnitTypeGranary;
+   if (cMyCulture == cCultureChinese)
+   HuntingDogsUpgBuilding = cUnitTypeStoragePit;
+   
+      if (cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse && kbUnitCount(cMyID, HuntingDogsUpgBuilding, cUnitStateAlive) < 1)
+	  return;
+   
    if (gHuntingDogsASAP == true && aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechHuntingDogs) < 0)
    {
 	   //Hunting dogs.
@@ -646,7 +655,7 @@ rule DONATEFood
 	       float foodSupply = kbResourceGet(cResourceFood);
 	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && foodSupply > 1500)
 		   {
-		             aiEcho("Tributing 100 food to one of my allies!");
+		             if (ShowAiEcho == true) aiEcho("Tributing 100 food to one of my allies!");
 	  aiTribute(i, cResourceFood, 100);
 	  }  	
  }
@@ -673,7 +682,7 @@ rule DONATEWood
 	       float woodSupply = kbResourceGet(cResourceWood);
 	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && woodSupply > 1750)
 		   {
-		             aiEcho("Tributing 100 wood to one of my allies!");
+		             if (ShowAiEcho == true) aiEcho("Tributing 100 wood to one of my allies!");
 	  aiTribute(i, cResourceWood, 100);
 	  return;
 	  }  	
@@ -701,7 +710,7 @@ rule DONATEGold
 	       float goldSupply = kbResourceGet(cResourceGold);
 	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && goldSupply > 2000)
 		   {
-		             aiEcho("Tributing 100 gold to one of my allies!");
+		             if (ShowAiEcho == true) aiEcho("Tributing 100 gold to one of my allies!");
 	  aiTribute(i, cResourceGold, 100);
 	  return;
 	  }  	
@@ -968,7 +977,7 @@ else if (FoodSupply > 600 && WoodSupply > 300 && GoldSupply > 400 && MyFavor > 6
         }	
 }
 }	
-	aiEcho("Setting gardens to: " + resname);
+	if (ShowAiEcho == true) aiEcho("Setting gardens to: " + resname);
 	kbSetGardenResource(res);
     }		
 
@@ -987,7 +996,7 @@ rule getEarthenWall
         return;
     }
 
-    aiEcho("getEarhernWall:");
+    if (ShowAiEcho == true) aiEcho("getEarhernWall:");
 
 
     
@@ -1020,7 +1029,7 @@ rule getGreatWall
         return;
     }
     
-    aiEcho("getGreatWall:");
+    if (ShowAiEcho == true) aiEcho("getGreatWall:");
 
     if (kbGetTechStatus(cTechStoneWall) < cTechStatusResearching)
     {
@@ -1054,7 +1063,7 @@ rule getGreatWall
         aiPlanSetDesiredPriority(x, 90);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        aiEcho("Getting Great Wall");
+        if (ShowAiEcho == true) aiEcho("Getting Great Wall");
     }
 }
 //==============================================================================
@@ -1837,7 +1846,7 @@ int getNumberUnitsInArea(int areaID =-1,int unitType =-1)
 
 int findClosestAreaWithUnits(int areaID = -1,int type=-1, int unitType = -1, int numUnits=-1, int recursion = 3)
 {
-	aiEcho("Looking around area: "+areaID);
+	if (ShowAiEcho == true) aiEcho("Looking around area: "+areaID);
 	vector position   = kbAreaGetCenter(areaID);
 	int numBorderAreas   = kbAreaGetNumberBorderAreas(areaID);
 	int borderArea   = -1;

@@ -378,7 +378,7 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
     static bool increaseStartIndex = false;
 
     
-    aiEcho("updatePlayerToAttack:");
+    if (ShowAiEcho == true) aiEcho("updatePlayerToAttack:");
     //Determine a random start index for our hate loop.
     static int startIndex = -1;
     if (increaseStartIndex == true)
@@ -388,13 +388,13 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
         else
             startIndex = startIndex + 1;
         increaseStartIndex = false;
-        aiEcho("increasing startIndex. startIndex is now: "+startIndex);
+        if (ShowAiEcho == true) aiEcho("increasing startIndex. startIndex is now: "+startIndex);
     }
     
     if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (15)*60*1000))
     {
         startIndex = aiRandInt(cNumberPlayers);
-        aiEcho("getting new random startIndex. startIndex is now: "+startIndex);
+        if (ShowAiEcho == true) aiEcho("getting new random startIndex. startIndex is now: "+startIndex);
     }
 
     //Find the "first" enemy player that's still in the game.  This will be the
@@ -415,7 +415,7 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
             comparePlayerID = actualIndex;
             if ((actualIndex == lastTargetPlayerID) && (aiRandInt(4) < 1))
             {
-                aiEcho("actualIndex == lastTargetPlayerID, looking for other enemies");
+                if (ShowAiEcho == true) aiEcho("actualIndex == lastTargetPlayerID, looking for other enemies");
                 increaseStartIndex = true;
                 continue;
             }
@@ -436,8 +436,8 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
     {
         lastTargetPlayerID = actualPlayerID;
         lastTargetPlayerIDSaveTime = xsGetTime();
-        aiEcho("lastTargetPlayerID: "+lastTargetPlayerID);
-        aiEcho("lastTargetPlayerIDSaveTime: "+lastTargetPlayerIDSaveTime);
+        if (ShowAiEcho == true) aiEcho("lastTargetPlayerID: "+lastTargetPlayerID);
+        if (ShowAiEcho == true) aiEcho("lastTargetPlayerIDSaveTime: "+lastTargetPlayerIDSaveTime);
         randNum = aiRandInt(5);
     }
 
@@ -445,7 +445,7 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
     {
         //Default us off.
         aiSetMostHatedPlayerID(actualPlayerID);
-        aiEcho("most hated playerID = "+actualPlayerID);
+        if (ShowAiEcho == true) aiEcho("most hated playerID = "+actualPlayerID);
     }
 }
 
@@ -461,7 +461,7 @@ rule AttackStrongestPlayer   //Updates the player we should be attacking.
     static int randNum = 0;
     static bool increaseStartIndex = false;
 
-    aiEcho("updatePlayerToAttack:");
+    if (ShowAiEcho == true) aiEcho("updatePlayerToAttack:");
     //Determine a random start index for our hate loop.
     static int startIndex = -1;
     if (increaseStartIndex == true)
@@ -471,14 +471,14 @@ rule AttackStrongestPlayer   //Updates the player we should be attacking.
         else
             startIndex = startIndex + 1;
         increaseStartIndex = false;
-        aiEcho("increasing startIndex. startIndex is now: "+startIndex);
+        if (ShowAiEcho == true) aiEcho("increasing startIndex. startIndex is now: "+startIndex);
     }
 
 	
     if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (15)*60*1000))
     {
         startIndex = aiRandInt(cNumberPlayers);
-        aiEcho("getting new random startIndex. startIndex is now: "+startIndex);
+        if (ShowAiEcho == true) aiEcho("getting new random startIndex. startIndex is now: "+startIndex);
     }
 
     //Find the "first" enemy player that's still in the game.  This will be the
@@ -499,7 +499,7 @@ rule AttackStrongestPlayer   //Updates the player we should be attacking.
             comparePlayerID = actualIndex;
             if ((actualIndex == lastTargetPlayerID) && (aiRandInt(4) < 1))
             {
-                aiEcho("actualIndex == lastTargetPlayerID, looking for other enemies");
+                if (ShowAiEcho == true) aiEcho("actualIndex == lastTargetPlayerID, looking for other enemies");
                 increaseStartIndex = true;
                 continue;
             }
@@ -528,8 +528,8 @@ rule AttackStrongestPlayer   //Updates the player we should be attacking.
     {
         lastTargetPlayerID = actualPlayerID;
         lastTargetPlayerIDSaveTime = xsGetTime();
-        aiEcho("lastTargetPlayerID: "+lastTargetPlayerID);
-        aiEcho("lastTargetPlayerIDSaveTime: "+lastTargetPlayerIDSaveTime);
+        if (ShowAiEcho == true) aiEcho("lastTargetPlayerID: "+lastTargetPlayerID);
+        if (ShowAiEcho == true) aiEcho("lastTargetPlayerIDSaveTime: "+lastTargetPlayerIDSaveTime);
         randNum = aiRandInt(5);
     }
 
@@ -538,14 +538,14 @@ rule AttackStrongestPlayer   //Updates the player we should be attacking.
     {
         //Default us off.
         aiSetMostHatedPlayerID(actualPlayerID);
-        aiEcho("most hated playerID = "+actualPlayerID);
+        if (ShowAiEcho == true) aiEcho("most hated playerID = "+actualPlayerID);
     }
 	
     if (actualPlayerID != -1 && aiGetWorldDifficulty() > cDifficultyHard)
     {
         //Default us off.
         aiSetMostHatedPlayerID(HateChoice);
-        aiEcho("most hated playerID = "+actualPlayerID);
+        if (ShowAiEcho == true) aiEcho("most hated playerID = "+actualPlayerID);
     }	
 }
 // END OF ALTERNATE ATTACK GOAL
@@ -555,7 +555,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
     minInterval 10 //starts in cAge1
     active
 {
-    aiEcho("checkEscrow:");
+    if (ShowAiEcho == true) aiEcho("checkEscrow:");
 
     static int failCount = 0;
     static bool initialResetDone = false;
@@ -587,17 +587,17 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         {
             needReset = true;
             if (res == cResourceGold)
-              aiEcho("Gold imbalance.  Escrow says "+escrowQty+", actual is "+actualQty);
+              if (ShowAiEcho == true) aiEcho("Gold imbalance.  Escrow says "+escrowQty+", actual is "+actualQty);
             if (res == cResourceWood)
             {
-                aiEcho("Wood imbalance.  Escrow says "+escrowQty+", actual is "+actualQty);
+                if (ShowAiEcho == true) aiEcho("Wood imbalance.  Escrow says "+escrowQty+", actual is "+actualQty);
                 if ( (gFishing == true) && (xsGetTime()<(8*60*1000)) )
                     fishingReset = true; // We're fishing, it's in the first 8 min, and wood is off.
             }
             if (res == cResourceFood)
-                aiEcho("Food imbalance.  Escrow says "+escrowQty+", actual is "+actualQty);
+                if (ShowAiEcho == true) aiEcho("Food imbalance.  Escrow says "+escrowQty+", actual is "+actualQty);
             if (res == cResourceFavor)
-                aiEcho("Favor imbalance.  Escrow says "+escrowQty+", actual is "+actualQty);			
+                if (ShowAiEcho == true) aiEcho("Favor imbalance.  Escrow says "+escrowQty+", actual is "+actualQty);			
         }
     }
    
@@ -611,7 +611,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         failCount = failCount+1;
         if ( (failCount > 5) || ( (failCount > 0) && (xsGetTime() < 30*1000) ) )
         {
-            aiEcho("ERROR:  Escrow balances invalid.  Reallocating");
+            if (ShowAiEcho == true) aiEcho("ERROR:  Escrow balances invalid.  Reallocating");
             kbEscrowAllocateCurrentResources();
         }
     }
@@ -631,13 +631,13 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         if (foodSupply < 90)
         {
             kbEscrowFlush(cMilitaryEscrowID, cResourceFood, true);
-            aiEcho("Flushing military food escrow");
+            if (ShowAiEcho == true) aiEcho("Flushing military food escrow");
             if (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAlive) > 0)
             {
                 if ((aiGetMarketBuyCost(cResourceFood) < goldSupply) && (count > 0))
                 {
                     aiBuyResourceOnMarket(cResourceFood);
-                    aiEcho("Food supply below 90, buying food.");
+                    if (ShowAiEcho == true) aiEcho("Food supply below 90, buying food.");
                     count = 0;
                 }
                 else
@@ -658,7 +658,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             {
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                aiEcho("Flushing military wood and gold escrow");
+                if (ShowAiEcho == true) aiEcho("Flushing military wood and gold escrow");
             }
         }
         
@@ -668,7 +668,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             {
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                aiEcho("Flushing military wood and gold escrow");
+                if (ShowAiEcho == true) aiEcho("Flushing military wood and gold escrow");
             }
         }
         
@@ -676,7 +676,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         if ((foodSupply > 800) && (goldSupply > 500) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
         {
             aiTaskUnitResearch(mainBaseUnitID, gAge3MinorGod);
-            aiEcho("tasking research of tech ID"+gAge3MinorGod);
+            if (ShowAiEcho == true) aiEcho("tasking research of tech ID"+gAge3MinorGod);
         }
         
         if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, cTechWatchTower, true) >= 0))
@@ -685,7 +685,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
-                aiEcho("Flushing economy wood and gold escrow");
+                if (ShowAiEcho == true) aiEcho("Flushing economy wood and gold escrow");
             }
         }
         
@@ -697,7 +697,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
                 kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                aiEcho("Flushing wood and gold escrow");
+                if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
         }
     }
@@ -718,7 +718,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             {
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                aiEcho("Flushing military wood and gold escrow");
+                if (ShowAiEcho == true) aiEcho("Flushing military wood and gold escrow");
             }
         }
         
@@ -730,12 +730,12 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 {
                     kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                     kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
-                    aiEcho("Flushing economy wood and gold escrow");
+                    if (ShowAiEcho == true) aiEcho("Flushing economy wood and gold escrow");
                 }
                 else
                 {
                     aiTaskUnitResearch(mainBaseUnitID, cTechFortifyTownCenter);
-                    aiEcho("tasking research of tech ID"+cTechFortifyTownCenter);
+                    if (ShowAiEcho == true) aiEcho("tasking research of tech ID"+cTechFortifyTownCenter);
                 }
             }
         }
@@ -748,7 +748,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
                 kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                aiEcho("Flushing wood and gold escrow");
+                if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
         }
         
@@ -756,7 +756,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         if ((foodSupply > 1000) && (goldSupply > 1000) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) && (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAlive) > 0))
         {
             aiTaskUnitResearch(mainBaseUnitID, gAge4MinorGod);
-            aiEcho("tasking research of tech ID"+gAge4MinorGod);
+            if (ShowAiEcho == true) aiEcho("tasking research of tech ID"+gAge4MinorGod);
         }
     }
     else if (kbGetAge() > cAge3)
@@ -767,7 +767,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceFavor, true);
                 kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
-                aiEcho("Flushing economy favor and gold escrow");
+                if (ShowAiEcho == true) aiEcho("Flushing economy favor and gold escrow");
             }
         }
         
@@ -777,7 +777,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             {
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                aiEcho("Flushing military wood and gold escrow");
+                if (ShowAiEcho == true) aiEcho("Flushing military wood and gold escrow");
             }
         }
         
@@ -786,7 +786,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             if ((woodSupply > 400) && (goldSupply > 400))
             {
                 aiTaskUnitResearch(mainBaseUnitID, cTechFortifyTownCenter);
-                aiEcho("tasking research of tech ID"+cTechFortifyTownCenter);
+                if (ShowAiEcho == true) aiEcho("tasking research of tech ID"+cTechFortifyTownCenter);
             }
         }
         
@@ -798,7 +798,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
                 kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                aiEcho("Flushing wood and gold escrow");
+                if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
         }
     }
@@ -860,13 +860,13 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     int milMax = kbUnitPickGetMaximumPop(upID);
     if (milMax > milPop) // We have a problem
     {
-        aiEcho("***** MilPop is "+milPop+", resetting military goals.");
+        if (ShowAiEcho == true) aiEcho("***** MilPop is "+milPop+", resetting military goals.");
         kbUnitPickSetMaximumPop(upID,(milPop*4)/5);
         kbUnitPickSetMinimumPop(upID,(milPop*3)/5);
     }
 /*
-    aiEcho("Unit picker military minPop: "+kbUnitPickGetMinimumPop(upID));
-    aiEcho("Unit picker military maxPop: "+kbUnitPickGetMaximumPop(upID));
+    if (ShowAiEcho == true) aiEcho("Unit picker military minPop: "+kbUnitPickGetMinimumPop(upID));
+    if (ShowAiEcho == true) aiEcho("Unit picker military maxPop: "+kbUnitPickGetMaximumPop(upID));
 */
     
     //Percentages.
@@ -1029,7 +1029,7 @@ rule updateEMAge2
 		
 		if (gAgeFaster == true && aiGetWorldDifficulty() == cDifficultyHard)
 		      {
-			  aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
+			  if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
 			 milPopTarget = eMaxMilPop;
 			 }
     }
@@ -1397,7 +1397,7 @@ if (aiGetWorldDifficulty() > cDifficultyEasy && kbGetAge() > cAge3 && xsGetTime(
    {
    if (goldSupply > mGoldBeforeTrade)
    {
-   aiEcho("Damn..! I have too much gold, buying food/wood!");
+   if (ShowAiEcho == true) aiEcho("Damn..! I have too much gold, buying food/wood!");
    if (woodSupply > foodSupply)
    aiBuyResourceOnMarket(cResourceFood);
    else
@@ -1441,7 +1441,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     if (gGlutRatio > 3.0)
         gGlutRatio = 3.0;    // Never cut econ below 1/3 of normal
 //    if (gGlutRatio > 1)
-//        aiEcho("Glut ratio = "+gGlutRatio);
+//        if (ShowAiEcho == true) aiEcho("Glut ratio = "+gGlutRatio);
 
     float totalShortage = goldShortage + woodShortage + foodShortage;
     if (totalShortage < 1)
@@ -1474,7 +1474,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     if (civPopTotal > (aiGetEconomyPop() + 5))
     {  
         // We need to delete something
-        aiEcho("We need to delete an econ unit");
+        if (ShowAiEcho == true) aiEcho("We need to delete an econ unit");
         if (numGatherers > numTradeCarts) // Gatherer or fish boat
         {
             if (numGatherers > numFishBoats)
@@ -1483,7 +1483,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
                 doomedID = findUnit(cUnitTypeAbstractVillager, cUnitStateAlive, cActionIdle, cMyID);
                 if (doomedID < 0)
                     doomedID = findUnit(cUnitTypeAbstractVillager);
-                aiEcho("Deleting a villager. "+doomedID);
+                if (ShowAiEcho == true) aiEcho("Deleting a villager. "+doomedID);
             }
             else
             {
@@ -1491,7 +1491,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
                 doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0), cUnitStateAlive, cActionIdle, cMyID);
                 if (doomedID < 0)
                     doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0));
-                aiEcho("Deleting a fishing boat. "+doomedID);
+                if (ShowAiEcho == true) aiEcho("Deleting a fishing boat. "+doomedID);
             }
         }
         else  // Trade cart or fish boat
@@ -1502,7 +1502,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
                 doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0), cUnitStateAlive, cActionIdle, cMyID);
                 if (doomedID < 0)
                     doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0));
-                aiEcho("Deleting a trade cart. "+doomedID);
+                if (ShowAiEcho == true) aiEcho("Deleting a trade cart. "+doomedID);
             }
             else
             {
@@ -1510,7 +1510,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
                 doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0), cUnitStateAlive, cActionIdle, cMyID);
                 if (doomedID < 0)
                     doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0));
-                aiEcho("Deleting a fishing boat. "+doomedID);
+                if (ShowAiEcho == true) aiEcho("Deleting a fishing boat. "+doomedID);
             }
         }
         aiTaskUnitDelete(doomedID);
@@ -1747,13 +1747,13 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 /*
     if (kbGetAge() > cAge1)
     {
-        aiEcho("gold resource percentage: "+aiGetResourceGathererPercentage(cResourceGold, cRGPActual));
-        aiEcho("wood resource percentage: "+aiGetResourceGathererPercentage(cResourceWood, cRGPActual));
-        aiEcho("food resource percentage: "+aiGetResourceGathererPercentage(cResourceFood, cRGPActual));
-        aiEcho("favor resource percentage: "+aiGetResourceGathererPercentage(cResourceFavor, cRGPActual));
+        if (ShowAiEcho == true) aiEcho("gold resource percentage: "+aiGetResourceGathererPercentage(cResourceGold, cRGPActual));
+        if (ShowAiEcho == true) aiEcho("wood resource percentage: "+aiGetResourceGathererPercentage(cResourceWood, cRGPActual));
+        if (ShowAiEcho == true) aiEcho("food resource percentage: "+aiGetResourceGathererPercentage(cResourceFood, cRGPActual));
+        if (ShowAiEcho == true) aiEcho("favor resource percentage: "+aiGetResourceGathererPercentage(cResourceFavor, cRGPActual));
     }
 */
-aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
+if (ShowAiEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
 }
 
 //==============================================================================
@@ -1765,7 +1765,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     
     if ( (kbGetAge() == cAge3) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) )	// Upgrade failed, revert
     {
-        aiEcho("Age 4 upgrade failed.");
+        if (ShowAiEcho == true) aiEcho("Age 4 upgrade failed.");
         xsDisableSelf();
         xsEnableRule("econForecastAge3");
         return;
@@ -1931,7 +1931,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     
 
     
-    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -1951,7 +1951,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     }
     else if ((kbGetAge() == cAge2) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))	// Upgrade failed, revert
     {
-        aiEcho("Age 3 upgrade failed.");
+        if (ShowAiEcho == true) aiEcho("Age 3 upgrade failed.");
         xsDisableSelf();
         xsEnableRule("econForecastAge2");
         return;
@@ -1959,7 +1959,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     else if ((kbGetAge() == cAge3) && (ageStartTime == -1))
         ageStartTime = xsGetTime();
 
-    aiEcho("age 3 start time: "+ageStartTime);
+    if (ShowAiEcho == true) aiEcho("age 3 start time: "+ageStartTime);
     
     gGoldForecast = 500;
     gWoodForecast = 500;
@@ -2163,7 +2163,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     else if (foodSupply > 1600)
         gFoodForecast = gFoodForecast * 0.9;
 	
-    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -2183,7 +2183,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     }
     else if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching))	// Upgrade failed, revert
     {
-        aiEcho("Age 2 upgrade failed.");
+        if (ShowAiEcho == true) aiEcho("Age 2 upgrade failed.");
         xsDisableSelf();
         xsEnableRule("econForecastAge1");
         return;
@@ -2191,7 +2191,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     else if ((kbGetAge() == cAge2) && (ageStartTime == -1))
         ageStartTime = xsGetTime();
 
-    aiEcho("age 2 start time: "+ageStartTime);
+    if (ShowAiEcho == true) aiEcho("age 2 start time: "+ageStartTime);
     
     // If we've made it here, we're in age 2 (or researching it)
     
@@ -2438,7 +2438,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     else if (foodSupply > 1300)
         gFoodForecast = gFoodForecast * 0.9;
 
-    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -2468,8 +2468,8 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     // If we've made it here, we're in age 1 (cAge1), we've been in the age at least 2 minutes,
     // and we haven't started the age 2 upgrade.  Let's see what we need.
 	
-    gGoldForecast = 0.0;
-    gWoodForecast = 0.0;
+    gGoldForecast = 100.0;
+    gWoodForecast = 100.0;
     gFoodForecast = 700.0;
 
 	if (RethFishEco == true && gWaterMap == true && ConfirmFish == true	&& xsGetTime() < eFishTimer*1*1000)
@@ -2478,7 +2478,7 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
 	gFoodForecast = eFBoomFood+.0;
 	gGoldForecast = eFBoomGold+.0;
 	gWoodForecast = eFBoomWood+.0;
-	aiEcho("Phase 2: Going wild on wood");
+	if (ShowAiEcho == true) aiEcho("Phase 2: Going wild on wood");
 		
 }	
 
@@ -2486,7 +2486,7 @@ if (xsGetTime() > eFishTimer*1*1000 && RethFishEco == true && ConfirmFish == tru
     {	
     gSuperboom=true;
 	RethFishEco = false;
-	aiEcho("Phase 3: RethFishEco is disabled");
+	if (ShowAiEcho == true) aiEcho("Phase 3: RethFishEco is disabled");
     }
 	
 	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000)
@@ -2532,7 +2532,7 @@ if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCul
             gWoodForecast = gWoodForecast + (200 - woodSupply);
     }
 
-    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -2893,8 +2893,8 @@ void initChinese(void)
 	   }
 		
 		if(cMyCulture == cCultureChinese)
-	{   
-		createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 6, false, kbBaseGetMainID(cMyID));
+	{ 
+        xsEnableRule("DelayImmortalHero"); 	
 		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 3, false, kbBaseGetMainID(cMyID));
 		createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, 2, false, kbBaseGetMainID(cMyID));
 	}
@@ -2946,6 +2946,23 @@ void initChinese(void)
     if (cvAge4GodChoice != -1)
         gAge4MinorGod = cvAge4GodChoice;
 }
+}
+
+rule DelayImmortalHero
+minInterval 25
+inactive
+{
+
+    if (kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAlive) < 1)
+	return;
+
+	if(cMyCulture == cCultureChinese)
+    createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 6, false, kbBaseGetMainID(cMyID));
+	
+	
+	xsDisableSelf();
+	
+
 }
 //==============================================================================
 int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
@@ -3678,16 +3695,16 @@ void init(void)
         cvOffenseDefenseSlider = 1.0;
     if (cvOffenseDefenseSlider < -1.0)
         cvOffenseDefenseSlider = -1.0;
-    aiEcho("Sliders are...RushBoom "+cvRushBoomSlider+", MilitaryEcon "+cvMilitaryEconSlider+", OffenseDefense "+cvOffenseDefenseSlider);
+    if (ShowAiEcho == true) aiEcho("Sliders are...RushBoom "+cvRushBoomSlider+", MilitaryEcon "+cvMilitaryEconSlider+", OffenseDefense "+cvOffenseDefenseSlider);
 
 
     //Startup messages.
-    aiEcho("Greetings, my name is "+cMyName+".");
-    aiEcho("AI Filename='"+cFilename+"'.");
-    aiEcho("MapName="+cvRandomMapName+".");
-    aiEcho("Civ="+kbGetCivName(cMyCiv)+".");
-    aiEcho("DifficultyLevel="+aiGetWorldDifficultyName(aiGetWorldDifficulty())+".");
-    aiEcho("Personality="+aiGetPersonality()+".");
+    if (ShowAiEcho == true) aiEcho("Greetings, my name is "+cMyName+".");
+    if (ShowAiEcho == true) aiEcho("AI Filename='"+cFilename+"'.");
+    if (ShowAiEcho == true) aiEcho("MapName="+cvRandomMapName+".");
+    if (ShowAiEcho == true) aiEcho("Civ="+kbGetCivName(cMyCiv)+".");
+    if (ShowAiEcho == true) aiEcho("DifficultyLevel="+aiGetWorldDifficultyName(aiGetWorldDifficulty())+".");
+    if (ShowAiEcho == true) aiEcho("Personality="+aiGetPersonality()+".");
 
     //Find someone to hate.
     if (cvPlayerToAttack < 1)
@@ -3750,7 +3767,7 @@ void init(void)
             //Skip this settlement if it already has a base.
             if (kbUnitGetBaseID(settlementID) >= 0)
             {
-                aiEcho("settlement: "+settlementID+" already has a base, skipping it");
+                if (ShowAiEcho == true) aiEcho("settlement: "+settlementID+" already has a base, skipping it");
                 continue;
             }
             vector settlementPosition=kbUnitGetPosition(settlementID);
@@ -3763,8 +3780,8 @@ void init(void)
                 kbBaseSetFrontVector(cMyID, newBaseID, baseFront);
                 //Military gather point.
                 vector militaryGatherPoint=settlementPosition+baseFront*18.0;
-                aiEcho("main base settlementPosition is: "+settlementPosition);
-                aiEcho("main base militaryGatherPoint is: "+militaryGatherPoint);
+                if (ShowAiEcho == true) aiEcho("main base settlementPosition is: "+settlementPosition);
+                if (ShowAiEcho == true) aiEcho("main base militaryGatherPoint is: "+militaryGatherPoint);
                 kbBaseSetMilitaryGatherPoint(cMyID, newBaseID, militaryGatherPoint);
                 //Set the other flags.
                 kbBaseSetMilitary(cMyID, newBaseID, true);
@@ -3814,7 +3831,7 @@ void init(void)
     kbTechTreeAddMinorGodPref(gAge2MinorGod);
     kbTechTreeAddMinorGodPref(gAge3MinorGod);
     kbTechTreeAddMinorGodPref(gAge4MinorGod);
-    aiEcho("Minor god plan is "+kbGetTechName(gAge2MinorGod)+", "+kbGetTechName(gAge3MinorGod)+", "+kbGetTechName(gAge4MinorGod));
+    if (ShowAiEcho == true) aiEcho("Minor god plan is "+kbGetTechName(gAge2MinorGod)+", "+kbGetTechName(gAge3MinorGod)+", "+kbGetTechName(gAge4MinorGod));
 
     //Set the Explore Danger Threshold.
     aiSetExploreDangerThreshold(300.0);
@@ -3830,12 +3847,12 @@ void init(void)
         
     //Set the housing rebuild bound to 4 for the first age.
     if (cMyCulture == cCultureEgyptian)
-        gHouseAvailablePopRebuild=8;
+        gHouseAvailablePopRebuild=6;
     else if (cMyCulture == cCultureAtlantean)
-        gHouseAvailablePopRebuild=8;
+        gHouseAvailablePopRebuild=6;
     else
 //        gHouseAvailablePopRebuild=4;
-        gHouseAvailablePopRebuild=6;
+        gHouseAvailablePopRebuild=4;
 
     //Set the hard pop caps.
     if (aiGetGameMode() == cGameModeLightning)
@@ -3915,14 +3932,14 @@ void init(void)
     }
 
     if (gBuildWallsAtMainBase == true)
-        aiEcho("Decided to build walls at the main base.");
+        if (ShowAiEcho == true) aiEcho("Decided to build walls at the main base.");
     else
-        aiEcho("Decided NOT to build walls at the main base.");
+        if (ShowAiEcho == true) aiEcho("Decided NOT to build walls at the main base.");
         
     if (gBuildWalls == true)
-        aiEcho("Decided to build walls at other bases.");
+        if (ShowAiEcho == true) aiEcho("Decided to build walls at other bases.");
     else
-        aiEcho("Decided NOT to build walls at other bases.");
+        if (ShowAiEcho == true) aiEcho("Decided NOT to build walls at other bases.");
 
 
     // always consider towering
@@ -3965,7 +3982,7 @@ void init(void)
         gBuildTowers = false;
         gTargetNumTowers = 0;
     }
-    aiEcho("Decided to build "+gTargetNumTowers+" towers.");
+    if (ShowAiEcho == true) aiEcho("Decided to build "+gTargetNumTowers+" towers.");
 
     //set our default stance to defensive.
     aiSetDefaultStance(cUnitStanceDefensive);
@@ -4061,7 +4078,7 @@ void init(void)
             gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 1, true); // Rush with rushSize pop slots of two types, 1 buildings, do guess enemy unit type
     }
 
-    aiEcho("Setting rush unit picker for "+rushCount+" rushes with "+rushSize+" pop slots used.");
+    if (ShowAiEcho == true) aiEcho("Setting rush unit picker for "+rushCount+" rushes with "+rushSize+" pop slots used.");
 
     // Set a smaller number for first wave.
     int newRushSize = 0;
@@ -4073,7 +4090,7 @@ void init(void)
     if (newRushSize != rushSize)
     {
         kbUnitPickSetMinimumPop(gRushUPID, newRushSize);
-        aiEcho("Initial attack wave will use "+newRushSize+" pop slots.");
+        if (ShowAiEcho == true) aiEcho("Initial attack wave will use "+newRushSize+" pop slots.");
     }
     
     //new stuff for new land attack rule
@@ -4099,7 +4116,7 @@ void init(void)
         gFirstRushSize = newRushSize / 3;
     }
 
-    aiEcho("gRushCount: "+gRushCount+", gRushSize: "+gRushSize+", gFirstRushSize: "+gFirstRushSize);
+    if (ShowAiEcho == true) aiEcho("gRushCount: "+gRushCount+", gRushSize: "+gRushSize+", gFirstRushSize: "+gFirstRushSize);
 
     
     //Create our UP.
@@ -4183,7 +4200,7 @@ void init(void)
             maxPop=maxPop-16;
         }
         
-        aiEcho("gLateUP minPop: "+minPop+", maxPop: "+maxPop);
+        if (ShowAiEcho == true) aiEcho("gLateUP minPop: "+minPop+", maxPop: "+maxPop);
         
         if ( aiGetGameMode() != cGameModeDeathmatch )
         {
@@ -4408,7 +4425,7 @@ void init(void)
     if (gatherRelics == true)
     {
         xsEnableRule("goAndGatherRelics");
-        aiEcho("goAndGatherRelics enabled");
+        if (ShowAiEcho == true) aiEcho("goAndGatherRelics enabled");
     }
     
     //Enable building repair.
@@ -5496,7 +5513,7 @@ rule ShouldIResign
     minInterval 53 //starts in cAge1
     active
 {
-    aiEcho("ShouldIResign:");
+    if (ShowAiEcho == true) aiEcho("ShouldIResign:");
 
     if (cvOkToResign == false)
     {
@@ -5714,7 +5731,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 {
  xsSetRuleMinIntervalSelf(25);
    
-   aiEcho("findFish:");
+   if (ShowAiEcho == true) aiEcho("findFish:");
 		if (xsGetTime() > 15*60*1000)  // Disable if we've tried for too long.
         xsDisableSelf();
 	
@@ -5722,7 +5739,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 		
 		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") || (cRandomMapName == "vinlandsaga") || (cRandomMapName == "Deep Jungle"))
 		  {
-		  aiEcho("FindFish disabled, map forced this.");
+		  if (ShowAiEcho == true) aiEcho("FindFish disabled, map forced this.");
 		  xsDisableSelf();
 		  return;
 	}
@@ -5777,7 +5794,7 @@ rule watchForFirstWonderStart   //Look for any wonder being built.  If found, ac
     minInterval 73 //starts in cAge3    // Hopefully nobody will build one faster than this
     inactive
 {
-    aiEcho("watchForFirstWonderStart:");
+    if (ShowAiEcho == true) aiEcho("watchForFirstWonderStart:");
     
     static int wonderQueryStart = -1;
     if (wonderQueryStart < 0)
@@ -5796,7 +5813,7 @@ rule watchForFirstWonderStart   //Look for any wonder being built.  If found, ac
     kbUnitQueryResetResults(wonderQueryStart);
     if (kbUnitQueryExecute(wonderQueryStart) > 0)
     {
-        aiEcho("**** Someone is building a wonder!");
+        if (ShowAiEcho == true) aiEcho("**** Someone is building a wonder!");
         xsDisableSelf();
         xsEnableRule("watchForFirstWonderDone");
     }
@@ -5808,7 +5825,7 @@ rule watchForFirstWonderDone    //See who makes the first wonder, note its ID, m
     inactive
     minInterval 30 //starts in cAge3 activated in watchForFirstWonderStart
 {
-    aiEcho("watchForFirstWonderDone:");
+    if (ShowAiEcho == true) aiEcho("watchForFirstWonderDone:");
     
     static int enemyWonderQuery = -1;
     static int wonderID = -1;
@@ -5917,7 +5934,7 @@ rule watchForFirstWonderDone    //See who makes the first wonder, note its ID, m
             wonderDefendPlanStartTime = xsGetTime();
             
             aiPlanSetActive(gEnemyWonderDefendPlan);
-            aiEcho("Creating enemy wonder attack plan");
+            if (ShowAiEcho == true) aiEcho("Creating enemy wonder attack plan");
         }
         else
         {
@@ -5953,7 +5970,7 @@ rule watchForFirstWonderDone    //See who makes the first wonder, note its ID, m
                         wonderDefendPlanStartTime = xsGetTime();
 
                         aiPlanSetActive(gEnemyWonderDefendPlan);
-                        aiEcho("Creating ally wonder defend plan");
+                        if (ShowAiEcho == true) aiEcho("Creating ally wonder defend plan");
                     }
                 }
             }
@@ -5978,7 +5995,7 @@ rule watchForWonder  // See if my wonder has been placed.  If so, go build it.
     minInterval 23 //starts in cAge4, activated in make wonder
     inactive
 {
-    aiEcho("watchForWonder:");
+    if (ShowAiEcho == true) aiEcho("watchForWonder:");
     
     if ( kbUnitCount(cMyID, cUnitTypeWonder, cUnitStateAliveOrBuilding) < 1 )
         return;
@@ -6010,7 +6027,7 @@ rule watchForWonder  // See if my wonder has been placed.  If so, go build it.
         aiPlanSetVariableInt(gWonderDefendPlan, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
         aiPlanSetVariableInt(gWonderDefendPlan, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
         aiPlanSetActive(gWonderDefendPlan); 
-        aiEcho("Creating wonder defend plan");
+        if (ShowAiEcho == true) aiEcho("Creating wonder defend plan");
     }
 
     // we have a wonder, get a titan
@@ -6024,7 +6041,7 @@ rule watchWonderLost    // Kill the uber-defend plan if wonder falls
     minInterval 35 //starts in cAge4, activated in watchForWonder
     inactive
 {
-    aiEcho("watchWonderLost:");
+    if (ShowAiEcho == true) aiEcho("watchWonderLost:");
     
     if ( kbUnitCount(cMyID, cUnitTypeWonder, cUnitStateAliveOrBuilding) > 0 )
         return;
@@ -6045,10 +6062,10 @@ rule goAndGatherRelics
      int EgyTempleUp = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAlive);
      if (EgyTempleUp < 1 && cMyCulture == cCultureEgyptian)
      {
-	 aiEcho("No! I will not make my pharaoh get stuck in my temple again!");
+	 if (ShowAiEcho == true) aiEcho("No! I will not make my pharaoh get stuck in my temple again!");
 	 return;
 	 }
-    aiEcho("gatherRelicStartTime "+gatherRelicStartTime);
+    if (ShowAiEcho == true) aiEcho("gatherRelicStartTime "+gatherRelicStartTime);
     
     int numRelicGatherers = kbUnitCount(cMyID, gGatherRelicType, cUnitStateAlive);
     if ((numRelicGatherers < 1) && (xsGetTime() < 5*60*1000))
@@ -6064,12 +6081,12 @@ rule goAndGatherRelics
             gatherRelicStartTime = -1;
 //            xsSetRuleMinIntervalSelf(47);
             xsSetRuleMinIntervalSelf(101);
-            aiEcho("destroying gRelicGatherPlanID as it has been active for more than 10 minutes");
+            if (ShowAiEcho == true) aiEcho("destroying gRelicGatherPlanID as it has been active for more than 10 minutes");
             return;
         }
         else
         {
-            aiEcho("activeGatherRelicPlans > 0, returning");
+            if (ShowAiEcho == true) aiEcho("activeGatherRelicPlans > 0, returning");
             return;
         }
     }
@@ -6079,13 +6096,13 @@ rule goAndGatherRelics
         if (kbGetTechStatus(cTechHandsofthePharaoh) == cTechStatusActive)
         {
             gGatherRelicType = cUnitTypePriest;
-            aiEcho("cTechHandsofthePharaoh == active, gGatherRelicType = "+gGatherRelicType);
+            if (ShowAiEcho == true) aiEcho("cTechHandsofthePharaoh == active, gGatherRelicType = "+gGatherRelicType);
         }
         else
-            aiEcho("cTechHandsofthePharaoh is not active, gGatherRelicType = "+gGatherRelicType);
+            if (ShowAiEcho == true) aiEcho("cTechHandsofthePharaoh is not active, gGatherRelicType = "+gGatherRelicType);
     }
     
-    aiEcho("Creating relic gathering plan with unit type "+gGatherRelicType);
+    if (ShowAiEcho == true) aiEcho("Creating relic gathering plan with unit type "+gGatherRelicType);
     gRelicGatherPlanID = aiPlanCreate("Relic Gather", cPlanGatherRelic);
 	
 	
@@ -6099,10 +6116,10 @@ rule goAndGatherRelics
         aiPlanSetBaseID(gRelicGatherPlanID, kbBaseGetMainID(cMyID));
         aiPlanSetDesiredPriority(gRelicGatherPlanID, 100);
         aiPlanSetActive(gRelicGatherPlanID);
-        aiEcho("gRelicGatherPlanID: "+gRelicGatherPlanID);
+        if (ShowAiEcho == true) aiEcho("gRelicGatherPlanID: "+gRelicGatherPlanID);
         xsSetRuleMinIntervalSelf(307);
         gatherRelicStartTime = xsGetTime();
-        aiEcho("gatherRelicStartTime "+gatherRelicStartTime);
+        if (ShowAiEcho == true) aiEcho("gatherRelicStartTime "+gatherRelicStartTime);
     }
 }
 
@@ -6112,7 +6129,7 @@ rule relicUnitHandler
     minInterval 127 //starts in cAge1
     inactive
 {  
-    aiEcho("relicUnitHandler:");
+    if (ShowAiEcho == true) aiEcho("relicUnitHandler:");
 
     int numPegasus = kbUnitCount(cMyID, cUnitTypePegasus, cUnitStateAlive);   
 
@@ -6121,7 +6138,7 @@ rule relicUnitHandler
         int exploreID = aiPlanCreate("RelicPegasus_Exp", cPlanExplore);
         if (exploreID >= 0)
         {
-            aiEcho("Pegasus Relic detected : Setting up Pegasus explore plan.");
+            if (ShowAiEcho == true) aiEcho("Pegasus Relic detected : Setting up Pegasus explore plan.");
             aiPlanAddUnitType(exploreID, cUnitTypePegasus, 1, 1, 1);
             aiPlanSetVariableBool(exploreID, cExplorePlanDoLoops, 0, false);
             aiPlanSetDesiredPriority(exploreID, 98);
@@ -6138,7 +6155,7 @@ rule spotAgeUpgrades    //detect age upgrades given as starting condtions or via
     minInterval 18 //starts in cAge1
     inactive
 {
-    aiEcho("spotAgeUpgrades:");
+    if (ShowAiEcho == true) aiEcho("spotAgeUpgrades:");
     
     if ( gLastAgeHandled < kbGetAge() )    // If my current age is higher than the last upgrade I remember...do the handler
     {

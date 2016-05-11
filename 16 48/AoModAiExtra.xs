@@ -58,7 +58,7 @@ extern int eMaxMilPop = 50;               // Max military pop cap during Classic
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 650;              // Food
+extern int eBoomFood = 600;              // Food
 extern int eBoomGold = 150;              // Gold
 extern int eBoomWood = 200;              // Wood, duh.
 
@@ -237,7 +237,7 @@ void initRethlAge1(void)  // Am I doing this right??
 		if (cMyCulture == cCultureNorse)
 		aiSetMinNumberNeedForGatheringAggressvies(5);
 		if (cMyCulture == cCultureChinese)
-		aiSetMinNumberNeedForGatheringAggressvies(5);			
+		aiSetMinNumberNeedForGatheringAggressvies(4);			
         }
       
 	   // Don't build transport ships on these maps!
@@ -323,8 +323,9 @@ xsEnableRule("DockDefenseMonitor");
 // RULE ActivateRethOverridesAge 1-4
 //==============================================================================
 rule ActivateRethOverridesAge1
-   minInterval 5
+   minInterval 1
    active
+   runImmediately
 {
         initRethlAge1();
 		if (gHuntingDogsASAP == true)
@@ -605,11 +606,18 @@ void relicHandler(int relicID = -1)
 // RULE HuntingDogsAsap
 //==============================================================================
 rule HuntingDogsAsap
-   minInterval 15
+   minInterval 4
    inactive
 {
    static int age2Count = 0;
 
+   int HuntingDogsUpgBuilding = cUnitTypeGranary;
+   if (cMyCulture == cCultureChinese)
+   HuntingDogsUpgBuilding = cUnitTypeStoragePit;
+   
+      if (cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse && kbUnitCount(cMyID, HuntingDogsUpgBuilding, cUnitStateAlive) < 1)
+	  return;
+   
    if (gHuntingDogsASAP == true && aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechHuntingDogs) < 0)
    {
 	   //Hunting dogs.
