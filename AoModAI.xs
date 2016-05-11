@@ -1580,7 +1580,10 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     
     
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 75.0);
+	
+	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 55.0);
+	TotalTreesNearMB = numTeesNearMainBase;
+   
     float neededWoodGatherers = desiredWoodUnits;
     if (numTeesNearMainBase < 15 && cvRandomMapName != "Deep Jungle"|| woodSupply > goldSupply+1500)
         neededWoodGatherers = 0;
@@ -2725,15 +2728,15 @@ void initNorse(void)
     }
 
     // Get two extra oxcarts ASAP before we're at econ pop cap, not on Easy though.
-    if ( aiGetWorldDifficulty() > cDifficultyEasy )
+    if (aiGetWorldDifficulty() > cDifficultyEasy )
     {
         int easyOxPlan=aiPlanCreate("Easy/Moderate Oxcarts", cPlanTrain);
         if (easyOxPlan >= 0)
         {
             aiPlanSetVariableInt(easyOxPlan, cTrainPlanUnitType, 0, cUnitTypeOxCart);
             //Train off of economy escrow.
-            aiPlanSetEscrowID(easyOxPlan, cEconomyEscrowID);
-            aiPlanSetVariableInt(easyOxPlan, cTrainPlanNumberToTrain, 0, 1); 
+          //  aiPlanSetEscrowID(easyOxPlan, cEconomyEscrowID);
+            aiPlanSetVariableInt(easyOxPlan, cTrainPlanNumberToTrain, 0, 2); 
             aiPlanSetVariableInt(easyOxPlan, cTrainPlanBuildFromType, 0, cUnitTypeAbstractSettlement); 
             aiPlanSetDesiredPriority(easyOxPlan, 100); 
             aiPlanSetActive(easyOxPlan);
@@ -3703,11 +3706,11 @@ void init(void)
 
     //Startup messages.
     if (ShowAiEcho == true) aiEcho("Greetings, my name is "+cMyName+".");
-    if (ShowAiEcho == true) aiEcho("AI Filename='"+cFilename+"'.");
-    if (ShowAiEcho == true) aiEcho("MapName="+cvRandomMapName+".");
-    if (ShowAiEcho == true) aiEcho("Civ="+kbGetCivName(cMyCiv)+".");
-    if (ShowAiEcho == true) aiEcho("DifficultyLevel="+aiGetWorldDifficultyName(aiGetWorldDifficulty())+".");
-    if (ShowAiEcho == true) aiEcho("Personality="+aiGetPersonality()+".");
+    if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("AI Filename='"+cFilename+"'.");
+    if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("MapName="+cvRandomMapName+".");
+    if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("Civ="+kbGetCivName(cMyCiv)+".");
+    if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("DifficultyLevel="+aiGetWorldDifficultyName(aiGetWorldDifficulty())+".");
+    if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("Personality="+aiGetPersonality()+".");
 
     //Find someone to hate.
     if (cvPlayerToAttack < 1)
@@ -3897,8 +3900,8 @@ void init(void)
         wallOdds = 0.1;                            // Now 0.1 to 1.2, always a 10% chance
 
     wallOdds = wallOdds * 100;                   // 10 to 120
-	if (bWallUp == true)
-	wallOdds = wallOdds * 3000;    
+	
+    
 
     if ((cMyCulture == cCultureNorse) && (gAge2MinorGod == cTechAge2Heimdall))
     {
@@ -3933,16 +3936,23 @@ void init(void)
         gBuildWallsAtMainBase = true;
 		}
     }
+	
+	if (bWallUp == true)
+	{
+	    gBuildWalls = true;
+        gBuildWallsAtMainBase = true;
+	
+	}
 
     if (gBuildWallsAtMainBase == true)
-        if (ShowAiEcho == true) aiEcho("Decided to build walls at the main base.");
+        if (ShowAiEcho == true || ShowAiDefEcho == true) aiEcho("Decided to build walls at the main base.");
     else
-        if (ShowAiEcho == true) aiEcho("Decided NOT to build walls at the main base.");
+        if (ShowAiEcho == true || ShowAiDefEcho == true) aiEcho("Decided NOT to build walls at the main base.");
         
     if (gBuildWalls == true)
-        if (ShowAiEcho == true) aiEcho("Decided to build walls at other bases.");
+        if (ShowAiEcho == true || ShowAiDefEcho == true) aiEcho("Decided to build walls at other bases.");
     else
-        if (ShowAiEcho == true) aiEcho("Decided NOT to build walls at other bases.");
+        if (ShowAiEcho == true || ShowAiDefEcho == true) aiEcho("Decided NOT to build walls at other bases.");
 
 
     // always consider towering
@@ -6280,15 +6290,4 @@ void gpHandler(int powerProtoID=-1)
 void attackChatCallback(int parm1=-1)
 {
     aiCommsSendStatement(aiGetMostHatedPlayerID(), cAICommPromptAIAttack, -1); 
-}
-
-
-rule testtest
-minInterval 2
-active
-{
-int mainBaseID = kbBaseGetMainID(cMyID);
-vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 01, 0, mainBaseLocation, 80.0);
-aiEcho(" "+numTeesNearMainBase+"");
 }

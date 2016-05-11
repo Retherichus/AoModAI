@@ -44,7 +44,7 @@ rule updateWoodBreakdown
     
     bool reducedWoodGathererCount = false;
 
-    if (woodGathererCount <= 0) //always some units on wood, unless there are less than 15 trees
+    if (woodGathererCount <= 0 && TotalTreesNearMB > 15) //always some units on wood, unless there are less than 15 trees
     {
             woodGathererCount = 1;
             reducedWoodGathererCount = true;
@@ -55,16 +55,16 @@ rule updateWoodBreakdown
    {
             if (foodGathererCount > 2 && goldGathererCount > 0)
 			woodGathererCount = 1;
-			if (foodGathererCount > 3 && goldGathererCount > 0)
-			woodGathererCount = 2;        
+			//if (foodGathererCount > 3 && goldGathererCount > 0)
+			//woodGathererCount = 2;        
    }
    
    if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv == cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
    {
             if (foodGathererCount > 2)
 			woodGathererCount = 1;
-			if (foodGathererCount > 3 && goldGathererCount > 0)
-			woodGathererCount = 2;        
+			//if (foodGathererCount > 3 && goldGathererCount > 0)
+			//woodGathererCount = 2;        
    }
    
    if (kbGetAge() < cAge2 && cMyCulture != cCultureAtlantean &&  cMyCulture != cCultureEgyptian && gHuntingDogsASAP == true && ConfirmFish == false)
@@ -281,16 +281,16 @@ rule updateGoldBreakdown
    {
             if (foodGathererCount > 2 && woodGathererCount > 0)
 			goldGathererCount = 1;
-			if (foodGathererCount > 4 && woodGathererCount > 2)
-			goldGathererCount = 2;        
+			//if (foodGathererCount > 4 && woodGathererCount > 2)
+			//goldGathererCount = 2;        
    }
    
       if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv != cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
    {
             if (foodGathererCount > 1)
 			goldGathererCount = 1;
-			if (foodGathererCount > 4 && woodGathererCount > 2)
-			goldGathererCount = 2;        
+			//if (foodGathererCount > 4 && woodGathererCount > 2)
+			//goldGathererCount = 2;        
    }   
    
       if (kbGetAge() < cAge2 && cMyCulture != cCultureAtlantean &&  cMyCulture != cCultureEgyptian && gHuntingDogsASAP == true && ConfirmFish == false)
@@ -303,9 +303,9 @@ rule updateGoldBreakdown
    
       if (kbGetAge() < cAge2 && cMyCulture == cCultureEgyptian && gHuntingDogsASAP == true && ConfirmFish == false)
    {
-            if (foodGathererCount > 6)
+            if (foodGathererCount > 7)
 			goldGathererCount = 3;
-			if (foodGathererCount > 7)
+			if (foodGathererCount > 8)
 			goldGathererCount = 4;
 			if (foodGathererCount > 10)
 			goldGathererCount = 6;        
@@ -500,11 +500,9 @@ rule updateFoodBreakdown
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
     float distance = kbBaseGetMaximumResourceDistance(cMyID, mainBaseID);
-	if (kbGetAge() < 2 && xsGetTime() < 2.5*60*1000)
+	if (kbGetAge() < 2 && xsGetTime() < 2*60*1000)
 	distance = 40;
     else if (kbGetAge() < 2 && xsGetTime() > 3*60*1000)
-	distance = 65;
-	else if (kbGetAge() < 2 && xsGetTime() > 4*60*1000)
 	distance = 85;
 
 
@@ -534,8 +532,9 @@ rule updateFoodBreakdown
 		if (cMyCulture == cCultureAtlantean)
 		createSimpleBuildPlan(cUnitTypeGuild, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
     }
+
 	
-    
+	
 	if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.
         numberAggressiveResourceSpots = 0;  // Never get enough vills to go hunting.
     
@@ -584,13 +583,11 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 30;
+    int desiredFarmers = 24;
     if (mapRequires2FarmPlans() == true)
-        desiredFarmers = 36;
+        desiredFarmers = 28;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 11;
-    if (mapRequires2FarmPlans() == true && cMyCulture == cCultureAtlantean)
-        desiredFarmers = 14;		
+        desiredFarmers = 10;		
 		
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)
@@ -1330,6 +1327,12 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
     minInterval 1 //starts in cAge1
     inactive
 {
+
+    xsSetRuleMinIntervalSelf(40);
+	
+    if (cMyCulture == cCultureNorse && kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive) > 0)
+	return;
+	
     //If no scout, go away.
     if (gLandScout == -1)
     {
@@ -1600,8 +1603,13 @@ void econAge4Handler(int age=0)
 void initEcon() //setup the initial Econ stuff.
 {
     if (ShowAiEcho == true) aiEcho("initEcon:");    
-
-    //Set our update resource handler.
+    
+	int mainBaseID = kbBaseGetMainID(cMyID);
+	vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 65.0);
+	TotalTreesNearMB = numTeesNearMainBase;
+    
+	//Set our update resource handler.
     aiSetUpdateResourceEventHandler("updateResourceHandler");
 
     //Set up auto-gather escrows.
@@ -1661,16 +1669,44 @@ void initEcon() //setup the initial Econ stuff.
 //==============================================================================
 rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it to the food-heavy
                     //"starting" mix after we have 7 villagers (or 3 for Atlantea)
-    minInterval 7 //starts in cAge1
+    minInterval 1 //starts in cAge1
     inactive
 {
+    xsSetRuleMinIntervalSelf(7);
+	
+	float foodGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood);
+    float woodGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceWood);
+    float goldGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceGold);
+    float favorGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFavor);
+
     if (gWaterMap == true && RethFishEco == true && ConfirmFish == true)
 	{
     xsDisableSelf();
-    xsEnableRule("econForecastAge1");
 	if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Found fish! Looks like we're going fishing then!");
+	
+	aiSetResourceGathererPercentage(cResourceFood, foodGPct, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceWood, woodGPct, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceGold, goldGPct, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceFavor, favorGPct, false, cRGPScript);
+    aiNormalizeResourceGathererPercentages(cRGPScript);
+	xsEnableRule("econForecastAge1");
+	return;
 	}
 	
+	/*
+	if (BoomV2 == true)
+  {
+    xsDisableSelf();
+    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("BoomV2 Initiated.");
+    aiSetResourceGathererPercentage(cResourceFood, foodGPct, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceWood, woodGPct, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceGold, goldGPct, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceFavor, favorGPct, false, cRGPScript);
+    aiNormalizeResourceGathererPercentages(cRGPScript);
+	xsEnableRule("econForecastAge1");
+	return;
+	}
+	*/
 	if (ShowAiEcho == true) aiEcho("setEarlyEcon: ");
     int gathererCount = kbUnitCount(cMyID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer, 0), cUnitStateAlive);
 
@@ -1693,10 +1729,7 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
     if ((gathererCount < 5) && (numberEasyResourceSpots > 0))
         return;
    
-    float foodGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood);
-    float woodGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceWood);
-    float goldGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceGold);
-    float favorGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFavor);
+
     aiSetResourceGathererPercentage(cResourceFood, foodGPct, false, cRGPScript);
     aiSetResourceGathererPercentage(cResourceWood, woodGPct, false, cRGPScript);
     aiSetResourceGathererPercentage(cResourceGold, goldGPct, false, cRGPScript);
@@ -1850,7 +1883,7 @@ rule fishing
 //==============================================================================
 rule collectIdleVills
 //    minInterval 61 //starts in cAge1
-    minInterval 16 //starts in cAge1
+    minInterval 22 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("collectIdleVills:");
@@ -1885,8 +1918,8 @@ rule collectIdleVills
     bool noTrees = false;
 
 	float woodSupply = kbResourceGet(cResourceWood);
-    int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 55.0);
-    if (numTeesNearMainBase < 10 || woodSupply > 5000 && xsGetTime() > 20*60*1000)
+    int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 45.0);
+    if (numTeesNearMainBase < 10 || woodSupply > 4200 && xsGetTime() > 20*60*1000)
         noTrees = true;
         
     bool noGoldMines = false;
@@ -1973,18 +2006,12 @@ rule collectIdleVills
             }
             case 4:
             {
-                resourceType = cUnitTypeFarm;
-                if (ShowAiEcho == true) aiEcho("sending idle villager to an available farm");
-                break;
-            }
-            case 5:
-            {
                 if (ShowAiEcho == true) aiEcho("there are no trees and no gold mines");
                 break;
-            }			
+            }
         }
 
-        if (randomResource == 5)
+        if (randomResource == 4)
         {
             aiTaskUnitMove(currentVillie, mainBaseLocation);
             if (ShowAiEcho == true) aiEcho("sending idle villager to mainBase");

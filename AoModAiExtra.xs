@@ -30,6 +30,8 @@ extern int gLandScoutSpecialUlfsark = -1;
 extern bool IsRunTradeUnits1 = false;
 extern bool IsRunTradeUnits2 = false;
 extern bool IsRunHuntingDogs = false;
+extern bool BoomV2 = true;
+extern int TotalTreesNearMB = -1;
 
 //////////////// DEBUG 
 
@@ -37,6 +39,7 @@ extern bool ShowAiEcho = false;
 extern bool ShowAiEcoEcho = true;
 extern bool ShowAiGenEcho = true;
 extern bool ShowAiMilEcho = true;
+extern bool ShowAiDefEcho = true;
 
 //////////////// END OF DEBUG 
 //==============================================================================
@@ -237,7 +240,7 @@ void initRethlAge1(void)  // Am I doing this right??
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
-	   
+	    
 	   
 	   if (gHuntEarly == true && cRandomMapName != "Deep Jungle")
 		{
@@ -1903,5 +1906,24 @@ int findClosestAreaWithUnits(int areaID = -1,int type=-1, int unitType = -1, int
 	}
 	return(closestArea);
 }
+
+	    if (xsGetTime() < 12*1*1000 && gHuntingDogsASAP == true)
+		{ 
+		// Force early aggressive hunting for these, as they are not likely to kill a villager.
+	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+		if (HippoNearMB > 1 && cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse) 
+		aiSetMinNumberNeedForGatheringAggressvies(1);
+		else if (HippoNearMB > 1 && cMyCulture == cCultureAtlantean) 
+		aiSetMinNumberNeedForGatheringAggressvies(1);
+		else if (HippoNearMB > 1 && cMyCulture == cCultureNorse) 
+		aiSetMinNumberNeedForGatheringAggressvies(2);
+        }
+
 */
 // TESTING GROUND
+rule testtestt
+minInterval 2
+inactive
+{
+
+}
