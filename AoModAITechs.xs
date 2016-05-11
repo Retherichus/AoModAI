@@ -1759,7 +1759,10 @@ rule getStoneWall
     minInterval 37 //starts in cAge2
 {
     int techID = cTechStoneWall;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
+	if (cMyCulture == cCultureChinese)
+	techID = cTechStoneWallChinese;
+    
+	if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
         if (cMyCulture == cCultureAtlantean)
             xsEnableRule("getBronzeWall");

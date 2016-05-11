@@ -15,19 +15,18 @@ rule maintainTradeUnits
     if (numMarkets < 1)
         return;
     
-    bool IsRun1 = false;
-	bool IsRun2 = false;
+
 	
-	if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa && IsRun1 == false)
+	if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa && IsRunTradeUnits1 == false)
 	{
 	gMaxTradeCarts = 3;
-	IsRun1 = true;
+	IsRunTradeUnits1  = true;
     }
 	
-	if (kbGetAge() > cAge2 && cMyCiv == cCivNuwa && IsRun2 == false)
+	if (kbGetAge() > cAge2 && cMyCiv == cCivNuwa && IsRunTradeUnits2 == false)
 	{
 	gMaxTradeCarts = 22;
-	IsRun2 = true;
+	IsRunTradeUnits2  = true;
     }	
     int tradeCartPUID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0);
     int numTradeUnits = kbUnitCount(cMyID, tradeCartPUID, cUnitStateAlive);

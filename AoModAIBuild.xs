@@ -4726,6 +4726,11 @@ rule buildResearchGranary   //or a guild for Atlanteans or a house for Norse
     {
         return;
     }
+	
+    if (cMyCulture == cCultureAtlantean && kbUnitCount(cMyID, cUnitTypeGuild, cUnitStateAlive) > 0)
+    {
+        return;
+    }	
 
     int buildingType = cUnitTypeGranary;
     if (cMyCulture == cCultureAtlantean)

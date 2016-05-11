@@ -10,152 +10,217 @@
 
 //==============================================================================
 rule updateWoodBreakdown
-   minInterval 10
-   inactive
-   group startRules
-{
-   int mainBaseID = kbBaseGetMainID(cMyID);
+    minInterval 10
+    inactive
+{   
+    if (ShowAiEcho == true) aiEcho("updateWoodBreakdown: ");
+ 
+    int mainBaseID = kbBaseGetMainID(cMyID);
+  
+    int randomBase = findUnit(cUnitTypeAbstractSettlement);
+    if (randomBase < 0)
+        return;
+    else
+    {
+        int randomBaseID = kbUnitGetBaseID(randomBase);
+    }
 
-   int woodPriority=50;
-   if (cMyCulture == cCultureEgyptian)
-      woodPriority=55;
+    if ((aiRandInt(4) < 2) && (randomBaseID != mainBaseID))
+    {
+        randomBaseID = mainBaseID;
+    }
+        
+    int woodPriority=45;
+    if (cMyCulture == cCultureEgyptian)
+        woodPriority=40;
 
-   int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
-   int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
-   int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
-   int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
+    int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
+    int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
+    int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
+    int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
 
-   
-   
-   if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean)
+      if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv != cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
    {
-            if (foodGathererCount > 1)
+            if (foodGathererCount > 2 && goldGathererCount > 0)
 			woodGathererCount = 1;
 			if (foodGathererCount > 3 && goldGathererCount > 0)
 			woodGathererCount = 2;        
    }
    
-   if (kbGetAge() < cAge2 && cMyCulture != cCultureAtlantean &&  cMyCulture != cCultureEgyptian)
+   if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv == cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
    {
-            if (foodGathererCount > 4)
-			woodGathererCount = 4;
-			if (foodGathererCount > 8 && goldGathererCount > 2)
+            if (foodGathererCount > 2)
+			woodGathererCount = 1;
+			if (foodGathererCount > 3 && goldGathererCount > 0)
+			woodGathererCount = 2;        
+   }
+   
+   if (kbGetAge() < cAge2 && cMyCulture != cCultureAtlantean &&  cMyCulture != cCultureEgyptian && gHuntingDogsASAP == true && ConfirmFish == false)
+   {
+            if (foodGathererCount > 6)
+			woodGathererCount = 2;
+			if (foodGathererCount > 9 && goldGathererCount > 2)
 			woodGathererCount = 4;        
    }   
-   
+
+      float woodSupply = kbResourceGet(cResourceWood);
+	  float goldSupply = kbResourceGet(cResourceGold);
+  
+    if ((woodSupply > goldSupply+1500) && (xsGetTime() > 20*60*1000))
+        woodGathererCount = 0;
     
+    
+    bool reducedWoodGathererCount = false;
 
-   // If we have no need for wood, set plans=0 and exit
-   if (woodGathererCount <= 0)
-   {
-      aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, 0);
-      aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, mainBaseID);
-      if (gWoodBaseID != mainBaseID)
-         aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);
-      return;
-   }
+    if (woodGathererCount <= 0) //always some units on wood, unless there are less than 15 trees
+    {
+            woodGathererCount = 1;
+            reducedWoodGathererCount = true;
+        }
+    
+    
+//Test
+    //if we lost a lot of villagers, keep them close to our settlements (=farming)
+    int minVillagers = 12;
+    if (cMyCulture == cCultureAtlantean)
+        minVillagers = 7;
+    else if (cMyCulture == cCultureGreek)
+        minVillagers = 14;
+    int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
+    if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
+    {
+        woodGathererCount = 0;
+    }
+//Test end
+  
+    // If we have no need for wood, set plans=0 and exit
+    if (woodGathererCount <= 0)
+    {
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, 0);
+        aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, mainBaseID);
+        if (gWoodBaseID != mainBaseID)
+            aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);
+        return;
+    }
+    
+    // If we're this far, we need some wood gatherers.  The number of plans we use will be the greater of 
+    // a) the ideal number for this number of gatherers, or
+    // b) the number of plans active that have resource sites, either main base or wood base.
 
-   // If we're this far, we need some wood gatherers.  The number of plans we use will be the greater of 
-   // a) the ideal number for this number of gatherers, or
-   // b) the number of plans active that have resource sites, either main base or wood base.
+    //Count of sites.
+    int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy);
+    
+    int numberWoodBaseSites = 0;
+    if ( (gWoodBaseID >= 0) && (gWoodBaseID != mainBaseID) )    // Count wood base if different
+        numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
 
-   //Count of sites.
-   int numberMainBaseSites=kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy);
-   int numberWoodBaseSites = 0;
-   if ( (gWoodBaseID >= 0) && (gWoodBaseID != mainBaseID) )    // Count wood base if different
-      numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
+    //Get the count of plans we currently have going.
+    int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
-   //Get the count of plans we currently have going.
-   int numWoodPlans=aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
+    int desiredWoodPlans = 2;
+    if (xsGetTime() < 12*60*1000)
+        desiredWoodPlans = 1;
+    
+    if (woodGathererCount < desiredWoodPlans)
+        desiredWoodPlans = woodGathererCount;
 
-   int desiredWoodPlans = 1 + (woodGathererCount/14);
+    if ((desiredWoodPlans < numWoodPlans) && (reducedWoodGathererCount == false))
+        desiredWoodPlans = numWoodPlans;    // Try to preserve existing plans
 
-   if (desiredWoodPlans < numWoodPlans)
-      desiredWoodPlans = numWoodPlans;    // Try to preserve existing plans
+    // Three cases are possible:
+    // 1)  We have enough sites at our main base.  All should work in main base.
+    // 2)  We have some wood at main, but not enough.  Split the sites
+    // 3)  We have no wood at main...use woodBase
 
-   // Three cases are possible:
-   // 1)  We have enough sites at our main base.  All should work in main base.
-   // 2)  We have some wood at main, but not enough.  Split the sites
-   // 3)  We have no wood at main...use woodBase
+    if (numberMainBaseSites >= desiredWoodPlans) // case 1
+    {
+        // remove any breakdown for woodBaseID
+        if (gWoodBaseID != mainBaseID)
+            aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);
+        gWoodBaseID = mainBaseID;
+        aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, mainBaseID);
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
+        return;
+    }
 
-   if (numberMainBaseSites >= desiredWoodPlans) // case 1
-   {
-      // remove any breakdown for woodBaseID
-      if (gWoodBaseID != mainBaseID)
-         aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);
-      gWoodBaseID = mainBaseID;
-      aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, mainBaseID);
-      aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
-      return;
-   }
+    if ( (numberMainBaseSites > 0) && (numberMainBaseSites < desiredWoodPlans) )  // case 2
+    {
+        aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numberMainBaseSites, woodPriority, 1.0, mainBaseID);
 
-   if ( (numberMainBaseSites > 0) && (numberMainBaseSites < desiredWoodPlans) )  // case 2
-   {
-      aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numberMainBaseSites, woodPriority, 1.0, mainBaseID);
+        if (numberWoodBaseSites > 0)  // We do have remote wood
+        {
+            if (gTransportMap == true)
+                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+            else
+                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
+            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
+        }
+        else  // No remote wood...bummer.  Kill old breakdown, look for more
+        {
+            aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
+            //Try to find a new wood base.
+            if (gTransportMap == true)
+                gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, randomBaseID);
+            else
+                gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, mainBaseID);
 
-      if (numberWoodBaseSites > 0)  // We do have remote wood
-      {
-         aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans-numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
-         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
-      }
-      else  // No remote wood...bummer.  Kill old breakdown, look for more
-      {
-         aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
-         //Try to find a new wood base.
-         gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, kbBaseGetMainID(cMyID));
-         if (gWoodBaseID >= 0)
-         {
-            
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
-	         aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans-numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
-         }
-         else
-         {
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, numberMainBaseSites);   // That's all we get
-         }
-      }
-      return;
-   }
+            if (gWoodBaseID >= 0)
+            {
+                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
+                if (gTransportMap == true)
+                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+                else
+                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
+            }
+            else
+            {
+                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, numberMainBaseSites);   // That's all we get
+            }
+        }
+        return;
+    }
 
-   if (numberMainBaseSites < 1)  // case 3
-   {
-      aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy,mainBaseID);
+    if (numberMainBaseSites < 1)  // case 3
+    {
+        aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy,mainBaseID);
 
-      if (numberWoodBaseSites >= desiredWoodPlans)  // We have enough remote wood
-      {
-         aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gWoodBaseID);
-         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
-      }
-      else if (numberWoodBaseSites > 0)   // We have some, but not enough
-      {
-         aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numberWoodBaseSites, woodPriority, 1.0, gWoodBaseID);
-         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, numberWoodBaseSites);
-      }
-      else  // We have none, try elsewhere
-      {
-	 int oldWoodBase=gWoodBaseID;
-         aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
-         //Try to find a new wood base.
-         gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, kbBaseGetMainID(cMyID));
+        if (numberWoodBaseSites >= desiredWoodPlans)  // We have enough remote wood
+        {
+            aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gWoodBaseID);
+            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
+        }
+        else if (numberWoodBaseSites > 0)   // We have some, but not enough
+        {
+            aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numberWoodBaseSites, woodPriority, 1.0, gWoodBaseID);
+            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, numberWoodBaseSites);
+        }
+        else  // We have none, try elsewhere
+        {
+            int oldWoodBase=gWoodBaseID;
+            aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
+            //Try to find a new wood base.
+            if (gTransportMap == true)
+                gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, randomBaseID);
+            else
+                gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, mainBaseID);
 
-	 if((gWoodBaseID < 0) && (gTransportMap == true))
-	 {            
-            // try to find a wood base on another island
-            gWoodBaseID = newResourceBase(oldWoodBase, cResourceWood);
-	 }
+            if((gWoodBaseID < 0) && (gTransportMap == true))
+            {            
+                // try to find a wood base on another island
+                gWoodBaseID = newResourceBase(oldWoodBase, cResourceWood);
+            }
 
-         if (gWoodBaseID >= 0)
-         {
-            
-            numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
-            if (numberWoodBaseSites < desiredWoodPlans)
-               desiredWoodPlans = numberWoodBaseSites;
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      
-	         aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gWoodBaseID);
-         }
-      }
-      return;
-   }
+            if (gWoodBaseID >= 0)
+            {
+                numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
+                if (numberWoodBaseSites < desiredWoodPlans)
+                    desiredWoodPlans = numberWoodBaseSites;
+                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      
+                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gWoodBaseID);
+            }
+        }
+        return;
+    }
 }
 
 //==============================================================================
@@ -163,152 +228,246 @@ rule updateGoldBreakdown
     minInterval 12
     inactive
 {
-int mainBaseID = kbBaseGetMainID(cMyID);
+    if (ShowAiEcho == true) aiEcho("updateGoldBreakdown: ");
 
-   int goldPriority=49; // Lower than wood for non-Egyptians
+    int mainBaseID = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+
+    int randomBase = findUnit(cUnitTypeAbstractSettlement);
+    if (randomBase < 0)
+        return;
+    else
+    {
+        int randomBaseID = kbUnitGetBaseID(randomBase);
+    }
+
+    if ((aiRandInt(4) < 2) && (randomBaseID != mainBaseID))
+    {
+        randomBaseID = mainBaseID;
+    }
+    float goldSupply = kbResourceGet(cResourceGold);
+        
+//    int goldPriority = 60; // Lower than wood for non-Egyptians
+   int goldPriority=55; // Lower than wood for non-Egyptians
    if (cMyCulture == cCultureEgyptian)    // Higher than Egyptian wood
-      goldPriority=56;
+      goldPriority=60;
 
-   int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
+    int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
    int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
    int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
    int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
 
-      if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean)
+      if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv == cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
    {
-            if (foodGathererCount > 1 && woodGathererCount > 0)
+            if (foodGathererCount > 2 && woodGathererCount > 0)
 			goldGathererCount = 1;
 			if (foodGathererCount > 4 && woodGathererCount > 2)
 			goldGathererCount = 2;        
    }
    
-      if (kbGetAge() < cAge2 && cMyCulture != cCultureAtlantean &&  cMyCulture != cCultureEgyptian)
+      if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv != cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
    {
-            if (foodGathererCount > 6 && woodGathererCount > 1)
-			goldGathererCount = 3;
-			if (foodGathererCount > 9 && woodGathererCount > 6)
-			goldGathererCount = 6;        
+            if (foodGathererCount > 1)
+			goldGathererCount = 1;
+			if (foodGathererCount > 4 && woodGathererCount > 2)
+			goldGathererCount = 2;        
    }   
    
-      if (kbGetAge() < cAge2 && cMyCulture == cCultureEgyptian)
+      if (kbGetAge() < cAge2 && cMyCulture != cCultureAtlantean &&  cMyCulture != cCultureEgyptian && gHuntingDogsASAP == true && ConfirmFish == false)
+   {
+            if (foodGathererCount > 7 && woodGathererCount > 1)
+			goldGathererCount = 2;
+			if (foodGathererCount > 10 && woodGathererCount > 3)
+			goldGathererCount = 4;        
+   }   
+   
+      if (kbGetAge() < cAge2 && cMyCulture == cCultureEgyptian && gHuntingDogsASAP == true && ConfirmFish == false)
    {
             if (foodGathererCount > 6)
+			goldGathererCount = 3;
+			if (foodGathererCount > 7)
 			goldGathererCount = 4;
-			if (foodGathererCount > 9)
+			if (foodGathererCount > 10)
 			goldGathererCount = 6;        
-   }      
-   
-   // If we have no need for gold, set plans=0 and exit
-   if (goldGathererCount <= 0)
-   {
-      aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, 0);
-      aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, mainBaseID);
-      if (gGoldBaseID != mainBaseID)
-         aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);
-      return;
-   }
+   } 
+    
+    int numMainBaseGoldSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
+    int numGoldBaseSites = 0;
+    if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
+        numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
+    int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
 
-   // If we're this far, we need some gold gatherers.  The number of plans we use will be the greater of 
-   // a) the ideal number for this number of gatherers, or
-   // b) the number of plans active that have resource sites, either main base or gold base.
+    bool reducedGoldGathererCount = false;
 
-   //Count of sites.
-   int numberMainBaseSites=kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
-   int numberGoldBaseSites = 0;
-   if ( (gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID) )    // Count gold base if different
-      numberGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
+    if (goldGathererCount <= 0) //always some units on gold, unless there are no gold sites
+    {
+        if ((numGoldSites > 0) && (kbGetAge() > cAge1))
+        {
+            goldGathererCount = 1;
+            reducedGoldGathererCount = true;
+        }
+    }
 
-   //Get the count of plans we currently have going.
-   int numGoldPlans=aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
+//Test
+    //if we lost a lot of villagers, keep them close to our settlements (=farming)
+    int minVillagers = 12;
+    if (cMyCulture == cCultureAtlantean)
+        minVillagers = 6;
+    else if (cMyCulture == cCultureGreek)
+        minVillagers = 14;
+    int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
+    if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
+    {
+        goldGathererCount = 0;
+    }
+//Test end
+    
+    // If we have no need for gold, set plans=0 and exit
+    if (goldGathererCount <= 0)
+    {
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, 0);
+        aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, mainBaseID);
+        if (gGoldBaseID != mainBaseID)
+            aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);
+        return;
+    }
+    
+    // If we're this far, we need some gold gatherers.  The number of plans we use will be the greater of 
+    // a) the ideal number for this number of gatherers, or
+    // b) the number of plans active that have resource sites, either main base or gold base.
 
-   int desiredGoldPlans = 1 + (goldGathererCount/14);
+    //Count of sites.
+    int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
 
-   if (desiredGoldPlans < numGoldPlans)
-      desiredGoldPlans = numGoldPlans;    // Try to preserve existing plans
+    int numberGoldBaseSites = 0;
+    if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
+        numberGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
 
-   // Three cases are possible:
-   // 1)  We have enough sites at our main base.  All should work in main base.
-   // 2)  We have some gold at main, but not enough.  Split the sites
-   // 3)  We have no gold at main...use goldBase
+    //Get the count of plans we currently have going.
+    int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 
-   if (numberMainBaseSites >= desiredGoldPlans) // case 1
-   {
-      // remove any breakdown for goldBaseID
-      if (gGoldBaseID != mainBaseID)
-         aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);
-      gGoldBaseID = mainBaseID;
-      aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans, goldPriority, 1.0, mainBaseID);
-      aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);
-      return;
-   }
+    int desiredGoldPlans = 2;
+    
+    int numGoldMinesNearMBInR50 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0);
+    
+    if (ShowAiEcho == true) aiEcho("numGoldMinesNearMBInR50: "+numGoldMinesNearMBInR50);
+    //override on anatolia
+    if (cRandomMapName == "anatolia")
+    {
+//        if (numGoldMinesNearMBInR50 == 1)
+        if ((numGoldMinesNearMBInR50 == 1) && (kbGetAge() < cAge3))
+        {
+            desiredGoldPlans = 1;
+            reducedGoldGathererCount = true;   //to make sure the number of desiredGoldPlans gets reduced to 1
+        }
+    }
+    
+    if (xsGetTime() < 14*60*1000)
+        desiredGoldPlans = 1;
+        
+    if (goldGathererCount < desiredGoldPlans)
+        desiredGoldPlans = goldGathererCount;
 
-   if ( (numberMainBaseSites > 0) && (numberMainBaseSites < desiredGoldPlans) )  // case 2
-   {
-      aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, numberMainBaseSites, goldPriority, 1.0, mainBaseID);
+    if ((desiredGoldPlans < numGoldPlans) && (reducedGoldGathererCount == false))
+        desiredGoldPlans = numGoldPlans;    // Try to preserve existing plans
 
-      if (numberGoldBaseSites > 0)  // We do have remote gold
-      {
-         aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans-numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
-         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);
-      }
-      else  // No remote gold...bummer.  Kill old breakdown, look for more
-      {
-         aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);   // Remove old breakdown
-         //Try to find a new gold base.
-         gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, kbBaseGetMainID(cMyID));
-         if (gGoldBaseID >= 0)
-         {
-            
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);      // We can have the full amount
-	         aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans-numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
-         }
-         else
-         {
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, numberMainBaseSites);   // That's all we get
-         }
-      }
-      return;
-   }
+    if (ShowAiEcho == true) aiEcho("desiredGoldPlans: "+desiredGoldPlans);
+
+    
+    // Three cases are possible:
+    // 1)  We have enough sites at our main base.  All should work in main base.
+    // 2)  We have some gold at main, but not enough.  Split the sites
+    // 3)  We have no gold at main...use goldBase
+
+    if (numberMainBaseSites >= desiredGoldPlans) // case 1
+    {
+        // remove any breakdown for goldBaseID
+        if (gGoldBaseID != mainBaseID)
+            aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);
+        gGoldBaseID = mainBaseID;
+        aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans, goldPriority, 1.0, mainBaseID);
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);
+        return;
+    }
+
+    if ( (numberMainBaseSites > 0) && (numberMainBaseSites < desiredGoldPlans) )  // case 2
+    {
+        aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, numberMainBaseSites, goldPriority, 1.0, mainBaseID);
+
+        if (numberGoldBaseSites > 0)  // We do have remote gold
+        {
+            if (gTransportMap == true)
+                aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
+            else
+                aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 0.2, gGoldBaseID);
+            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);
+        }
+        else  // No remote gold...bummer.  Kill old breakdown, look for more
+        {
+            aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);   // Remove old breakdown
+            //Try to find a new gold base.
+            if (gTransportMap == true)
+                gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, randomBaseID);
+            else
+                gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, mainBaseID);
+            if (gGoldBaseID >= 0)
+            {
+                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);      // We can have the full amount
+                if (gTransportMap == true)
+                    aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
+                else
+                    aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 0.2, gGoldBaseID);
+            }
+            else
+            {
+                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, numberMainBaseSites);   // That's all we get
+            }
+        }
+        return;
+    }
 
 
-   if (numberMainBaseSites < 1)  // case 3
-   {
-      aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy,mainBaseID);
+    if (numberMainBaseSites < 1)  // case 3
+    {
+        aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy,mainBaseID);
 
-      if (numberGoldBaseSites >= desiredGoldPlans)  // We have enough remote gold
-      {
-         aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans, goldPriority, 1.0, gGoldBaseID);
-         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);
-      }
-      else if (numberGoldBaseSites > 0)   // We have some, but not enough
-      {
-         aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, numberGoldBaseSites, goldPriority, 1.0, gGoldBaseID);
-         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, numberGoldBaseSites);
-      }
-      else  // We have none, try elsewhere
-      {
-	 int oldGoldBase=gGoldBaseID;
-         aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);   // Remove old breakdown
-         //Try to find a new gold base.
-         gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, kbBaseGetMainID(cMyID));
-         if ( gGoldBaseID < 0 && gTransportMap ) // did not find base on my mainbase
-         {
-            // try to find a gold base on another island
-            gGoldBaseID = newResourceBase(oldGoldBase, cResourceGold);
-         }
+        if (numberGoldBaseSites >= desiredGoldPlans)  // We have enough remote gold
+        {
+            aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans, goldPriority, 1.0, gGoldBaseID);
+            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);
+        }
+        else if (numberGoldBaseSites > 0)   // We have some, but not enough
+        {
+            aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, numberGoldBaseSites, goldPriority, 1.0, gGoldBaseID);
+            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, numberGoldBaseSites);
+        }
+        else  // We have none, try elsewhere
+        {
+            int oldGoldBase=gGoldBaseID;
+            aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);   // Remove old breakdown
+            //Try to find a new gold base.
+            if (gTransportMap == true)
+                gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, randomBaseID);
+            else
+                gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, mainBaseID);
 
-         if (gGoldBaseID >= 0)
-         {
-            
-            numberGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
-            if (numberGoldBaseSites < desiredGoldPlans)
-               desiredGoldPlans = numberGoldBaseSites;
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);      
-	         aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans, goldPriority, 1.0, gGoldBaseID);
-         }
-      }
-      return;
-   }
+            if ((gGoldBaseID < 0) && (gTransportMap == true)) // did not find base on my mainbase
+            {
+                // try to find a gold base on another island
+                gGoldBaseID = newResourceBase(oldGoldBase, cResourceGold);
+            }
+
+            if (gGoldBaseID >= 0)
+            {
+                numberGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
+                if (numberGoldBaseSites < desiredGoldPlans)
+                    desiredGoldPlans = numberGoldBaseSites;
+                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);      
+                aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans, goldPriority, 1.0, gGoldBaseID);
+            }
+        }
+        return;
+    }
 }
 
 //==============================================================================
@@ -338,12 +497,29 @@ rule updateFoodBreakdown
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
     float distance = kbBaseGetMaximumResourceDistance(cMyID, mainBaseID);
-    
+	if (kbGetAge() < 2 && xsGetTime() < 3*60*1000)
+	distance = 40;
+    else if (kbGetAge() < 2 && xsGetTime() > 3*60*1000)
+	distance = 65;
+	else if (kbGetAge() < 2 && xsGetTime() > 4*60*1000)
+	distance = 85;
+
 
     //Get the number of valid resources spots.
     int numberAggressiveResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
 
-    if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.
+	if (numberAggressiveResourceSpots > 0 && IsRunHuntingDogs == false && xsGetTime() < 20*1*1000)
+	   { 
+        if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Huntable found nearby, activating HuntingDogsAsap");
+		IsRunHuntingDogs = true;
+		gHuntingDogsASAP = true;
+		xsEnableRule("HuntingDogsAsap");
+		if (cMyCulture == cCultureAtlantean)
+		createSimpleBuildPlan(cUnitTypeGuild, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
+    }
+	
+    
+	if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.
         numberAggressiveResourceSpots = 0;  // Never get enough vills to go hunting.
     
     if ((numFarms > 20) || ((cMyCulture == cCultureAtlantean) && (numFarms > 8))) // we don't need any aggressive spots anymore that could move our villagers too far away from our main base
@@ -391,11 +567,13 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 28;
+    int desiredFarmers = 30;
     if (mapRequires2FarmPlans() == true)
-        desiredFarmers = 32;
+        desiredFarmers = 36;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 14;
+        desiredFarmers = 11;
+    if (mapRequires2FarmPlans() == true && cMyCulture == cCultureAtlantean)
+        desiredFarmers = 14;		
 		
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)
@@ -584,12 +762,7 @@ rule updateFoodBreakdown
     if ((aiGetGameMode() == cGameModeLightning) || (aiGetGameMode() == cGameModeDeathmatch))
         totalAmount = 200;   // Fake a shortage so that farming always starts early in these game modes
 	
-//    int numAggrResourceSpotsInR85 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, 85.0);
-//    int numEasyResourceSpotsInR85 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 85.0);
-//    int numResourceSpotsInR85 = numAggrResourceSpotsInR85 + numEasyResourceSpotsInR85;
-//    int numAggrResourceSpotsInR75 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, 75.0);
-//    int numEasyResourceSpotsInR75 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 75.0);
-//    int numResourceSpotsInR75 = numAggrResourceSpotsInR75 + numEasyResourceSpotsInR75;
+
     int numAggrResourceSpotsInR70 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, 70.0);
     int numEasyResourceSpotsInR70 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 70.0);
     int numResourceSpotsInR70 = numAggrResourceSpotsInR70 + numEasyResourceSpotsInR70;
@@ -597,9 +770,6 @@ rule updateFoodBreakdown
     if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)))   // can build farms
     {
         if ((totalNumberResourceSpots < 2) || (totalAmount < 1900) || (gFarming == true) || (kbGetAge() == cAge3)
-//         || ((numAggrResourceSpotsInR85 < 1) && (numEasyResourceSpotsInR85 < 1)))  
-//           || (numResourceSpotsInR85 < 2))
-//           || (numResourceSpotsInR75 < 2))
            || ((numResourceSpotsInR70 < 2) && (xsGetTime() > 9*60*1000)))
         {
             if (cMyCulture == cCultureAtlantean)
@@ -706,7 +876,7 @@ rule updateFoodBreakdown
     
     int numPlansUnassigned = numPlansWanted;
     
-    int minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() - 2;    // Don't start a new aggressive plan unless we have this many vills...buffer above strict minimum.
+    int minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() + 0;    // Don't start a new aggressive plan unless we have this many vills...buffer above strict minimum.
     if (cMyCulture == cCultureAtlantean)
         minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() + 0;
 
@@ -1481,7 +1651,7 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
 	{
     xsDisableSelf();
     xsEnableRule("econForecastAge1");
-	if (ShowAiEcho == true) aiEcho("Found fish! Looks like we're going fishing then!");
+	if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Found fish! Looks like we're going fishing then!");
 	}
 	
 	if (ShowAiEcho == true) aiEcho("setEarlyEcon: ");

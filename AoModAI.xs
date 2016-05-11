@@ -1397,7 +1397,7 @@ if (aiGetWorldDifficulty() > cDifficultyEasy && kbGetAge() > cAge3 && xsGetTime(
    {
    if (goldSupply > mGoldBeforeTrade)
    {
-   if (ShowAiEcho == true) aiEcho("Damn..! I have too much gold, buying food/wood!");
+   if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("Damn..! I have too much gold, buying food/wood!");
    if (woodSupply > foodSupply)
    aiBuyResourceOnMarket(cResourceFood);
    else
@@ -1439,7 +1439,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         gGlutRatio = foodSupply/gFoodForecast;
     gGlutRatio = gGlutRatio * 2.0;   // Double it, i.e. start reducing civ pop when all resources are > 50% of forecast.
     if (gGlutRatio > 3.0)
-        gGlutRatio = 3.0;    // Never cut econ below 1/3 of normal
+        gGlutRatio = 3.4;    // Never cut econ below 1/3 of normal
 //    if (gGlutRatio > 1)
 //        if (ShowAiEcho == true) aiEcho("Glut ratio = "+gGlutRatio);
 
@@ -1753,7 +1753,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         if (ShowAiEcho == true) aiEcho("favor resource percentage: "+aiGetResourceGathererPercentage(cResourceFavor, cRGPActual));
     }
 */
-if (ShowAiEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
+if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
 }
 
 //==============================================================================
@@ -1931,7 +1931,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     
 
     
-    if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcho == true || ShowAiEcoEcho == true)  aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -2163,7 +2163,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     else if (foodSupply > 1600)
         gFoodForecast = gFoodForecast * 0.9;
 	
-    if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -2438,14 +2438,14 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     else if (foodSupply > 1300)
         gFoodForecast = gFoodForecast * 0.9;
 
-    if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
 //==============================================================================
 rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in setEarlyEcon rule, ending when next age upgrade starts
 //    minInterval 23
-    minInterval 8
+    minInterval 7
     inactive
 {
     int age = kbGetAge();
@@ -2532,7 +2532,7 @@ if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCul
             gWoodForecast = gWoodForecast + (200 - woodSupply);
     }
 
-    if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -2629,7 +2629,7 @@ void initEgyptian(void)
             aiPlanSetEconomy(eOsiris, true);
             aiPlanAddUnitType(eOsiris, cUnitTypePharaohofOsiris, 1, 1, 1);
             aiPlanSetVariableInt(eOsiris, cEmpowerPlanTargetTypeID, 0, cUnitTypeAbstractSettlement);
-            aiPlanSetDesiredPriority(eOsiris, 50);
+            aiPlanSetDesiredPriority(eOsiris, 60);
 			aiPlanSetActive(eOsiris);
             }
         }
@@ -2643,7 +2643,7 @@ void initEgyptian(void)
             aiPlanSetEconomy(Pempowermarket, true);
             aiPlanAddUnitType(Pempowermarket, cUnitTypePharaohSecondary, 1, 1, 1);
             aiPlanSetVariableInt(Pempowermarket, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
-            aiPlanSetDesiredPriority(Pempowermarket, 50);
+            aiPlanSetDesiredPriority(Pempowermarket, 90);
 			aiPlanSetActive(Pempowermarket);
 			
             }
@@ -4791,7 +4791,7 @@ void age2Handler(int age=1)
                 aiPlanSetEconomy(ePlanID, true);
                 aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
                 aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMiningCamp);
-                aiPlanSetActive(ePlanID);
+				aiPlanSetActive(ePlanID);
             }
             ePlanID=aiPlanCreate("Lumber Camp Empower", cPlanEmpower);
             if (ePlanID >= 0)
@@ -4799,7 +4799,7 @@ void age2Handler(int age=1)
                 aiPlanSetEconomy(ePlanID, true);
                 aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
                 aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeLumberCamp);
-                aiPlanSetActive(ePlanID);
+				aiPlanSetActive(ePlanID);
             }
             ePlanID=aiPlanCreate("Monument Empower", cPlanEmpower);
             if (ePlanID >= 0)
@@ -4807,7 +4807,7 @@ void age2Handler(int age=1)
                 aiPlanSetEconomy(ePlanID, true);
                 aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
                 aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeAbstractMonument);
-                aiPlanSetActive(ePlanID);
+				aiPlanSetActive(ePlanID);
             }
 			ePlanID=aiPlanCreate("Market TEST Empower", cPlanEmpower);
             if (ePlanID >= 0)
@@ -4815,7 +4815,7 @@ void age2Handler(int age=1)
                 aiPlanSetEconomy(ePlanID, true);
                 aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
                 aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
-                aiPlanSetActive(ePlanID);
+				aiPlanSetActive(ePlanID);
             }
 			ePlanID=aiPlanCreate("Citadel TEST Empower", cPlanEmpower);
             if (ePlanID >= 0)

@@ -27,7 +27,18 @@ extern int HateChoice = -1;
 extern int gInitialWoodBaseID = -1;
 extern int gLandExplorePlanID2=-1;
 extern int gLandScoutSpecialUlfsark = -1;
-extern bool ShowAiEcho = false;   
+extern bool IsRunTradeUnits1 = false;
+extern bool IsRunTradeUnits2 = false;
+extern bool IsRunHuntingDogs = false;
+
+//////////////// DEBUG 
+
+extern bool ShowAiEcho = false; 
+extern bool ShowAiEcoEcho = true;
+extern bool ShowAiGenEcho = true;
+extern bool ShowAiMilEcho = true;
+
+//////////////// END OF DEBUG 
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
 //Below, you'll find a few things I've set up,
@@ -95,9 +106,9 @@ extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wo
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 900;             // Food
+extern int RethLGFAge2 = 500;             // Food
 extern int RethLGGAge2 = 550;              // Gold
-extern int RethLGWAge2 = 250;              // Wood
+extern int RethLGWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -107,9 +118,9 @@ extern int RethLGWAge3 = 600;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLGFAge4 = 4000;              // Food
-extern int RethLGGAge4 = 3400;              // Gold
-extern int RethLGWAge4 = 2200;              // Wood
+extern int RethLGFAge4 = 4300;              // Food
+extern int RethLGGAge4 = 3600;              // Gold
+extern int RethLGWAge4 = 2300;              // Wood
 
 
 //==============================================================================
@@ -117,7 +128,7 @@ extern int RethLGWAge4 = 2200;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLEFAge2 = 900;              // Food
+extern int RethLEFAge2 = 500;              // Food
 extern int RethLEGAge2 = 700;              // Gold
 extern int RethLEWAge2 = 100;              // Wood
 
@@ -129,8 +140,8 @@ extern int RethLEWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLEFAge4 = 4000;              // Food
-extern int RethLEGAge4 = 3400;              // Gold
+extern int RethLEFAge4 = 4300;              // Food
+extern int RethLEGAge4 = 3600;              // Gold
 extern int RethLEWAge4 = 1200;              // Wood
 
 //==============================================================================
@@ -138,9 +149,9 @@ extern int RethLEWAge4 = 1200;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 900;             // Food
+extern int RethLNFAge2 = 500;             // Food
 extern int RethLNGAge2 = 600;              // Gold
-extern int RethLNWAge2 = 200;              // Wood
+extern int RethLNWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -150,18 +161,18 @@ extern int RethLNWAge3 = 750;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLNFAge4 = 4000;              // Food
-extern int RethLNGAge4 = 3400;              // Gold
-extern int RethLNWAge4 = 2000;              // Wood
+extern int RethLNFAge4 = 4300;              // Food
+extern int RethLNGAge4 = 3600;              // Gold
+extern int RethLNWAge4 = 2300;              // Wood
 
 //==============================================================================
 //Atlantean
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 900;              // Food
+extern int RethLAFAge2 = 500;              // Food
 extern int RethLAGAge2 = 600;              // Gold
-extern int RethLAWAge2 = 200;              // Wood
+extern int RethLAWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -171,9 +182,9 @@ extern int RethLAWAge3 = 800;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLAFAge4 = 4000;              // Food
-extern int RethLAGAge4 = 3400;              // Gold
-extern int RethLAWAge4 = 2000;              // Wood
+extern int RethLAFAge4 = 4300;              // Food
+extern int RethLAGAge4 = 3600;              // Gold
+extern int RethLAWAge4 = 2300;              // Wood
 
 
 //==============================================================================
@@ -181,9 +192,9 @@ extern int RethLAWAge4 = 2000;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLCFAge2 = 900;              // Food
+extern int RethLCFAge2 = 500;              // Food
 extern int RethLCGAge2 = 550;              // Gold
-extern int RethLCWAge2 = 200;              // Wood
+extern int RethLCWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -193,9 +204,9 @@ extern int RethLCWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLCFAge4 = 4000;              // Food
-extern int RethLCGAge4 = 3400;              // Gold
-extern int RethLCWAge4 = 2000;              // Wood
+extern int RethLCFAge4 = 4300;              // Food
+extern int RethLCGAge4 = 3600;              // Gold
+extern int RethLCWAge4 = 2300;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -217,10 +228,10 @@ void initRethlAge1(void)  // Am I doing this right??
 	// kbLookAtAllUnitsOnMap();   // Semi cheating!.. Disabled due to unstable results.
 	
 	if (aiIsMultiplayer() == false)
-	if (ShowAiEcho == true) aiEcho("We're in a singleplayer/offline game, nothing can stop us here!");                 // Just to confirm game mode.
+	if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("We're in a singleplayer/offline game, nothing can stop us here!");                 // Just to confirm game mode.
 	
 	if (aiIsMultiplayer() == true)
-	if (ShowAiEcho == true) aiEcho("We're in a multiplayer game, I will make sure not to use any De-sync sensitive Godpowers.");  // ^ Ditto, heh.
+	if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("We're in a multiplayer game, I will make sure not to use any De-sync sensitive Godpowers.");  // ^ Ditto, heh.
 	
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
@@ -230,15 +241,16 @@ void initRethlAge1(void)  // Am I doing this right??
 	   if (gHuntEarly == true && cRandomMapName != "Deep Jungle")
 		{
 		if (cMyCulture == cCultureGreek)
-		aiSetMinNumberNeedForGatheringAggressvies(5);      // The number inside of ( ) represents the amount of villagers/units needed.
+		aiSetMinNumberNeedForGatheringAggressvies(4);      // The number inside of ( ) represents the amount of villagers/units needed.
 		if (cMyCulture == cCultureAtlantean)
 		aiSetMinNumberNeedForGatheringAggressvies(1);
 	    if (cMyCulture == cCultureEgyptian)
-		aiSetMinNumberNeedForGatheringAggressvies(5);
+		aiSetMinNumberNeedForGatheringAggressvies(4);
 		if (cMyCulture == cCultureNorse)
-		aiSetMinNumberNeedForGatheringAggressvies(5);
+		aiSetMinNumberNeedForGatheringAggressvies(4);
 		if (cMyCulture == cCultureChinese)
-		aiSetMinNumberNeedForGatheringAggressvies(4);			
+		aiSetMinNumberNeedForGatheringAggressvies(4);
+		
         }
       
 	   // Don't build transport ships on these maps!
@@ -615,6 +627,9 @@ rule HuntingDogsAsap
    int HuntingDogsUpgBuilding = cUnitTypeGranary;
    if (cMyCulture == cCultureChinese)
    HuntingDogsUpgBuilding = cUnitTypeStoragePit;
+   if (cMyCulture == cCultureAtlantean)
+   HuntingDogsUpgBuilding = cUnitTypeGuild;
+   
    
       if (cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse && kbUnitCount(cMyID, HuntingDogsUpgBuilding, cUnitStateAlive) < 1)
 	  return;
@@ -990,8 +1005,7 @@ rule getEarthenWall
     int techID = cTechEarthenWall;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
-        if (cMyCulture == cCultureChinese)
-            xsEnableRule("getStoneWall");
+        xsEnableRule("getStoneWall");
         xsDisableSelf();
         return;
     }
