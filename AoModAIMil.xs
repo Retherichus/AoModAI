@@ -2471,13 +2471,13 @@ rule attackEnemySettlement
 //                else if (((planState == cPlanStateGather) || (planState == cPlanStateExplore))
                 else if (((planState == cPlanStateGather) || (planState == cPlanStateExplore) || (planState == cPlanStateNone))
 //                 && (xsGetTime() > attackPlanStartTime + 5*60*1000) && (attackPlanStartTime != -1))
-                 && (xsGetTime() > attackPlanStartTime + 3.5*60*1000) && (attackPlanStartTime != -1))
+                 && (xsGetTime() > attackPlanStartTime + 2.5*60*1000) && (attackPlanStartTime != -1))
                 {
-                    if ((xsGetTime() > attackPlanStartTime + 5*60*1000) && (attackPlanStartTime != -1))
+                    if ((xsGetTime() > attackPlanStartTime + 3*60*1000) && (attackPlanStartTime != -1))
                     {
                         aiPlanDestroy(attackPlanID);
                         gEnemySettlementAttPlanTargetUnitID = -1;
-                        if (ShowAiEcho == true) aiEcho("destroying gEnemySettlementAttPlanID as it has been active for more than 5 Minutes");
+                        if (ShowAiEcho == true) aiEcho("destroying gEnemySettlementAttPlanID as it has been active for more than 3 Minutes");
                     }
                     else
                     {
@@ -3000,13 +3000,13 @@ rule defendSettlementPosition
                     return;
                 }
 
-                if ((xsGetTime() > defendPlanStartTime + 10*60*1000) || (alliedBaseAtDefPlanPosition > 0)
+                if ((xsGetTime() > defendPlanStartTime + 2.5*60*1000) || (alliedBaseAtDefPlanPosition > 0)
                  || ((myBaseAtDefPlanPosition > 0) && ((numAttEnemyMilUnitsInR40 < 10) && (myBuildingsThatShootAtDefPlanPosition > 1))
                  || (equal(aiPlanGetVariableVector(gBaseUnderAttackDefPlanID, cDefendPlanDefendPoint, 0), defPlanDefPoint) == true)))
                  
                 {
-                    if (xsGetTime() > defendPlanStartTime + 10*60*1000)
-                        if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as it has been active for more than 10 Minutes");
+                    if (xsGetTime() > defendPlanStartTime + 2.5*60*1000)
+                        if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as it has been active for more than 2.5 Minutes");
                     else if (alliedBaseAtDefPlanPosition > 0)
                         if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as an ally has built a settlement at the defend position");
                     else
@@ -4047,7 +4047,7 @@ rule createLandAttack
                 if (ShowAiEcho == true) aiEcho("attackPlanID == gLandAttackPlanID");
 
                 if ((aiPlanGetState(attackPlanID) < cPlanStateAttack)
-                 && (((xsGetTime() > attackPlanStartTime + 5*60*1000) && (attackPlanStartTime != -1))
+                 && (((xsGetTime() > attackPlanStartTime + 4*60*1000) && (attackPlanStartTime != -1))
                   || (aiPlanGetVariableInt(attackPlanID, cAttackPlanNumberAttacks, 0) > 1)))
                 {
                     aiPlanDestroy(attackPlanID);
@@ -4452,13 +4452,13 @@ rule defendBaseUnderAttack
                     return;
                 }
 
-                if ((alliedBaseAtDefPlanPosition > 0) || ((xsGetTime() > defendPlanStartTime + 3*60*1000) && (enemyMilUnitsInR50 < 3) && (numAttEnemySiegeInR50 < 1)))
+                if ((alliedBaseAtDefPlanPosition > 0) || ((xsGetTime() > defendPlanStartTime + 2*60*1000) && (enemyMilUnitsInR50 < 3) && (numAttEnemySiegeInR50 < 1)))
                 {
                     aiPlanDestroy(defendPlanID);
                     if (alliedBaseAtDefPlanPosition > 0)
                         if (ShowAiEcho == true) aiEcho("destroying gBaseUnderAttackDefPlanID as an ally has built a base at our defend position");
                     else
-                        if (ShowAiEcho == true) aiEcho("destroying gBaseUnderAttackDefPlanID as it has been active for more than 3 Minutes and there are less than 3 enemies");
+                        if (ShowAiEcho == true) aiEcho("destroying gBaseUnderAttackDefPlanID as it has been active for more than 2 Minutes and there are less than 3 enemies");
                     gBaseUnderAttackID = -1;
                     gBaseUnderAttackDefPlanID = -1;
                     xsSetRuleMinIntervalSelf(12);

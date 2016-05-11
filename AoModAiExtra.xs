@@ -53,8 +53,9 @@ extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will ta
 extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
 extern bool bWallUp = true;              // This ensures that the Ai will build walls(almost always), regardless of personality.
 extern bool Age3Armory = false;           // Prevents the Ai from researching armory upgrades before reaching Heroic Age.
-extern bool OneMBDefPlanOnly = true;      // Only allow one active "idle defense plan for Mainbase (6 units else 12 if set to false)"
+extern bool OneMBDefPlanOnly = true;      // Only allow one active "idle defense plan for Mainbase (6 units, 12 if set to false)"
 
+extern bool ResInflate = false;
 extern bool OnlyOneMBDefRule = true;
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
 extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. (Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
@@ -106,7 +107,7 @@ extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wo
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 500;             // Food
+extern int RethLGFAge2 = 800;             // Food
 extern int RethLGGAge2 = 550;              // Gold
 extern int RethLGWAge2 = 400;              // Wood
 
@@ -128,7 +129,7 @@ extern int RethLGWAge4 = 2300;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLEFAge2 = 500;              // Food
+extern int RethLEFAge2 = 800;              // Food
 extern int RethLEGAge2 = 700;              // Gold
 extern int RethLEWAge2 = 100;              // Wood
 
@@ -149,7 +150,7 @@ extern int RethLEWAge4 = 1200;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 500;             // Food
+extern int RethLNFAge2 = 800;             // Food
 extern int RethLNGAge2 = 600;              // Gold
 extern int RethLNWAge2 = 400;              // Wood
 
@@ -170,7 +171,7 @@ extern int RethLNWAge4 = 2300;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 500;              // Food
+extern int RethLAFAge2 = 800;              // Food
 extern int RethLAGAge2 = 600;              // Gold
 extern int RethLAWAge2 = 400;              // Wood
 
@@ -192,7 +193,7 @@ extern int RethLAWAge4 = 2300;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLCFAge2 = 500;              // Food
+extern int RethLCFAge2 = 800;              // Food
 extern int RethLCGAge2 = 550;              // Gold
 extern int RethLCWAge2 = 400;              // Wood
 
@@ -962,7 +963,7 @@ if (GoldSupply < 400 && FoodSupply > 500 && WoodSupply > GoldSupply)
 		resname = "Favor";
 	}
 	
-	if (MyFavor < 30)
+	if (MyFavor < 30 && FoodSupply > 150)
 	{
 		res  = cResourceFavor;
 		resname = "Favor";
@@ -1904,4 +1905,3 @@ int findClosestAreaWithUnits(int areaID = -1,int type=-1, int unitType = -1, int
 }
 */
 // TESTING GROUND
-

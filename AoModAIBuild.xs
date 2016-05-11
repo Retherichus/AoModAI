@@ -1291,7 +1291,7 @@ rule mainBaseAreaWallTeam1
 
     static bool alreadyStarted = false;
     int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
-    if ((alreadyStarted == false) && (numHeroes < 1) && (xsGetTime() < 6.5*60*1000))
+    if ((alreadyStarted == false) && (numHeroes < 1) && (xsGetTime() < 7*60*1000))
         return;
     
     float goldSupply = kbResourceGet(cResourceGold);

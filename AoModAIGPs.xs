@@ -915,13 +915,14 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	// If we have a group of 10 or more military units. Lets hope there is a mythunit present
 	if(powerProtoID == cPowerCallToArms)
 	{
-		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
-		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistanceSelf);
-		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
-		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 0.0);
-		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
-		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-		return (true);
+	  aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+	  aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
+	  aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
+	  aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 20.0);
+	  aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
+	  aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
+	  aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
+	  return (true);  
 	}
 	// Set up the Earth Dragon power
 	// Near enemies?

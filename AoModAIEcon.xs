@@ -39,7 +39,19 @@ rule updateWoodBreakdown
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
 
-      if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv != cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
+ 
+    
+    
+    bool reducedWoodGathererCount = false;
+
+    if (woodGathererCount <= 0) //always some units on wood, unless there are less than 15 trees
+    {
+            woodGathererCount = 1;
+            reducedWoodGathererCount = true;
+        }
+    
+    
+     if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv != cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
    {
             if (foodGathererCount > 2 && goldGathererCount > 0)
 			woodGathererCount = 1;
@@ -67,18 +79,7 @@ rule updateWoodBreakdown
 	  float goldSupply = kbResourceGet(cResourceGold);
   
     if ((woodSupply > goldSupply+1500) && (xsGetTime() > 20*60*1000))
-        woodGathererCount = 0;
-    
-    
-    bool reducedWoodGathererCount = false;
-
-    if (woodGathererCount <= 0) //always some units on wood, unless there are less than 15 trees
-    {
-            woodGathererCount = 1;
-            reducedWoodGathererCount = true;
-        }
-    
-    
+        woodGathererCount = 0;	
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 12;
@@ -257,7 +258,26 @@ rule updateGoldBreakdown
    int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
    int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
 
-      if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv == cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
+ 
+    
+    int numMainBaseGoldSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
+    int numGoldBaseSites = 0;
+    if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
+        numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
+    int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
+
+    bool reducedGoldGathererCount = false;
+
+    if (goldGathererCount <= 0) //always some units on gold, unless there are no gold sites
+    {
+        if ((numGoldSites > 0) && (kbGetAge() > cAge1))
+        {
+            goldGathererCount = 1;
+            reducedGoldGathererCount = true;
+        }
+    }
+	
+     if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv == cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
    {
             if (foodGathererCount > 2 && woodGathererCount > 0)
 			goldGathererCount = 1;
@@ -289,24 +309,7 @@ rule updateGoldBreakdown
 			goldGathererCount = 4;
 			if (foodGathererCount > 10)
 			goldGathererCount = 6;        
-   } 
-    
-    int numMainBaseGoldSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
-    int numGoldBaseSites = 0;
-    if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
-        numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
-    int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
-
-    bool reducedGoldGathererCount = false;
-
-    if (goldGathererCount <= 0) //always some units on gold, unless there are no gold sites
-    {
-        if ((numGoldSites > 0) && (kbGetAge() > cAge1))
-        {
-            goldGathererCount = 1;
-            reducedGoldGathererCount = true;
-        }
-    }
+   } 	
 
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -478,7 +481,7 @@ rule updateFoodBreakdown
 {
     if (ShowAiEcho == true) aiEcho("updateFoodBreakdown: ");
     
-	if (xsGetTime() > 10*1*1000)
+	if (xsGetTime() > 20*1*1000)
 	xsSetRuleMinIntervalSelf(10);
 	
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -497,7 +500,7 @@ rule updateFoodBreakdown
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
     float distance = kbBaseGetMaximumResourceDistance(cMyID, mainBaseID);
-	if (kbGetAge() < 2 && xsGetTime() < 3*60*1000)
+	if (kbGetAge() < 2 && xsGetTime() < 2.5*60*1000)
 	distance = 40;
     else if (kbGetAge() < 2 && xsGetTime() > 3*60*1000)
 	distance = 65;
@@ -507,10 +510,24 @@ rule updateFoodBreakdown
 
     //Get the number of valid resources spots.
     int numberAggressiveResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
-
-	if (numberAggressiveResourceSpots > 0 && IsRunHuntingDogs == false && xsGetTime() < 20*1*1000)
+    
+	// Consider any of these below, as Aggressive Animals at the start of the game.
+	
+	if (IsRunHuntingDogs == false && xsGetTime() < 20*1*1000)
+	{ 
+	int ZebraNearMB = getNumUnits(cUnitTypeZebra, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+    int CaribouNearMB = getNumUnits(cUnitTypeCaribou, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+    int GazelleNearMB = getNumUnits(cUnitTypeGazelle, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+    int ElkNearMB = getNumUnits(cUnitTypeElk, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+    int DeerNearMB = getNumUnits(cUnitTypeDeer, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+	
+	int FakeAggressives = ZebraNearMB+CaribouNearMB+GazelleNearMB+ElkNearMB+DeerNearMB;
+	}
+	
+	if (numberAggressiveResourceSpots > 0 && IsRunHuntingDogs == false && xsGetTime() < 20*1*1000 || FakeAggressives > 3 && IsRunHuntingDogs == false && xsGetTime() < 20*1*1000)
 	   { 
-        if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Huntable found nearby, activating HuntingDogsAsap");
+	   int TotalAnimalsFound = numberAggressiveResourceSpots+FakeAggressives; 
+        if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Animals or Agressive spots found: "+TotalAnimalsFound+", activating HuntingDogsAsap");
 		IsRunHuntingDogs = true;
 		gHuntingDogsASAP = true;
 		xsEnableRule("HuntingDogsAsap");
@@ -1833,7 +1850,7 @@ rule fishing
 //==============================================================================
 rule collectIdleVills
 //    minInterval 61 //starts in cAge1
-    minInterval 22 //starts in cAge1
+    minInterval 16 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("collectIdleVills:");
@@ -1868,8 +1885,8 @@ rule collectIdleVills
     bool noTrees = false;
 
 	float woodSupply = kbResourceGet(cResourceWood);
-
-    if ((woodSupply > 2500) && (xsGetTime() > 20*60*1000))
+    int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 55.0);
+    if (numTeesNearMainBase < 10 || woodSupply > 5000 && xsGetTime() > 20*60*1000)
         noTrees = true;
         
     bool noGoldMines = false;
@@ -1885,6 +1902,7 @@ rule collectIdleVills
     
     int numLivingHerdablesNearMainBase = getNumUnits(cUnitTypeHerdable, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
     int numDeadHerdablesNearMainBase = getNumUnits(cUnitTypeHerdable, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0); //'dead' herdables have playerID=0 and cUnitStateAlive
+	int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
         
     for (i = 0; < numberVills)
     {
@@ -1955,12 +1973,18 @@ rule collectIdleVills
             }
             case 4:
             {
-                if (ShowAiEcho == true) aiEcho("there are no trees and no gold mines");
+                resourceType = cUnitTypeFarm;
+                if (ShowAiEcho == true) aiEcho("sending idle villager to an available farm");
                 break;
             }
+            case 5:
+            {
+                if (ShowAiEcho == true) aiEcho("there are no trees and no gold mines");
+                break;
+            }			
         }
 
-        if (randomResource == 4)
+        if (randomResource == 5)
         {
             aiTaskUnitMove(currentVillie, mainBaseLocation);
             if (ShowAiEcho == true) aiEcho("sending idle villager to mainBase");

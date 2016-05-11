@@ -588,7 +588,7 @@ rule trainMythUnit
         return;
 
     //In Mythic age only, this should give it a 75% chance of being an age 4 unit, and 25% for an age 3.. Never go for Age 2 ones.
-	int choiceMythic = aiRandInt(3);
+	int choiceMythic = aiRandInt(4);
 	if (kbGetAge() > cAge3)
 	switch(choiceMythic)
     {

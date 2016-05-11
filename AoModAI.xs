@@ -1153,7 +1153,7 @@ rule updateEMAge4
          civPopTarget = 35;
       milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.90);   }
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.95);   }
    else
  {
       int num1 =aiRandInt(3);
@@ -1415,8 +1415,8 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     float favorSupply = kbResourceGet(cResourceFavor);
 
     float foodMultiplier = 1.2;      // Because food is so much slower to gather, inflate need
-	if (foodSupply > 5000)
-	foodMultiplier = 0.8;
+	//if (ResInflate == foodSupply > 5000)
+	//foodMultiplier = 1.0;
 	
     gFoodForecast = gFoodForecast * foodMultiplier;
 
@@ -1439,7 +1439,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         gGlutRatio = foodSupply/gFoodForecast;
     gGlutRatio = gGlutRatio * 2.0;   // Double it, i.e. start reducing civ pop when all resources are > 50% of forecast.
     if (gGlutRatio > 3.0)
-        gGlutRatio = 3.4;    // Never cut econ below 1/3 of normal
+        gGlutRatio = 3.0;    // Never cut econ below 1/3 of normal
 //    if (gGlutRatio > 1)
 //        if (ShowAiEcho == true) aiEcho("Glut ratio = "+gGlutRatio);
 
@@ -1578,10 +1578,11 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
             neededGoldGatherers = minGoldGatherers;
     }
     
-
-	
+    
+    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 75.0);
     float neededWoodGatherers = desiredWoodUnits;
-    if (woodSupply > goldSupply+1500)
+    if (numTeesNearMainBase < 15 && cvRandomMapName != "Deep Jungle"|| woodSupply > goldSupply+1500)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -2880,7 +2881,7 @@ void initChinese(void)
     gWaterScout=cUnitTypeFishingShipChinese;
     gAirScout=-1;
     // Use any hero for gathering relics
-    gGatherRelicType = cUnitTypeHero;   //use any hero       
+    gGatherRelicType = cUnitTypeHeroChineseImmortal;   //use Immortal hero       
     gGardenBuildLimit = 10;
 
 	if (cMyCiv == cCivNuwa)
@@ -2898,7 +2899,7 @@ void initChinese(void)
 	{ 
         xsEnableRule("DelayImmortalHero"); 	
 		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 3, false, kbBaseGetMainID(cMyID));
-		createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, 2, false, kbBaseGetMainID(cMyID));
+		createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(3)+2, false, kbBaseGetMainID(cMyID));
 	}
         if (aiGetWorldDifficulty() != cDifficultyEasy && cMyCulture == cCultureChinese)
             createSimpleMaintainPlan(cUnitTypeSittingTiger, 4, false, kbBaseGetMainID(cMyID));
@@ -6282,3 +6283,12 @@ void attackChatCallback(int parm1=-1)
 }
 
 
+rule testtest
+minInterval 2
+active
+{
+int mainBaseID = kbBaseGetMainID(cMyID);
+vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 01, 0, mainBaseLocation, 80.0);
+aiEcho(" "+numTeesNearMainBase+"");
+}
