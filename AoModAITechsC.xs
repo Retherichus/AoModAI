@@ -322,7 +322,7 @@ rule getHouseAltars
         int x=-1;
         x = aiPlanCreate("HouseAltars", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechHouseAltars);
-        aiPlanSetDesiredPriority(x, 10);
+        aiPlanSetDesiredPriority(x, 50);
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting HouseAltars");

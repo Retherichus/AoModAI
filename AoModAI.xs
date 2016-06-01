@@ -65,7 +65,7 @@ extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age hand
 
 
 // Trade globals
-extern int gMaxTradeCarts = 25;           // Max trade carts
+extern int gMaxTradeCarts = 22;           // Max trade carts
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -2463,26 +2463,26 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     else if (woodSupply > 600)
         gWoodForecast = gWoodForecast * 0.9;
         
-    if (goldSupply > 1300)
+    if (goldSupply > 900)
         gGoldForecast = gGoldForecast * 0.5;
-    else if (goldSupply > 1200)
+    else if (goldSupply > 800)
         gGoldForecast = gGoldForecast * 0.6;
-    else if (goldSupply > 1100)
+    else if (goldSupply > 600)
         gGoldForecast = gGoldForecast * 0.7;
-    else if (goldSupply > 1000)
+    else if (goldSupply > 550)
         gGoldForecast = gGoldForecast * 0.8;
-    else if (goldSupply > 900)
+    else if (goldSupply > 500)
         gGoldForecast = gGoldForecast * 0.9;
         
-    if (foodSupply > 1700)
+    if (foodSupply > 1100)
         gFoodForecast = gFoodForecast * 0.5;
-    else if (foodSupply > 1600)
+    else if (foodSupply > 1000)
         gFoodForecast = gFoodForecast * 0.6;
-    else if (foodSupply > 1500)
+    else if (foodSupply > 900)
         gFoodForecast = gFoodForecast * 0.7;
-    else if (foodSupply > 1400)
+    else if (foodSupply > 800)
         gFoodForecast = gFoodForecast * 0.8;
-    else if (foodSupply > 1300)
+    else if (foodSupply > 700)
         gFoodForecast = gFoodForecast * 0.9;
 
     if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
@@ -4373,7 +4373,7 @@ void init(void)
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFood, 1.5);
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFavor, 10.0);
         //Set our farm limits.
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 26);  //  Up from 4
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 28);  //  Up from 4
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanMaxFarmLimit, 0, 40);     //  Up from 24
         aiSetFarmLimit(aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0));
         //Do our late econ init.
@@ -4536,7 +4536,6 @@ void age2Handler(int age=1)
     //enable the hesperides rule if there's an Oranos or Gaia player
     bool hesperidesPower = false;
     bool obelisk = false;
-	bool PotentialUWPass = false;
     int playerID = -1;
     for (playerID = 1; < cNumberPlayers)
     {
@@ -4557,19 +4556,12 @@ void age2Handler(int age=1)
                 continue;
             }
         }
-        if ((kbGetCivForPlayer(playerID) == cCivHades) || (kbGetCivForPlayer(playerID) == cCivZeus))
-        {
-            PotentialUWPass = true;
-            continue;
-        }		
     }
     
     if (hesperidesPower == true)
         xsEnableRule("hesperides");
     if (obelisk == true)
         xsEnableRule("activateObeliskClearingPlan");
-    if (PotentialUWPass == true)
-        xsEnableRule("IHateUnderworldPassages");		
     
     //Econ.
     econAge2Handler(age);

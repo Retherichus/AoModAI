@@ -1283,7 +1283,6 @@ rule makeWonder
 
 //==============================================================================
 rule mainBaseAreaWallTeam1
-//    minInterval 21 //starts in cAge2
     minInterval 23 //starts in cAge2
     inactive
 {
@@ -1308,6 +1307,7 @@ rule mainBaseAreaWallTeam1
     int activeWallPlans = aiPlanGetNumber(cPlanBuildWall, -1, true);
 
     int mainBaseID=kbBaseGetMainID(cMyID);
+	vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
 
     if (wallPlanID >= 0)
     {
@@ -1338,9 +1338,10 @@ rule mainBaseAreaWallTeam1
                 }
 
                 //Get the enemies near my base
-                int numEnemyUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
-                int myUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationSelf, cUnitTypeLogicalTypeLandMilitary);
-                int alliedUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationAlly, cUnitTypeLogicalTypeLandMilitary);
+                int numEnemyUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, gMainBaseAreaWallRadius);
+				int myUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationSelf, mainBaseLocation, gMainBaseAreaWallRadius);  
+                int alliedUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationAlly, mainBaseLocation, gMainBaseAreaWallRadius); 
+                
 
                 //Get the time under attack.
                 int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, mainBaseID);
@@ -1431,7 +1432,7 @@ rule mainBaseAreaWallTeam1
             gResetWallPlans = false;
             savedBackAreaID = -1;
         }
-        
+       
         if (firstRun == true)
         {
             //always include the backArea
@@ -1463,12 +1464,6 @@ rule mainBaseAreaWallTeam1
                             {
                                 bx = bx * 1.1;
                                 bz = bz * 1.1;
-/*
-                                if (gBackAreaID == mainArea)
-                                    if (ShowAiEcho == true) aiEcho("gBackAreaID is the same as the mainArea,");
-                                else
-                                    if (ShowAiEcho == true) aiEcho("gBackAreaID is the same as the savedBackAreaID,");
-*/
                                 continue;
                             }
                             else
@@ -1541,23 +1536,11 @@ rule mainBaseAreaWallTeam1
                             {
                                 bx = bx * 1.1;
                                 bz = bz * 1.1;
-/*
-                                if (gHouseAreaID == mainArea)
-                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID is the same as the mainArea,");
-                                else
-                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID is the same as the gBackAreaID,");
-*/
                                 continue;
                             }
                             else
                             {
                                 gHouseAreaID = -1;   //only add it if it's not the mainArea or the gBackAreaID
-/*
-                                if (gHouseAreaID == mainArea)
-                                    if (ShowAiEcho == true) aiEcho("no need to add the gHouseAreaID as it's the same as the mainArea");
-                                else
-                                    if (ShowAiEcho == true) aiEcho("no need to add the gHouseAreaID as it's the same as the gBackAreaID");
-*/
                                 break;
                             }
                         }
@@ -1621,8 +1604,6 @@ rule mainBaseAreaWallTeam1
             //increase the radius if it's a forest area
             if (areaType == cAreaTypeForest)
             {
-//                if ((dx > gMainBaseAreaWallRadius * 1.3) || (dx < -1.0 * gMainBaseAreaWallRadius * 1.3)
-//                 || (dz > gMainBaseAreaWallRadius * 1.3) || (dz < -1.0 * gMainBaseAreaWallRadius * 1.3))
                 if ((dx > gMainBaseAreaWallRadius * 1.2) || (dx < -1.0 * gMainBaseAreaWallRadius * 1.2)
                  || (dz > gMainBaseAreaWallRadius * 1.2) || (dz < -1.0 * gMainBaseAreaWallRadius * 1.2))
                 {
@@ -1653,13 +1634,6 @@ rule mainBaseAreaWallTeam1
                 {
                     needToSave = true;
                 }
-/*
-                else
-                {
-                    if (needToSave == true)
-                        if (ShowAiEcho == true) aiEcho("adding area: "+firstRingID+" as it's within gMainBaseAreaWallRadius");
-                }
-*/
             }
 
             // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
@@ -1698,8 +1672,6 @@ rule mainBaseAreaWallTeam1
                             
                             if (areaType == cAreaTypeForest)
                             {
-//                                if ((dx > gMainBaseAreaWallRadius * 1.3) || (dx < -1.0 * gMainBaseAreaWallRadius * 1.3)
-//                                 || (dz > gMainBaseAreaWallRadius * 1.3) || (dz < -1.0 * gMainBaseAreaWallRadius * 1.3))
                                 if ((dx > gMainBaseAreaWallRadius * 1.2) || (dx < -1.0 * gMainBaseAreaWallRadius * 1.2)
                                  || (dz > gMainBaseAreaWallRadius * 1.2) || (dz < -1.0 * gMainBaseAreaWallRadius * 1.2))
                                 {
@@ -1733,23 +1705,6 @@ rule mainBaseAreaWallTeam1
                             
                             if ((alreadyIn == false) && (skipme == false) && (numAreasAdded < 20))  // add it
                             {
-/*
-                                if (gHouseAreaID == secondRingID)
-                                {
-                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
-                                }
-                                else
-                                {
-                                    if (areaType == cAreaTypeForest)
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a forest area and within gMainBaseAreaWallRadius * 1.2");
-                                    else if (areaType == cAreaTypeGold)
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a gold area and within gMainBaseAreaWallRadius * 1.4");
-                                    else if (areaType == cAreaTypeSettlement)
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gMainBaseAreaWallRadius * 1.4");
-                                    else
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's within gMainBaseAreaWallRadius * 1.4");
-                                }
-*/
                                 aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, secondRingID);
                                 numAreasAdded = numAreasAdded + 1;
                             }
@@ -1758,11 +1713,6 @@ rule mainBaseAreaWallTeam1
                 }
             }
         }
-/*
-        if (ShowAiEcho == true) aiEcho("    Area list:");
-        for (l = 0; < numAreasAdded)
-            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, l));
-*/
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
 
@@ -1781,6 +1731,7 @@ rule mainBaseAreaWallTeam1
             alreadyStarted = true;
     }
 }
+
 //Reth
 //==============================================================================
 rule MBSecondaryWall
@@ -1822,7 +1773,8 @@ rule MBSecondaryWall
     int activeWallPlans = aiPlanGetNumber(cPlanBuildWall, -1, true);
 
     int mainBaseID=kbBaseGetMainID(cMyID);
-
+    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+	
     if (wallPlanID >= 0)
     {
         for (i = 0; < activeWallPlans)
@@ -1852,9 +1804,9 @@ rule MBSecondaryWall
                 }
 
                 //Get the enemies near my base
-                int numEnemyUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
-                int myUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationSelf, cUnitTypeLogicalTypeLandMilitary);
-                int alliedUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationAlly, cUnitTypeLogicalTypeLandMilitary);
+                int numEnemyUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, gSecondaryMainBaseAreaWallRadius);
+				int myUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationSelf, mainBaseLocation, gSecondaryMainBaseAreaWallRadius);  
+                int alliedUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationAlly, mainBaseLocation, gSecondaryMainBaseAreaWallRadius); 
 
                 //Get the time under attack.
                 int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, mainBaseID);
@@ -1904,20 +1856,7 @@ rule MBSecondaryWall
     int mainBaseAreaWallTeam1PlanID = aiPlanCreate("mainBaseAreaWallTeam1PlanID", cPlanBuildWall);
     if (mainBaseAreaWallTeam1PlanID != -1)
     {
-        if (cRandomMapName == "ghost lake") 
-            gMainBaseAreaWallRadius = 29;
-        else if (cRandomMapName == "marsh")
-            gMainBaseAreaWallRadius = 29;
-        else if (cRandomMapName == "jotunheim")
-            gMainBaseAreaWallRadius = 23;
-        else if (cRandomMapName == "anatolia")
-            gMainBaseAreaWallRadius = 23;
-        else if (cRandomMapName == "savannah")
-            gMainBaseAreaWallRadius = 31;
-        else if (cRandomMapName == "alfheim")
-            gMainBaseAreaWallRadius = 29;
-        else if (cRandomMapName == "tundra")    //TODO: find the best radius
-            gMainBaseAreaWallRadius = 29;
+
         
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, 20, true);
         int numAreasAdded = 0;
@@ -1977,12 +1916,6 @@ rule MBSecondaryWall
                             {
                                 bx = bx * 1.1;
                                 bz = bz * 1.1;
-/*
-                                if (gBackAreaID == mainArea)
-                                    if (ShowAiEcho == true) aiEcho("gBackAreaID is the same as the mainArea,");
-                                else
-                                    if (ShowAiEcho == true) aiEcho("gBackAreaID is the same as the savedBackAreaID,");
-*/
                                 continue;
                             }
                             else
@@ -2055,23 +1988,11 @@ rule MBSecondaryWall
                             {
                                 bx = bx * 1.1;
                                 bz = bz * 1.1;
-/*
-                                if (gHouseAreaID == mainArea)
-                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID is the same as the mainArea,");
-                                else
-                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID is the same as the gBackAreaID,");
-*/
                                 continue;
                             }
                             else
                             {
                                 gHouseAreaID = -1;   //only add it if it's not the mainArea or the gBackAreaID
-/*
-                                if (gHouseAreaID == mainArea)
-                                    if (ShowAiEcho == true) aiEcho("no need to add the gHouseAreaID as it's the same as the mainArea");
-                                else
-                                    if (ShowAiEcho == true) aiEcho("no need to add the gHouseAreaID as it's the same as the gBackAreaID");
-*/
                                 break;
                             }
                         }
@@ -2135,8 +2056,6 @@ rule MBSecondaryWall
             //increase the radius if it's a forest area
             if (areaType == cAreaTypeForest)
             {
-//                if ((dx > gSecondaryMainBaseAreaWallRadius * 1.3) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.3)
-//                 || (dz > gSecondaryMainBaseAreaWallRadius * 1.3) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.3))
                 if ((dx > gSecondaryMainBaseAreaWallRadius * 1.2) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.2)
                  || (dz > gSecondaryMainBaseAreaWallRadius * 1.2) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.2))
                 {
@@ -2167,13 +2086,6 @@ rule MBSecondaryWall
                 {
                     needToSave = true;
                 }
-/*
-                else
-                {
-                    if (needToSave == true)
-                        if (ShowAiEcho == true) aiEcho("adding area: "+firstRingID+" as it's within gSecondaryMainBaseAreaWallRadius");
-                }
-*/
             }
 
             // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
@@ -2212,8 +2124,6 @@ rule MBSecondaryWall
                             
                             if (areaType == cAreaTypeForest)
                             {
-//                                if ((dx > gSecondaryMainBaseAreaWallRadius * 1.3) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.3)
-//                                 || (dz > gSecondaryMainBaseAreaWallRadius * 1.3) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.3))
                                 if ((dx > gSecondaryMainBaseAreaWallRadius * 1.2) || (dx < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.2)
                                  || (dz > gSecondaryMainBaseAreaWallRadius * 1.2) || (dz < -1.0 * gSecondaryMainBaseAreaWallRadius * 1.2))
                                 {
@@ -2247,23 +2157,6 @@ rule MBSecondaryWall
                             
                             if ((alreadyIn == false) && (skipme == false) && (numAreasAdded < 20))  // add it
                             {
-/*
-                                if (gHouseAreaID == secondRingID)
-                                {
-                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
-                                }
-                                else
-                                {
-                                    if (areaType == cAreaTypeForest)
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a forest area and within gSecondaryMainBaseAreaWallRadius * 1.2");
-                                    else if (areaType == cAreaTypeGold)
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a gold area and within gSecondaryMainBaseAreaWallRadius * 1.4");
-                                    else if (areaType == cAreaTypeSettlement)
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gSecondaryMainBaseAreaWallRadius * 1.4");
-                                    else
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's within gSecondaryMainBaseAreaWallRadius * 1.4");
-                                }
-*/
                                 aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, secondRingID);
                                 numAreasAdded = numAreasAdded + 1;
                             }
@@ -2272,16 +2165,11 @@ rule MBSecondaryWall
                 }
             }
         }
-/*
-        if (ShowAiEcho == true) aiEcho("    Area list:");
-        for (l = 0; < numAreasAdded)
-            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, l));
-*/
+
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
 
         aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-//        aiPlanAddUnitType(mainBaseAreaWallTeam1PlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
         aiPlanAddUnitType(mainBaseAreaWallTeam1PlanID, builderType, 1, 1, 1);
         aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanNumberOfGates, 0, 50);
         aiPlanSetVariableFloat(mainBaseAreaWallTeam1PlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
@@ -2314,7 +2202,8 @@ rule mainBaseAreaWallTeam2
     int activeWallPlans = aiPlanGetNumber(cPlanBuildWall, -1, true);
 
     int mainBaseID=kbBaseGetMainID(cMyID);
-
+    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+	
     if (wallPlanID >= 0)
     {
         for (i = 0; < activeWallPlans)
@@ -2344,9 +2233,9 @@ rule mainBaseAreaWallTeam2
                 }
 				
                 //Get the enemies near my base
-                int numEnemyUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
-                int myUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationSelf, cUnitTypeLogicalTypeLandMilitary);
-                int alliedUnitsNearBase = kbBaseGetNumberUnits(cMyID, mainBaseID, cPlayerRelationAlly, cUnitTypeLogicalTypeLandMilitary);
+                int numEnemyUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, gMainBaseAreaWallRadius);
+				int myUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationSelf, mainBaseLocation, gMainBaseAreaWallRadius);  
+                int alliedUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationAlly, mainBaseLocation, gMainBaseAreaWallRadius); 
 				
                 //Get the time under attack.
                 int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, mainBaseID);
@@ -2441,8 +2330,6 @@ rule mainBaseAreaWallTeam2
             //increase the radius if it's a forest area
             if (areaType == cAreaTypeForest)
             {
-//                if ((dx > gMainBaseAreaWallRadius * 1.3) || (dx < -1.0 * gMainBaseAreaWallRadius * 1.3)
-//                 || (dz > gMainBaseAreaWallRadius * 1.3) || (dz < -1.0 * gMainBaseAreaWallRadius * 1.3))
                 if ((dx > gMainBaseAreaWallRadius * 1.2) || (dx < -1.0 * gMainBaseAreaWallRadius * 1.2)
                  || (dz > gMainBaseAreaWallRadius * 1.2) || (dz < -1.0 * gMainBaseAreaWallRadius * 1.2))
                 {
@@ -2473,13 +2360,6 @@ rule mainBaseAreaWallTeam2
                 {
                     needToSave = true;
                 }
-/*
-                else
-                {
-                    if (needToSave == true)
-                        if (ShowAiEcho == true) aiEcho("adding area: "+firstRingID+" as it's within gMainBaseAreaWallRadius");
-                }
-*/
             }
             
             // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
@@ -2518,8 +2398,6 @@ rule mainBaseAreaWallTeam2
                             
                             if (areaType == cAreaTypeForest)
                             {
-//                                if ((dx > gMainBaseAreaWallRadius * 1.3) || (dx < -1.0 * gMainBaseAreaWallRadius * 1.3)
-//                                 || (dz > gMainBaseAreaWallRadius * 1.3) || (dz < -1.0 * gMainBaseAreaWallRadius * 1.3))
                                 if ((dx > gMainBaseAreaWallRadius * 1.2) || (dx < -1.0 * gMainBaseAreaWallRadius * 1.2)
                                  || (dz > gMainBaseAreaWallRadius * 1.2) || (dz < -1.0 * gMainBaseAreaWallRadius * 1.2))
                                 {
@@ -2553,23 +2431,6 @@ rule mainBaseAreaWallTeam2
                             
                             if ((alreadyIn == false) && (skipme == false) && (numAreasAdded < 20))  // add it
                             {
-/*
-                                if (gHouseAreaID == secondRingID)
-                                {
-                                    if (ShowAiEcho == true) aiEcho("gHouseAreaID == secondRingID, adding the gHouseAreaID: "+gHouseAreaID);
-                                }
-                                else
-                                {
-                                    if (areaType == cAreaTypeForest)
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a forest area and within gMainBaseAreaWallRadius * 1.2");
-                                    else if (areaType == cAreaTypeGold)
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a gold area and within gMainBaseAreaWallRadius * 1.4");
-                                    else if (areaType == cAreaTypeSettlement)
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's a settlement area and within gMainBaseAreaWallRadius * 1.4");
-                                    else
-                                        if (ShowAiEcho == true) aiEcho("adding area: "+secondRingID+" as it's within gMainBaseAreaWallRadius * 1.4");
-                                }
-*/
                                 aiPlanSetVariableInt(mainBaseAreaWallTeam2PlanID, cBuildWallPlanAreaIDs, numAreasAdded, secondRingID);
                                 numAreasAdded = numAreasAdded + 1;
                             }
@@ -2578,16 +2439,11 @@ rule mainBaseAreaWallTeam2
                 }
             }
         }
-/*
-        if (ShowAiEcho == true) aiEcho("    Area list:");
-        for (l = 0; < numAreasAdded)
-            if (ShowAiEcho == true) aiEcho("        "+aiPlanGetVariableInt(mainBaseAreaWallTeam2PlanID, cBuildWallPlanAreaIDs, l));
-*/
+
         // Set the true number of area variables, preserving existing values, then turn on the plan
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam2PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
 
         aiPlanSetVariableInt(mainBaseAreaWallTeam2PlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-//        aiPlanAddUnitType(mainBaseAreaWallTeam2PlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
         aiPlanAddUnitType(mainBaseAreaWallTeam2PlanID, builderType, 1, 1, 1);
         aiPlanSetVariableInt(mainBaseAreaWallTeam2PlanID, cBuildWallPlanNumberOfGates, 0, 50);
         aiPlanSetVariableFloat(mainBaseAreaWallTeam2PlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
@@ -2627,11 +2483,13 @@ rule otherBaseRingWallTeam1
 	
     //check if there are farms close to where we want to place our walls and delete them
     vector otherBaseLocation = kbBaseGetLocation(cMyID, otherBaseID);
+/* DISABLED
     int numFarmsInR12 = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, -1, cMyID, otherBaseLocation, 12.0);
     int numFarmsInR25 = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, -1, cMyID, otherBaseLocation, 25.0);
     if (ShowAiEcho == true) aiEcho("numFarmsInR12: "+numFarmsInR12);
     if (ShowAiEcho == true) aiEcho("numFarmsInR25: "+numFarmsInR25);
-    if (numFarmsInR25 - numFarmsInR12 > 0)
+    
+	if (numFarmsInR25 - numFarmsInR12 > 0)
     {
         for (i = numFarmsInR25 - 1; >= 0)
         {
@@ -2656,7 +2514,7 @@ rule otherBaseRingWallTeam1
             }
         }
     }
-    
+    */
     //If we already have a build wall plan, don't make another one.
     int wallPlanID = aiPlanGetIDByTypeAndVariableType(cPlanBuildWall, cBuildWallPlanWallType, cBuildWallPlanWallTypeArea, true);
     int activeWallPlans = aiPlanGetNumber(cPlanBuildWall, -1, true);
@@ -2689,9 +2547,9 @@ rule otherBaseRingWallTeam1
                 }
 
                 //Get the enemies near my base
-                int numEnemyUnitsNearBase = kbBaseGetNumberUnits(cMyID, otherBaseID, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
-                int myUnitsNearBase = kbBaseGetNumberUnits(cMyID, otherBaseID, cPlayerRelationSelf, cUnitTypeLogicalTypeLandMilitary);
-                int alliedUnitsNearBase = kbBaseGetNumberUnits(cMyID, otherBaseID, cPlayerRelationAlly, cUnitTypeLogicalTypeLandMilitary);
+			    int numEnemyUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, otherBaseLocation, 35);
+				int myUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationSelf, otherBaseLocation, 35);  
+                int alliedUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationAlly, otherBaseLocation, 35); 				
 
                 //Get the time under attack.
                 int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, otherBaseID);
@@ -2873,11 +2731,12 @@ rule otherBase1RingWallTeam
                     xsSetRuleMinIntervalSelf(61);
                     return;
                 }
-
+                vector otherBaseLocation1 = kbBaseGetLocation(cMyID, gOtherBase1ID);
                 //Get the enemies near my base
-                int numEnemyUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase1ID, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
-                int myUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase1ID, cPlayerRelationSelf, cUnitTypeLogicalTypeLandMilitary);
-                int alliedUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase1ID, cPlayerRelationAlly, cUnitTypeLogicalTypeLandMilitary);
+			    int numEnemyUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, otherBaseLocation1, 35);
+				int myUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationSelf, otherBaseLocation1, 35);  
+                int alliedUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationAlly, otherBaseLocation1, 35); 						
+
 
                 //Get the time under attack.
                 int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, gOtherBase1ID);
@@ -3035,10 +2894,11 @@ rule otherBase2RingWallTeam
                     return;
                 }
 
+                vector otherBaseLocation2 = kbBaseGetLocation(cMyID, gOtherBase2ID);
                 //Get the enemies near my base
-                int numEnemyUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase2ID, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
-                int myUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase2ID, cPlayerRelationSelf, cUnitTypeLogicalTypeLandMilitary);
-                int alliedUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase2ID, cPlayerRelationAlly, cUnitTypeLogicalTypeLandMilitary);
+			    int numEnemyUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, otherBaseLocation2, 35);
+				int myUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationSelf, otherBaseLocation2, 35);  
+                int alliedUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationAlly, otherBaseLocation2, 35); 
 
                 //Get the time under attack.
                 int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, gOtherBase2ID);
@@ -3196,10 +3056,11 @@ rule otherBase3RingWallTeam
                     return;
                 }
 
+                vector otherBaseLocation3 = kbBaseGetLocation(cMyID, gOtherBase3ID);
                 //Get the enemies near my base
-                int numEnemyUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase3ID, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
-                int myUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase3ID, cPlayerRelationSelf, cUnitTypeLogicalTypeLandMilitary);
-                int alliedUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase3ID, cPlayerRelationAlly, cUnitTypeLogicalTypeLandMilitary);
+			    int numEnemyUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, otherBaseLocation3, 35);
+				int myUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationSelf, otherBaseLocation3, 35);  
+                int alliedUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationAlly, otherBaseLocation3, 35); 
 
                 //Get the time under attack.
                 int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, gOtherBase3ID);
@@ -3357,10 +3218,11 @@ rule otherBase4RingWallTeam
                     return;
                 }
 
+                vector otherBaseLocation4 = kbBaseGetLocation(cMyID, gOtherBase4ID);
                 //Get the enemies near my base
-                int numEnemyUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase4ID, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
-                int myUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase4ID, cPlayerRelationSelf, cUnitTypeLogicalTypeLandMilitary);
-                int alliedUnitsNearBase = kbBaseGetNumberUnits(cMyID, gOtherBase4ID, cPlayerRelationAlly, cUnitTypeLogicalTypeLandMilitary);
+			    int numEnemyUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, otherBaseLocation4, 35);
+				int myUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationSelf, otherBaseLocation4, 35);  
+                int alliedUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationAlly, otherBaseLocation4, 35); 
 
                 //Get the time under attack.
                 int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, gOtherBase4ID);

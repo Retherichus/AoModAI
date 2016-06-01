@@ -2588,7 +2588,7 @@ rule attackEnemySettlement
             if (ShowAiEcho == true) aiEcho("returning as we don't have a Titan, a siege weapon, or a military myth unit");
             return;
         }
-        else if (((woodSupply < 400) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap - 2))
+        else if (((woodSupply < 100) || (goldSupply < 100) || (foodSupply < 100)) && (currentPop <= currentPopCap - 2))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;
@@ -2597,7 +2597,7 @@ rule attackEnemySettlement
     else
     {
 
-        if (((woodSupply < 150) || (goldSupply < 150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 2))
+        if (((woodSupply < 100) || (goldSupply < 100) || (foodSupply < 100)) && (currentPop <= currentPopCap - 2))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;
@@ -3570,7 +3570,7 @@ rule randomAttackGenerator
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     vector baseLocationToUse = mainBaseLocation;
     
-    float closeRangeRadius = 110;    
+    float closeRangeRadius = 100.0;    
     int numEnemySettlementsInCloseRange = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, cPlayerRelationEnemy, mainBaseLocation, closeRangeRadius);
     int numMotherNatureSettlementsInCloseRange = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, 0, mainBaseLocation, closeRangeRadius);
     numEnemySettlementsInCloseRange = numEnemySettlementsInCloseRange - numMotherNatureSettlementsInCloseRange;
@@ -3634,7 +3634,7 @@ rule randomAttackGenerator
     float goldSupply = kbResourceGet(cResourceGold);
 
     
-    if ((woodSupply < 200) || (foodSupply < 200) || (goldSupply < 200))
+    if ((woodSupply < 50) || (foodSupply < 100) || (goldSupply < 100))
     {
         return;
     }
@@ -3665,7 +3665,7 @@ rule randomAttackGenerator
     bool targetIsDropsite = false;
     int index = 0;
     int playerID = -1;
-    closeRangeRadius = 100.0;
+    closeRangeRadius = 300.0;
     
     for (playerID = 1; < cNumberPlayers)
     {
@@ -4009,7 +4009,7 @@ rule createLandAttack
     numEnemySettlements = numEnemySettlements - numMotherNatureSettlements;
     if (ShowAiEcho == true) aiEcho("modified numEnemySettlements: "+numEnemySettlements);
 
-    float closeRangeRadius = 110.0;
+    float closeRangeRadius = 100.0;
     int numEnemySettlementsInCloseRange = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, cPlayerRelationEnemy, mainBaseLocation, closeRangeRadius);
     if (ShowAiEcho == true) aiEcho("numEnemySettlementsInCloseRange: "+numEnemySettlementsInCloseRange);
     int numMotherNatureSettlementsInCloseRange = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, 0, mainBaseLocation, closeRangeRadius);
@@ -4093,7 +4093,7 @@ rule createLandAttack
             if (ShowAiEcho == true) aiEcho("returning as gRushAttackCount >= gRushCount");
             return;
         }
-        else if ((woodSupply < 100) || (foodSupply < 100) || (goldSupply < 100))
+        else if ((woodSupply < 50) || (foodSupply < 50) || (goldSupply < 50))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;
@@ -4107,7 +4107,7 @@ rule createLandAttack
             return;
         }
 
-        else if (((woodSupply < 230) || (foodSupply < 230) || (goldSupply < 230)) && (currentPop < currentPopCap))
+        else if (((woodSupply < 100) || (foodSupply < 100) || (goldSupply < 100)) && (currentPop < currentPopCap))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;

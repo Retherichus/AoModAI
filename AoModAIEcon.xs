@@ -532,7 +532,9 @@ rule updateFoodBreakdown
 		if (cMyCulture == cCultureAtlantean)
 		createSimpleBuildPlan(cUnitTypeGuild, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
     }
-		if (xsGetTime() < 20*1*1000 && gHuntingDogsASAP == true)
+	
+	    static bool HippoDone = false;
+		if (HippoDone == false && gHuntingDogsASAP == true && xsGetTime() < 20*1*1000)
 		{ 
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
 	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, distance);
@@ -542,6 +544,8 @@ rule updateFoodBreakdown
 		aiSetMinNumberNeedForGatheringAggressvies(1);
 		else if (HippoNearMB > 1 && cMyCulture == cCultureNorse) 
 		aiSetMinNumberNeedForGatheringAggressvies(3);
+		if (HippoNearMB > 1)
+		HippoDone = true;
         }			
 	
 	
@@ -594,8 +598,6 @@ rule updateFoodBreakdown
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
     int desiredFarmers = 26;
-    if (mapRequires2FarmPlans() == true)
-        desiredFarmers = 30;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
         desiredFarmers = 11;		
 	
@@ -2012,6 +2014,7 @@ rule collectIdleVills
             case 1:
             {
                 resourceType = cUnitTypeFarm;
+				playerID = cMyID;
                 if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("sending idle villager to Farm");
                 break;
             }

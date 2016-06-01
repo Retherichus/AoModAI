@@ -42,7 +42,7 @@ extern bool ShowAiEcoEcho = true;
 extern bool ShowAiGenEcho = true;
 extern bool ShowAiMilEcho = true;
 extern bool ShowAiDefEcho = true;
-extern bool ShowAiTestEcho = true;
+extern bool ShowAiTestEcho = false;
 //////////////// END OF DEBUG 
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
@@ -1274,7 +1274,7 @@ void CountTreesOtherBase(void)
 //==============================================================================
 rule IHateSiege
    minInterval 5
-   inactive
+   active
    group HateScripts
 {
    static int unitQueryID=-1;
@@ -1506,7 +1506,7 @@ rule IHateMonks
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 26);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 18);
    }
 
    int numberFoundTemp = 0;
@@ -1517,7 +1517,7 @@ rule IHateMonks
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0 && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeLogicalTypeLandMilitary) == true || cMyCulture == cCultureEgyptian))
+	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
@@ -1586,9 +1586,7 @@ rule IHateBuildingsHadesSpecial
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
-	   	int NoFarmsPlease = kbUnitQueryGetResult(enemyQueryID, 0);
-		int NoTCPlease = kbUnitQueryGetResult(enemyQueryID, 0); // Because TCs bugs out their ownership when destroyed
-        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm) || kbUnitIsType(NoTCPlease, cUnitTypeAbstractSettlement))
+        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
             continue;
 	   
 	   if (numberFoundTemp > 0)
@@ -1864,11 +1862,10 @@ rule IHateBuildingsBeheAndScarab
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
-	   	int NoFarmsPlease = kbUnitQueryGetResult(enemyQueryID, 0);
-        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm))
+        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
             continue;
 	   
-	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
+	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
@@ -1881,7 +1878,7 @@ rule IHateBuildingsBeheAndScarab
 // IHateBuildingsSiege
 //==============================================================================
 rule IHateBuildingsSiege
-   minInterval 5
+   minInterval 1
    inactive
    group HateScripts
 {
@@ -1936,9 +1933,7 @@ rule IHateBuildingsSiege
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
-	   	int NoFarmsPlease = kbUnitQueryGetResult(enemyQueryID, 0);
-		int NoTCPlease = kbUnitQueryGetResult(enemyQueryID, 0); // Because TCs bugs out their ownership when destroyed
-        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm) || kbUnitIsType(NoTCPlease, cUnitTypeAbstractSettlement))
+        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
             continue;
 			
 	   if (numberFoundTemp > 0)
