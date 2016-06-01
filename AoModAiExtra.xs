@@ -1587,10 +1587,11 @@ rule IHateBuildingsHadesSpecial
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
 	   	int NoFarmsPlease = kbUnitQueryGetResult(enemyQueryID, 0);
-        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm))
+		int NoTCPlease = kbUnitQueryGetResult(enemyQueryID, 0); // Because TCs bugs out their ownership when destroyed
+        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm) || kbUnitIsType(NoTCPlease, cUnitTypeAbstractSettlement))
             continue;
 	   
-	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
+	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
@@ -1735,7 +1736,6 @@ rule IHateVillagers
 rule IHateUnderworldPassages
    minInterval 8
    inactive
-   group HateScripts
 {
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
@@ -1937,10 +1937,11 @@ rule IHateBuildingsSiege
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
 	   	int NoFarmsPlease = kbUnitQueryGetResult(enemyQueryID, 0);
-        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm))
+		int NoTCPlease = kbUnitQueryGetResult(enemyQueryID, 0); // Because TCs bugs out their ownership when destroyed
+        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm) || kbUnitIsType(NoTCPlease, cUnitTypeAbstractSettlement))
             continue;
 			
-	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
+	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);

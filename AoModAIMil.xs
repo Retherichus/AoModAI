@@ -191,7 +191,7 @@ rule monitorDefPlans
                             gDefendPlanID = -1;
                             xsDisableRule("defendPlanRule");
                             
-                            xsSetRuleMinInterval("defendPlanRule", 2);
+                            xsSetRuleMinInterval("defendPlanRule", 8);
                             xsEnableRule("defendPlanRule");
                             countZ = 0;
                         }
@@ -461,7 +461,7 @@ rule monitorDefPlans
                     else
                     {
                         countA = 0;
-                        xsSetRuleMinInterval("defendSettlementPosition", 1);
+                        xsSetRuleMinInterval("defendSettlementPosition", 7);
                         xsDisableRule("defendSettlementPosition");
                         aiPlanDestroy(defendPlanID);
                         continue;
@@ -479,7 +479,7 @@ rule monitorDefPlans
                         else
                         {
                             resourceCountA = 0;
-                            xsSetRuleMinInterval("defendSettlementPosition", 1);
+                            xsSetRuleMinInterval("defendSettlementPosition", 7);
                             xsDisableRule("defendSettlementPosition");
                             aiPlanDestroy(defendPlanID);
                             continue;
@@ -568,7 +568,7 @@ rule monitorDefPlans
                     else
                     {
                         countB = 0;
-                        xsSetRuleMinInterval("defendBaseUnderAttack", 1);
+                        xsSetRuleMinInterval("defendBaseUnderAttack", 4);
                         xsDisableRule("defendBaseUnderAttack");
                         aiPlanDestroy(defendPlanID);
                         continue;
@@ -586,7 +586,7 @@ rule monitorDefPlans
                         else
                         {
                             resourceCountB = 0;
-                            xsSetRuleMinInterval("defendBaseUnderAttack", 1);
+                            xsSetRuleMinInterval("defendBaseUnderAttack", 4);
                             xsDisableRule("defendBaseUnderAttack");
                             aiPlanDestroy(defendPlanID);
                             
@@ -595,7 +595,7 @@ rule monitorDefPlans
                             xsDisableRule("defendPlanRule");
                             gBaseUnderAttackID = -1;
                             
-                            xsSetRuleMinInterval("defendPlanRule", 2);
+                            xsSetRuleMinInterval("defendPlanRule", 8);
                             xsEnableRule("defendPlanRule");
                             continue;
                         }
@@ -1254,7 +1254,7 @@ rule defendPlanRule
                     {
                         aiPlanDestroy(defendPlanID);
                         gDefendPlanID = -1;
-                        xsSetRuleMinIntervalSelf(2);
+                        xsSetRuleMinIntervalSelf(5);
                         if (ShowAiEcho == true) aiEcho("destroying current gDefendPlanID and restarting defendPlanRule");
                         return;
                     }
@@ -1416,7 +1416,7 @@ rule decreaseRaxPref    //Egyptian decrease rax units preference if has at least
 //==============================================================================
 rule mainBaseDefPlan1   //Make a defend plan that protects the main base
 //    minInterval 61 //starts in cAge2
-    minInterval 71 //starts in cAge1
+    minInterval 41 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("mainBaseDefPlan1:");
@@ -2212,7 +2212,7 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
         if (ShowAiEcho == true) aiEcho("otherBaseDefPlan for base #"+newBaseID+" set active: "+otherBaseDefPlanID);
         
         //reset the minInterval since calling the wallplans seems to change the minInterval
-        xsSetRuleMinIntervalSelf(43);
+        xsSetRuleMinIntervalSelf(35);
     }
 }
 
@@ -2918,7 +2918,7 @@ rule attackEnemySettlement
 
 //==============================================================================
 rule defendSettlementPosition
-    minInterval 1 //starts in cAge2, activated in monitorAttack rule or findMySettlementsBeingBuilt rule
+    minInterval 6 //starts in cAge2, activated in monitorAttack rule or findMySettlementsBeingBuilt rule
     inactive
 {
     
@@ -2995,7 +2995,7 @@ rule defendSettlementPosition
                         if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as there's an enemy Settlement at our defend position");
                     else
                         if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as there are too many enemies near our main base");
-                    xsSetRuleMinIntervalSelf(1);
+                    xsSetRuleMinIntervalSelf(4);
                     xsDisableSelf();
                     return;
                 }
@@ -3015,7 +3015,7 @@ rule defendSettlementPosition
                         if (ShowAiEcho == true) aiEcho("and I have a settlement plus 1 defensive building at the defend position");
                     }
                     aiPlanDestroy(defendPlanID);
-                    xsSetRuleMinIntervalSelf(1);
+                    xsSetRuleMinIntervalSelf(4);
                     xsDisableSelf();
                     return;
                 }
@@ -3041,7 +3041,7 @@ rule defendSettlementPosition
         xsSetRuleMinIntervalSelf(11);
         if (count > 2)
         {
-            xsSetRuleMinIntervalSelf(1);
+            xsSetRuleMinIntervalSelf(4);
             count = 0;
             xsDisableSelf();
         }
@@ -4444,10 +4444,10 @@ rule defendBaseUnderAttack
                     if (ShowAiEcho == true) aiEcho("destroying current gDefendPlanID and restarting defendPlanRule");
                     gBaseUnderAttackID = -1;
                     
-                    xsSetRuleMinInterval("defendPlanRule", 2);
+                    xsSetRuleMinInterval("defendPlanRule", 11);
                     xsEnableRule("defendPlanRule");
                     
-                    xsSetRuleMinIntervalSelf(1);
+                    xsSetRuleMinIntervalSelf(12);
                     xsDisableSelf();
                     return;
                 }
@@ -4461,7 +4461,7 @@ rule defendBaseUnderAttack
                         if (ShowAiEcho == true) aiEcho("destroying gBaseUnderAttackDefPlanID as it has been active for more than 2 Minutes and there are less than 3 enemies");
                     gBaseUnderAttackID = -1;
                     gBaseUnderAttackDefPlanID = -1;
-                    xsSetRuleMinIntervalSelf(1);
+                    xsSetRuleMinIntervalSelf(12);
                     xsDisableSelf();
                     return;
                 }
@@ -4799,7 +4799,7 @@ rule tacticalBuildings
     {
         if (kbGetAge() == cAge2)
         {
-            xsSetRuleMinIntervalSelf(8);
+            xsSetRuleMinIntervalSelf(11);
             alreadyInAge2 = true;
         }
     }

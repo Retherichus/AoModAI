@@ -1583,7 +1583,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 	// Lets not do this calculation too often, as it is a resource hog.
 	static int Count=0;  
  
-    if (Count > 36)
+    if (Count > 72)
     Count = 0; 
 	
 	if (Count < 1)
@@ -1621,7 +1621,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 	}
 	Count = Count + 1;
 	
-	int ResetTime = Count - 38;
+	int ResetTime = Count - 74;
 	
     if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("NumTrees calculation, runs in:  "+ResetTime+" ");
 	if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Treecount:  "+TotalTreesNearMB+" ");
@@ -4536,6 +4536,7 @@ void age2Handler(int age=1)
     //enable the hesperides rule if there's an Oranos or Gaia player
     bool hesperidesPower = false;
     bool obelisk = false;
+	bool PotentialUWPass = false;
     int playerID = -1;
     for (playerID = 1; < cNumberPlayers)
     {
@@ -4556,12 +4557,19 @@ void age2Handler(int age=1)
                 continue;
             }
         }
+        if ((kbGetCivForPlayer(playerID) == cCivHades) || (kbGetCivForPlayer(playerID) == cCivZeus))
+        {
+            PotentialUWPass = true;
+            continue;
+        }		
     }
     
     if (hesperidesPower == true)
         xsEnableRule("hesperides");
     if (obelisk == true)
         xsEnableRule("activateObeliskClearingPlan");
+    if (PotentialUWPass == true)
+        xsEnableRule("IHateUnderworldPassages");		
     
     //Econ.
     econAge2Handler(age);
