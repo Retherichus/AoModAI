@@ -1582,22 +1582,52 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 	
 	// Lets not do this calculation too often, as it is a resource hog.
 	static int Count=0;  
-    Count = Count + 1;
+ 
+    if (Count > 36)
+    Count = 0; 
 	
-	if (Count < 2)
-	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, 0, 0, mainBaseLocation, 52.0);
+	if (Count < 1)
+	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, 0, 0, mainBaseLocation, 50.0);
 	else numTeesNearMainBase = TotalTreesNearMB;
 	TotalTreesNearMB = numTeesNearMainBase;
 	
-	
+	if (numTeesNearMainBase < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 60*60*1000 && Count < 1)
+	{
+    int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
+    static int lastBaseID = -1;
 	
-if (Count > 36)
-    Count = 0;
-    if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("NumTrees calculation, resets at 37:  "+Count+" ");
+    for (i = 0; < numSettlements)
+    {
+        int otherBaseUnitID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive);
+        if (otherBaseUnitID < 0)
+            continue;
+        else
+        {
+            //Get the base ID
+            int otherBaseID = kbUnitGetBaseID(otherBaseUnitID);
+            if (otherBaseID == -1)
+                continue;
+				
+		if (otherBaseID != mainBaseID)		
+		{		
+		vector otherBaseLocation = kbBaseGetLocation(cMyID, otherBaseID);
+		int numTeesNearOtherBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, 0, 0, otherBaseLocation, 35.0);
+		numTeesNearMainBase = TotalTreesNearMB+numTeesNearOtherBase;
+	    TotalTreesNearMB = numTeesNearMainBase;
+		}
+	}
+	}
+	}
+	Count = Count + 1;
+	
+	int ResetTime = Count - 38;
+	
+    if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("NumTrees calculation, runs in:  "+ResetTime+" ");
 	if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Treecount:  "+TotalTreesNearMB+" ");
-    float neededWoodGatherers = desiredWoodUnits;
-   if (woodSupply > goldSupply+1500 || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 60*60*1000)
+    
+	float neededWoodGatherers = desiredWoodUnits;
+    if (woodSupply > goldSupply+1500 || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 60*60*1000)
    //if (woodSupply > goldSupply+1500)
         neededWoodGatherers = 0;
     

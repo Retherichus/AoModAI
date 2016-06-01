@@ -271,8 +271,13 @@ void initRethlAge1(void)  // Am I doing this right??
 void initRethlAge2(void)
 {
 	// The Greeks are working as intended, so we're skipping that.
-	
-    if (cMyCiv == cCivIsis)
+    
+	if (cMyCiv == cCivHades)
+    {   	
+	xsEnableRuleGroup("HateScriptsH");
+    }   
+
+   if (cMyCiv == cCivIsis)
     {   	
 	xsEnableRule("getFloodOfTheNile");
     }
@@ -334,8 +339,12 @@ void initRethlAge2(void)
 	}
 
 	//  Enable Dock defense. 
-xsEnableRule("DockDefenseMonitor");
-	
+    xsEnableRule("DockDefenseMonitor");
+    //HateScripts
+	xsEnableRuleGroup("HateScripts");
+	// Check with allies and enable donations
+    xsEnableRule("MonitorAllies");
+
 }	
 
 //==============================================================================
@@ -384,6 +393,7 @@ rule ActivateRethOverridesAge2
     if (kbGetAge() > cAge1)
     {
 		initRethlAge2();
+		
 		//CHINESE MINOR GOD SPECIFIC
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Change) == cTechStatusActive)
         xsEnableRuleGroup("Change");
@@ -464,6 +474,9 @@ rule ActivateRethOverridesAge3
         xsEnableRuleGroup("ArmoryAge2");
         if (cMyCiv == cCivThor && Age3Armory == true)
         xsEnableRuleGroup("ArmoryThor");
+		
+		if (cMyCiv == cCivPoseidon)
+		xsEnableRule("buildManyBuildings");
 		
 		xsDisableSelf();
            
@@ -661,7 +674,8 @@ rule HuntingDogsAsap
 rule DONATEFood
    minInterval 30
    maxInterval 80
-   active
+   inactive
+   Group Donations
 {
   if  (aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy)
   {
@@ -674,7 +688,7 @@ rule DONATEFood
          continue;
       
 	       float foodSupply = kbResourceGet(cResourceFood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && foodSupply > 1500)
+	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && foodSupply > 1500)
 		   {
 		             if (ShowAiEcho == true) aiEcho("Tributing 100 food to one of my allies!");
 	  aiTribute(i, cResourceFood, 100);
@@ -688,7 +702,8 @@ rule DONATEFood
 rule DONATEWood
    minInterval 30
    maxInterval 80
-   active
+   inactive
+   Group Donations
 {
   if  (aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy)
   {
@@ -701,7 +716,7 @@ rule DONATEWood
          continue;
       
 	       float woodSupply = kbResourceGet(cResourceWood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && woodSupply > 1750)
+	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && woodSupply > 1750)
 		   {
 		             if (ShowAiEcho == true) aiEcho("Tributing 100 wood to one of my allies!");
 	  aiTribute(i, cResourceWood, 100);
@@ -716,7 +731,8 @@ rule DONATEWood
 rule DONATEGold
    minInterval 30
    maxInterval 80
-   active
+   inactive
+   Group Donations
 {
   if  (aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy)
   {
@@ -729,7 +745,7 @@ rule DONATEGold
          continue;
       
 	       float goldSupply = kbResourceGet(cResourceGold);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && goldSupply > 2000)
+	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && goldSupply > 2000)
 		   {
 		             if (ShowAiEcho == true) aiEcho("Tributing 100 gold to one of my allies!");
 	  aiTribute(i, cResourceGold, 100);
@@ -1116,7 +1132,7 @@ int getNumberUnits(int unitType=-1, int playerID=-1, int state=cUnitStateAlive)
 //==============================================================================
 rule buildManyBuildings
    minInterval 45
-   active
+   inactive
 {
 //   float currentFood=kbResourceGet(cResourceFood);
    float currentWood=kbResourceGet(cResourceWood);
@@ -1223,9 +1239,7 @@ rule buildManyBuildings
 //==============================================================================
 //CountTreesOtherBase
 //==============================================================================
-rule CountTreesOtherBase
-minInterval 999 // Will be called upon if no trees are found in MB.
-inactive
+void CountTreesOtherBase(void)
 {
 	if (numTeesNearMainBase < 1)
 	{
@@ -1247,21 +1261,21 @@ inactive
 				
 		vector otherBaseLocation = kbBaseGetLocation(cMyID, otherBaseID);
 		int numTeesNearOtherBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, 0, 0, otherBaseLocation, 35.0);
-		numTeesNearMainBase = numTeesNearMainBase+numTeesNearOtherBase;
-		return();
+		numTeesNearMainBase = TotalTreesNearMB+numTeesNearOtherBase;
+		return;
 	
 	    }
 	}
     }
 }
 */
-
 //==============================================================================
-// tacticalHeroAttackMyth
+// IHateSiege
 //==============================================================================
-rule tacticalHeroAttackMyth
-   minInterval 7
-   active
+rule IHateSiege
+   minInterval 5
+   inactive
+   group HateScripts
 {
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
@@ -1271,6 +1285,109 @@ rule tacticalHeroAttackMyth
 	xsDisableSelf();
 	return;
    }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Unit Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeAbstractSiegeWeapon);
+	    kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+	   int NoArcherPlease = kbUnitQueryGetResult(unitQueryID, i);
+        if (kbUnitIsType(NoArcherPlease, cUnitTypeAbstractArcher) || (kbUnitIsType(NoArcherPlease, cUnitTypeAbstractSiegeWeapon)))
+            continue;
+	   
+	   if (numberFoundTemp > 0)
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+//==============================================================================
+// tacticalHeroAttackMyth
+//==============================================================================
+rule tacticalHeroAttackMyth
+   minInterval 5
+   inactive
+   group HateScripts
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+   static bool RunOnlyOnce = false;
+   
+   if (aiGetWorldDifficulty() == cDifficultyEasy)
+   {
+	xsDisableSelf();
+	return;
+   }
+   
+   		if (cMyCulture == cCultureGreek && RunOnlyOnce == false)
+		{
+		static int Hero1ID = -1;
+		static int Hero2ID = -1;
+		static int Hero3ID = -1;
+		static int Hero4ID = -1;
+		if (cMyCiv == cCivZeus)
+        {
+            Hero1ID = cUnitTypeHeroGreekJason;
+            Hero2ID = cUnitTypeHeroGreekOdysseus;
+            Hero3ID = cUnitTypeHeroGreekHeracles;
+            Hero4ID = cUnitTypeHeroGreekBellerophon;			
+        }
+        else if (cMyCiv == cCivPoseidon)
+        {
+            Hero1ID = cUnitTypeHeroGreekTheseus;
+            Hero2ID = cUnitTypeHeroGreekHippolyta;
+            Hero3ID = cUnitTypeHeroGreekAtalanta;
+            Hero4ID = cUnitTypeHeroGreekPolyphemus;			
+        }
+        else if (cMyCiv == cCivHades)
+        {
+            Hero1ID = cUnitTypeHeroGreekAjax;
+            Hero2ID = cUnitTypeHeroGreekChiron;
+            Hero3ID = cUnitTypeHeroGreekAchilles;
+            Hero4ID = cUnitTypeHeroGreekPerseus;			
+        }
+		if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Heroes set");
+		RunOnlyOnce = true;
+		}
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
@@ -1313,20 +1430,40 @@ rule tacticalHeroAttackMyth
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+	    if (cMyCulture != cCultureEgyptian)
+		{
+	    int NoMeleeHeroPlease = kbUnitQueryGetResult(unitQueryID, i);
+	   	int NoFlyingPlease = kbUnitQueryGetResult(enemyQueryID, 0);
+		if ((kbUnitIsType(NoFlyingPlease, cUnitTypePegasus) || kbUnitIsType(NoFlyingPlease, cUnitTypeRoc) || kbUnitIsType(NoFlyingPlease, cUnitTypeFlyingMedic) || 
+		kbUnitIsType(NoFlyingPlease, cUnitTypeStymphalianBird) || kbUnitIsType(NoFlyingPlease, cUnitTypePhoenix) || kbUnitIsType(NoFlyingPlease, cUnitTypeVermilionBird)))
+		{
+        if (cMyCulture == cCultureGreek) if (kbUnitIsType(NoMeleeHeroPlease, Hero1ID) || kbUnitIsType(NoMeleeHeroPlease, Hero3ID) || kbUnitIsType(NoMeleeHeroPlease, Hero4ID))    
+			continue;
+        if (cMyCulture == cCultureNorse) if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroNorse) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroRagnorok))    
+			continue;
+        if (cMyCulture == cCultureAtlantean) if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeSwordsmanHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeTridentSoldierHero) || 
+		kbUnitIsType(NoMeleeHeroPlease, cUnitTypeRoyalGuardHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeMacemanHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeLancerHero))    
+			continue;
+        if (cMyCulture == cCultureChinese) if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroChineseMonk))    
+			continue;			
+	   }
+	   }
 	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
 	   }
    }
-}
+}   
 
 //==============================================================================
 // IHateMonks
 //==============================================================================
 rule IHateMonks
    minInterval 6
-   active
+   inactive
+   group HateScripts
 {
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
@@ -1388,77 +1525,15 @@ rule IHateMonks
    }
 }
 
-//==============================================================================
-// IHateSiege
-//==============================================================================
-rule IHateSiege
-   minInterval 6
-   active
-{
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
 
-   if (aiGetWorldDifficulty() == cDifficultyEasy)
-   {
-	xsDisableSelf();
-	return;
-   }
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Unit Query");
-   
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeAbstractSiegeWeapon);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   if (numberFoundTemp > 0)
-	   {
-		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
-		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
-	   }
-   }
-}
 
 //==============================================================================
 // IHateBuildingsHadesSpecial
 //==============================================================================
 rule IHateBuildingsHadesSpecial
    minInterval 5
-   active
+   inactive
+   group HateScriptsH
 {
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
@@ -1510,6 +1585,11 @@ rule IHateBuildingsHadesSpecial
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+	   	int NoFarmsPlease = kbUnitQueryGetResult(enemyQueryID, 0);
+        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm))
+            continue;
+	   
 	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
@@ -1564,7 +1644,7 @@ rule BanditMigdolRemoval
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 42);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 40);
    }
 
    int numberFoundTemp = 0;
@@ -1588,7 +1668,8 @@ rule BanditMigdolRemoval
 //==============================================================================
 rule IHateVillagers
    minInterval 5
-   active
+   inactive
+   group HateScripts
 {
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
@@ -1653,7 +1734,8 @@ rule IHateVillagers
 //==============================================================================
 rule IHateUnderworldPassages
    minInterval 8
-   active
+   inactive
+   group HateScripts
 {
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
@@ -1714,16 +1796,28 @@ rule IHateUnderworldPassages
 //==============================================================================
 rule IHateBuildingsBeheAndScarab
    minInterval 6
-   active
+   inactive
+   group Sekhmet
+   group Rheia
 {
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
+   static int MythUnit=-1;
+   
 
    if ((aiGetWorldDifficulty() == cDifficultyEasy) || (cMyCulture != cCultureAtlantean && cMyCulture != cCultureEgyptian))
    {
 	xsDisableSelf();
 	return;
    }
+   if (cMyCulture == cCultureAtlantean)
+   MythUnit = cUnitTypeBehemoth;
+   else MythUnit = cUnitTypeScarab;
+   
+   if (kbUnitCount(cMyID, MythUnit) < 1)
+   xsSetRuleMinIntervalSelf(65);
+   else xsSetRuleMinIntervalSelf(6);
+   
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
@@ -1769,6 +1863,11 @@ rule IHateBuildingsBeheAndScarab
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+	   	int NoFarmsPlease = kbUnitQueryGetResult(enemyQueryID, 0);
+        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm))
+            continue;
+	   
 	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
@@ -1783,7 +1882,8 @@ rule IHateBuildingsBeheAndScarab
 //==============================================================================
 rule IHateBuildingsSiege
    minInterval 5
-   active
+   inactive
+   group HateScripts
 {
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
@@ -1835,6 +1935,11 @@ rule IHateBuildingsSiege
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+	   	int NoFarmsPlease = kbUnitQueryGetResult(enemyQueryID, 0);
+        if (kbUnitIsType(NoFarmsPlease, cUnitTypeFarm))
+            continue;
+			
 	   if (numberFoundTemp > 0 && kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == false )
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
@@ -1949,9 +2054,21 @@ int findClosestAreaWithUnits(int areaID = -1,int type=-1, int unitType = -1, int
 
 */
 // TESTING GROUND
-rule TestTest
-minInterval 999 // 
+rule MonitorAllies
+minInterval 1  
 inactive
 {
-
+   xsSetRuleMinIntervalSelf(181);
+   static bool checkTeamStatus=true;
+   if (checkTeamStatus == true)
+   {
+      for (i=1; < cNumberPlayers)
+      {
+         if (i == cMyID)
+            continue;
+         if (kbIsPlayerMutualAlly(i) == true && kbIsPlayerResigned(i) == false && kbIsPlayerValid(i) == true && kbHasPlayerLost(i) == false)
+         xsEnableRuleGroup("Donations");
+		 else xsDisableRuleGroup("Donations");
+         }
 	}
+}

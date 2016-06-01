@@ -78,7 +78,7 @@ rule updateWoodBreakdown
       float woodSupply = kbResourceGet(cResourceWood);
 	  float goldSupply = kbResourceGet(cResourceGold);
   
-    if ((woodSupply > goldSupply+1500) && (xsGetTime() > 20*60*1000) || TotalTreesNearMB < 1 && xsGetTime() > 60*60*1000)
+    if ((woodSupply > goldSupply+1500) && (xsGetTime() > 20*60*1000) || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 60*60*1000)
         woodGathererCount = 0;	
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)

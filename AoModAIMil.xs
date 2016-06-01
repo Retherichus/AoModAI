@@ -4799,7 +4799,7 @@ rule tacticalBuildings
     {
         if (kbGetAge() == cAge2)
         {
-            xsSetRuleMinIntervalSelf(11);
+            xsSetRuleMinIntervalSelf(8);
             alreadyInAge2 = true;
         }
     }

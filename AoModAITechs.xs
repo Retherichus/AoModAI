@@ -285,14 +285,7 @@ rule getEnclosedDeck
     }
     
     if (ShowAiEcho == true) aiEcho("getEnclosedDeck:");
-    
-//test    
-    if (cMyCulture == cCultureAtlantean)
-    {
-        xsDisableSelf();
-        return;
-    }
-//test end      
+        
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
         return;
@@ -341,13 +334,7 @@ rule getPurseSeine
     
     if (ShowAiEcho == true) aiEcho("getPurseSeine:");
     
-//test    
-    if (cMyCulture == cCultureAtlantean)
-    {
-        xsDisableSelf();
-        return;
-    }
-//test end  
+
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
         return;
@@ -396,13 +383,6 @@ rule getSaltAmphora
     
     if (ShowAiEcho == true) aiEcho("getSaltAmphora:");
     
-//test    
-    if (cMyCulture == cCultureAtlantean)
-    {
-        xsDisableSelf();
-        return;
-    }
-//test end  
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
         return;
