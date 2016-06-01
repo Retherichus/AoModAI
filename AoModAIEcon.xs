@@ -44,7 +44,7 @@ rule updateWoodBreakdown
     
     bool reducedWoodGathererCount = false;
 
-    if (woodGathererCount <= 0 && TotalTreesNearMB > 15) //always some units on wood, unless there are less than 15 trees
+    if (woodGathererCount <= 0) //always some units on wood, unless there are less than 15 trees
     {
             woodGathererCount = 1;
             reducedWoodGathererCount = true;
@@ -118,7 +118,7 @@ rule updateWoodBreakdown
     //Get the count of plans we currently have going.
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
-    int desiredWoodPlans = 2;
+    int desiredWoodPlans = 1 + (woodGathererCount/12);
     if (xsGetTime() < 12*60*1000)
         desiredWoodPlans = 1;
     
@@ -349,7 +349,7 @@ rule updateGoldBreakdown
     //Get the count of plans we currently have going.
     int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 
-    int desiredGoldPlans = 2;
+    int desiredGoldPlans = 1 + (goldGathererCount/14);
     
     int numGoldMinesNearMBInR50 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0);
     
@@ -583,11 +583,21 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 24;
+    int desiredFarmers = 26;
     if (mapRequires2FarmPlans() == true)
-        desiredFarmers = 28;
+        desiredFarmers = 30;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 10;		
+        desiredFarmers = 11;		
+	
+    // Up it a little bit as our civ population raises.	
+    int NumVillagers = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID);
+	if (xsGetTime() > 45*60*1000 || kbGetAge() > cAge3 && xsGetTime() > 30*60*1000)
+	{
+	if (cMyCulture != cCultureAtlantean)
+	desiredFarmers = desiredFarmers+NumVillagers*0.24;
+	else desiredFarmers = desiredFarmers+NumVillagers*0.22;
+	if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho(""+desiredFarmers+"");	
+    }
 		
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)
@@ -1606,8 +1616,8 @@ void initEcon() //setup the initial Econ stuff.
     
 	int mainBaseID = kbBaseGetMainID(cMyID);
 	vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 65.0);
-	TotalTreesNearMB = numTeesNearMainBase;
+	//int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, 0, 0, mainBaseLocation, 65.0);
+	//TotalTreesNearMB = numTeesNearMainBase;
     
 	//Set our update resource handler.
     aiSetUpdateResourceEventHandler("updateResourceHandler");
@@ -1883,7 +1893,7 @@ rule fishing
 //==============================================================================
 rule collectIdleVills
 //    minInterval 61 //starts in cAge1
-    minInterval 22 //starts in cAge1
+    minInterval 26 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("collectIdleVills:");
@@ -1918,8 +1928,7 @@ rule collectIdleVills
     bool noTrees = false;
 
 	float woodSupply = kbResourceGet(cResourceWood);
-    int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 45.0);
-    if (numTeesNearMainBase < 10 || woodSupply > 4200 && xsGetTime() > 20*60*1000)
+    if (woodSupply > 4200 && xsGetTime() > 20*60*1000)
         noTrees = true;
         
     bool noGoldMines = false;
@@ -1935,7 +1944,7 @@ rule collectIdleVills
     
     int numLivingHerdablesNearMainBase = getNumUnits(cUnitTypeHerdable, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
     int numDeadHerdablesNearMainBase = getNumUnits(cUnitTypeHerdable, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0); //'dead' herdables have playerID=0 and cUnitStateAlive
-	int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
+	// int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
         
     for (i = 0; < numberVills)
     {
@@ -1961,8 +1970,13 @@ rule collectIdleVills
             else
                 randomResource = aiRandInt(2);
         }
-                
-        if (numLivingHerdablesNearMainBase > 0)
+              
+
+	 //  if (numFarmsNearMainBase > 20)
+	//	{
+	//	 randomResource = 5;
+  //      }  
+            if (numLivingHerdablesNearMainBase > 0)
         {
             if ((numDeadHerdablesNearMainBase > 0) && (aiRandInt(2) < 1))
             {
@@ -1982,33 +1996,38 @@ rule collectIdleVills
             case 0:
             {
                 resourceType = cUnitTypeGold;
-                if (ShowAiEcho == true) aiEcho("sending idle villager to gold");
+                if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("sending idle villager to gold");
                 break;
             }
             case 1:
             {
-                resourceType = cUnitTypeWood;
-                if (ShowAiEcho == true) aiEcho("sending idle villager to wood");
+                resourceType = cUnitTypeFarm;
+                if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("sending idle villager to Farm");
                 break;
             }
             case 2:
             {
                 resourceType = cUnitTypeHerdable;
                 playerID = cMyID;
-                if (ShowAiEcho == true) aiEcho("sending idle villager to a living herdable");
+                if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("sending idle villager to a living herdable");
                 break;
             }
             case 3:
             {
                 resourceType = cUnitTypeHerdable;
-                if (ShowAiEcho == true) aiEcho("sending idle villager to a dead herdable");
+                if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("sending idle villager to a dead herdable");
                 break;
             }
             case 4:
             {
-                if (ShowAiEcho == true) aiEcho("there are no trees and no gold mines");
+                if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("there are no trees and no gold mines");
                 break;
             }
+          //  case 5:
+          //  {
+            //    resourceType = cUnitTypeFarm;
+            //    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Sending idle villager to a farm");
+        //    }			
         }
 
         if (randomResource == 4)

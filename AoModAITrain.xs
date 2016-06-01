@@ -975,6 +975,12 @@ rule maintainMilitaryTroops
         unitType2 = cUnitTypeMaceman;
         unitType3 = cUnitTypeSwordsman;
     }
+    else if (cMyCulture == cCultureChinese)
+    {
+        unitType1 = cUnitTypeChuKoNu;
+        unitType2 = cUnitTypeHalberdier;
+       //unitType3 = cUnitTypeScoutChinese;  // Not for now.
+    }	
     
     bool unitType1BeingTrained = false;
     bool unitType2BeingTrained = false;

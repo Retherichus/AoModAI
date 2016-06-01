@@ -194,6 +194,9 @@ extern int cvMapSubType = -1;
 //for trigonometric functions
 extern float PI = 3.141592;
 
+// Reth Placeholder
+extern bool ShowAiEcho = false;
+extern bool DisallowPullBack = false;
 
 
 //==============================================================================

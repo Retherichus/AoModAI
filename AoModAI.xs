@@ -65,7 +65,7 @@ extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age hand
 
 
 // Trade globals
-extern int gMaxTradeCarts = 22;           // Max trade carts
+extern int gMaxTradeCarts = 25;           // Max trade carts
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -93,13 +93,6 @@ extern int gWonderDefendPlan = -1;     // Uber-plan to defend my wonder
 extern int gEnemyWonderDefendPlan = -1;   // Uber-uber-plan to attack or defend other wonder
 extern int gObeliskClearingPlanID = -1;   // Small attack plan used to remove enemy obelisks
 //extern int gTargetNavySize = 0;     // Set periodically based on difficulty, enemy navy/fish boat count. Units, not pop slots.
-
-//==============================================================================
-
-// Placeholder Reth
-include "AoModAiExtra.xs";
-include "StinnerV.xs";
-
 
 //==============================================================================
 //Minor Gods.
@@ -313,6 +306,11 @@ mutable void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVec
 //==============================================================================
 //Basics Include.
 include "AoModAIBasics.xs";
+
+
+// Placeholder Reth
+include "AoModAiExtra.xs";
+include "StinnerV.xs";
 
 //==============================================================================
 
@@ -1581,11 +1579,24 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
 	
-	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAny, 0, 0, mainBaseLocation, 55.0);
-	TotalTreesNearMB = numTeesNearMainBase;
-   
+	// Lets not do this calculation too often, as it is a resource hog.
+	//static int Count=0;  
+  //  Count = Count + 1;
+	
+	//if (Count < 2 && cvRandomMapName != "Deep Jungle")
+	//int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, 0, 0, mainBaseLocation, 70.0);
+	//else numTeesNearMainBase = TotalTreesNearMB;
+	
+//	TotalTreesNearMB = numTeesNearMainBase;
+
+	
+//	if (Count > 15)
+//	Count = 0;
+//	aiEcho(""+Count+"");
+	
     float neededWoodGatherers = desiredWoodUnits;
-    if (numTeesNearMainBase < 15 && cvRandomMapName != "Deep Jungle"|| woodSupply > goldSupply+1500)
+   // if (numTeesNearMainBase < 15 && cvRandomMapName != "Deep Jungle"|| woodSupply > goldSupply+1500)
+   if (woodSupply > goldSupply+1500)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -2792,6 +2803,8 @@ void initNorse(void)
     //Enable our no-infantry check.
     xsEnableRule("norseInfantryCheck");
 	xsEnableRule("startLandScoutingSpecialUlfsark");
+	xsEnableRule("trainDwarves");
+	
 }
 
 //==============================================================================

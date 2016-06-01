@@ -1294,6 +1294,13 @@ rule mainBaseAreaWallTeam1
     if ((alreadyStarted == false) && (numHeroes < 1) && (xsGetTime() < 7*60*1000))
         return;
     
+	if (IsRunWallSize == false && aiGetWorldDifficulty() < cDifficultyNightmare && kbGetMapXSize() > 400000000)
+	{
+	gMainBaseAreaWallRadius = gMainBaseAreaWallRadius*0.7;
+	IsRunWallSize = true;
+	 aiEcho(""+kbGetMapXSize()+"");
+	}
+	
     float goldSupply = kbResourceGet(cResourceGold);
 
     //If we already have a build wall plan, don't make another one.
@@ -3698,10 +3705,7 @@ rule buildFortress
             if (cRandomMapName == "jotunheim")
                 buffer = 40.0;
             
-            int numTreesAliveInR20 = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, location, 20.0);
-            int numWoodAliveInR20 = getNumUnits(cUnitTypeWood, cUnitStateAlive, -1, 0, location, 20.0);
-            int numTreesDeadInR20 = getNumUnits(cUnitTypeTree, cUnitStateDead, -1, 0, location, 20.0);
-            int numWoodDeadInR20 = getNumUnits(cUnitTypeWood, cUnitStateDead, -1, 0, location, 20.0);
+
             float woodAmountInR20 = kbGetAmountValidResources(otherBaseID, cResourceWood, cAIResourceSubTypeEasy, 20.0);
             
 
@@ -3710,9 +3714,7 @@ rule buildFortress
             if ((xsVectorGetX(location) < buffer) || (xsVectorGetZ(location) < buffer)
              || (xsVectorGetX(location) > kbGetMapXSize() - buffer)
              || (xsVectorGetZ(location) > kbGetMapZSize() - buffer)
-//             || (numTreesAliveInR20 > 0) || (numTreesDeadInR20 > 0))    //cUnitStateDead doesn't work properly with cUnitTypeTree
-//             || (numWoodAliveInR20 > 0) || (numWoodDeadInR20 > 0))  //cUnitStateDead doesn't work properly with cUnitTypeWood
-             || (numTreesAliveInR20 > 1) || (woodAmountInR20 > 150))
+             || (woodAmountInR20 > 150))
             {
                 int building1ID = -1;
                 if (cMyCulture == cCultureEgyptian)
@@ -4055,25 +4057,16 @@ rule buildBuildingsAtOtherBase
     if (cRandomMapName == "jotunheim")
         buffer = 40.0;
     
-    int numTreesAliveInR20 = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, location, 20.0);
-    int numWoodAliveInR20 = getNumUnits(cUnitTypeWood, cUnitStateAlive, -1, 0, location, 20.0);
-    int numTreesDeadInR20 = getNumUnits(cUnitTypeTree, cUnitStateDead, -1, 0, location, 20.0);
-    int numWoodDeadInR20 = getNumUnits(cUnitTypeWood, cUnitStateDead, -1, 0, location, 20.0);
     float woodAmountInR20 = kbGetAmountValidResources(otherBaseID, cResourceWood, cAIResourceSubTypeEasy, 20.0);
     
-    if (ShowAiEcho == true) aiEcho("numTreesAliveInR20: "+numTreesAliveInR20);
-    if (ShowAiEcho == true) aiEcho("numWoodAliveInR20: "+numWoodAliveInR20);
-    if (ShowAiEcho == true) aiEcho("numTreesDeadInR20: "+numTreesDeadInR20);
-    if (ShowAiEcho == true) aiEcho("numWoodDeadInR20: "+numWoodDeadInR20);
+
     if (ShowAiEcho == true) aiEcho("woodAmountInR20: "+woodAmountInR20);
    
     
     if ((xsVectorGetX(location) < buffer) || (xsVectorGetZ(location) < buffer)
      || (xsVectorGetX(location) > kbGetMapXSize() - buffer)
      || (xsVectorGetZ(location) > kbGetMapZSize() - buffer)
-//     || (numTreesAliveInR20 > 0) || (numTreesDeadInR20 > 0))    //cUnitStateDead doesn't work properly with cUnitTypeTrees
-//     || (numWoodAliveInR20 > 0) || (numWoodDeadInR20 > 0))  //cUnitStateDead doesn't work properly with cUnitTypeWood
-     || (numTreesAliveInR20 > 1) || (woodAmountInR20 > 150))
+     || (woodAmountInR20 > 150))
     {
         int numFortressesNearOtherBase = getNumUnits(cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
         if (numFortressesNearOtherBase > 0)
@@ -4219,10 +4212,6 @@ rule buildBuildingsAtOtherBase2
     if (cRandomMapName == "jotunheim")
         buffer = 40.0;
     
-    int numTreesAliveInR20 = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, location, 20.0);
-    int numWoodAliveInR20 = getNumUnits(cUnitTypeWood, cUnitStateAlive, -1, 0, location, 20.0);
-    int numTreesDeadInR20 = getNumUnits(cUnitTypeTree, cUnitStateDead, -1, 0, location, 20.0);
-    int numWoodDeadInR20 = getNumUnits(cUnitTypeWood, cUnitStateDead, -1, 0, location, 20.0);
     float woodAmountInR20 = kbGetAmountValidResources(otherBaseID, cResourceWood, cAIResourceSubTypeEasy, 20.0);
     
 
@@ -4231,7 +4220,7 @@ rule buildBuildingsAtOtherBase2
     if ((xsVectorGetX(location) < buffer) || (xsVectorGetZ(location) < buffer)
      || (xsVectorGetX(location) > kbGetMapXSize() - buffer)
      || (xsVectorGetZ(location) > kbGetMapZSize() - buffer)
-     || (numTreesAliveInR20 > 1) || (woodAmountInR20 > 150))
+     || (woodAmountInR20 > 150))
     {
         int numFortressesNearOtherBase = getNumUnits(cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
         if (numFortressesNearOtherBase > 2)

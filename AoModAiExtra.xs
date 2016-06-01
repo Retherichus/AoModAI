@@ -30,12 +30,13 @@ extern int gLandScoutSpecialUlfsark = -1;
 extern bool IsRunTradeUnits1 = false;
 extern bool IsRunTradeUnits2 = false;
 extern bool IsRunHuntingDogs = false;
+extern bool IsRunWallSize = false;
 extern bool BoomV2 = true;
-extern int TotalTreesNearMB = -1;
+// extern int TotalTreesNearMB = -1;
 
 //////////////// DEBUG 
 
-extern bool ShowAiEcho = false; 
+extern bool ShowAiEcho = false; // All aiEcho, see specific below to override.
 extern bool ShowAiEcoEcho = true;
 extern bool ShowAiGenEcho = true;
 extern bool ShowAiMilEcho = true;
@@ -242,7 +243,7 @@ void initRethlAge1(void)  // Am I doing this right??
     xsEnableRule("buildMonuments");
 	    
 	   
-	   if (gHuntEarly == true && cRandomMapName != "Deep Jungle")
+	   if (gHuntEarly == true && cRandomMapName != "Deep Jungle" && cRandomMapName != "erebus")
 		{
 		if (cMyCulture == cCultureGreek)
 		aiSetMinNumberNeedForGatheringAggressvies(4);      // The number inside of ( ) represents the amount of villagers/units needed.
@@ -1923,7 +1924,7 @@ int findClosestAreaWithUnits(int areaID = -1,int type=-1, int unitType = -1, int
 // TESTING GROUND
 rule testtestt
 minInterval 2
-inactive
+active
 {
 
 }
