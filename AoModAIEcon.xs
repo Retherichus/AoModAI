@@ -1905,7 +1905,7 @@ rule fishing
 //==============================================================================
 rule collectIdleVills
 //    minInterval 61 //starts in cAge1
-    minInterval 26 //starts in cAge1
+    minInterval 35 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("collectIdleVills:");
@@ -1940,7 +1940,7 @@ rule collectIdleVills
     bool noTrees = false;
 
 	float woodSupply = kbResourceGet(cResourceWood);
-    if (woodSupply > 4200 && xsGetTime() > 20*60*1000)
+    if (woodSupply > 4200 && xsGetTime() > 20*60*1000 || TotalTreesNearMB < 1 && xsGetTime() > 45*60*1000)
         noTrees = true;
         
     bool noGoldMines = false;
@@ -2070,7 +2070,7 @@ rule randomUpgrader
 {
     if (ShowAiEcho == true) aiEcho("randomUpgrader:");
 
-    if (kbGetTechStatus(cTechSecretsoftheTitans) <= cTechStatusResearching)
+    if (kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusObtainable && kbGetTechStatus(cTechSecretsoftheTitans) <= cTechStatusResearching)
         return;
     
     if ((gAge4MinorGod == cTechAge4Hephaestus) && (kbGetTechStatus(cTechForgeofOlympus) <= cTechStatusResearching))
@@ -2092,7 +2092,8 @@ rule randomUpgrader
     float currentWood = kbResourceGet(cResourceWood);
     float currentGold = kbResourceGet(cResourceGold);
     float currentFavor = kbResourceGet(cResourceFavor);
-    if ((currentFood > 1000) && (currentWood > 1000) && (currentGold > 1000))
+	
+    if ((currentFood > 2000) && (currentWood > 2000) && (currentGold > 2000))
     {
         int upgradeTechID = kbTechTreeGetRandomUnitUpgrade();
         //Dont make another plan if we already have one.

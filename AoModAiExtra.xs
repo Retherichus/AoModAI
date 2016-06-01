@@ -38,10 +38,10 @@ extern int numTeesNearMainBase = -1;
 //////////////// DEBUG 
 
 extern bool ShowAiEcho = false; // All aiEcho, see specific below to override.
-extern bool ShowAiEcoEcho = true;
-extern bool ShowAiGenEcho = true;
-extern bool ShowAiMilEcho = true;
-extern bool ShowAiDefEcho = true;
+extern bool ShowAiEcoEcho = false;
+extern bool ShowAiGenEcho = false;
+extern bool ShowAiMilEcho = false;
+extern bool ShowAiDefEcho = false;
 extern bool ShowAiTestEcho = false;
 //////////////// END OF DEBUG 
 //==============================================================================
@@ -341,7 +341,7 @@ void initRethlAge2(void)
 	//  Enable Dock defense. 
     xsEnableRule("DockDefenseMonitor");
     //HateScripts
-	xsEnableRuleGroup("HateScripts");
+	//xsEnableRuleGroup("HateScripts");
 	// Check with allies and enable donations
     xsEnableRule("MonitorAllies");
 
@@ -527,7 +527,10 @@ rule ActivateRethOverridesAge4
 		if (cMyCulture == cCultureNorse)
 		xsEnableRule("getMediumArchers");	
     
+	    if (kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusObtainable)
 	    xsEnableRule("repairTitanGate");
+		if (aiGetWorldDifficulty() > cDifficultyModerate)
+		xsEnableRule("randomUpgrader");
 
 		
 		xsDisableSelf();
@@ -1449,6 +1452,7 @@ rule tacticalHeroAttackMyth
 			continue;			
 	   }
 	   }
+	   
 	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
@@ -1586,7 +1590,7 @@ rule IHateBuildingsHadesSpecial
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
-        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
+        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
             continue;
 	   
 	   if (numberFoundTemp > 0)
@@ -1862,7 +1866,7 @@ rule IHateBuildingsBeheAndScarab
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
-        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
+        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
             continue;
 	   
 	   if (numberFoundTemp > 0)
@@ -1878,7 +1882,7 @@ rule IHateBuildingsBeheAndScarab
 // IHateBuildingsSiege
 //==============================================================================
 rule IHateBuildingsSiege
-   minInterval 1
+   minInterval 5
    inactive
    group HateScripts
 {
@@ -1933,7 +1937,7 @@ rule IHateBuildingsSiege
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
-        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
+        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
             continue;
 			
 	   if (numberFoundTemp > 0)
@@ -1944,112 +1948,9 @@ rule IHateBuildingsSiege
    }
 }
 
-
-
-/*
-// PART 4: Borrowed code.
-// Borrowed code from the Stardard AI to support a more stable WoodBase. // erm, not really.. they were too daring, so it's disabled for now.
-TEST, I don't even lift?
-float vec2LenSq(vector vec2 = cInvalidVector)
-{
-	return((xsVectorGetX(vec2)*xsVectorGetX(vec2))+(xsVectorGetZ(vec2)*xsVectorGetZ(vec2)));
-}
-
-float vec2Cross(vector v0 = cInvalidVector, vector v1 = cInvalidVector)
-{
-	return(xsVectorGetX(v0)*xsVectorGetZ(v1) - xsVectorGetZ(v0)*xsVectorGetX(v1));
-}
-
-vector movePointToPoint(vector v0= cInvalidVector, vector v1 = cInvalidVector, float percentage = -1.0)
-{
-	float x = xsVectorGetX(v0);
-	float z = xsVectorGetZ(v0);
-	return(xsVectorSet(x + percentage*(xsVectorGetX(v1)-x),0.0,z + percentage*(xsVectorGetZ(v1)-z)));
-}
-
-
-
-bool vec2Equal(vector v0 = cInvalidVector, vector v1 = cInvalidVector)
-{
-	if(xsVectorGetX(v0)!=xsVectorGetX(v1))
-	{
-		return(false);
-	}
-	if(xsVectorGetZ(v0)!=xsVectorGetZ(v1))
-	{
-		return(false);
-	}
-	return(true);
-}
-
-
-bool pointInRangeOfPoint(vector v0 = cInvalidVector, vector v1 = cInvalidVector, float range = -1.0)
-{
-	return(vec2LenSq(v0-v1)<=range*range);
-}
-
-int getNumberUnitsInArea(int areaID =-1,int unitType =-1)
-{
-	int num = kbAreaGetNumberUnits(areaID);
-	int retNum = 0;
-	for(i=0;<num)
-	{
-		if(kbUnitIsType(kbAreaGetUnitID(areaID,i),unitType))
-		{
-			retNum++;
-		}
-	}
-	return(num);
-}
-
-int findClosestAreaWithUnits(int areaID = -1,int type=-1, int unitType = -1, int numUnits=-1, int recursion = 3)
-{
-	if (ShowAiEcho == true) aiEcho("Looking around area: "+areaID);
-	vector position   = kbAreaGetCenter(areaID);
-	int numBorderAreas   = kbAreaGetNumberBorderAreas(areaID);
-	int borderArea   = -1;
-	int closestArea   = -1;
-	int numRequiredUnits = -1;
-	int num  = -1;
-	float distance   = 0;
-	float lastDistance   = 999999;
-	// Check for the closest
-	for(i=0;< numBorderAreas)
-	{
-		borderArea = kbAreaGetBorderAreaID(areaID,i);
-		if(getNumberUnitsInArea(borderArea,unitType)>=numUnits&&kbAreaGetType(borderArea)==type)
-		{
-			distance = vec2LenSq(position-kbAreaGetCenter(borderArea));
-			if(distance<lastDistance)
-			{
-				lastDistance = distance;
-				closestArea  = borderArea;
-			}
-		}
-	}
-	if(closestArea != -1)
-	{
-		return(closestArea);
-	}
-	if(recursion!=0)
-	{
-		for(i=0;< numBorderAreas)
-		{
-			borderArea = findClosestAreaWithUnits(kbAreaGetBorderAreaID(areaID,i),type,unitType,numUnits,recursion-1);
-			distance   = vec2LenSq(position-kbAreaGetCenter(borderArea));
-			if(distance<lastDistance)
-			{
-				lastDistance = distance;
-				closestArea  = borderArea;
-			}
-		}
-	}
-	return(closestArea);
-}
-
-
-*/
-// TESTING GROUND
+//==============================================================================
+// MonitorAllies
+//==============================================================================
 rule MonitorAllies
 minInterval 1  
 inactive

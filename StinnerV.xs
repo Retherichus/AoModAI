@@ -1,15 +1,15 @@
 //File: StinnerV.xs
 
 
-// This applies to Titan only!
+// This applies to Titan only, with some exceptions like PullBack etc.
 
 extern int gTitanTradeCarts = 13;         // Max trade carts for Titan (+5)
 
-extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, Also affects Hard Difficulty, because it is nice.
+extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, (All modes).
 
 extern bool HardFocus = false;    // Please set this to true if you want the AI to focus the player with most units.
 
-extern bool DisallowPullBack = false;  // set true to make the AI no longer retreat.
+extern bool DisallowPullBack = false;  // set true to make the AI no longer retreat(All modes).
 // TC stuff
 
 extern int ModdedTCTimer = 25;

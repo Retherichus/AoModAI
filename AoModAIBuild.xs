@@ -76,7 +76,6 @@ rule repairTitanGate
     inactive
 {
     if (ShowAiEcho == true) aiEcho("repairTitanGate:");
-    
     int buildingID = -1;
 
     // Find the Titan Gate..
@@ -1295,7 +1294,7 @@ rule mainBaseAreaWallTeam1
     
 	if (IsRunWallSize == false && aiGetWorldDifficulty() < cDifficultyNightmare && kbGetMapXSize() > 400000000)
 	{
-	gMainBaseAreaWallRadius = gMainBaseAreaWallRadius*0.70;
+	gMainBaseAreaWallRadius = gMainBaseAreaWallRadius*0.65;
 	IsRunWallSize = true;
 	 aiEcho(""+kbGetMapXSize()+"");
 	}
