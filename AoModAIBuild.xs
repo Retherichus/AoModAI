@@ -1296,7 +1296,7 @@ rule mainBaseAreaWallTeam1
     
 	if (IsRunWallSize == false && aiGetWorldDifficulty() < cDifficultyNightmare && kbGetMapXSize() > 400000000)
 	{
-	gMainBaseAreaWallRadius = gMainBaseAreaWallRadius*0.7;
+	gMainBaseAreaWallRadius = gMainBaseAreaWallRadius*0.70;
 	IsRunWallSize = true;
 	 aiEcho(""+kbGetMapXSize()+"");
 	}

@@ -78,7 +78,7 @@ rule updateWoodBreakdown
       float woodSupply = kbResourceGet(cResourceWood);
 	  float goldSupply = kbResourceGet(cResourceGold);
   
-    if ((woodSupply > goldSupply+1500) && (xsGetTime() > 20*60*1000))
+    if ((woodSupply > goldSupply+1500) && (xsGetTime() > 20*60*1000) || TotalTreesNearMB < 1 && xsGetTime() > 60*60*1000)
         woodGathererCount = 0;	
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -118,8 +118,8 @@ rule updateWoodBreakdown
     //Get the count of plans we currently have going.
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
-    int desiredWoodPlans = 1 + (woodGathererCount/12);
-    if (xsGetTime() < 12*60*1000)
+    int desiredWoodPlans = 2;
+    if (xsGetTime() < 10*60*1000)
         desiredWoodPlans = 1;
     
     if (woodGathererCount < desiredWoodPlans)
@@ -349,7 +349,7 @@ rule updateGoldBreakdown
     //Get the count of plans we currently have going.
     int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 
-    int desiredGoldPlans = 1 + (goldGathererCount/14);
+    int desiredGoldPlans = 2;
     
     int numGoldMinesNearMBInR50 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0);
     
@@ -365,8 +365,8 @@ rule updateGoldBreakdown
         }
     }
     
-    if (xsGetTime() < 14*60*1000)
-        desiredGoldPlans = 1;
+   if (xsGetTime() < 10*60*1000)
+      desiredGoldPlans = 1;
         
     if (goldGathererCount < desiredGoldPlans)
         desiredGoldPlans = goldGathererCount;
@@ -532,7 +532,17 @@ rule updateFoodBreakdown
 		if (cMyCulture == cCultureAtlantean)
 		createSimpleBuildPlan(cUnitTypeGuild, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
     }
-
+		if (xsGetTime() < 20*1*1000 && gHuntingDogsASAP == true)
+		{ 
+		// Force early aggressive hunting for these, as they are not likely to kill a villager.
+	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+		if (HippoNearMB > 1 && cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse) 
+		aiSetMinNumberNeedForGatheringAggressvies(3);
+		else if (HippoNearMB > 1 && cMyCulture == cCultureAtlantean) 
+		aiSetMinNumberNeedForGatheringAggressvies(1);
+		else if (HippoNearMB > 1 && cMyCulture == cCultureNorse) 
+		aiSetMinNumberNeedForGatheringAggressvies(3);
+        }			
 	
 	
 	if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.

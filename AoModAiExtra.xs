@@ -32,7 +32,8 @@ extern bool IsRunTradeUnits2 = false;
 extern bool IsRunHuntingDogs = false;
 extern bool IsRunWallSize = false;
 extern bool BoomV2 = true;
-// extern int TotalTreesNearMB = -1;
+extern int TotalTreesNearMB = -1;
+extern int numTeesNearMainBase = -1;
 
 //////////////// DEBUG 
 
@@ -41,7 +42,7 @@ extern bool ShowAiEcoEcho = true;
 extern bool ShowAiGenEcho = true;
 extern bool ShowAiMilEcho = true;
 extern bool ShowAiDefEcho = true;
-
+extern bool ShowAiTestEcho = true;
 //////////////// END OF DEBUG 
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
@@ -1114,7 +1115,7 @@ int getNumberUnits(int unitType=-1, int playerID=-1, int state=cUnitStateAlive)
 // RULE: buildManyBuildings (Age of Buildings strategy --- Poseidon ONLY)
 //==============================================================================
 rule buildManyBuildings
-   minInterval 30
+   minInterval 45
    active
 {
 //   float currentFood=kbResourceGet(cResourceFood);
@@ -1142,7 +1143,7 @@ rule buildManyBuildings
    if (kbGetAge() < 2)
       return;
 
-   if (currentWood < 900)
+   if (currentWood < 1000)
       return;
 
  if (numberOfArcheryRange < 15 || numberOfBarracks < 15 || numberOfStables < 15)
@@ -1218,11 +1219,48 @@ rule buildManyBuildings
  }
 }
 
+/* Disabled
+//==============================================================================
+//CountTreesOtherBase
+//==============================================================================
+rule CountTreesOtherBase
+minInterval 999 // Will be called upon if no trees are found in MB.
+inactive
+{
+	if (numTeesNearMainBase < 1)
+	{
+    int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
+
+    static int lastBaseID = -1;
+	
+    for (i = 0; < numSettlements)
+    {
+        int otherBaseUnitID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive);
+        if (otherBaseUnitID < 0)
+            continue;
+        else
+        {
+            //Get the base ID
+            int otherBaseID = kbUnitGetBaseID(otherBaseUnitID);
+            if (otherBaseID == -1)
+                continue;
+				
+		vector otherBaseLocation = kbBaseGetLocation(cMyID, otherBaseID);
+		int numTeesNearOtherBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, 0, 0, otherBaseLocation, 35.0);
+		numTeesNearMainBase = numTeesNearMainBase+numTeesNearOtherBase;
+		return();
+	
+	    }
+	}
+    }
+}
+*/
+
 //==============================================================================
 // tacticalHeroAttackMyth
 //==============================================================================
 rule tacticalHeroAttackMyth
-   minInterval 5
+   minInterval 7
    active
 {
    static int unitQueryID=-1;
@@ -1809,8 +1847,8 @@ rule IHateBuildingsSiege
 
 /*
 // PART 4: Borrowed code.
-// Borrowed code from the Stardard AI to support a more stable WoodBase.
-TEST, DO YOU EVEN IGNORE ME?
+// Borrowed code from the Stardard AI to support a more stable WoodBase. // erm, not really.. they were too daring, so it's disabled for now.
+TEST, I don't even lift?
 float vec2LenSq(vector vec2 = cInvalidVector)
 {
 	return((xsVectorGetX(vec2)*xsVectorGetX(vec2))+(xsVectorGetZ(vec2)*xsVectorGetZ(vec2)));
@@ -1908,23 +1946,12 @@ int findClosestAreaWithUnits(int areaID = -1,int type=-1, int unitType = -1, int
 	return(closestArea);
 }
 
-	    if (xsGetTime() < 12*1*1000 && gHuntingDogsASAP == true)
-		{ 
-		// Force early aggressive hunting for these, as they are not likely to kill a villager.
-	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, distance);
-		if (HippoNearMB > 1 && cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse) 
-		aiSetMinNumberNeedForGatheringAggressvies(1);
-		else if (HippoNearMB > 1 && cMyCulture == cCultureAtlantean) 
-		aiSetMinNumberNeedForGatheringAggressvies(1);
-		else if (HippoNearMB > 1 && cMyCulture == cCultureNorse) 
-		aiSetMinNumberNeedForGatheringAggressvies(2);
-        }
 
 */
 // TESTING GROUND
-rule testtestt
-minInterval 2
-active
+rule TestTest
+minInterval 999 // 
+inactive
 {
 
-}
+	}
