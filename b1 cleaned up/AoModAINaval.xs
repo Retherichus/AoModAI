@@ -93,10 +93,7 @@ int initNavalUnitPicker(string name="BUG", int minShips=5,
 
     //Desired number units types, buildings.
     kbUnitPickSetDesiredNumberUnitTypes(upID, 3, numberBuildings, false);
-//  TODO: we need this here?
-    //Min/Max units and Min/Max pop.
-//   kbUnitPickSetMinimumPop(upID, minPop);
-//   kbUnitPickSetMaximumPop(upID, maxPop);
+
 
     //Do the preference work now.
     int choice = aiRandInt(2);
@@ -392,7 +389,6 @@ int setupExploreIsland()
     int max = 16;
     if (cMyCulture == cCultureAtlantean)
         max = 9;
-//    for (k = 0; < 16)
     for (k = 0; < max)
     {
         int i = aiRandInt(areaNum);

@@ -248,10 +248,8 @@ rule updateGoldBreakdown
     }
     float goldSupply = kbResourceGet(cResourceGold);
         
-//    int goldPriority = 60; // Lower than wood for non-Egyptians
-   int goldPriority=55; // Lower than wood for non-Egyptians
-   if (cMyCulture == cCultureEgyptian)    // Higher than Egyptian wood
-      goldPriority=60;
+   int goldPriority=60; // Testing
+
 
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
    int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
@@ -357,7 +355,6 @@ rule updateGoldBreakdown
     //override on anatolia
     if (cRandomMapName == "anatolia")
     {
-//        if (numGoldMinesNearMBInR50 == 1)
         if ((numGoldMinesNearMBInR50 == 1) && (kbGetAge() < cAge3))
         {
             desiredGoldPlans = 1;
@@ -663,7 +660,6 @@ rule updateFoodBreakdown
             building1ID = cUnitTypeLonghouse;
         else if (cMyCulture == cCultureAtlantean)
         {
-//            building1ID = cUnitTypeBarracksAtlantean;
             if ((cMyCiv == cCivOuranos) && (gTransportMap == false))
                 building1ID = cUnitTypeSkyPassage;
             else
@@ -1223,8 +1219,6 @@ int changeMainBase(int newSettle = -1)
         gResetWallPlans = true;
         aiPlanDestroy(gMainBaseAreaWallTeam1PlanID);
         aiPlanDestroy(gMainBaseAreaWallTeam2PlanID);
-//        xsDisableRule("mainBaseAreaWallTeam1"); //don't need to disable end reenable it
-//        xsDisableRule("mainBaseAreaWallTeam2");
     }
     
     if (mainBaseID == gOtherBase1ID)
@@ -1318,8 +1312,6 @@ rule relocateFarming
         
         //Make a new breakdown.
         int numFarmPlans=aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeFarm);
-	  
-//        aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, numFarmPlans, 100, 1.0, gFarmBaseID);
         aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, numFarmPlans, 90, 1.0, gFarmBaseID);
 
         if (gTransportMap == false)
@@ -1387,7 +1379,6 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
         if (cMyCulture == cCultureEgyptian)
         {
             aiPlanSetVariableBool(gLandExplorePlanID, cExplorePlanDoLoops, 0, false);
-//            aiPlanSetVariableBool(gLandExplorePlanID, cExplorePlanCanBuildLOSProto, 0, true);
             aiPlanSetVariableBool(gLandExplorePlanID, cExplorePlanCanBuildLOSProto, 0, false);
             xsEnableRule("autoBuildOutpost");
         }
@@ -1670,7 +1661,6 @@ void initEcon() //setup the initial Econ stuff.
     float score = 2.0 * (-1.0*cvRushBoomSlider);    // Minus one, we want the boom side
     score = score + (-1.0 * cvMilitaryEconSlider);
 
-//    if (score > 1.5)
     if (score > 1.8)
         gEarlySettlementTarget = 3;
     else if (score > 0)
@@ -1716,7 +1706,7 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
 	return;
 	}
 	
-	/*
+	
 	if (BoomV2 == true)
   {
     xsDisableSelf();
@@ -1729,7 +1719,7 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
 	xsEnableRule("econForecastAge1");
 	return;
 	}
-	*/
+	
 	if (ShowAiEcho == true) aiEcho("setEarlyEcon: ");
     int gathererCount = kbUnitCount(cMyID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer, 0), cUnitStateAlive);
 
@@ -1818,7 +1808,6 @@ void postInitEcon()
         aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numWoodPlans, 55, 1.0, kbBaseGetMainID(cMyID));
         aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, numGoldPlans, 50, 1.0, kbBaseGetMainID(cMyID));
     }
-//    aiSetResourceBreakdown(cResourceFavor, cAIResourceSubTypeEasy, numFavorPlans, 40, 1.0, kbBaseGetMainID(cMyID));
     aiSetResourceBreakdown(cResourceFavor, cAIResourceSubTypeEasy, numFavorPlans, 41, 1.0, kbBaseGetMainID(cMyID));
 }
 
@@ -1985,10 +1974,6 @@ rule collectIdleVills
         }
               
 
-	 //  if (numFarmsNearMainBase > 20)
-	//	{
-	//	 randomResource = 5;
-  //      }  
             if (numLivingHerdablesNearMainBase > 0)
         {
             if ((numDeadHerdablesNearMainBase > 0) && (aiRandInt(2) < 1))
@@ -2037,11 +2022,6 @@ rule collectIdleVills
                 if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("there are no trees and no gold mines");
                 break;
             }
-          //  case 5:
-          //  {
-            //    resourceType = cUnitTypeFarm;
-            //    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Sending idle villager to a farm");
-        //    }			
         }
 
         if (randomResource == 4)
@@ -2080,7 +2060,6 @@ rule randomUpgrader
     static int id = 0;
     //Don't do anything until we have some pop.
     int maxPop = kbGetPopCap();
-//    if (maxPop < 130)
     if (maxPop < 120)
         return;
     //If we still have some pop slots to fill, quit.
@@ -2108,9 +2087,7 @@ rule randomUpgrader
             return;
 
         aiPlanSetVariableInt(planID, cProgressionPlanGoalTechID, 0, upgradeTechID);
-//        aiPlanSetDesiredPriority(planID, 25);
         aiPlanSetDesiredPriority(planID, 50);
-//        aiPlanSetEscrowID(planID, cEconomyEscrowID);
         aiPlanSetEscrowID(planID, cMilitaryEscrowID);
         aiPlanSetActive(planID);
         if (ShowAiEcho == true) aiEcho("randomUpgrader: successful in creating a progression to "+kbGetTechName(upgradeTechID));
@@ -2169,7 +2146,6 @@ rule createHerdplan
             aiPlanSetVariableInt(gHerdPlanID, cHerdPlanBuildingID, 0, gResearchGranaryID);  
             researchGranary = true;
         }
-//        aiPlanSetVariableFloat(gHerdPlanID, cHerdPlanDistance, 0, 15.0);
         aiPlanSetVariableFloat(gHerdPlanID, cHerdPlanDistance, 0, 18.0);
         aiPlanSetActive(gHerdPlanID);
         if (ShowAiEcho == true) aiEcho("activating herdplan ID is: "+gHerdPlanID);
@@ -2637,11 +2613,9 @@ rule tradeWithCaravans
         int i = -1;
         vector towardHome = cInvalidVector;
         towardHome = mainBaseLocation - marketLocation;
-//        towardHome = towardHome / 20;    // 5% of distance from market to home
         towardHome = towardHome / 10;    // 10% of distance from market to home
         bool success = false;
 
-//        for (i = 0; < 18)    // Keep testing until areaGroups match
         for (i = 0; < 9)    // Keep testing until areaGroups match
         {
             marketAreaGroup = kbAreaGroupGetIDByPosition(marketLocation);
@@ -2715,7 +2689,6 @@ rule tradeWithCaravans
                                 if (ShowAiEcho == true) aiEcho("This is an impassable land area, skipping it");
                                 continue;
                             }
-//                            int numBuildingsInR15 = getNumUnits(cUnitTypeBuilding, cUnitStateAlive, -1, cMyID, areaLocation, 15.0);
                             int numBuildingsInR15 = getNumUnits(cUnitTypeLogicalTypeBuildingsNotWalls, cUnitStateAlive, -1, cMyID, areaLocation, 15.0);
                             if (numBuildingsInR15 > 3)
                             {
@@ -2755,7 +2728,6 @@ rule tradeWithCaravans
         }
         
         if (ShowAiEcho == true) aiEcho("Market target location is "+marketLocation+" in areaGroup "+kbAreaGroupGetIDByPosition(marketLocation));
-//        gTradeMarketLocation = marketLocation; // Set the global var for later reference in identifying the trade market.
         gTradeMarketDesiredLocation = marketLocation; // Set the global var for later reference in identifying the trade market.
 
         static float distanceIncrease = 0;
@@ -2809,7 +2781,6 @@ rule tradeWithCaravans
         kbUnitQuerySetUnitType(marketQueryID, cUnitTypeMarket);
         kbUnitQuerySetState(marketQueryID, cUnitStateAlive);
     }
-//    kbUnitQuerySetPosition(marketQueryID, gTradeMarketLocation);
     kbUnitQuerySetPosition(marketQueryID, gTradeMarketDesiredLocation);
     kbUnitQuerySetAscendingSort(marketQueryID, true);
 
@@ -2858,7 +2829,6 @@ rule tradeWithCaravans
     
     for (i = 0; < numMarkets)
     {
-//        int marketUnitID = kbUnitQueryGetResult(marketQueryID, 0);    // Closest to target point
         int marketUnitID = kbUnitQueryGetResult(marketQueryID, i);
         if (marketUnitID == -1)
             continue;
@@ -2876,8 +2846,6 @@ rule tradeWithCaravans
     {
         return;
     }
-    
-//    if (equal(marketLocation, mainBaseLocation) == false)
     if (equal(gTradeMarketLocation, mainBaseLocation) == false)
     {
         //Build a tower near our trade market
@@ -2909,14 +2877,10 @@ rule tradeWithCaravans
     
     //Get our cart PUID.
     int tradeCartPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0);    
-//    aiPlanSetInitialPosition(gTradePlanID, kbUnitGetPosition(marketUnitID));
     aiPlanSetInitialPosition(gTradePlanID, kbUnitGetPosition(gTradeMarketUnitID));
-//    aiPlanSetVariableVector(gTradePlanID, cTradePlanStartPosition, 0, kbUnitGetPosition(marketUnitID));
     aiPlanSetVariableVector(gTradePlanID, cTradePlanStartPosition, 0, kbUnitGetPosition(gTradeMarketUnitID));
     aiPlanSetVariableInt(gTradePlanID, cTradePlanTradeUnitType, 0, tradeCartPUID);
-//    aiPlanSetVariableInt(gTradePlanID, cTradePlanMarketID, 0, marketUnitID);
     aiPlanSetVariableInt(gTradePlanID, cTradePlanMarketID, 0, gTradeMarketUnitID);
-//    aiPlanAddUnitType(gTradePlanID, tradeCartPUID, 1, 1, 5);     // Just one to start, max 5, maintain plan will adjust later based on route quality
     aiPlanAddUnitType(gTradePlanID, tradeCartPUID, 1, 1, 1);     // Just one to start, max 1, maintain plan will adjust later
     aiPlanSetVariableInt(gTradePlanID, cTradePlanTargetUnitTypeID, 0, cUnitTypeAbstractSettlement);
     aiPlanSetBaseID(gTradePlanID, mainBaseID);
@@ -3080,7 +3044,6 @@ rule sendIdleTradeUnitsToRandomBase
     
     int action = cActionIdle;
     int numTradeUnitsToUse = getNumUnits(tradeCartPUID, cUnitStateAlive, action, cMyID);
-//    if ((numTradeUnitsToUse < 1) || (aiRandInt(10) == 0))
     if ((numTradeUnitsToUse < 1) || (aiRandInt(10) == 0) || (override == true))
     {
         action = -1;
@@ -3095,7 +3058,7 @@ rule sendIdleTradeUnitsToRandomBase
     
     if (ShowAiEcho == true) aiEcho("action: "+action);
     
-    float minRequiredDistance = 5.0;
+    float minRequiredDistance = 6.0;
     int tradeDestinationID = -1;
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
@@ -3126,7 +3089,7 @@ rule sendIdleTradeUnitsToRandomBase
     float tradeRouteLength = 0.0;
     float currentTradeRouteLength = 0.0;
     int alliedTradeDestinationID = -1;
-    int numAlliedSettlementsInR100 = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly, tradeMarketPosition, 200.0);
+    int numAlliedSettlementsInR100 = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly, tradeMarketPosition, 220.0);
     if (ShowAiEcho == true) aiEcho("numAlliedSettlementsInR100: "+numAlliedSettlementsInR100);
     if (numAlliedSettlementsInR100 > 0)
     {
@@ -3134,7 +3097,7 @@ rule sendIdleTradeUnitsToRandomBase
             numAlliedSettlementsInR100 = 3;
         for (i = 0; < numAlliedSettlementsInR100)
         {
-            int alliedSettlementIDInR100 = findUnitByRelByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive, -1, cPlayerRelationAlly, tradeMarketPosition, 200.0);
+            int alliedSettlementIDInR100 = findUnitByRelByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive, -1, cPlayerRelationAlly, tradeMarketPosition, 220.0);
             if (ShowAiEcho == true) aiEcho("alliedSettlementIDInR100: "+alliedSettlementIDInR100);
             if (alliedSettlementIDInR100 != -1)
             {
@@ -3218,11 +3181,7 @@ rule sendIdleTradeUnitsToRandomBase
                             tradeDestinationID = otherBaseUnitID;
                     }
                 }
-                
-//                //33% chance to use the alliedTradeDestinationID
-                //50% chance to use the alliedTradeDestinationID
-//                if ((alliedTradeDestinationID != -1) && (aiRandInt(3) == 0))
-                if ((alliedTradeDestinationID != -1) && (aiRandInt(3) > 0))
+                if ((alliedTradeDestinationID != -1) && (aiRandInt(4) > 0))
                 {
                     tradeDestinationID = alliedTradeDestinationID;
                     if (ShowAiEcho == true) aiEcho("setting tradeDestinationID = alliedTradeDestinationID");
@@ -3304,10 +3263,8 @@ rule sendIdleTradeUnitsToRandomBase
                     }
                 }
                 
-//                //33% chance to use the alliedTradeDestinationID
-                //50% chance to use the alliedTradeDestinationID
-//                if ((alliedTradeDestinationID != -1) && (aiRandInt(3) == 0))
-                if ((alliedTradeDestinationID != -1) && (aiRandInt(2) == 0))
+
+                if ((alliedTradeDestinationID != -1) && (aiRandInt(4) == 0))
                 {
                     tradeDestinationID = alliedTradeDestinationID;
                     if (ShowAiEcho == true) aiEcho("setting tradeDestinationID = alliedTradeDestinationID");

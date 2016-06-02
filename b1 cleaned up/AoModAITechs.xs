@@ -56,7 +56,6 @@ rule getMasons
             {
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-//                xsSetRuleMinIntervalSelf(22);
             }
         }
         return;
@@ -71,7 +70,6 @@ rule getMasons
     if ((foodSupply < 400) || (woodSupply < 600))
         return;
             
-//    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetAge() == cAge2))
     if ((foodSupply > 560) && (foodSupply < 850) && (goldSupply > 200) && (kbGetAge() == cAge2))
         return;
     
@@ -85,11 +83,9 @@ rule getMasons
         {
             aiPlanSetVariableInt(masonsID, cProgressionPlanGoalTechID, 0, techID);
             aiPlanSetDesiredPriority(masonsID, 40);      
-//            aiPlanSetEscrowID(masonsID, cEconomyEscrowID);
             aiPlanSetEscrowID(masonsID, cMilitaryEscrowID);
             aiPlanSetActive(masonsID);
             if (ShowAiEcho == true) aiEcho("getting masons upgrade");
-//            xsSetRuleMinIntervalSelf(11);
         }
     }
 }
@@ -124,7 +120,6 @@ rule getArchitects
             {
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-//                xsSetRuleMinIntervalSelf(24);
             }
         }
         return;
@@ -213,14 +208,11 @@ rule getArchitects
         int architectsID=aiPlanCreate("getArchitects", cPlanProgression);
         if (architectsID != -1)
         {
-            aiPlanSetVariableInt(architectsID, cProgressionPlanGoalTechID, 0, techID);
-//            aiPlanSetDesiredPriority(architectsID, 40);      
+            aiPlanSetVariableInt(architectsID, cProgressionPlanGoalTechID, 0, techID);      
             aiPlanSetDesiredPriority(architectsID, 80);      
-//            aiPlanSetEscrowID(architectsID, cEconomyEscrowID);
             aiPlanSetEscrowID(architectsID, cMilitaryEscrowID);
             aiPlanSetActive(architectsID);
             if (ShowAiEcho == true) aiEcho("getting architects upgrade");
-//            xsSetRuleMinIntervalSelf(11);
         }
     }
 }
@@ -263,7 +255,6 @@ rule getFortifiedTownCenter
     if (planID >= 0)
     { 
         aiPlanSetVariableInt(planID, cProgressionPlanGoalTechID, 0, techID);
-//      aiPlanSetDesiredPriority(planID, 75);
         aiPlanSetDesiredPriority(planID, 100);
         aiPlanSetEscrowID(planID, cMilitaryEscrowID);
         aiPlanSetActive(planID);
@@ -526,9 +517,6 @@ rule getPickaxe
     if (numTemples < 1)
         return;
     
-    // if ((cMyCulture != cCultureAtlantean) && (kbGetTechStatus(cTechHusbandry) < cTechStatusResearching))
-    //    return;
-    
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     if (kbGetAge() < cAge2)
@@ -538,7 +526,6 @@ rule getPickaxe
     }
     else
     {
-//        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false) && (xsGetTime() < 5*60*1000))
             return;
     }
@@ -616,7 +603,6 @@ rule getHandaxe
     }
     else
     {
-//        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false) && (xsGetTime() < 5*60*1000))
             return;
     }
@@ -778,14 +764,12 @@ rule getHuntingDogs
             {
                 //if (ShowAiEcho == true) aiEcho("*___hunting dogs check");
                 int dropsiteID = aiPlanGetVariableInt(foodGatherPlanID, cGatherPlanDropsiteID, 0);
-//                if (cMyCulture == cCultureNorse)
                 if ((cMyCulture == cCultureNorse) || (cMyCulture == cCultureAtlantean))
                 {
                     int numUnitsInThePlan = aiPlanGetNumberUnits(foodGatherPlanID, cUnitTypeUnit);
                     for (j = 0; < numUnitsInThePlan)
                     {
                         int unitID = aiPlanGetUnitByIndex(foodGatherPlanID, j);
-//                        if (kbUnitIsType(unitID, cUnitTypeOxCart) == true)
                         if (kbUnitIsType(unitID, unitType) == true)
                         {
                             dropsiteID = unitID;
@@ -1327,7 +1311,6 @@ rule getAmbassadors
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
     
-//    xsSetRuleMinIntervalSelf(31);
     if (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) < 1)
         return;
         
@@ -1391,7 +1374,6 @@ rule getTaxCollectors
     {
         int x = aiPlanCreate("TaxCollectors", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
-//        aiPlanSetDesiredPriority(x, 25);
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cEconomyEscrowID);
         aiPlanSetActive(x);
@@ -1442,7 +1424,6 @@ rule getHeroicFleet
 //==============================================================================
 rule getCrenellations
     inactive
-//    minInterval 60 //starts in cAge2
     minInterval 79 //starts in cAge2
 {
     int techID = cTechCrenellations;
@@ -1515,7 +1496,6 @@ rule getSignalFires
         return;
         
     float woodSupply = kbResourceGet(cResourceWood);
-//    if (woodSupply < 400)
     if (woodSupply < 500)
         return;
     
@@ -1526,7 +1506,6 @@ rule getSignalFires
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-//        xsSetRuleMinIntervalSelf(307);
         if (ShowAiEcho == true) aiEcho("Getting signal fires");
     }
 }
@@ -1575,7 +1554,6 @@ rule getBoilingOil
 //==============================================================================
 rule getCarrierPigeons
     inactive
-//    minInterval 70 //starts in cAge3
     minInterval 107 //starts in cAge2 activated in getSignalFires
 {
     int techID = cTechCarrierPigeons;
@@ -1606,7 +1584,6 @@ rule getCarrierPigeons
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-//        xsSetRuleMinIntervalSelf(307);
         if (ShowAiEcho == true) aiEcho("Getting carrier pigeons");
     }
 }
@@ -1643,7 +1620,6 @@ rule getWatchTower
 //==============================================================================
 rule getGuardTower
     inactive
-//    minInterval 30 //starts in cAge3
     minInterval 43 //starts in cAge3
 {
     int techID = cTechGuardTower;
@@ -1692,7 +1668,6 @@ rule getGuardTower
         aiPlanSetDesiredPriority(x, 99);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-//        xsSetRuleMinIntervalSelf(11);
         if (ShowAiEcho == true) aiEcho("Getting Guard Tower");
     }
 }
@@ -1700,7 +1675,6 @@ rule getGuardTower
 //==============================================================================
 rule getBallistaTower
     inactive
-//    minInterval 30 //starts in cAge4
     minInterval 47 //starts in cAge3 activated in getGuardTower
 {
     int techID = cTechBallistaTower;
@@ -1735,7 +1709,6 @@ rule getBallistaTower
 //==============================================================================
 rule getStoneWall
     inactive
-//    minInterval 31 //starts in cAge2
     minInterval 37 //starts in cAge2
 {
     int techID = cTechStoneWall;
@@ -1789,7 +1762,6 @@ rule getStoneWall
         aiPlanSetDesiredPriority(x, 98);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-//        xsSetRuleMinIntervalSelf(11);
         if (ShowAiEcho == true) aiEcho("Getting Stone Wall");
     }
 }
@@ -1797,7 +1769,6 @@ rule getStoneWall
 //==============================================================================
 rule getFortifiedWall
     inactive
-//    minInterval 31 //starts in cAge3
     minInterval 37 //starts in cAge2 activated in getStoneWall
 {
     int techID = cTechFortifiedWall;
@@ -1883,7 +1854,6 @@ rule getCitadelWall
     {
         int x = aiPlanCreate("CitadelWall", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
-//        aiPlanSetDesiredPriority(x, 100);
         aiPlanSetDesiredPriority(x, 80);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
@@ -1930,7 +1900,6 @@ rule getBronzeWall
     {
         int x = aiPlanCreate("BronzeWall", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
-//        aiPlanSetDesiredPriority(x, 100);
         aiPlanSetDesiredPriority(x, 95);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
@@ -1979,7 +1948,6 @@ rule getIronWall
     {
         int x = aiPlanCreate("IronWall", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
-//        aiPlanSetDesiredPriority(x, 100);
         aiPlanSetDesiredPriority(x, 90);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
@@ -2017,7 +1985,6 @@ rule getOreichalkosWall
     {
         int x = aiPlanCreate("OreichalkosWall", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
-//        aiPlanSetDesiredPriority(x, 100);
         aiPlanSetDesiredPriority(x, 80);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
@@ -2155,7 +2122,6 @@ rule getBeastSlayer
     {
         int x = aiPlanCreate("BeastSlayer", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
-//        aiPlanSetDesiredPriority(x, 50);
         aiPlanSetDesiredPriority(x, 70);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
@@ -2190,7 +2156,6 @@ rule getMediumInfantry
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);    
     
-//    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
     {
         if (kbGetTechStatus(techID) < cTechStatusResearching)
@@ -2225,9 +2190,7 @@ rule getMediumInfantry
     
     if (kbGetTechStatus(techID) < cTechStatusResearching)
     {
-//        int x = aiPlanCreate("MediumInfantry", cPlanResearch);
         int x = aiPlanCreate("MediumInfantry", cPlanProgression);
-//        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
         aiPlanSetVariableInt(x, cProgressionPlanGoalTechID, 0, techID);
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
@@ -2263,7 +2226,6 @@ rule getMediumCavalry
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);    
     
-//    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
     {
         if (kbGetTechStatus(techID) < cTechStatusResearching)
@@ -2299,9 +2261,7 @@ rule getMediumCavalry
     
     if (kbGetTechStatus(techID) < cTechStatusResearching)
     {
-//        int x = aiPlanCreate("MediumCavalry", cPlanResearch);
         int x = aiPlanCreate("MediumCavalry", cPlanProgression);
-//        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
         aiPlanSetVariableInt(x, cProgressionPlanGoalTechID, 0, techID);
         aiPlanSetDesiredPriority(x, 100);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
@@ -2397,7 +2357,6 @@ rule getChampionInfantry
     
     if (ShowAiEcho == true) aiEcho("getChampionInfantry:");
 
-//    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
         return;
     
@@ -2412,9 +2371,7 @@ rule getChampionInfantry
     
     if (kbGetTechStatus(techID) < cTechStatusResearching)
     {
-//        int x = aiPlanCreate("ChampionInfantry", cPlanResearch);
         int x = aiPlanCreate("ChampionInfantry", cPlanProgression);
-//        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
         aiPlanSetVariableInt(x, cProgressionPlanGoalTechID, 0, techID);
         aiPlanSetDesiredPriority(x, 98);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
@@ -2439,7 +2396,6 @@ rule getChampionCavalry
     
     if (ShowAiEcho == true) aiEcho("getChampionCavalry:");
 
-//    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
     if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
         return;
     
@@ -2454,9 +2410,7 @@ rule getChampionCavalry
     
     if (kbGetTechStatus(techID) < cTechStatusResearching)
     {
-//        int x = aiPlanCreate("ChampionCavalry", cPlanResearch);
         int x = aiPlanCreate("ChampionCavalry", cPlanProgression);
-//        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
         aiPlanSetVariableInt(x, cProgressionPlanGoalTechID, 0, techID);
         aiPlanSetDesiredPriority(x, 98);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);

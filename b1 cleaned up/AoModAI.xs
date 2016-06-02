@@ -4993,8 +4993,8 @@ void age2Handler(int age=1)
 			xsEnableRule("MBSecondaryWall");
 			
 
-         //   if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
-            //    xsEnableRule("destroyUnnecessaryDropsites");
+           if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek) || (cMyCulture == cCultureChinese))
+              xsEnableRule("destroyUnnecessaryDropsites");
             
             if (aiGetGameMode() != cGameModeDeathmatch)
                 xsEnableRule("setUnitPicker");
@@ -5027,7 +5027,7 @@ void age2Handler(int age=1)
         xsEnableRule("fixUnfinishedWalls");
         
         //enable the rule to destroy unnecessary dropsites near our mainbase
-        if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
+        if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureChinese))
             xsEnableRule("destroyUnnecessaryDropsites");
     }
 
@@ -5270,7 +5270,7 @@ void age3Handler(int age=2)
   
     //get tax collectors and ambassadors
     xsEnableRule("getTaxCollectors");  
-    xsEnableRule("getAmbassadors");
+    // xsEnableRule("getAmbassadors"); //AI is not affected by tribute penalty.
 
     //enable the tacticalSiege rule
     xsEnableRule("tacticalSiege");

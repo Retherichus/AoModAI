@@ -127,7 +127,6 @@ rule maintainTradeUnits
     if (trainTradeUnitPlanID < 0)
         return;
         
-//    aiPlanSetEconomy(trainTradeUnitPlanID, true);
     aiPlanSetMilitary(trainTradeUnitPlanID, true);
     aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanUnitType, 0, unitTypeToTrain);
     if (firstRun == true)
@@ -147,7 +146,6 @@ rule maintainTradeUnits
     aiPlanSetVariableBool(trainTradeUnitPlanID, cTrainPlanUseMultipleBuildings, 0, false);
     aiPlanSetDesiredPriority(trainTradeUnitPlanID, 100);
     aiPlanSetActive(trainTradeUnitPlanID);
-    //if (ShowAiEcho == true) aiEcho("Training a trade unit: "+kbGetProtoUnitName(unitTypeToTrain)+" at main base: "+mainBaseID);
 }
 
 //==============================================================================
@@ -198,7 +196,6 @@ rule maintainAirScouts
                     {
                         aiPlanDestroy(trainPlanIndexID);
                     }
-                    //if (ShowAiEcho == true) aiEcho("plan to train air scout: "+kbGetProtoUnitName(gAirScout)+" at main base: "+mainBaseID+" exists, returning");
                 }
                 return;
             }
@@ -223,7 +220,6 @@ rule maintainAirScouts
     
     if (unitTypeToTrain == -1)
     {
-        //if (ShowAiEcho == true) aiEcho("air unitTypeToTrain == -1, returning");
         return;
     }
 
@@ -553,7 +549,7 @@ rule trainMythUnit
     
     if (number < 0)
     {
-        if (ShowAiEcho == true) aiEcho("!!!!!_____ strange: number < 0, returning _____!!!!!");
+        if (ShowAiEcho == true) aiEcho(" strange: number < 0, returning!");
         return;
     }
     
@@ -852,7 +848,6 @@ rule maintainMilitaryTroops
     aiPlanSetBaseID(trainMilitaryUnitPlanID, mainBaseID);
     aiPlanSetDesiredPriority(trainMilitaryUnitPlanID, 100);
     aiPlanSetActive(trainMilitaryUnitPlanID);
-    //if (ShowAiEcho == true) aiEcho("Training a MilitaryUnit: "+kbGetProtoUnitName(unitTypeToTrain)+" at main base: "+mainBaseID);
 }
 
 //==============================================================================
@@ -919,8 +914,7 @@ rule maintainSiegeUnits
         //if (ShowAiEcho == true) aiEcho("siegeUnitType1 is being trained, returning");
         return;
     }
-    
-//    int numSiegeUnitType1 = kbUnitCount(cMyID, siegeUnitType1, cUnitStateAlive);
+	
     int numSiegeUnitType1 = kbUnitCount(cMyID, siegeUnitType1, cUnitStateAliveOrBuilding);
     
     float goldSupply = kbResourceGet(cResourceGold);
@@ -932,7 +926,6 @@ rule maintainSiegeUnits
         numSiegeUnitType1ToTrain = 5;
     if ((numSiegeUnitType1 < numSiegeUnitType1ToTrain) && (siegeUnitType1BeingTrained == false))
     {
-//        if (cMyCulture == cCultureAtlantean)
         if ((cMyCulture == cCultureAtlantean) && (kbGetAge() < cAge4))
         {
             if (((numSiegeUnitType1 < 2) && (foodSupply > 100) && (goldSupply > 100)) || ((foodSupply > 160) && (goldSupply > 160)))
@@ -1278,7 +1271,6 @@ rule makeAtlanteanHeroes
     
 }
 
-//new rule
 //==============================================================================
 rule makeAtlanteanHeroesFallBack
     minInterval 10 //gets started in makeAtlanteanHeroes rule
