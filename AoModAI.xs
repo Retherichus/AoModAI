@@ -310,7 +310,7 @@ include "AoModAIBasics.xs";
 
 // Placeholder Reth
 include "AoModAiExtra.xs";
-include "StinnerV.xs";
+include "AoModAiStinnerV.xs";
 
 //==============================================================================
 
@@ -362,8 +362,6 @@ include "AoModAITechsC.xs";  // Chinese god-techs
 //trainRules Include.
 include "AoModAITrain.xs";
 
-
-//==============================================================================
 //==============================================================================
 rule updatePlayerToAttack   //Updates the player we should be attacking.
     minInterval 27 //starts in cAge1
@@ -1025,7 +1023,7 @@ rule updateEMAge2
     }
     else
     {
-        civPopTarget = 65 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush;
+        civPopTarget = 60 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush;
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
             civPopTarget = 35;  
         milPopTarget = getSoftPopCap() - civPopTarget;
@@ -1078,7 +1076,7 @@ rule updateEMAge3
     }
     else
     {
-      civPopTarget = 65 - (cvRushBoomSlider*5.99);    // +/- 5
+      civPopTarget = 60 - (cvRushBoomSlider*5.99);    // +/- 5
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
@@ -1133,7 +1131,7 @@ rule updateEMAge4
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-      civPopTarget = 65;      // 55 of first 115
+      civPopTarget = 60;      // 55 of first 115
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -1400,7 +1398,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     float favorSupply = kbResourceGet(cResourceFavor);
 
     float foodMultiplier = 1.2;      // Because food is so much slower to gather, inflate need
-	if (ResInflate == foodSupply > 5000)
+	if (ResInflate == true && foodSupply > 5000)
 	foodMultiplier = 1.0;
 	
     gFoodForecast = gFoodForecast * foodMultiplier;
@@ -1605,10 +1603,10 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 	}
 	Count = Count + 1;
 	
-	int ResetTime = Count - 40;
+	//int ResetTime = Count - 40;
 	
-    if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("NumTrees calculation, runs in:  "+ResetTime+" ");
-	if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Treecount:  "+TotalTreesNearMB+" ");
+    //if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("NumTrees calculation, runs in:  "+ResetTime+" ");
+	//if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Treecount:  "+TotalTreesNearMB+" ");
     
 	float neededWoodGatherers = desiredWoodUnits;
     if (woodSupply > goldSupply+1500 || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 60*60*1000)
@@ -2652,8 +2650,6 @@ void initEgyptian(void)
 
 	//Basic Towncenter empower plan for Son of Osiris
 		
-		if ((cvRandomMapName != "vinlandsaga") && (cvRandomMapName != "team migration"))
-	 {
 	    int eOsiris=aiPlanCreate("Osiris Empower", cPlanEmpower);
         if (eOsiris >= 0)
         {
@@ -2663,22 +2659,18 @@ void initEgyptian(void)
             aiPlanSetDesiredPriority(eOsiris, 60);
 			aiPlanSetActive(eOsiris);
             }
-        }
+        
 		
-	// Secondary Pharaoh Market empower plan
-		if ((cvRandomMapName != "vinlandsaga") && (cvRandomMapName != "team migration"))
-	 {
+		
 	    int Pempowermarket=aiPlanCreate("Pharaoh Market Empower", cPlanEmpower);
         if (Pempowermarket >= 0)
         {
             aiPlanSetEconomy(Pempowermarket, true);
             aiPlanAddUnitType(Pempowermarket, cUnitTypePharaohSecondary, 1, 1, 1);
             aiPlanSetVariableInt(Pempowermarket, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
-            aiPlanSetDesiredPriority(Pempowermarket, 90);
 			aiPlanSetActive(Pempowermarket);
-			
             }
-        }
+        
 
 
     //Egyptian scout types.
@@ -4734,45 +4726,50 @@ void age2Handler(int age=1)
         if (cMyCiv == cCivRa)
         {
             gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypePriest, 5, true, kbBaseGetMainID(cMyID));
-            int ePlanID=aiPlanCreate("Mining Camp Empower", cPlanEmpower);
-            if (ePlanID >= 0)
+            int APlanID=aiPlanCreate("Mining Camp Empower", cPlanEmpower);
+            if (APlanID >= 0)
             {
-                aiPlanSetEconomy(ePlanID, true);
-                aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
-                aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMiningCamp);
-				aiPlanSetActive(ePlanID);
+                aiPlanSetEconomy(APlanID, true);
+                aiPlanAddUnitType(APlanID, cUnitTypePriest, 1, 1, 1);
+                aiPlanSetVariableInt(APlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMiningCamp);
+				aiPlanSetActive(APlanID);
             }
-            ePlanID=aiPlanCreate("Lumber Camp Empower", cPlanEmpower);
-            if (ePlanID >= 0)
+			int BPlanID=aiPlanCreate("Lumber Camp Empower", cPlanEmpower);
+            BPlanID=aiPlanCreate("Lumber Camp Empower", cPlanEmpower);
+            if (BPlanID >= 0)
             {
-                aiPlanSetEconomy(ePlanID, true);
-                aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
-                aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeLumberCamp);
-				aiPlanSetActive(ePlanID);
+                aiPlanSetEconomy(BPlanID, true);
+                aiPlanAddUnitType(BPlanID, cUnitTypePriest, 1, 1, 1);
+                aiPlanSetVariableInt(BPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeLumberCamp); 
+				aiPlanSetActive(BPlanID);
             }
-            ePlanID=aiPlanCreate("Monument Empower", cPlanEmpower);
-            if (ePlanID >= 0)
+			int CPlanID=aiPlanCreate("Monument Camp Empower", cPlanEmpower);
+            CPlanID=aiPlanCreate("Monument Empower", cPlanEmpower);
+            if (CPlanID >= 0)
             {
-                aiPlanSetEconomy(ePlanID, true);
-                aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
-                aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeAbstractMonument);
-				aiPlanSetActive(ePlanID);
+                aiPlanSetEconomy(CPlanID, true);
+                aiPlanAddUnitType(CPlanID, cUnitTypePriest, 1, 1, 1);
+                aiPlanSetVariableInt(CPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeAbstractMonument);
+				aiPlanSetActive(CPlanID);
             }
-			ePlanID=aiPlanCreate("Market TEST Empower", cPlanEmpower);
-            if (ePlanID >= 0)
+			int DPlanID=aiPlanCreate("Market Priest Empower", cPlanEmpower);
+			DPlanID=aiPlanCreate("Market Priest Empower", cPlanEmpower);
+            if (DPlanID >= 0)
             {
-                aiPlanSetEconomy(ePlanID, true);
-                aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
-                aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
-				aiPlanSetActive(ePlanID);
+                aiPlanSetEconomy(DPlanID, true);
+                aiPlanAddUnitType(DPlanID, cUnitTypePriest, 1, 1, 1);
+                aiPlanSetVariableInt(DPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
+				aiPlanSetActive(DPlanID);
             }
-			ePlanID=aiPlanCreate("Citadel TEST Empower", cPlanEmpower);
-            if (ePlanID >= 0)
+			int EPlanID=aiPlanCreate("Citadel Empower", cPlanEmpower);
+			CPlanID=aiPlanCreate("Citadel Empower", cPlanEmpower);
+            if (EPlanID >= 0)
             {
-                aiPlanSetEconomy(ePlanID, true);
-                aiPlanAddUnitType(ePlanID, cUnitTypePriest, 1, 1, 1);
-                aiPlanSetVariableInt(ePlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeCitadelCenter);
-                aiPlanSetActive(ePlanID);
+                aiPlanSetEconomy(EPlanID, true);
+                aiPlanAddUnitType(EPlanID, cUnitTypePriest, 1, 1, 1);
+                aiPlanSetVariableInt(EPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeCitadelCenter);
+				aiPlanSetDesiredPriority(EPlanID, 5);
+                aiPlanSetActive(EPlanID);
             }			
         }
 		        
@@ -4814,7 +4811,6 @@ void age2Handler(int age=1)
             aiPlanSetVariableFloat(longhouse1PlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
 
             aiPlanSetDesiredPriority(longhouse1PlanID, 100);
-//            aiPlanAddUnitType(longhouse1PlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 2);
             aiPlanAddUnitType(longhouse1PlanID, cUnitTypeAbstractInfantry, 1, 1, 1);
             aiPlanSetEscrowID(longhouse1PlanID, cMilitaryEscrowID);
             aiPlanSetBaseID(longhouse1PlanID, kbBaseGetMainID(cMyID));
@@ -4843,7 +4839,6 @@ void age2Handler(int age=1)
             aiPlanSetVariableFloat(longhouse2PlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
 
             aiPlanSetDesiredPriority(longhouse2PlanID, 100);
-//            aiPlanAddUnitType(longhouse2PlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 2);
             aiPlanAddUnitType(longhouse2PlanID, cUnitTypeAbstractInfantry, 1, 1, 1);
             aiPlanSetEscrowID(longhouse2PlanID, cMilitaryEscrowID);
             aiPlanSetBaseID(longhouse2PlanID, kbBaseGetMainID(cMyID));
@@ -4858,7 +4853,8 @@ void age2Handler(int age=1)
         if (cMyCiv == cCivOdin)
         {
             aiPlanDestroy(gLandExplorePlanID);
-//            aiPlanDestroy(gWaterExploreID);  //maybe this plan isn't that unnecessary
+			xsDisableRule("startLandScouting");
+
         }
     }
     else if (cMyCulture == cCultureAtlantean)
@@ -4993,8 +4989,8 @@ void age2Handler(int age=1)
 			xsEnableRule("MBSecondaryWall");
 			
 
-         //   if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek))
-            //    xsEnableRule("destroyUnnecessaryDropsites");
+           if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek) || (cMyCulture == cCultureChinese))
+              xsEnableRule("destroyUnnecessaryDropsites");
             
             if (aiGetGameMode() != cGameModeDeathmatch)
                 xsEnableRule("setUnitPicker");
@@ -5027,7 +5023,7 @@ void age2Handler(int age=1)
         xsEnableRule("fixUnfinishedWalls");
         
         //enable the rule to destroy unnecessary dropsites near our mainbase
-        if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
+        if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureChinese))
             xsEnableRule("destroyUnnecessaryDropsites");
     }
 
@@ -5270,7 +5266,7 @@ void age3Handler(int age=2)
   
     //get tax collectors and ambassadors
     xsEnableRule("getTaxCollectors");  
-    xsEnableRule("getAmbassadors");
+    // xsEnableRule("getAmbassadors"); //AI is not affected by tribute penalty.
 
     //enable the tacticalSiege rule
     xsEnableRule("tacticalSiege");

@@ -3,7 +3,7 @@
 
 // This applies to Titan only, with some exceptions like PullBack etc.
 
-extern int gTitanTradeCarts = 13;         // Max trade carts for Titan (+5)
+extern int gTitanTradeCarts = 14;         // Max trade carts for Titan (+5)
 
 extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, (All modes).
 
@@ -151,7 +151,7 @@ if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSuprema
          continue;
       
 	       float foodSupply = kbResourceGet(cResourceFood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && foodSupply > 5000)
+	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && foodSupply > 5000)
 		   {
 		             if (ShowAiEcho == true) aiEcho("Tributing 1000 food to one of my allies!");
 	  aiTribute(i, cResourceFood, 1000);
@@ -179,7 +179,7 @@ if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSuprema
          continue;
       
 	       float woodSupply = kbResourceGet(cResourceWood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && woodSupply > 3500)
+	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && woodSupply > 3500)
 		   {
 		             if (ShowAiEcho == true) aiEcho("Tributing 750 wood to one of my allies!");
 	  aiTribute(i, cResourceWood, 750);
@@ -191,7 +191,7 @@ if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSuprema
  //==============================================================================
 // RULE DONATEMassiveGold
 //==============================================================================
-rule DONATEMASGold
+rule DONATEMASSGold
    minInterval 15
    maxInterval 40
    inactive
@@ -208,7 +208,7 @@ if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSuprema
          continue;
       
 	       float goldSupply = kbResourceGet(cResourceGold);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && goldSupply > 5000)
+	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && goldSupply > 5000)
 		   {
 		             if (ShowAiEcho == true) aiEcho("Tributing 1000 gold to one of my allies!");
 	  aiTribute(i, cResourceGold, 1000);

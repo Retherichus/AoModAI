@@ -581,8 +581,6 @@ vector findForwardBasePos()
         float s = _sin(q+p);
         float x = xsVectorGetX(enemyPos) + (c * radius);
         float z = xsVectorGetZ(enemyPos) + (s * radius);
-        //if (ShowAiEcho == true) aiEcho("findForwardBase: x="+x);
-        //if (ShowAiEcho == true) aiEcho("findForwardBase: z="+z);
         forwardBasePos = xsVectorSetX(forwardBasePos, x);
         forwardBasePos = xsVectorSetZ(forwardBasePos, z);
 
@@ -595,12 +593,10 @@ vector findForwardBasePos()
         int enemyAGID = kbAreaGroupGetIDByPosition(enemyPos);
         int i = -1;
         vector towardHim = enemyPos - forwardBasePos;
-//        towardHim = towardHim / 20;    // 5% of distance from forward base to him
         towardHim = towardHim / 10;    // 10% of distance from forward base to him
         bool success = false;
         int forwardAGID = -1;
 
-//        for (i=0; <18)    // Keep testing until areaGroups match
         for (i = 0; < 9)    // Keep testing until areaGroups match
         {
             forwardAGID = kbAreaGroupGetIDByPosition(forwardBasePos);
@@ -655,8 +651,6 @@ int getPlayerForIsland(int AGID=-1)
 int findUnit(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, 
                 int playerID = cMyID, vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    //if (ShowAiEcho == true) aiEcho("findUnit:");
-
     int count = -1;
     static int unitQueryID = -1;
 
@@ -666,7 +660,6 @@ int findUnit(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1,
    
     //Define a query to get all matching units
     if (unitQueryID != -1)
-//        configQuery(unitQueryID, unitTypeID, action, state, playerID, center, false, radius, seeable, areaID);
         configQuery(unitQueryID, unitTypeID, action, state, playerID, center, true, radius, seeable, areaID);   //sort = true
     else
         return(-1);
@@ -684,8 +677,6 @@ int findUnit(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1,
 int findUnitByRel(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, int playerRelation = cPlayerRelationSelf,
                          vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    //if (ShowAiEcho == true) aiEcho("findUnitByRel:");
-
     int count = -1;
     static int unitQueryID = -1;
 
@@ -695,7 +686,6 @@ int findUnitByRel(int unitTypeID = -1, int state = cUnitStateAlive, int action =
    
     //Define a query to get all matching units
     if (unitQueryID != -1)
-//        configQueryRelation(unitQueryID, unitTypeID, action, state, playerRelation, center, false, radius, seeable, areaID);
         configQueryRelation(unitQueryID, unitTypeID, action, state, playerRelation, center, true, radius, seeable, areaID); //sort = true
     else
         return(-1);
@@ -870,52 +860,39 @@ int getMainBaseUnitIDForPlayer(int playerID = -1)
     int mainBaseUnitID = -1;
 
     int mainBaseID = kbBaseGetMainID(playerID); //For some reason the mainBaseID of enemies usually isn't a settlement base!
-    //if (ShowAiEcho == true) aiEcho("mainBaseID: "+mainBaseID);
     vector mainBaseLocation = kbBaseGetLocation(playerID, mainBaseID);  //doesn't actually return the settlement position
-    //if (ShowAiEcho == true) aiEcho("mainBaseLocation: "+mainBaseLocation);
     float radius = 15.0;
     for (i = 0; < 4)
     {
         mainBaseUnitID = findUnitByIndex(cUnitTypeAbstractSettlement, 0, cUnitStateAlive, -1, playerID, mainBaseLocation, radius);
         if (mainBaseUnitID < 0)
         {
-            //if (ShowAiEcho == true) aiEcho("no settlement found, increasing radius by 15.0");
             radius = radius + 15.0;
         }
         else
         {
-            //if (ShowAiEcho == true) aiEcho("mainBaseUnitID found, breaking off");
             break;
         }
     }
     
     if (mainBaseUnitID < 0)
     {
-        //if (ShowAiEcho == true) aiEcho("mainBaseUnitID < 0, checking all settlements");
         for (i = 0; < numSettlements)
         {
             int settlementID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive, -1, playerID);
-            //if (ShowAiEcho == true) aiEcho("settlementID: "+settlementID);
             if (settlementID != -1)
             {
                 vector settlementLocation = kbUnitGetPosition(settlementID);
-                //if (ShowAiEcho == true) aiEcho("settlementLocation "+settlementLocation);
                 int numTowersInR50 = getNumUnits(cUnitTypeTower, cUnitStateAlive, -1, playerID, settlementLocation, 50.0);
                 int numFarmsInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, playerID, settlementLocation, 30.0);
-                //if (ShowAiEcho == true) aiEcho("numTowersInR50: "+numTowersInR50);
-                //if (ShowAiEcho == true) aiEcho("numFarmsInR30: "+numFarmsInR30);
-            
                 if ((numTowersInR50 > 3) || (numFarmsInR30 > 6))    //TODO: rework and improve the main base detection!
                 {
-                    //if (ShowAiEcho == true) aiEcho("This is probably the mainBase as numTowersInR50 > 3 or numFarmsInR30 > 6");
                     mainBaseUnitID = settlementID;
                     break;
                 }
             }
         }
     }
-    
-    //if (ShowAiEcho == true) aiEcho("mainBaseUnitID: "+mainBaseUnitID+" for player:"+playerID);
     return(mainBaseUnitID);
 }
 
@@ -937,7 +914,6 @@ int findNumUnitsInBase(int playerID = 0, int baseID = -1, int unitTypeID = -1, i
         kbUnitQuerySetPlayerID(unitQueryID, playerID);
         kbUnitQuerySetBaseID(unitQueryID, baseID);
         kbUnitQuerySetUnitType(unitQueryID, unitTypeID);
-//        kbUnitQuerySetState(unitQueryID, cUnitStateAny);
         kbUnitQuerySetState(unitQueryID, state);
     }
     else
@@ -962,8 +938,6 @@ int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
     int baseID=-1, bool allowRetreat=false)
 {
     if (ShowAiEcho == true) aiEcho("CreateSimpleAttackGoal:  Name="+name+", AttackPlayerID="+attackPlayerID+".");
-    //if (ShowAiEcho == true) aiEcho("  UnitPickerID="+unitPickerID+", Repeat="+repeat+", baseID="+baseID+".");
-    //if (ShowAiEcho == true) aiEcho("  MinAge="+minAge+", maxAge="+maxAge+", allowRetreat="+allowRetreat+".");
 
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
@@ -1014,7 +988,6 @@ int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
     // Handle OkToAttack control variable
     if (cvOkToAttack == false)     
     {
-        //if (ShowAiEcho == true) aiEcho("CreateSimpleAttackPlan:  Setting attack "+goalID+" to idle.");
         aiPlanSetVariableBool(goalID, cGoalPlanIdleAttack, 0, true);       // Prevent attacks
     }
 
@@ -1027,8 +1000,6 @@ int createBaseGoal(string name="BUG", int goalType=-1, int attackPlayerID=-1,
     int repeat=-1, int minAge=-1, int maxAge=-1, int parentBaseID=-1)
 {
     if (ShowAiEcho == true) aiEcho("CreateBaseGoal:  Name="+name+", AttackPlayerID="+attackPlayerID+".");
-    //if (ShowAiEcho == true) aiEcho("  GoalType="+goalType+", Repeat="+repeat+", parentBaseID="+parentBaseID+".");
-    //if (ShowAiEcho == true) aiEcho("  MinAge="+minAge+", maxAge="+maxAge+".");
 
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
@@ -1070,7 +1041,6 @@ int createCallbackGoal(string name="BUG", string callbackName="BUG", int repeat=
     int minAge=-1, int maxAge=-1, bool autoUpdate=false)
 {
     if (ShowAiEcho == true) aiEcho("CreateCallbackGoal:  Name="+name+", CallbackName="+callbackName+".");
-    //if (ShowAiEcho == true) aiEcho("  Repeat="+repeat+", MinAge="+minAge+", maxAge="+maxAge+".");
 
     //Get the callbackFID.
     int callbackFID=xsGetFunctionID(callbackName);
@@ -1106,7 +1076,6 @@ int createBuildBuildingGoal(string name="BUG", int buildingTypeID=-1, int repeat
     bool autoUpdate=true, int pri=90, int buildingPlacementID = -1)
 {
     if (ShowAiEcho == true) aiEcho("CreateBuildBuildingGoal:  Name="+name+", BuildingType="+kbGetUnitTypeName(buildingTypeID)+".");
-    //if (ShowAiEcho == true) aiEcho("  Repeat="+repeat+", MinAge="+minAge+", maxAge="+maxAge+".");
 
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
@@ -1147,7 +1116,6 @@ int createBuildSettlementGoal(string name="BUG", int minAge=-1, int maxAge=-1, i
     int buildingTypeID = cUnitTypeSettlementLevel1;
 
     if (ShowAiEcho == true) aiEcho("CreateBuildSettlementGoal:  Name="+name+", BuildingType="+kbGetUnitTypeName(buildingTypeID)+".");
-    //if (ShowAiEcho == true) aiEcho("  MinAge="+minAge+", maxAge="+maxAge+".");
 
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
@@ -1186,8 +1154,6 @@ int createTransportPlan(string name="BUG", int startAreaID=-1, int goalAreaID=-1
     bool persistent=false, int transportPUID=-1, int pri=-1, int baseID=-1)
 {
     if (ShowAiEcho == true) aiEcho("CreateTransportPlan:  Name="+name+", Priority="+pri+".");
-    //if (ShowAiEcho == true) aiEcho("  StartAreaID="+startAreaID+", GoalAreaID="+goalAreaID+", Persistent="+persistent+".");
-    //if (ShowAiEcho == true) aiEcho("  TransportType="+kbGetUnitTypeName(transportPUID)+", BaseID="+baseID+".");
 
     //Create the plan.
     int planID=aiPlanCreate(name, cPlanTransport);
@@ -1238,7 +1204,7 @@ int getEconPop(void)    //Returns the unit count of villagers, dwarves, fishing 
         retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipEgyptian, cUnitStateAlive);
     else if (cMyCulture == cCultureAtlantean)
         retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipAtlantean, cUnitStateAlive);   
-	else
+	else if (cMyCulture == cCultureChinese)
         retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipChinese, cUnitStateAlive);   	
     
     return(retVal);
@@ -1562,7 +1528,6 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
     if (buildTowerPlanID >= 0)
     {
         aiPlanSetVariableInt(buildTowerPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeTower);
-//	      aiPlanSetDesiredPriority(buildTowerPlanID, 30);
         aiPlanSetDesiredPriority(buildTowerPlanID, 100);
         aiPlanSetBaseID(buildTowerPlanID, newBaseID);
         aiPlanSetVariableInt(buildTowerPlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(there));

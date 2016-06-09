@@ -4174,7 +4174,7 @@ rule setUnitPicker
             if (landUPupdate == false)
             {
                 // increase the number of buildings of the lateUPID
-                kbUnitPickSetDesiredNumberUnitTypes(gLateUPID, 4, 4, true);  // 3 unit types and 3 buildings.
+                kbUnitPickSetDesiredNumberUnitTypes(gLateUPID, 3, 3, true);  // 3 unit types and 3 buildings.
                 landUPupdate = true;
             }
         }
@@ -4186,7 +4186,7 @@ rule setUnitPicker
             kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractSiegeWeapon, 1.0);
             if (landUPupdate == false)
             {
-                kbUnitPickSetDesiredNumberUnitTypes(gLateUPID, 4, 4, true);  // 3 unit types and 3 buildings.
+                kbUnitPickSetDesiredNumberUnitTypes(gLateUPID, 3, 3, true);  // 3 unit types and 3 buildings.
                 landUPupdate = true;
             }
             xsDisableSelf();

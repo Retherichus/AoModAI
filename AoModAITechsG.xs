@@ -17,8 +17,6 @@ rule getVaultsOfErebus
         return;
     }
 
-//    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-//        return;
     
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -34,7 +32,6 @@ rule getVaultsOfErebus
     if (voePID != 0)
     {
         aiPlanSetVariableInt(voePID, cResearchPlanTechID, 0, techID);
-//        aiPlanSetDesiredPriority(voePID, 25);
         aiPlanSetDesiredPriority(voePID, 50);
         aiPlanSetEscrowID(voePID, cEconomyEscrowID);
         aiPlanSetActive(voePID);
@@ -78,7 +75,6 @@ rule getLordOfHorses
         int x=-1;
         x = aiPlanCreate("LordOfHorses", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
-//        aiPlanSetDesiredPriority(x, 20);
         aiPlanSetDesiredPriority(x, 30);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
@@ -456,7 +452,6 @@ rule getGoldenApples
         x = aiPlanCreate("GoldenApples", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
         aiPlanSetDesiredPriority(x, 50);
-//        aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetEscrowID(x, cEconomyEscrowID);
         aiPlanSetActive(x);
         if (ShowAiEcho == true) aiEcho("Getting GoldenApples");
@@ -517,7 +512,6 @@ rule getRoarOfOrthus
         int x=-1;
         x = aiPlanCreate("RoarOfOrthus", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
-//        aiPlanSetDesiredPriority(x, 10);
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);

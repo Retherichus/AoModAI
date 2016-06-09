@@ -109,7 +109,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTown);
         //-- override the default building placement distance so that plenty has some room to cast
         //-- it is pretty big..
-//        aiPlanSetVariableFloat(planID, cGodPowerPlanBuildingPlacementDistance, 0, 100.0);
         aiPlanSetVariableFloat(planID, cGodPowerPlanBuildingPlacementDistance, 0, 140.0);
         return (true);
     }
@@ -123,7 +122,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, mainBaseLocation);
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 55.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-//        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
         aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
         return (true);  
@@ -266,7 +264,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, mainBaseLocation);
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 55.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-//        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
         aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
         return (true);  
@@ -327,7 +324,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, mainBaseLocation);
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 55.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-//        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 20);
         aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
         return (true);  
@@ -353,7 +349,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, mainBaseLocation);
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 55.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-//        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 20);
         aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
         return (true);  
@@ -399,7 +394,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     }
 
     //-- setup the Restoration power
-    if (powerProtoID == cPowerRestoration && aiIsMultiplayer() == false)
+    if (powerProtoID == cPowerRestoration)
     {
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
         aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistancePosition);
@@ -407,7 +402,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, mainBaseLocation);
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 55.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-//        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 12);
         aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
         return (true);  
@@ -434,7 +428,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, mainBaseLocation);
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 55.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-//        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 15);
         aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
         return (true);  
@@ -451,7 +444,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     }
 
     //-- setup the Tornado power
-    if (powerProtoID == cPowerTornado && aiIsMultiplayer() == false)
+    if (powerProtoID == cPowerTornado)
     {
         gHeavyGPTechID = cTechTornado;
         gHeavyGPPlanID = planID;
@@ -754,7 +747,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, mainBaseLocation);
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 55.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-//        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
         aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
         aiPlanSetVariableBool(planID, cGodPowerPlanMultiCast, 0, true);
@@ -770,7 +762,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, mainBaseLocation);
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 55.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-//        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
         aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
         aiPlanSetVariableBool(planID, cGodPowerPlanMultiCast, 0, true);
@@ -781,10 +772,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     // Any time we have a group of 8 or more military units
     if (powerProtoID == cPowerHeroize)
     {
-//        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
-        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false); 
-//TODO: add a rule to cast it only on units in gDefendPlan
-         
+        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false);  
         aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistanceSelf);
         aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 20.0);
@@ -828,7 +816,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 
         aiPlanSetVariableInt(planID, cGodPowerPlanQueryID, 0, queryID);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 1);
-//        aiPlanSetVariableFloat(planID, cGodPowerPlanQueryHitpointFilter, 0, 200.0);
         aiPlanSetVariableFloat(planID, cGodPowerPlanQueryHitpointFilter, 0, 500.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
         aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerRelation, 0, cPlayerRelationEnemy);
@@ -876,7 +863,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 40.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeFarm);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
-//        aiPlanSetVariableBool(planID, cGodPowerPlanMultiCast, 0, true);
         return (true);
     }
 
@@ -1062,19 +1048,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 
    return (false);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 //==============================================================================
 void initGodPowers(void)    //initialize the god power module
 {
@@ -1253,7 +1226,7 @@ rule rAge4FindGP
 
 //==============================================================================
 rule rCeaseFire
-    minInterval 21 //starts in cAge2
+    minInterval 32 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("rCeaseFire:");    
@@ -1383,7 +1356,6 @@ rule rDwarvenMinePower
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     int numGoldMinesNearMBInR85 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 85.0);
     //Are we in the third age yet? If not cast it only if there are no gold mines in range
-//    if (kbGetAge() < cAge3)
     if ((kbGetAge() < cAge3) && (numGoldMinesNearMBInR85 > 0))
         return;
        
@@ -1441,7 +1413,6 @@ rule rPlaceTitanGate
     aiPlanSetVariableInt(gPlaceTitanGatePlanID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTown);
     //-- override the default building placement distance so that the Titan Gate has some room to cast
     //-- it is pretty big..
-//    aiPlanSetVariableFloat(gPlaceTitanGatePlanID, cGodPowerPlanBuildingPlacementDistance, 0, 100.0);
     aiPlanSetVariableFloat(gPlaceTitanGatePlanID, cGodPowerPlanBuildingPlacementDistance, 0, 110.0);
 
     aiPlanSetActive(gPlaceTitanGatePlanID);
@@ -1566,7 +1537,6 @@ rule rRagnorokPower
     
     static int count = 0;
     
-//    if ((currentPop > currentPopCap * 0.6) || (myMilUnitsInR75 + alliedMilUnitsInR75 + 3 >= enemyMilUnitsInR75))
     if ((currentPop > currentPopCap * 0.7) && (myMilUnitsInR75 + alliedMilUnitsInR75 + 3 >= enemyMilUnitsInR75)
      && (numEnemyTitansInR75 - numAlliedTitansInR75 - numTitans <= 0))
     {
@@ -1973,6 +1943,10 @@ rule rShiftingSand
 			kbUnitQuerySetUnitType(queryID, cUnitTypeMiningCamp);
 		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureGreek)
 			kbUnitQuerySetUnitType(queryID, cUnitTypeStorehouse);
+		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureChinese)
+			kbUnitQuerySetUnitType(queryID, cUnitTypeStoragePit);	
+		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureAtlantean)
+			kbUnitQuerySetUnitType(queryID, cUnitTypeVillagerAtlantean);				
 	        kbUnitQuerySetState(queryID, cUnitStateAlive);
    }
 
@@ -2252,9 +2226,7 @@ inactive
 			vector finalPosition = position - (position-startPosition)*2;
 			if(aiCastGodPowerAtPositionFacingPosition(cTechTsunami,startPosition,finalPosition))
 			{
-				// Yay we did it!
-				if (ShowAiEcho == true) aiEcho("Thanks WarriorMario for helping me out here ;)");
-			//	breakpoint;   // WHY??? :(
+			
 			}
 			
 		}

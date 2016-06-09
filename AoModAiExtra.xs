@@ -12,7 +12,7 @@
 //==============================================================================
 //PART 1 Int & Handler
 //Below, you'll find the Plan handler. 
-//you don't really want to touch this.
+//you don't really want to touch this.. and if you do, you'll break stuff.
 //==============================================================================
 mutable bool persWantForwardBase() {}
 extern int gForwardBaseID=-1;
@@ -22,6 +22,7 @@ mutable void retreatHandler(int planID=-1) {}
 mutable void relicHandler(int relicID=-1) {}
 mutable void wonderDeathHandler(int playerID=-1) { }
 extern bool ConfirmFish = false;          // Don't change this, It's for extra safety when fishing, and it'll enable itself if fish is found.
+extern bool gHuntingDogsASAP = false;     // Will automatically be called upon if there is huntable nearby the MB.
 extern int gGardenBuildLimit = 0;
 extern int HateChoice = -1;
 extern int gInitialWoodBaseID = -1;
@@ -35,23 +36,26 @@ extern bool BoomV2 = true;
 extern int TotalTreesNearMB = -1;
 extern int numTeesNearMainBase = -1;
 
-//////////////// DEBUG 
+
+//////////////// aiEchoDEBUG ////////////////
 
 extern bool ShowAiEcho = false; // All aiEcho, see specific below to override.
-extern bool ShowAiEcoEcho = true;
+extern bool ShowAiEcoEcho = false;
 extern bool ShowAiGenEcho = false;
 extern bool ShowAiMilEcho = false;
 extern bool ShowAiDefEcho = false;
 extern bool ShowAiTestEcho = false;
-//////////////// END OF DEBUG 
+
+//////////////// END OF aiEchoDEBUG ////////////////
+
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
 //Below, you'll find a few things I've set up,
-//you can turn these on/off as you please, by setting the final value to true or false.
+//you can turn these on/off as you please, by setting the final value to "true" (on) or "false" (off).
 //There's also a small description on all of them, to make it a little easier to understand what happens when you set it to true.
 //==============================================================================
 extern bool mCanIDefendAllies = true;     // Allows the AI to defend his allies.
-extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''
+extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''.
 extern bool gAgeFaster = false;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
@@ -60,10 +64,8 @@ extern bool bWallUp = true;              // This ensures that the Ai will build 
 extern bool Age3Armory = false;           // Prevents the Ai from researching armory upgrades before reaching Heroic Age.
 extern bool OneMBDefPlanOnly = true;      // Only allow one active "idle defense plan for Mainbase (6 units, 12 if set to false)"
 
-extern bool ResInflate = false;
-extern bool OnlyOneMBDefRule = true;
+extern bool ResInflate = true;            // Sets the food multiplier to 1.0 once above 5k food.
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
-extern bool gHuntingDogsASAP = false;     // (By Zycat) This will research Hunting Dogs ASAP. (Note: This will increase the time it takes for the Ai to reach Classical Age, but it'll give a stronger early econ overall.
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
 extern bool gEarlyMonuments = false;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
@@ -233,12 +235,13 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
 	// kbLookAtAllUnitsOnMap();   // Semi cheating!.. Disabled due to unstable results.
 	
+	/*
 	if (aiIsMultiplayer() == false)
 	if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("We're in a singleplayer/offline game, nothing can stop us here!");                 // Just to confirm game mode.
 	
 	if (aiIsMultiplayer() == true)
 	if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("We're in a multiplayer game, I will make sure not to use any De-sync sensitive Godpowers.");  // ^ Ditto, heh.
-	
+	*/
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
@@ -342,8 +345,10 @@ void initRethlAge2(void)
     xsEnableRule("DockDefenseMonitor");
     //HateScripts
     xsEnableRuleGroup("HateScripts");
+	
 	// Check with allies and enable donations
     xsEnableRule("MonitorAllies");
+
 
 }	
 
@@ -425,6 +430,12 @@ rule ActivateRethOverridesAge2
         xsEnableRuleGroup("Prometheus");
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge2Okeanus) == cTechStatusActive)
         xsEnableRuleGroup("Oceanus");
+		
+		if (cMyCulture == cCultureNorse)
+		{
+		aiPlanDestroy(gLandExplorePlanID2);
+		xsDisableRule("startLandScouting");
+		}
 		
 		xsDisableSelf();
 		
@@ -531,7 +542,6 @@ rule ActivateRethOverridesAge4
 	    xsEnableRule("repairTitanGate");
 		if (aiGetWorldDifficulty() > cDifficultyModerate)
 		xsEnableRule("randomUpgrader");
-
 		
 		xsDisableSelf();
            
@@ -1736,7 +1746,7 @@ rule IHateUnderworldPassages
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 42);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 20);
    }
 
    int numberFoundTemp = 0;
@@ -1938,3 +1948,6 @@ inactive
 	}
 }
 }
+
+
+//Testing ground
