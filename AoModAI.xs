@@ -1135,7 +1135,7 @@ rule updateEMAge4
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
-         civPopTarget = 20;   // limited for first 10 minutes while resource glut remains
+         civPopTarget = 35;   // limited for first 10 minutes while resource glut remains
       civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;
@@ -1150,7 +1150,7 @@ rule updateEMAge4
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
-         civPopTarget = 20;   // limited for first 10 minutes while resource glut remains
+         civPopTarget = 35;   // limited for first 10 minutes while resource glut remains
       civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;
@@ -3800,7 +3800,7 @@ void init(void)
             createSimpleMaintainPlan(cUnitTypeDwarf, 5, true, -1);
     }
     else if (aiGetGameMode() == cGameModeDeathmatch)
-        gHardEconomyPopCap=5;   // Essentially shut off vill production until age 4.
+        gHardEconomyPopCap=25;   // Essentially shut off vill production until age 4.
     else
     {
         if (aiGetWorldDifficulty() == cDifficultyEasy)
@@ -5487,6 +5487,25 @@ rule ShouldIResign
         checkTeamedWithHuman=false;
     }
 
+	if (cMyCulture == cCultureNorse && kbGetPop() >= 10)
+	 {
+      for (i=1; < cNumberPlayers)
+      {
+         if (i == cMyID)
+            continue;
+         if (kbIsPlayerMutualAlly(i) == true && kbIsPlayerResigned(i) == false && kbIsPlayerValid(i) == true && kbHasPlayerLost(i) == false)
+		 {
+		 int NorseBuilders=kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive);
+		 int NorseLonghouse=kbUnitCount(cMyID, cUnitTypeLonghouse, cUnitStateAlive);
+		 int NorseFortress=kbUnitCount(cMyID, cUnitTypeHillFort, cUnitStateAlive);
+		 int NorseTemple=kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAlive);
+		 int NorseTotalMilBuildings=NorseLonghouse+NorseFortress+NorseTemple; 
+		 if (NorseBuilders > 0 || NorseTotalMilBuildings > 0)
+		 return;
+		 }
+      }
+	}	
+	
     int numSettlements=kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
     //If on easy, don't only resign if you have no settlements.
     if (aiGetWorldDifficulty() == cDifficultyEasy)

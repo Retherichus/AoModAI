@@ -35,6 +35,8 @@ extern bool IsRunWallSize = false;
 extern bool BoomV2 = true;
 extern int TotalTreesNearMB = -1;
 extern int numTeesNearMainBase = -1;
+extern int gDefendPlentyVault = -1;
+
 
 
 //////////////// aiEchoDEBUG ////////////////
@@ -1949,5 +1951,225 @@ inactive
 }
 }
 
+// KOTH COMPLEX
+
+//==============================================================================
+rule GetKOTHVault
+    minInterval 1 //starts in cAge3
+    inactive
+{
+    if (ShowAiEcho == true) aiEcho("FindVault:");
+    static bool GetKothVRun = false;
+    static vector KOTHPlace = cInvalidVector;
+	if (GetKothVRun == false)
+	{
+    //Find other islands area group.
+	    int gTCUnitID = -1;
+	    int TCunitQueryID = kbUnitQueryCreate("findPlentyVault");
+        kbUnitQuerySetPlayerRelation(TCunitQueryID, cPlayerRelationAny);
+        kbUnitQuerySetUnitType(TCunitQueryID, cUnitTypePlentyVaultKOTH);
+        kbUnitQuerySetState(TCunitQueryID, cUnitStateAny);
+        kbUnitQueryResetResults(TCunitQueryID);
+        int numberFound = kbUnitQueryExecute(TCunitQueryID);
+        gKOTHPlentyUnitID = kbUnitQueryGetResult(TCunitQueryID, 0);
+
+		
+		KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);
+		GetKothVRun = true;
+		}
+
+
+
+    //Create transport plan to get units to the other island
+	vector there = KOTHPlace;
+    ClaimKoth(there);
+	xsDisableSelf();
+}
+
+
+// Land & water KoTH		
+
+//==============================================================================
+rule getKingOfTheHillVault
+minInterval 10
+inactive
+{
+               xsSetRuleMinIntervalSelf(30);
+			   static bool LandNeedReCalculation = true;
+               static bool WaterVersion = false; 			   
+               static vector KOTHPlace = cInvalidVector;
+               KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);  
+               int NumEnemy = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, KOTHPlace, 25.0, true);
+               //int NumAllies = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, KOTHPlace, 25.0, true);
+               int NumSelf = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, KOTHPlace, 25.0);
+
+			    //aiEcho("ENEMIES:  "+NumEnemy+" ");
+                //aiEcho("ALLIES:  "+NumAllies+" ");
+                //aiEcho("SELF:  "+NumSelf+" ");
+				
+			   
+			   
+			   if (WaterVersion == false)
+			   {
+			   int numfish = kbUnitCount(0, cUnitTypeFish, cUnitStateAlive);
+			   if (numfish > 1)
+			   {
+			   WaterVersion = true;
+			   //aiEcho("Water version of KOTH detected.");
+			   aiPlanDestroy(gDefendPlentyVault);  // never again!
+			   return;
+               } 
+               }			   
+                int numAvailableUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive);
+                if (numAvailableUnits < 11 || kbGetPop() <= 29)
+                return;
+					  
+					if (LandNeedReCalculation == true && WaterVersion == false)
+					{
+					    gDefendPlentyVault = aiPlanCreate("KOTH VAULT DEFEND", cPlanDefend);         // Uses "enemy" plan for allies, too.
+                
+                        aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeMilitary, NumKOTHEnemies + 10, NumKOTHEnemies + 15, NumKOTHEnemies + 18);    // All mil units
+
+                        aiPlanSetDesiredPriority(gDefendPlentyVault, 60);                       // prio
+                        aiPlanSetVariableVector(gDefendPlentyVault, cDefendPlanDefendPoint, 0, KOTHPlace);
+                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanEngageRange, 0, 35.0);
+                        aiPlanSetVariableBool(gDefendPlentyVault, cDefendPlanPatrol, 0, false);
+
+                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanGatherDistance, 0, 40.0);
+                        aiPlanSetInitialPosition(gDefendPlentyVault, KOTHPlace);
+                        aiPlanSetUnitStance(gDefendPlentyVault, cUnitStanceDefensive);
+
+                        aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanRefreshFrequency, 0, 60);
+
+                        aiPlanSetNumberVariableValues(gDefendPlentyVault, cDefendPlanAttackTypeID, 2, true);
+                        aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
+                        aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
+                       
+
+                        aiPlanSetActive(gDefendPlentyVault);
+                        LandNeedReCalculation = false;
+						return;
+						}
+			   
+			   
+
+               
+			   if (NumEnemy + 5 > NumSelf && WaterVersion == false)
+		       {
+			   NumKOTHEnemies = NumEnemy;
+			   LandNeedReCalculation = true;
+			   xsSetRuleMinIntervalSelf(2);
+			   aiPlanDestroy(gDefendPlentyVault);  // restarting plan
+			   return;
+				}
+				 
+				 if (NumSelf > NumEnemy + 17 && WaterVersion == true)
+				 {
+				 SendBackCount = SendBackCount+1;
+				 
+				 if (SendBackCount > 4)
+				 {
+				 xsEnableRule("GetKOTHVault");
+				 KoTHOkNow = true;
+				 SendBackCount = 0;			 		 
+				 }
+				 }	 
+				 
+                 if (NumEnemy + 5 > NumSelf && WaterVersion == true)
+                 {
+                 NumKOTHEnemies = NumEnemy;
+			     aiPlanDestroy(gDefendPlentyVault);
+	             xsEnableRule("GetKOTHVault");
+				 LandNeedReCalculation = false;
+				 xsEnableRule("GatherAroundKOTH");
+				 return;
+	             }
+
+
+	   // done
+	  }
+
+//==============================================================================	  
+rule GatherAroundKOTH
+   minInterval 22
+   inactive
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);			
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationAny);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypePlentyVaultKOTH);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
+            continue;
+			
+	   if (numberFoundTemp > 0)
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+rule WaterKOTHMonitor
+minInterval 2
+inactive
+{
+
+    if (DestroyTransportPlan == true)
+	{
+	aiPlanDestroyByName("CLAIM THAT KOTH VAULT");
+	aiPlanDestroyByName("GO HOME AGAIN");
+    aiPlanDestroy(KOTHTransportPlan);
+    DestroyTransportPlan = false;	
+	}
+	else if (DestroyHTransportPlan == true)
+	{
+	aiPlanDestroyByName("GO HOME AGAIN");	
+	aiPlanDestroy(KOTHTHomeTransportPlan);
+	DestroyHTransportPlan = false;
+	}
+    xsDisableSelf();	
+}
 
 //Testing ground

@@ -197,6 +197,13 @@ extern float PI = 3.141592;
 // Reth Placeholder
 extern bool ShowAiEcho = false;
 extern bool DisallowPullBack = false;
+extern int KOTHTransportPlan = -1;
+extern int KOTHTHomeTransportPlan = -1;
+extern int NumKOTHEnemies = 1;
+extern int SendBackCount = 0;
+extern bool KoTHOkNow = false;
+extern bool DestroyTransportPlan = false;  
+extern bool DestroyHTransportPlan = false;
 
 
 //==============================================================================
@@ -2223,3 +2230,90 @@ void taskMilUnitTrainAtBase(int baseID = -1)
     }
 }
 
+//==============================================================================
+// ClaimKoth
+// @param where: the position of the Vault to claim
+// @param baseID: the base to get the units from. If left unspecified, the
+//                funct will try to find units
+//==============================================================================
+void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
+{
+    if (ShowAiEcho == true) aiEcho("claimSettlement:");    
+    
+    int baseID=-1;
+    int startAreaID=-1;
+    
+    int transportPUID=cUnitTypeTransportShipGreek;
+	
+	if (cMyCulture == cCultureEgyptian)
+	transportPUID = cUnitTypeTransportShipEgyptian;
+	else if (cMyCulture == cCultureNorse)
+	transportPUID = cUnitTypeTransportShipNorse;
+	else if (cMyCulture == cCultureAtlantean)
+	transportPUID = cUnitTypeTransportShipAtlantean;
+	else if (cMyCulture == cCultureChinese)
+	transportPUID = cUnitTypeTransportShipChinese;
+
+    int BoatToUse=kbUnitCount(cMyID, transportPUID, cUnitStateAlive);
+	
+    if (BoatToUse <= 0)
+    {
+    xsEnableRule("WaterKOTHMonitor");
+	aiEcho("No ships, destroying plans!");
+	DestroyTransportPlan = true;
+	return;
+    }
+	
+	
+	int IdleTransportPlans = aiGetNumberIdlePlans(cPlanTransport);
+	if (IdleTransportPlans >= 1)
+	{
+	DestroyHTransportPlan = true;
+	xsEnableRule("WaterKOTHMonitor");
+    }
+
+    // user specified a base, use it!
+    if ( baseToUseID != -1 )
+    {
+        baseID = baseToUseID;
+    }
+    
+    
+
+    if ( baseID == -1 ) // no base found, use mainbase!
+    {
+        baseID = kbBaseGetMainID(cMyID);
+    }
+
+    vector baseLoc = kbBaseGetLocation(cMyID, baseID); 
+    startAreaID = kbAreaGetIDByPosition(baseLoc);
+    
+	
+	int ActiveTransportPlans = aiPlanGetNumber(cPlanTransport, -1, true);
+	//aiEcho("ActiveTransportPlans:  "+ActiveTransportPlans+" ");
+    if (ActiveTransportPlans >= 1)
+	{
+     aiEcho("I have an active transport plan, returning.");
+	 return;
+    }
+	
+	if (KoTHOkNow == true)
+    {
+    KOTHTHomeTransportPlan=createTransportPlan("GO HOME AGAIN", kbAreaGetIDByPosition(where), startAreaID,
+                                                      false, transportPUID, 97, kbAreaGetIDByPosition(where));
+	aiPlanAddUnitType(KOTHTHomeTransportPlan, cUnitTypeHumanSoldier, 3, 6, 10);
+    KoTHOkNow = false;
+	aiEcho("GO HOME TRIGGERED");
+    return;													  
+    }
+    
+    KOTHTransportPlan=createTransportPlan("CLAIM THAT KOTH VAULT", startAreaID, kbAreaGetIDByPosition(where),
+                                                      false, transportPUID, 97, baseID);
+
+    // add the units to the transport plan
+    aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, NumKOTHEnemies * 1.1 + 15, NumKOTHEnemies * 1.2 + 16, NumKOTHEnemies * 1.3 + 17);
+	aiEcho("GO TO VAULT TRIGGERED");
+	
+    //Done
+   
+}

@@ -59,6 +59,7 @@ void preInitMap()
       (cRandomMapName == "Yellow River") || 	  
       (cRandomMapName == "vesuvius-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||
       (cRandomMapName == "river styx") ||
+      (cRandomMapName == "king of the hill") ||	  	  
 	  (cRandomMapName == "black sea"))
     {
         // on these maps, the players are on different islands.
@@ -930,38 +931,7 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
     }
 }
 
-//==============================================================================
-rule getKingOfTheHillVault
-//    minInterval 17 //starts in cAge1
-    minInterval 107 //starts in cAge1
-    inactive
-{
-    if (ShowAiEcho == true) aiEcho("getKingOfTheHillVault:");
 
-    //If we already have a attack goals, then quit.
-    if (aiPlanGetIDByTypeAndVariableType(cPlanGoal, cGoalPlanGoalType, cGoalPlanGoalTypeAttack, true) >= 0)
-        return;
-    //If we already have a scout plan for this, bail.
-    if (aiPlanGetIDByTypeAndVariableType(cPlanExplore, cExplorePlanNumberOfLoops, -1, true) >= 0)
-        return;
-   
-    //Create an explore plan to go there.
-    vector unitLocation=kbUnitGetPosition(gKOTHPlentyUnitID);
-    int exploreID=aiPlanCreate("getPlenty", cPlanExplore);
-    if (exploreID >= 0)
-    {
-        aiPlanAddUnitType(exploreID, cUnitTypeLogicalTypeLandMilitary, 5, 5, 5);
-        aiPlanAddWaypoint(exploreID, unitLocation);
-        aiPlanSetVariableBool(exploreID, cExplorePlanDoLoops, 0, false);
-        aiPlanSetVariableBool(exploreID, cExplorePlanQuitWhenPointIsVisible, 0, true);
-        aiPlanSetVariableBool(exploreID, cExplorePlanAvoidingAttackedAreas, 0, false);
-        aiPlanSetVariableInt(exploreID, cExplorePlanNumberOfLoops, 0, -1);
-        aiPlanSetRequiresAllNeedUnits(exploreID, true);
-        aiPlanSetVariableVector(exploreID, cExplorePlanQuitWhenPointIsVisiblePt, 0, unitLocation);
-        aiPlanSetDesiredPriority(exploreID, 100);
-        aiPlanSetActive(exploreID);
-    }
-}
 
 //==============================================================================
 bool mapPreventsRush()  //TODO: this are not all maps that prevent rushes.
