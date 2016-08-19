@@ -2739,7 +2739,7 @@ rule attackEnemySettlement
     else
         aiPlanSetVariableBool(enemySettlementAttPlanID, cAttackPlanAutoUseGPs, 0, true);
     
-    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanRefreshFrequency, 0, 40); 
+    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanRefreshFrequency, 0, 10); 
 
     aiPlanSetInitialPosition(enemySettlementAttPlanID, baseLocationToUse);
 
@@ -3343,13 +3343,13 @@ rule createRaidingParty
     
     if (targetIsMarket == true)
     {
-        aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanRefreshFrequency, 0, 40);
+        aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanRefreshFrequency, 0, 10);
         if (numSiegeUnitsIngDefendPlan > 1)
             aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
     }
     else
     {
-        aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanRefreshFrequency, 0, 40);
+        aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanRefreshFrequency, 0, 10);
     }
     
     aiPlanSetInitialPosition(raidingPartyAttackID, baseLocationToUse);
@@ -3774,7 +3774,7 @@ rule randomAttackGenerator
     }
     
     aiPlanSetInitialPosition(randomAttackPlanID, baseLocationToUse);
-    aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanRefreshFrequency, 0, 40);
+    aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanRefreshFrequency, 0, 10);
 
     aiPlanSetDesiredPriority(randomAttackPlanID, 50);
     
@@ -4120,7 +4120,7 @@ rule createLandAttack
 
     
     aiPlanSetInitialPosition(landAttackPlanID, baseLocationToUse);
-    aiPlanSetVariableInt(landAttackPlanID, cAttackPlanRefreshFrequency, 0, 40);
+    aiPlanSetVariableInt(landAttackPlanID, cAttackPlanRefreshFrequency, 0, 10);
 
     aiPlanSetVariableBool(landAttackPlanID, cAttackPlanAutoUseGPs, 0, false);
     

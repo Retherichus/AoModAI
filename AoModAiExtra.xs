@@ -35,7 +35,6 @@ extern bool IsRunWallSize = false;
 extern bool BoomV2 = true;
 extern int TotalTreesNearMB = -1;
 extern int numTeesNearMainBase = -1;
-extern int gDefendPlentyVault = -1;
 
 
 
@@ -1958,11 +1957,14 @@ rule GetKOTHVault
     minInterval 1 //starts in cAge3
     inactive
 {
-    if (ShowAiEcho == true) aiEcho("FindVault:");
-    static bool GetKothVRun = false;
-    static vector KOTHPlace = cInvalidVector;
-	if (GetKothVRun == false)
-	{
+    if (ShowAiEcho == true) aiEcho("findOtherSettlements:");
+        
+    //Get our initial location.
+    vector here=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
+
+    //Get our start area ID.
+    int startAreaID=kbAreaGetIDByPosition(here);
+
     //Find other islands area group.
 	    int gTCUnitID = -1;
 	    int TCunitQueryID = kbUnitQueryCreate("findPlentyVault");
@@ -1973,39 +1975,41 @@ rule GetKOTHVault
         int numberFound = kbUnitQueryExecute(TCunitQueryID);
         gKOTHPlentyUnitID = kbUnitQueryGetResult(TCunitQueryID, 0);
 
-		
+		vector KOTHPlace = cInvalidVector;
 		KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);
-		GetKothVRun = true;
-		}
+        vector there = KOTHPlace;
 
-
+    // settlement is on my island
+    if ( isOnMyIsland(there) == true )
+        return; // no transport needed!
 
     //Create transport plan to get units to the other island
-	vector there = KOTHPlace;
+    static vector gTransportToSettlementPos = cInvalidVector;
     ClaimKoth(there);
 	xsDisableSelf();
 }
 
 
-// Land & water KoTH		
+// Land KoTH		
 
 //==============================================================================
-rule getKingOfTheHillVault
-minInterval 10
-inactive
+rule CheckKoTHVault
+minInterval 1
+ active
 {
-               xsSetRuleMinIntervalSelf(30);
+               xsSetRuleMinIntervalSelf(25);
+               int gDefendPlentyVault = -1;
 			   static bool LandNeedReCalculation = true;
                static bool WaterVersion = false; 			   
-               static vector KOTHPlace = cInvalidVector;
+               vector KOTHPlace = cInvalidVector;
                KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);  
-               int NumEnemy = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, KOTHPlace, 25.0, true);
-               //int NumAllies = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, KOTHPlace, 25.0, true);
+               int NumEnemy = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, KOTHPlace, 35.0, true);
+               int NumAllies = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, KOTHPlace, 25.0, true);
                int NumSelf = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, KOTHPlace, 25.0);
 
-			    //aiEcho("ENEMIES:  "+NumEnemy+" ");
-                //aiEcho("ALLIES:  "+NumAllies+" ");
-                //aiEcho("SELF:  "+NumSelf+" ");
+			    aiEcho("ENEMIES:  "+NumEnemy+" ");
+                aiEcho("ALLIES:  "+NumAllies+" ");
+                aiEcho("SELF:  "+NumSelf+" ");
 				
 			   
 			   
@@ -2015,18 +2019,18 @@ inactive
 			   if (numfish > 1)
 			   {
 			   WaterVersion = true;
-			   //aiEcho("Water version of KOTH detected.");
+			   aiEcho("Water version of KOTH detected.");
 			   aiPlanDestroy(gDefendPlentyVault);  // never again!
 			   return;
                } 
                }			   
                 int numAvailableUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive);
-                if (numAvailableUnits < 11 || kbGetPop() <= 29)
+                if (numAvailableUnits < 15 || kbGetPop() <= 30)
                 return;
 					  
 					if (LandNeedReCalculation == true && WaterVersion == false)
 					{
-					    gDefendPlentyVault = aiPlanCreate("KOTH VAULT DEFEND", cPlanDefend);         // Uses "enemy" plan for allies, too.
+					    gDefendPlentyVault = aiPlanCreate("Ally Wonder Defend Plan", cPlanDefend);         // Uses "enemy" plan for allies, too.
                 
                         aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeMilitary, NumKOTHEnemies + 10, NumKOTHEnemies + 15, NumKOTHEnemies + 18);    // All mil units
 
@@ -2054,20 +2058,20 @@ inactive
 			   
 
                
-			   if (NumEnemy + 5 > NumSelf && WaterVersion == false)
+			   if (NumEnemy + 3 > NumSelf+NumAllies && WaterVersion == false)
 		       {
 			   NumKOTHEnemies = NumEnemy;
 			   LandNeedReCalculation = true;
-			   xsSetRuleMinIntervalSelf(2);
+			   xsSetRuleMinIntervalSelf(1);
 			   aiPlanDestroy(gDefendPlentyVault);  // restarting plan
 			   return;
 				}
 				 
-				 if (NumSelf > NumEnemy + 17 && WaterVersion == true)
+				 if (NumSelf > NumEnemy + 15 && WaterVersion == true)
 				 {
 				 SendBackCount = SendBackCount+1;
 				 
-				 if (SendBackCount > 4)
+				 if (SendBackCount > 3)
 				 {
 				 xsEnableRule("GetKOTHVault");
 				 KoTHOkNow = true;
@@ -2075,9 +2079,10 @@ inactive
 				 }
 				 }	 
 				 
-                 if (NumEnemy + 5 > NumSelf && WaterVersion == true)
+                 if (NumEnemy + 3 > NumSelf+NumAllies && WaterVersion == true)
                  {
                  NumKOTHEnemies = NumEnemy;
+                 //aiPlanDestroy(KOTHTransportPlan);
 			     aiPlanDestroy(gDefendPlentyVault);
 	             xsEnableRule("GetKOTHVault");
 				 LandNeedReCalculation = false;
@@ -2086,12 +2091,12 @@ inactive
 	             }
 
 
-	   // done
+	  return;  // done
 	  }
 
-//==============================================================================	  
+	  
 rule GatherAroundKOTH
-   minInterval 22
+   minInterval 45
    inactive
 {
    static int unitQueryID=-1;
@@ -2149,27 +2154,5 @@ rule GatherAroundKOTH
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
 	   }
    }
-}
-
-rule WaterKOTHMonitor
-minInterval 2
-inactive
-{
-
-    if (DestroyTransportPlan == true)
-	{
-	aiPlanDestroyByName("CLAIM THAT KOTH VAULT");
-	aiPlanDestroyByName("GO HOME AGAIN");
-    aiPlanDestroy(KOTHTransportPlan);
-    DestroyTransportPlan = false;	
-	}
-	else if (DestroyHTransportPlan == true)
-	{
-	aiPlanDestroyByName("GO HOME AGAIN");	
-	aiPlanDestroy(KOTHTHomeTransportPlan);
-	DestroyHTransportPlan = false;
-	}
-    xsDisableSelf();	
-}
-
+}	  
 //Testing ground
