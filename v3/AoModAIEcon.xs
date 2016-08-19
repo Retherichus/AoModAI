@@ -2294,11 +2294,11 @@ rule monitorTrade
         int numTradeUnitsInTradePlan = aiPlanGetNumberUnits(gTradePlanID, tradeCartPUID);
         vector destinationIDLocation = kbUnitGetPosition(destinationID);
         float distance = xsVectorLength(destinationIDLocation - marketLocation);
-        if (distance < 37.0)
+        if (distance < 26.0)
         {
             aiPlanDestroy(gTradePlanID);
             gTradePlanID = -1;
-            if (ShowAiEcho == true) aiEcho("distance from market to destination < 37.0, destroying plan");
+            if (ShowAiEcho == true) aiEcho("distance from market to destination < 26.0, destroying plan");
             return;
         }      
         else if (distance > 80.0)

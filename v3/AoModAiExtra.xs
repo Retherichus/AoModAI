@@ -36,7 +36,9 @@ extern bool BoomV2 = true;
 extern int TotalTreesNearMB = -1;
 extern int numTeesNearMainBase = -1;
 extern int gDefendPlentyVault = -1;
-
+extern int gHeavyGPTech=-1;
+extern int gHeavyGPPlan=-1;
+extern int gTradeMaintainPlanID=-1; 
 
 
 //////////////// aiEchoDEBUG ////////////////
@@ -1952,6 +1954,103 @@ inactive
 }
 
 // KOTH COMPLEX
+//==============================================================================
+// ClaimKoth
+// @param where: the position of the Vault to claim
+// @param baseID: the base to get the units from. If left unspecified, the
+//                funct will try to find units
+//==============================================================================
+void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
+{
+    if (ShowAiEcho == true) aiEcho("claimSettlement:");    
+    
+    int baseID=-1;
+    int startAreaID=-1;
+    
+    int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+	
+	if (cMyCulture == cCultureGreek)
+	transportPUID = cUnitTypeTransportShipGreek;
+	else if (cMyCulture == cCultureNorse)
+	transportPUID = cUnitTypeTransportShipNorse;
+	else if (cMyCulture == cCultureAtlantean)
+	transportPUID = cUnitTypeTransportShipAtlantean;
+	else if (cMyCulture == cCultureChinese)
+	transportPUID = cUnitTypeTransportShipChinese;
+
+    int BoatToUse=kbUnitCount(cMyID, transportPUID, cUnitStateAlive);
+	
+    if (BoatToUse <= 0)
+    {
+    xsEnableRule("KOTHMonitor");
+	aiEcho("No ships, destroying plans!");
+	DestroyTransportPlan = true;
+	return;
+    }
+	
+	
+	int IdleTransportPlans = aiGetNumberIdlePlans(cPlanTransport);
+	if (IdleTransportPlans >= 1)
+	{
+	DestroyHTransportPlan = true;
+	xsEnableRule("KOTHMonitor");
+    }
+
+    // user specified a base, use it!
+    if ( baseToUseID != -1 )
+    {
+        baseID = baseToUseID;
+    }
+    
+    
+
+    if ( baseID == -1 ) // no base found, use mainbase!
+    {
+        baseID = kbBaseGetMainID(cMyID);
+    }
+
+    vector baseLoc = kbBaseGetLocation(cMyID, baseID); 
+    startAreaID = kbAreaGetIDByPosition(baseLoc);
+    
+	
+	int ActiveTransportPlans = aiPlanGetNumber(cPlanTransport, -1, true);
+	//aiEcho("ActiveTransportPlans:  "+ActiveTransportPlans+" ");
+    if (ActiveTransportPlans >= 1)
+	{
+     aiEcho("I have 1 active transport plan, returning.");
+	 return;
+    }
+	
+	if (KoTHOkNow == true)
+    {
+    KOTHTHomeTransportPlan=createTransportPlan("GO HOME AGAIN", kbAreaGetIDByPosition(where), startAreaID,
+                                                      false, transportPUID, 97, kbAreaGetIDByPosition(where));
+	aiPlanAddUnitType(KOTHTHomeTransportPlan, cUnitTypeHumanSoldier, 3, 6, 10);
+    KoTHOkNow = false;
+	//aiPlanSetActive(KOTHTHomeTransportPlan, true);
+	aiEcho("GO HOME TRIGGERED");
+    return;													  
+    }
+    else 
+	{
+	
+
+	
+    KOTHTransportPlan=createTransportPlan("CLAIM THAT KOTH VAULT", startAreaID, kbAreaGetIDByPosition(where), false, transportPUID, 97, baseID);
+
+    // add the units to the transport plan
+	int numAvailableUnits = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+	if (numAvailableUnits < 15)
+    aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, 10, 12, 15);
+	else aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, 12, 16, 20);
+	
+	//aiPlanSetVariableBool(KOTHTransportPlan, cTransportPlanMaximizeXportMovement, 0, true);
+	//aiPlanSetActive(KOTHTransportPlan, true);
+	aiEcho("GO TO VAULT TRIGGERED");
+	}
+    //Done
+	// Never use cUnitTypeLogicalTypeLandMilitary, sym birds are considered a land unit and will crash the game.
+	}
 
 //==============================================================================
 rule GetKOTHVault
@@ -1987,16 +2086,23 @@ rule GetKOTHVault
 }
 
 
-// Land & water KoTH		
+// Land & water KoTH	
+
+	
 
 //==============================================================================
 rule getKingOfTheHillVault
 minInterval 10
 inactive
 {
-               xsSetRuleMinIntervalSelf(20);
-			   static bool LandNeedReCalculation = true;
-               static bool WaterVersion = false; 			   
+               static bool LandActive = false;
+			   static bool LandNeedReCalculation = false;
+               static bool WaterVersion = false; 
+               if (WaterVersion == true)
+               xsSetRuleMinIntervalSelf(55+aiRandInt(12));
+			   else 
+			   xsSetRuleMinIntervalSelf(45+aiRandInt(12));
+			   
                static vector KOTHPlace = cInvalidVector;
                KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);  
                int NumEnemy = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, KOTHPlace, 25.0, true);
@@ -2022,33 +2128,45 @@ inactive
                } 
                }			   
                 int numAvailableUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive);
-                if (numAvailableUnits < 10 || kbGetPop() <= 29 || WaterVersion == true && numAvailableUnits < 5 && xsGetTime() < 12*60*1000)
+                if (numAvailableUnits < 6 || kbGetPop() <= 39 || kbGetAge() < cAge1)
                 return;
 					  
 					if (LandNeedReCalculation == true && WaterVersion == false)
 					{
+					
+			        if (LandActive == false)
+					{
 					    gDefendPlentyVault = aiPlanCreate("KOTH VAULT DEFEND", cPlanDefend);         // Uses "enemy" plan for allies, too.
                 
-                        aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeMilitary, NumKOTHEnemies + 10, NumKOTHEnemies + 15, NumKOTHEnemies + 18);    // All mil units
+                        aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.7, numAvailableUnits * 0.8, numAvailableUnits * 0.85);    // Most mil units.
 
-                        aiPlanSetDesiredPriority(gDefendPlentyVault, 60);                       // prio
+                        aiPlanSetDesiredPriority(gDefendPlentyVault, 65);                       // prio
                         aiPlanSetVariableVector(gDefendPlentyVault, cDefendPlanDefendPoint, 0, KOTHPlace);
-                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanEngageRange, 0, 35.0);
+                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanEngageRange, 0, 20.0);
                         aiPlanSetVariableBool(gDefendPlentyVault, cDefendPlanPatrol, 0, false);
 
-                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanGatherDistance, 0, 40.0);
+                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanGatherDistance, 0, 10.0);
                         aiPlanSetInitialPosition(gDefendPlentyVault, KOTHPlace);
                         aiPlanSetUnitStance(gDefendPlentyVault, cUnitStanceDefensive);
 
-                        aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanRefreshFrequency, 0, 60);
+                        aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanRefreshFrequency, 0, 10);
 
                         aiPlanSetNumberVariableValues(gDefendPlentyVault, cDefendPlanAttackTypeID, 2, true);
                         aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
                         aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
-                       
+                        keepUnitsWithinRange(gDefendPlentyVault, KOTHPlace);
 
                         aiPlanSetActive(gDefendPlentyVault);
                         LandNeedReCalculation = false;
+						xsSetRuleMinIntervalSelf(50);
+						LandActive = true; // active, will add more units below.
+						return;
+						}
+						else 
+						//aiPlanRemoveUserVariableValue(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary);
+						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.7, numAvailableUnits * 0.8, numAvailableUnits * 0.85);    // Most mil units.
+						LandNeedReCalculation = false;
+						keepUnitsWithinRange(gDefendPlentyVault, KOTHPlace);
 						return;
 						}
 			   
@@ -2060,9 +2178,12 @@ inactive
 			   NumKOTHEnemies = NumEnemy;
 			   LandNeedReCalculation = true;
 			   xsSetRuleMinIntervalSelf(2);
-			   aiPlanDestroy(gDefendPlentyVault);  // restarting plan
+			   //aiPlanDestroy(gDefendPlentyVault);  // restarting plan
 			   return;
 				}
+				
+				if (WaterVersion == false)
+				return;  // will this skip the code below?
 				 
 				 if (NumSelf > NumEnemy + 17 && WaterVersion == true)
 				 {
@@ -2072,7 +2193,8 @@ inactive
 				 {
 				 xsEnableRule("GetKOTHVault");
 				 KoTHOkNow = true;
-				 SendBackCount = 0;			 		 
+				 SendBackCount = 0;
+                 return;				 
 				 }
 				 }	 
 				 
@@ -2092,7 +2214,7 @@ inactive
 
 //==============================================================================	  
 rule GatherAroundKOTH
-   minInterval 25
+   minInterval 22
    inactive
 {
    static int unitQueryID=-1;
@@ -2107,7 +2229,7 @@ rule GatherAroundKOTH
    if (unitQueryID != -1)
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);			
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeHumanSoldier);			
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
 
@@ -2129,7 +2251,7 @@ rule GatherAroundKOTH
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 35);
    }
 
    int numberFoundTemp = 0;
@@ -2169,6 +2291,8 @@ inactive
 	{
 	aiPlanDestroyByName("GO HOME AGAIN");	
 	aiPlanDestroy(KOTHTHomeTransportPlan);
+	aiPlanDestroyByName("CLAIM THAT KOTH VAULT");  // just destroy both, as they seem to hang up.
+	aiPlanDestroy(KOTHTransportPlan);
 	DestroyHTransportPlan = false;
 	}
 	else if (DestroyKOTHLandPlan == true)
@@ -2180,5 +2304,4 @@ inactive
     xsDisableSelf();
 	
 }
-
 //Testing ground

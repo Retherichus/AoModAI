@@ -36,7 +36,8 @@ extern bool BoomV2 = true;
 extern int TotalTreesNearMB = -1;
 extern int numTeesNearMainBase = -1;
 extern int gDefendPlentyVault = -1;
-
+extern int gHeavyGPTech=-1;
+extern int gHeavyGPPlan=-1;
 
 
 //////////////// aiEchoDEBUG ////////////////
@@ -1994,9 +1995,14 @@ rule getKingOfTheHillVault
 minInterval 10
 inactive
 {
-               xsSetRuleMinIntervalSelf(20);
-			   static bool LandNeedReCalculation = true;
-               static bool WaterVersion = false; 			   
+               static bool LandActive = false;
+			   static bool LandNeedReCalculation = false;
+               static bool WaterVersion = false; 
+               if (WaterVersion == true)
+               xsSetRuleMinIntervalSelf(15);
+			   else 
+			   xsSetRuleMinIntervalSelf(35);
+			   
                static vector KOTHPlace = cInvalidVector;
                KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);  
                int NumEnemy = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, KOTHPlace, 25.0, true);
@@ -2022,33 +2028,45 @@ inactive
                } 
                }			   
                 int numAvailableUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive);
-                if (numAvailableUnits < 10 || kbGetPop() <= 29 || WaterVersion == true && numAvailableUnits < 5 && xsGetTime() < 12*60*1000)
+                if (numAvailableUnits < 6 || kbGetPop() <= 39 || kbGetAge() < cAge1)
                 return;
 					  
 					if (LandNeedReCalculation == true && WaterVersion == false)
 					{
+					
+			        if (LandActive == false)
+					{
 					    gDefendPlentyVault = aiPlanCreate("KOTH VAULT DEFEND", cPlanDefend);         // Uses "enemy" plan for allies, too.
                 
-                        aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeMilitary, NumKOTHEnemies + 10, NumKOTHEnemies + 15, NumKOTHEnemies + 18);    // All mil units
+                        aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.7, numAvailableUnits * 0.8, numAvailableUnits * 0.85);    // Most mil units.
 
-                        aiPlanSetDesiredPriority(gDefendPlentyVault, 60);                       // prio
+                        aiPlanSetDesiredPriority(gDefendPlentyVault, 65);                       // prio
                         aiPlanSetVariableVector(gDefendPlentyVault, cDefendPlanDefendPoint, 0, KOTHPlace);
-                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanEngageRange, 0, 35.0);
+                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanEngageRange, 0, 20.0);
                         aiPlanSetVariableBool(gDefendPlentyVault, cDefendPlanPatrol, 0, false);
 
-                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanGatherDistance, 0, 40.0);
+                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanGatherDistance, 0, 10.0);
                         aiPlanSetInitialPosition(gDefendPlentyVault, KOTHPlace);
                         aiPlanSetUnitStance(gDefendPlentyVault, cUnitStanceDefensive);
 
-                        aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanRefreshFrequency, 0, 60);
+                        aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanRefreshFrequency, 0, 10);
 
                         aiPlanSetNumberVariableValues(gDefendPlentyVault, cDefendPlanAttackTypeID, 2, true);
                         aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
                         aiPlanSetVariableInt(gDefendPlentyVault, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
-                       
+                        keepUnitsWithinRange(gDefendPlentyVault, KOTHPlace);
 
                         aiPlanSetActive(gDefendPlentyVault);
                         LandNeedReCalculation = false;
+						xsSetRuleMinIntervalSelf(50);
+						LandActive = true; // active, will add more units below.
+						return;
+						}
+						else 
+						//aiPlanRemoveUserVariableValue(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary);
+						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.7, numAvailableUnits * 0.8, numAvailableUnits * 0.85);    // Most mil units.
+						LandNeedReCalculation = false;
+						keepUnitsWithinRange(gDefendPlentyVault, KOTHPlace);
 						return;
 						}
 			   
@@ -2060,9 +2078,12 @@ inactive
 			   NumKOTHEnemies = NumEnemy;
 			   LandNeedReCalculation = true;
 			   xsSetRuleMinIntervalSelf(2);
-			   aiPlanDestroy(gDefendPlentyVault);  // restarting plan
+			   //aiPlanDestroy(gDefendPlentyVault);  // restarting plan
 			   return;
 				}
+				
+				if (WaterVersion == false)
+				return;  // will this skip the code below?
 				 
 				 if (NumSelf > NumEnemy + 17 && WaterVersion == true)
 				 {
@@ -2072,7 +2093,8 @@ inactive
 				 {
 				 xsEnableRule("GetKOTHVault");
 				 KoTHOkNow = true;
-				 SendBackCount = 0;			 		 
+				 SendBackCount = 0;
+                 return;				 
 				 }
 				 }	 
 				 
@@ -2169,6 +2191,8 @@ inactive
 	{
 	aiPlanDestroyByName("GO HOME AGAIN");	
 	aiPlanDestroy(KOTHTHomeTransportPlan);
+	aiPlanDestroyByName("CLAIM THAT KOTH VAULT");  // just destroy both, as they seem to hang up.
+	aiPlanDestroy(KOTHTransportPlan);
 	DestroyHTransportPlan = false;
 	}
 	else if (DestroyKOTHLandPlan == true)

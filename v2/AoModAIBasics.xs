@@ -2243,10 +2243,10 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     int baseID=-1;
     int startAreaID=-1;
     
-    int transportPUID=cUnitTypeTransportShipGreek;
+    int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
 	
-	if (cMyCulture == cCultureEgyptian)
-	transportPUID = cUnitTypeTransportShipEgyptian;
+	if (cMyCulture == cCultureGreek)
+	transportPUID = cUnitTypeTransportShipGreek;
 	else if (cMyCulture == cCultureNorse)
 	transportPUID = cUnitTypeTransportShipNorse;
 	else if (cMyCulture == cCultureAtlantean)
@@ -2293,7 +2293,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	//aiEcho("ActiveTransportPlans:  "+ActiveTransportPlans+" ");
     if (ActiveTransportPlans >= 1)
 	{
-     aiEcho("I have an active transport plan, returning.");
+     aiEcho("I have 1 active transport plan, returning.");
 	 return;
     }
 	
@@ -2302,18 +2302,29 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     KOTHTHomeTransportPlan=createTransportPlan("GO HOME AGAIN", kbAreaGetIDByPosition(where), startAreaID,
                                                       false, transportPUID, 97, kbAreaGetIDByPosition(where));
 	aiPlanAddUnitType(KOTHTHomeTransportPlan, cUnitTypeHumanSoldier, 3, 6, 10);
+	aiPlanSetVariableBool(KOTHTHomeTransportPlan, cTransportPlanMaximizeXportMovement, 0, true);
     KoTHOkNow = false;
+	aiPlanSetActive(KOTHTHomeTransportPlan, true);
 	aiEcho("GO HOME TRIGGERED");
     return;													  
     }
-    
-    KOTHTransportPlan=createTransportPlan("CLAIM THAT KOTH VAULT", startAreaID, kbAreaGetIDByPosition(where),
-                                                      false, transportPUID, 97, baseID);
+    else 
+	{
+	
+
+	
+    KOTHTransportPlan=createTransportPlan("CLAIM THAT KOTH VAULT", startAreaID, kbAreaGetIDByPosition(where), false, transportPUID, 97, baseID);
 
     // add the units to the transport plan
-    aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, NumKOTHEnemies * 1.1 + 15, NumKOTHEnemies * 1.2 + 16, NumKOTHEnemies * 1.3 + 17);
-	aiEcho("GO TO VAULT TRIGGERED");
+	int numAvailableUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive);
+	if (numAvailableUnits < 15)
+    aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, 5, 10, 15);
+	else aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, 12, 16, 20);
 	
+	aiPlanSetVariableBool(KOTHTransportPlan, cTransportPlanMaximizeXportMovement, 0, true);
+	aiPlanSetActive(KOTHTransportPlan, true);
+	aiEcho("GO TO VAULT TRIGGERED");
+	}
     //Done
    
 }
