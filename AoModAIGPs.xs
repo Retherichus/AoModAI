@@ -857,13 +857,13 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     // Fire if >= 4 military buildings near my army...will kill my army, but may take out their center, too.
     if (powerProtoID == cPowerTartarianGate)
     {
-        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
-        aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
-        aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
-        aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 40.0);
-        aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeFarm);
-        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
-        return (true);
+      aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false); 
+      aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
+      aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
+	  gHeavyGPTech=cTechTartarianGate;
+	  gHeavyGPPlan=planID;
+      xsEnableRule("rCastHeavyGP");
+      return (true);
     }
 
     // Set up the vortex power
@@ -2253,4 +2253,66 @@ inactive
 		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
 	}
 	
+}
+
+//==============================================================================
+// RULE rCastHeavyGP -- TARTARIAN
+//==============================================================================
+rule rCastHeavyGP
+   minInterval 8
+	inactive
+{
+   static int settleQuery=-1;
+	static int fortressQuery=-1;
+	static int farmQuery=-1;
+	static int CastAttempt=0;
+
+	if(settleQuery < 0)
+	{
+	   settleQuery=kbUnitQueryCreate("Enemy Settle Query");
+		configQueryRelation(settleQuery, cUnitTypeAbstractSettlement, -1, cUnitStateAlive, cPlayerRelationEnemy);
+	}
+
+	if(fortressQuery < 0)
+	   fortressQuery=kbUnitQueryCreate("Fortress Query");
+	if(farmQuery < 0)
+	   farmQuery=kbUnitQueryCreate("Farm Query");
+
+	kbUnitQueryResetResults(settleQuery);
+	int numSettles=kbUnitQueryExecute(settleQuery);
+	for(i=0; <numSettles)
+	{
+	   vector loc=kbUnitGetPosition(kbUnitQueryGetResult(settleQuery, i));
+		kbUnitQueryResetData(fortressQuery);
+		kbUnitQueryResetData(farmQuery);
+		configQueryRelation(fortressQuery, cUnitTypeAbstractFortress, -1, cUnitStateAlive, cPlayerRelationEnemy, loc, false, 40.0);
+		configQueryRelation(farmQuery, cUnitTypeFarm, -1, cUnitStateAlive, cPlayerRelationEnemy, loc, false, 30.0);
+
+		kbUnitQueryResetResults(fortressQuery);
+		kbUnitQueryResetResults(farmQuery);
+		int numForts=kbUnitQueryExecute(fortressQuery);
+		int numFarms=kbUnitQueryExecute(farmQuery);
+		if( (numFarms > 0) && (numForts > 0) )
+		{
+			if(gHeavyGPTech == cTechTartarianGate)
+			{
+			   loc=kbUnitGetPosition(kbUnitQueryGetResult(fortressQuery, i));
+			}
+
+         if(kbLocationVisible(loc) == true)
+			{
+      		if(aiCastGodPowerAtPosition(gHeavyGPTech,loc) == true)
+   			{
+   				kbUnitQueryDestroy(settleQuery);
+   				kbUnitQueryDestroy(fortressQuery);
+   				kbUnitQueryDestroy(farmQuery);
+   		      aiPlanDestroy(gHeavyGPPlan);
+   			  CastAttempt = CastAttempt+1;
+			  if (CastAttempt > 5)
+			  xsDisableSelf();
+   			  return;
+   			}
+			}
+		}
+	}
 }
