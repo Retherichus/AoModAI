@@ -1211,8 +1211,8 @@ int getEconPop(void)    //Returns the unit count of villagers, dwarves, fishing 
         retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipEgyptian, cUnitStateAlive);
     else if (cMyCulture == cCultureAtlantean)
         retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipAtlantean, cUnitStateAlive);   
-	else if (cMyCulture == cCultureChinese)
-        retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipChinese, cUnitStateAlive);   	
+///CHINESE	else if (cMyCulture == cCultureChinese)
+    ///CHINESE    retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipChinese, cUnitStateAlive);   	
     
     return(retVal);
 }
@@ -1972,8 +1972,8 @@ void taskMilUnitTrainAtBase(int baseID = -1)
         building1ID = cUnitTypeLonghouse;
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
-    else if (cMyCulture == cCultureChinese)
-        building1ID = cUnitTypeStableChinese;		
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        building1ID = cUnitTypeStableChinese;		
 
     int bigBuildingID = cUnitTypeMigdolStronghold;
     if (cMyCulture == cCultureGreek)
@@ -1982,8 +1982,8 @@ void taskMilUnitTrainAtBase(int baseID = -1)
         bigBuildingID = cUnitTypeHillFort;
     else if (cMyCulture == cCultureAtlantean)
         bigBuildingID = cUnitTypePalace;
-    else if (cMyCulture == cCultureChinese)
-        bigBuildingID = cUnitTypeCastle;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        bigBuildingID = cUnitTypeCastle;			
     
     int building1NearBase = getNumUnits(building1ID, cUnitStateAlive, -1, cMyID, baseLocation, 30.0);
     int bigBuildingNearBase = getNumUnits(bigBuildingID, cUnitStateAlive, -1, cMyID, baseLocation, 30.0);
@@ -2189,17 +2189,17 @@ void taskMilUnitTrainAtBase(int baseID = -1)
                 puid = cUnitTypeTridentSoldier;
             }
         }
-        else if (cMyCulture == cCultureChinese)
-        {
-            if ((kbGetAge() > cAge3) && (randomUnit > 0))
-            {
-                puid = cUnitTypeFireLance;
-            }
-            else
-            {
-                puid = cUnitTypeWarChariot;
-            }
-        }		
+///CHINESE        else if (cMyCulture == cCultureChinese)
+///CHINESE        {
+///CHINESE            if ((kbGetAge() > cAge3) && (randomUnit > 0))
+///CHINESE            {
+///CHINESE                puid = cUnitTypeFireLance;
+///CHINESE            }
+///CHINESE            else
+///CHINESE           {
+///CHINESE                puid = cUnitTypeWarChariot;
+///CHINESE            }
+///CHINESE        }		
     }
     else
     {

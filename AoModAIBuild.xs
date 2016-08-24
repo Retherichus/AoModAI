@@ -903,125 +903,7 @@ rule buildSettlements
     createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
 }
 
-// MODDED ONE
-//==============================================================================
-rule ModifiedbuildSettlements
-    minInterval 15 //starts in cAge3
-    inactive
-{
-    	if (xsGetTime() > ModdedTCTimer*60*1000)
-        {
-            AllyTcLimit = false;
-			xsEnableRule("buildSettlements");
-			xsDisableSelf();
-            return;
-        }
-		
-    if (ShowAiEcho == true) aiEcho("buildSettlements:");
 
-    //Figure out if we have any active BuildSettlements.
-    int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
-    int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
-
-    int numberSettlementsPlanned = numberSettlements + numberBuildSettlementGoals;
-
-    if (numberSettlementsPlanned >= cvMaxSettlements)
-        return;        // Don't go over script limit
-
-    if (numberBuildSettlementGoals > 1)	// Allow 2 in progress, no more
-        return;
-    if (findASettlement() == false)
-        return;
-    if (numberSettlements > 1)  // Test for all the normal reasons to not build a settlement, unless we have only one
-    {
-        int popCapBuffer = 50;
-        if (numberSettlements == 3)
-            popCapBuffer = 30;
-        else if (numberSettlements == 4)
-            popCapBuffer = 20;
-        else if (numberSettlements > 4)
-            popCapBuffer = 10;
-        popCapBuffer = popCapBuffer + ((-1*cvRushBoomSlider)+1)*5 + 5;  // Add 5 for extreme rush, 15 for extreme boom
-        int currentPopNeeds=kbGetPop();
-        int adjustedPopCap=getSoftPopCap()-popCapBuffer;
-
-        //Don't do this unless we need the pop
-        if (currentPopNeeds < adjustedPopCap)
-            return;
-      
-
-        //If we're on Easy and we have 3 settlements, go away.
-        if ((aiGetWorldDifficulty() == cDifficultyEasy) && (numberSettlementsPlanned >= 3))
-        {
-            xsDisableSelf();
-            return;
-        }
-    }
-
-
-    //Don't get too many more than our human allies.
-    int largestAllyCount=-1;
-    for (i=1; < cNumberPlayers)
-    {
-        if (i == cMyID)
-            continue;
-        if (kbIsPlayerAlly(i) == true)
-            continue;
-
-        int count = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, i);
-        if (count > largestAllyCount)
-            largestAllyCount=count;
-    }
-    
-    //Never have more than 1 more settlements than any ally.
-    int difference=numberSettlementsPlanned-largestAllyCount;
-    if ((difference > 1) && (largestAllyCount>=0))     // If ally exists and we have more than 2 more...quit
-        return;
-
-    //See if there is another human on my team.
-    bool haveHumanTeammate=false;
-    for (i=1; < cNumberPlayers)
-    {
-        if (i == cMyID)
-            continue;
-        //Find the human player
-        if (kbIsPlayerAlly(i) != true)
-            continue;
-
-        //This player is a human ally and not resigned.
-        if ((kbIsPlayerAlly(i) == true) && (kbIsPlayerResigned(i) == false))
-        {
-            haveHumanTeammate=true;
-            break;
-        }
-    }
-    
-    if (haveHumanTeammate == true)
-    {
-        if (kbGetAge() == cAge3)
-        {
-            if (numberSettlementsPlanned > 4)
-                return;
-        }
-        else if (kbGetAge() == cAge4)
-        {
-            if (numberSettlementsPlanned >= cvMaxSettlements)
-                return;
-        }
-    }
-    if (ShowAiEcho == true) aiEcho("Creating another settlement goal.");
-
-    int numBuilders = 3;
-    if (cMyCulture == cCultureAtlantean)
-        numBuilders = 1;
-        
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-        builderType = cUnitTypeAbstractInfantry;
-        
-    //Else, do it.
-    createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
-}
 
 
 //==============================================================================
@@ -3319,8 +3201,8 @@ rule buildFortress
         bigBuildingID = cUnitTypeHillFort;
     else if (cMyCulture == cCultureAtlantean)
         bigBuildingID = cUnitTypePalace;	
-    else if (cMyCulture == cCultureChinese)
-        bigBuildingID = cUnitTypeCastle;		
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        bigBuildingID = cUnitTypeCastle;		
 
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     if (numFortresses >= kbGetBuildLimit(cMyID, bigBuildingID))
@@ -3418,8 +3300,8 @@ rule buildFortress
                     building1ID = cUnitTypeLonghouse;
                 else if (cMyCulture == cCultureAtlantean)
                     building1ID = cUnitTypeBarracksAtlantean;
-                else if (cMyCulture == cCultureChinese)
-                    building1ID = cUnitTypeStableChinese;					
+///CHINESE                else if (cMyCulture == cCultureChinese)
+///CHINESE                   building1ID = cUnitTypeStableChinese;					
                 int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
                 if (numBuilding1NearBase > 3)
                     return;
@@ -3699,8 +3581,8 @@ rule buildBuildingsAtOtherBase
         building1ID = cUnitTypeLonghouse;
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeCounterBuilding;
-    else if (cMyCulture == cCultureChinese)
-        building1ID = cUnitTypeStableChinese;	
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        building1ID = cUnitTypeStableChinese;	
 	
         
     vector location = kbUnitGetPosition(otherBaseUnitID);
@@ -3880,8 +3762,8 @@ rule buildBuildingsAtOtherBase2
         building1ID = cUnitTypeLonghouse;
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
-    else if (cMyCulture == cCultureChinese)
-        building1ID = cUnitTypeBarracksChinese;	
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        building1ID = cUnitTypeBarracksChinese;	
 	
         
     vector location = kbUnitGetPosition(otherBaseUnitID);
@@ -4581,20 +4463,20 @@ rule destroyUnnecessaryDropsites
                         continue;
                     }
                 }
-                else if (cMyCulture == cCultureChinese)
-                {
-                    if (kbUnitIsType(dropsiteID, cUnitTypeStoragePit) == true)
-                    {
-                        if (((numTrees < 1) && (numGoldMines < 1)) || ((otherBaseID != mainBaseID) && (numGoldMines < 1)))
-                        {
-                            if ((kbGetTechStatus(cTechHandAxe) != cTechStatusResearching) && (kbGetTechStatus(cTechPickaxe) != cTechStatusResearching))
-                            {
-                                aiTaskUnitDelete(dropsiteID);
-                            }
-                        }
-                        continue;				
-            }
-        }
+///CHINESE                else if (cMyCulture == cCultureChinese)
+///CHINESE                {
+///CHINESE                    if (kbUnitIsType(dropsiteID, cUnitTypeStoragePit) == true)
+///CHINESE                    {
+///CHINESE                        if (((numTrees < 1) && (numGoldMines < 1)) || ((otherBaseID != mainBaseID) && (numGoldMines < 1)))
+///CHINESE                        {
+///CHINESE                            if ((kbGetTechStatus(cTechHandAxe) != cTechStatusResearching) && (kbGetTechStatus(cTechPickaxe) != cTechStatusResearching))
+///CHINESE                            {
+///CHINESE                                aiTaskUnitDelete(dropsiteID);
+///CHINESE                            }
+///CHINESE                        }
+///CHINESE                        continue;				
+///CHINESE            }
+///CHINESE        }
     }
 }
 }
@@ -5121,8 +5003,8 @@ rule fixJammedDropsiteBuildPlans
     {
         if (cMyCulture == cCultureGreek)
             dropsiteTypeID = cUnitTypeStorehouse;
-        if (cMyCulture == cCultureChinese)
-            dropsiteTypeID = cUnitTypeStoragePit;			
+///CHINESE        if (cMyCulture == cCultureChinese)
+///CHINESE            dropsiteTypeID = cUnitTypeStoragePit;			
         else
         {
             if (i == 0)
@@ -5322,8 +5204,8 @@ rule makeExtraMarket    //If it takes more than 5 minutes to place our trade mar
     minInterval 37 //starts in cAge3, activated in tradeWithCaravans
 {
 
-    if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa)
-	return;
+///CHINESE    if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa)
+///CHINESE	return;
 	
     xsSetRuleMinIntervalSelf(37);
     static int ruleStartTime = -1;

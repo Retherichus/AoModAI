@@ -32,7 +32,6 @@ extern bool IsRunTradeUnits1 = false;
 extern bool IsRunTradeUnits2 = false;
 extern bool IsRunHuntingDogs = false;
 extern bool IsRunWallSize = false;
-extern bool BoomV2 = true;
 extern int TotalTreesNearMB = -1;
 extern int numTeesNearMainBase = -1;
 extern int gDefendPlentyVault = -1;
@@ -262,8 +261,8 @@ void initRethlAge1(void)  // Am I doing this right??
 		aiSetMinNumberNeedForGatheringAggressvies(4);
 		if (cMyCulture == cCultureNorse)
 		aiSetMinNumberNeedForGatheringAggressvies(4);
-		if (cMyCulture == cCultureChinese)
-		aiSetMinNumberNeedForGatheringAggressvies(4);
+///CHINESE		if (cMyCulture == cCultureChinese)
+///CHINESE		aiSetMinNumberNeedForGatheringAggressvies(4);
 		
         }
       
@@ -319,27 +318,27 @@ void initRethlAge2(void)
     {	
 	xsEnableRule("getFocus");
     }
-	if (cMyCiv == cCivNuwa)
-    {	
-	xsEnableRule("getAcupuncture");
-	xsEnableRule("getEarthenWall");
-	xsEnableRule("buildGarden");
-	xsEnableRule("ChooseGardenResource");	
-    }	
-	if (cMyCiv == cCivFuxi)
-    {	
-	xsEnableRule("getDomestication");
-	xsEnableRule("getEarthenWall");
-	xsEnableRule("buildGarden");
-	xsEnableRule("ChooseGardenResource");	
-    }	
-	if (cMyCiv == cCivShennong)
-    {	
-	xsEnableRule("getWheelbarrow");
-	xsEnableRule("getEarthenWall");
-	xsEnableRule("buildGarden");
-	xsEnableRule("ChooseGardenResource");
-    }		
+///CHINESE	if (cMyCiv == cCivNuwa)
+///CHINESE    {	
+///CHINESE	xsEnableRule("getAcupuncture");
+///CHINESE	xsEnableRule("getEarthenWall");
+///CHINESE	xsEnableRule("buildGarden");
+///CHINESE	xsEnableRule("ChooseGardenResource");	
+///CHINESE    }	
+///CHINESE	if (cMyCiv == cCivFuxi)
+///CHINESE    {	
+///CHINESE	xsEnableRule("getDomestication");
+///CHINESE	xsEnableRule("getEarthenWall");
+///CHINESE	xsEnableRule("buildGarden");
+///CHINESE	xsEnableRule("ChooseGardenResource");	
+///CHINESE    }	
+///CHINESE	if (cMyCiv == cCivShennong)
+///CHINESE    {	
+///CHINESE	xsEnableRule("getWheelbarrow");
+///CHINESE	xsEnableRule("getEarthenWall");
+///CHINESE	xsEnableRule("buildGarden");
+///CHINESE	xsEnableRule("ChooseGardenResource");
+///CHINESE    }		
 	   if ((cRandomMapName == "highland") || (cRandomMapName == "nomad"))
 	{
 	gWaterMap=true;
@@ -407,12 +406,12 @@ rule ActivateRethOverridesAge2
 		initRethlAge2();
 		
 		//CHINESE MINOR GOD SPECIFIC
-        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Change) == cTechStatusActive)
-        xsEnableRuleGroup("Change");
-        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Huangdi) == cTechStatusActive)
-        xsEnableRuleGroup("Huangdi");
-        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Sunwukong) == cTechStatusActive)
-        xsEnableRuleGroup("Sunwukong");
+///CHINESE        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Change) == cTechStatusActive)
+///CHINESE        xsEnableRuleGroup("Change");
+///CHINESE        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Huangdi) == cTechStatusActive)
+///CHINESE        xsEnableRuleGroup("Huangdi");
+///CHINESE        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge2Sunwukong) == cTechStatusActive)
+///CHINESE        xsEnableRuleGroup("Sunwukong");
 		
 		//EGYPTIAN MINOR GOD SPECIFIC
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge2Bast) == cTechStatusActive)
@@ -456,13 +455,13 @@ rule ActivateRethOverridesAge3
 {
     if (kbGetAge() > cAge2)
     {
-        //CHINESE MINOR GOD SPECIFIC
-		if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Dabogong) == cTechStatusActive)
-        xsEnableRuleGroup("Dabogong");
-        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Hebo) == cTechStatusActive)
-        xsEnableRuleGroup("Hebo");
-        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Zhongkui) == cTechStatusActive)
-        xsEnableRuleGroup("Zhongkui");
+///CHINESE        //CHINESE MINOR GOD SPECIFIC
+///CHINESE		if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Dabogong) == cTechStatusActive)
+///CHINESE        xsEnableRuleGroup("Dabogong");
+///CHINESE        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Hebo) == cTechStatusActive)
+///CHINESE        xsEnableRuleGroup("Hebo");
+///CHINESE        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Zhongkui) == cTechStatusActive)
+///CHINESE        xsEnableRuleGroup("Zhongkui");
 		
         //EGYPTIAN MINOR GOD SPECIFIC
 		if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge3Nephthys) == cTechStatusActive)
@@ -508,13 +507,13 @@ rule ActivateRethOverridesAge4
     if (kbGetAge() > cAge3)
     {
 	
-        //CHINESE MINOR GOD SPECIFIC	
-	    if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Aokuang) == cTechStatusActive)
-        xsEnableRuleGroup("Aokuang");
-        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Xiwangmu) == cTechStatusActive)
-        xsEnableRuleGroup("Xiwangmu");
-        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Chongli) == cTechStatusActive)
-        xsEnableRuleGroup("Chongli");
+///CHINESE        //CHINESE MINOR GOD SPECIFIC	
+///CHINESE	    if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Aokuang) == cTechStatusActive)
+///CHINESE        xsEnableRuleGroup("Aokuang");
+///CHINESE       if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Xiwangmu) == cTechStatusActive)
+///CHINESE        xsEnableRuleGroup("Xiwangmu");
+///CHINESE        if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Chongli) == cTechStatusActive)
+///CHINESE        xsEnableRuleGroup("Chongli");
 		
         //Egyptian MINOR GOD SPECIFIC	
 	    if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Horus) == cTechStatusActive)
@@ -586,8 +585,8 @@ rule DockDefenseMonitor
 			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeLongboat);
 			if (cMyCulture == cCultureAtlantean)
 			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeBireme);
-			if (cMyCulture == cCultureChinese)
-			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeJunk);
+///CHINESE			if (cMyCulture == cCultureChinese)
+///CHINESE			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeJunk);
             
 			aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 1); 
             aiPlanSetActive(planID);
@@ -664,8 +663,8 @@ rule HuntingDogsAsap
    static int age2Count = 0;
 
    int HuntingDogsUpgBuilding = cUnitTypeGranary;
-   if (cMyCulture == cCultureChinese)
-   HuntingDogsUpgBuilding = cUnitTypeStoragePit;
+///CHINESE   if (cMyCulture == cCultureChinese)
+///CHINESE   HuntingDogsUpgBuilding = cUnitTypeStoragePit;
    if (cMyCulture == cCultureAtlantean)
    HuntingDogsUpgBuilding = cUnitTypeGuild;
    
@@ -890,7 +889,8 @@ rule Helpme
    xsSetRuleMinIntervalSelf(600);  
 }
 
-
+///CHINESE
+/*
 //==============================================================================
 // buildGarden // Stolen from the Expansion. ):
 //==============================================================================
@@ -1122,6 +1122,8 @@ rule getGreatWall
         if (ShowAiEcho == true) aiEcho("Getting Great Wall");
     }
 }
+*/ 
+///CHINESE END
 //==============================================================================
 // getNumberUnits
 //==============================================================================
@@ -1419,7 +1421,7 @@ rule tacticalHeroAttackMyth
 	    int NoMeleeHeroPlease = kbUnitQueryGetResult(unitQueryID, i);
 	   	int NoFlyingPlease = kbUnitQueryGetResult(enemyQueryID, 0);
 		if ((kbUnitIsType(NoFlyingPlease, cUnitTypePegasus) || kbUnitIsType(NoFlyingPlease, cUnitTypeRoc) || kbUnitIsType(NoFlyingPlease, cUnitTypeFlyingMedic) || 
-		kbUnitIsType(NoFlyingPlease, cUnitTypeStymphalianBird) || kbUnitIsType(NoFlyingPlease, cUnitTypePhoenix) || kbUnitIsType(NoFlyingPlease, cUnitTypeVermilionBird)))
+		kbUnitIsType(NoFlyingPlease, cUnitTypeStymphalianBird) || kbUnitIsType(NoFlyingPlease, cUnitTypePhoenix) /* || kbUnitIsType(NoFlyingPlease, cUnitTypeVermilionBird)*/))
 		{
         if (cMyCulture == cCultureGreek) if (kbUnitIsType(NoMeleeHeroPlease, Hero1ID) || kbUnitIsType(NoMeleeHeroPlease, Hero3ID) || kbUnitIsType(NoMeleeHeroPlease, Hero4ID))    
 			continue;
@@ -1428,8 +1430,8 @@ rule tacticalHeroAttackMyth
         if (cMyCulture == cCultureAtlantean) if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeSwordsmanHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeTridentSoldierHero) || 
 		kbUnitIsType(NoMeleeHeroPlease, cUnitTypeRoyalGuardHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeMacemanHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeLancerHero))    
 			continue;
-        if (cMyCulture == cCultureChinese) if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroChineseMonk))    
-			continue;			
+        ///CHINESE if (cMyCulture == cCultureChinese) if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroChineseMonk))    
+		///CHINESE	continue;			
 	   }
 	   }
 	   
@@ -1439,8 +1441,9 @@ rule tacticalHeroAttackMyth
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
 	   }
    }
-}   
-
+} 
+///CHINESE  
+ /*
 //==============================================================================
 // IHateMonks
 //==============================================================================
@@ -1510,7 +1513,8 @@ rule IHateMonks
 }
 
 
-
+*/
+///CHINESE END
 //==============================================================================
 // IHateBuildingsHadesSpecial
 //==============================================================================
@@ -1966,7 +1970,7 @@ inactive
 void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 {
     if (ShowAiEcho == true) aiEcho("claimSettlement:");    
-    
+	
     int baseID=-1;
     int startAreaID=-1;
     static vector KOTHPlace = cInvalidVector;
@@ -1981,15 +1985,15 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	transportPUID = cUnitTypeTransportShipNorse;
 	else if (cMyCulture == cCultureAtlantean)
 	transportPUID = cUnitTypeTransportShipAtlantean;
-	else if (cMyCulture == cCultureChinese)
-	transportPUID = cUnitTypeTransportShipChinese;
+///CHINESE	else if (cMyCulture == cCultureChinese)
+///CHINESE	transportPUID = cUnitTypeTransportShipChinese;
 
     int BoatToUse=kbUnitCount(cMyID, transportPUID, cUnitStateAlive);
 	
     if (BoatToUse <= 0)
     {
     xsEnableRule("KOTHMonitor");
-	aiEcho("No ships, destroying plans!");
+	if (ShowAiEcho == true) aiEcho("No ships, destroying plans!");
 	DestroyTransportPlan = true;
 	return;
     }
@@ -2023,13 +2027,13 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	//aiEcho("ActiveTransportPlans:  "+ActiveTransportPlans+" ");
     if (ActiveTransportPlans >= 1)
 	{
-     aiEcho("I have 1 active transport plan, returning.");
+     if (ShowAiEcho == true) aiEcho("I have 1 active transport plan, returning.");
 	 return;
     }
 	// prepare other units too
 	
 	/*
-	TEMP REMOVED
+	TEMP REMOVED due to crashes
 	static int HeroType =-1;
 	if (cMyCulture == cCultureGreek)
 	HeroType = cUnitTypeLogicalTypeGreekHeroes;
@@ -2055,7 +2059,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	aiPlanAddUnitType(KOTHTHomeTransportPlan, cUnitTypeHumanSoldier, 3, 6, 10);
 	//aiPlanAddUnitType(KOTHTHomeTransportPlan, HeroType, 1, 1, 4);
     KoTHOkNow = false;
-	aiEcho("GO HOME TRIGGERED");
+	if (ShowAiEcho == true) aiEcho("GO HOME TRIGGERED");
     return;													  
     }
     else 
@@ -2073,7 +2077,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	else aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, 12, 16, 20);
 	
 	/*
-	TEMP REMOVED
+	TEMP REMOVED due to crashes.
 	if (numInfMU > 0)
 	aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeMythUnitInfantry, numInfMU/2, numInfMU, numInfMU);
 	if (numCavMU > 0)
@@ -2084,7 +2088,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     aiPlanAddUnitType(KOTHTransportPlan, HeroType, numHeroUnits*0.6, numHeroUnits*0.7, numHeroUnits*0.8);		
 	*/
 	
-	aiEcho("GO TO VAULT TRIGGERED");
+	if (ShowAiEcho == true) aiEcho("GO TO VAULT TRIGGERED");
 	}
     //Done
 	// Never use cUnitTypeLogicalTypeLandMilitary, Stymphalian Birds and other birds in general, are considered a land unit and will crash the game.
@@ -2154,7 +2158,7 @@ inactive
 			   if (numfish > 1)
 			   {
 			   WaterVersion = true;
-			   aiEcho("Water version of KOTH detected.");
+			   if (ShowAiEcho == true) aiEcho("Water version of KOTH detected.");
 			   DestroyKOTHLandPlan = true;  // never again!
 			   xsEnableRule("KOTHMonitor");
 			   return;
@@ -2165,9 +2169,17 @@ inactive
 				//if (WaterVersion == true)
 				numAvailableUnits = numAvailableUnits-NumSelf;
                 
+				if (WaterVersion == true)
+				{
 				if (numAvailableUnits < 7 && kbGetPop() <= 39 || kbGetAge() < cAge1)
                 return;
-					  
+				}
+				
+				if (WaterVersion == false)
+				{
+				if (numAvailableUnits < 3 && kbGetPop() <= 39 || kbGetAge() < cAge1)
+                return;
+				}	  
 					if (LandNeedReCalculation == true && WaterVersion == false)
 					{
 					
@@ -2247,7 +2259,7 @@ inactive
 	  }
 
 //==============================================================================	  
-rule GatherAroundKOTH  // modified hate script that launches a defend plan on the island.
+rule GatherAroundKOTH  // launches a defend plan on the island.
    minInterval 22
    inactive
 {
@@ -2261,7 +2273,7 @@ rule GatherAroundKOTH  // modified hate script that launches a defend plan on th
 	   
 		if (PlanActive == false)
 		{
-		aiEcho("was here!");
+		if (ShowAiEcho == true) aiEcho("I was here!");
 		gDefendPlentyVaultWater = aiPlanCreate("KOTH WATER VAULT DEFEND", cPlanDefend);
                 
         

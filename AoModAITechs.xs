@@ -435,8 +435,8 @@ rule getHusbandry
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -506,8 +506,8 @@ rule getPickaxe
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;		
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;		
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -582,8 +582,8 @@ rule getHandaxe
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -663,8 +663,8 @@ rule getPlow
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -725,8 +725,8 @@ rule getHuntingDogs
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -866,8 +866,8 @@ rule getBowSaw
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -962,8 +962,8 @@ rule getShaftMine
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -1037,8 +1037,8 @@ rule getIrrigation
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -1121,8 +1121,8 @@ rule getQuarry
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -1195,8 +1195,8 @@ rule getCarpenters
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -1269,8 +1269,8 @@ rule getFloodControl
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE        buildingType = cUnitTypeStoragePit;			
         
     int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
     if (numResearchBuildings < 1)
@@ -1712,14 +1712,14 @@ rule getStoneWall
     minInterval 37 //starts in cAge2
 {
     int techID = cTechStoneWall;
-	if (cMyCulture == cCultureChinese)
-	techID = cTechStoneWallChinese;
+///CHINESE	if (cMyCulture == cCultureChinese)
+///CHINESE	techID = cTechStoneWallChinese;
     
 	if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
         if (cMyCulture == cCultureAtlantean)
             xsEnableRule("getBronzeWall");
-        else if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek) || (cMyCulture == cCultureChinese))
+        else if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek) /* || (cMyCulture == cCultureChinese) */)
             xsEnableRule("getFortifiedWall");
         xsDisableSelf();
         return;
@@ -1776,8 +1776,8 @@ rule getFortifiedWall
     {
         if (cMyCulture == cCultureEgyptian)
             xsEnableRule("getCitadelWall");
-        if (cMyCulture == cCultureChinese)
-            xsEnableRule("getGreatWall");			
+///CHINESE        if (cMyCulture == cCultureChinese)
+///CHINESE            xsEnableRule("getGreatWall");			
 			
         xsDisableSelf();
         return;

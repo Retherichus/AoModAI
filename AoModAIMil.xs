@@ -1174,7 +1174,7 @@ rule defendPlanRule
     {
         defendCount = defendCount + 1;
    
-        aiPlanSetVariableInt(defPlanID, cDefendPlanRefreshFrequency, 0, 16);
+        aiPlanSetVariableInt(defPlanID, cDefendPlanRefreshFrequency, 0, 15);
         aiPlanSetVariableVector(defPlanID, cDefendPlanDefendPoint, 0, kbBaseGetLocation(cMyID, baseToUse));
             
         if (baseToUse != mainBaseID)
@@ -1350,7 +1350,7 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
     int mainBaseDefPlan1ID = aiPlanCreate("mainBaseDefPlan1", cPlanDefend);
     if (mainBaseDefPlan1ID != -1)
     {
-        aiPlanSetVariableInt(mainBaseDefPlan1ID, cDefendPlanRefreshFrequency, 0, 16);
+        aiPlanSetVariableInt(mainBaseDefPlan1ID, cDefendPlanRefreshFrequency, 0, 15);
         aiPlanSetVariableVector(mainBaseDefPlan1ID, cDefendPlanDefendPoint, 0, kbBaseGetLocation(cMyID, mainBaseID));
         
         aiPlanSetVariableFloat(mainBaseDefPlan1ID, cDefendPlanEngageRange, 0, 50.0);
@@ -1489,7 +1489,7 @@ rule mainBaseDefPlan2   //Make a second defend plan that protects the main base
     int mainBaseDefPlan2ID = aiPlanCreate("mainBaseDefPlan2", cPlanDefend);
     if (mainBaseDefPlan2ID != -1)
     {
-        aiPlanSetVariableInt(mainBaseDefPlan2ID, cDefendPlanRefreshFrequency, 0, 16);
+        aiPlanSetVariableInt(mainBaseDefPlan2ID, cDefendPlanRefreshFrequency, 0, 15);
         aiPlanSetVariableVector(mainBaseDefPlan2ID, cDefendPlanDefendPoint, 0, kbBaseGetLocation(cMyID, mainBaseID));
         
         aiPlanSetVariableFloat(mainBaseDefPlan2ID, cDefendPlanEngageRange, 0, 50.0);
@@ -2016,7 +2016,7 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
     if (otherBaseDefPlanID != -1)
     {
         aiPlanSetVariableVector(otherBaseDefPlanID, cDefendPlanDefendPoint, 0, newBaseUnitPosition);
-        aiPlanSetVariableInt(otherBaseDefPlanID, cDefendPlanRefreshFrequency, 0, 16);
+        aiPlanSetVariableInt(otherBaseDefPlanID, cDefendPlanRefreshFrequency, 0, 15);
         aiPlanSetUnitStance(otherBaseDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(otherBaseDefPlanID, cDefendPlanPatrol, 0, false);
 
@@ -2907,7 +2907,7 @@ rule defendSettlementPosition
     if (settlementPosDefPlanID > 0)
     {
         defendPlanStartTime = xsGetTime();
-        aiPlanSetVariableInt(settlementPosDefPlanID, cDefendPlanRefreshFrequency, 0, 16);
+        aiPlanSetVariableInt(settlementPosDefPlanID, cDefendPlanRefreshFrequency, 0, 15);
         
         aiPlanSetVariableVector(settlementPosDefPlanID, cDefendPlanDefendPoint, 0, gSettlementPosDefPlanDefPoint);
         aiPlanSetVariableFloat(settlementPosDefPlanID, cDefendPlanEngageRange, 0, 40.0);
@@ -3335,11 +3335,11 @@ rule createRaidingParty
         aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeMaceman, 1, 1, 1);
         aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeSwordsman, 1, 1, 2);
     }
-    else if (cMyCulture == cCultureChinese)
-    {
-        aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeChuKoNu, 1, 3, 6);
-        aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeHalberdier, 1, 2, 3);
-    }	
+///CHINESE    else if (cMyCulture == cCultureChinese)
+///CHINESE    {
+///CHINESE        aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeChuKoNu, 1, 3, 6);
+///CHINESE        aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeHalberdier, 1, 2, 3);
+///CHINESE    }	
     
     if (targetIsMarket == true)
     {
@@ -4307,7 +4307,7 @@ rule defendBaseUnderAttack
     if (baseUnderAttackDefPlanID > 0)
     {
         defendPlanStartTime = xsGetTime();
-        aiPlanSetVariableInt(baseUnderAttackDefPlanID, cDefendPlanRefreshFrequency, 0, 16);
+        aiPlanSetVariableInt(baseUnderAttackDefPlanID, cDefendPlanRefreshFrequency, 0, 15);
         
         aiPlanSetVariableVector(baseUnderAttackDefPlanID, cDefendPlanDefendPoint, 0, gBaseUnderAttackLocation);
         
@@ -4545,7 +4545,7 @@ rule defendAlliedBase   //TODO: check all allied bases not just the main base of
     if (alliedBaseDefPlanID > 0)
     {
         defendPlanStartTime = xsGetTime();
-        aiPlanSetVariableInt(alliedBaseDefPlanID, cDefendPlanRefreshFrequency, 0, 16);
+        aiPlanSetVariableInt(alliedBaseDefPlanID, cDefendPlanRefreshFrequency, 0, 15);
         
         aiPlanSetVariableVector(alliedBaseDefPlanID, cDefendPlanDefendPoint, 0, alliedBaseLocation);
         

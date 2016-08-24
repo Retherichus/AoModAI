@@ -1343,8 +1343,8 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
 
     xsSetRuleMinIntervalSelf(40);
 	
-    if (cMyCulture == cCultureNorse && kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive) > 0)
-	return;
+///EXPANSION    if (cMyCulture == cCultureNorse && kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive) > 0)
+///EXPANSION	return;
 	
     //If no scout, go away.
     if (gLandScout == -1)
@@ -1399,6 +1399,8 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
     xsDisableSelf();
 }
 //==============================================================================
+/*
+DISABLED FOR VANILLA
 //==============================================================================
 rule startLandScoutingSpecialUlfsark  //grabs the first scout in the scout list and starts scouting with it.
     minInterval 1 //starts in cAge1
@@ -1432,7 +1434,7 @@ rule startLandScoutingSpecialUlfsark  //grabs the first scout in the scout list 
     //Go away now.
     xsDisableSelf();
 }
-
+*/
 //==============================================================================
 // RULE: autoBuildOutpost
 rule autoBuildOutpost   //Restrict Egyptians from building outposts until they have a temple.
@@ -1592,14 +1594,14 @@ void econAge4Handler(int age=0)
                 bigBuildingType = cUnitTypePalace;
                 break;
             }
-            case cCultureChinese:
-            {
-                numBuilders = 3;
-                createSimpleBuildPlan(cUnitTypeBarracksChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-				createSimpleBuildPlan(cUnitTypeStableChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-                bigBuildingType = cUnitTypeCastle;
-                break;
-            }			
+///CHINESE            case cCultureChinese:
+///CHINESE            {
+///CHINESE                numBuilders = 3;
+///CHINESE                createSimpleBuildPlan(cUnitTypeBarracksChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+///CHINESE				createSimpleBuildPlan(cUnitTypeStableChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+///CHINESE               bigBuildingType = cUnitTypeCastle;
+///CHINESE                break;
+///CHINESE            }			
         }
 		if (aiGetGameMode() == cGameModeDeathmatch)
         createSimpleBuildPlan(bigBuildingType, 3, 80, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), numBuilders);
@@ -1711,20 +1713,6 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
 	return;
 	}
 	
-	/*
-	if (BoomV2 == true)
-  {
-    xsDisableSelf();
-    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("BoomV2 Initiated.");
-    aiSetResourceGathererPercentage(cResourceFood, foodGPct, false, cRGPScript);
-    aiSetResourceGathererPercentage(cResourceWood, woodGPct, false, cRGPScript);
-    aiSetResourceGathererPercentage(cResourceGold, goldGPct, false, cRGPScript);
-    aiSetResourceGathererPercentage(cResourceFavor, favorGPct, false, cRGPScript);
-    aiNormalizeResourceGathererPercentages(cRGPScript);
-	xsEnableRule("econForecastAge1");
-	return;
-	}
-	*/
 	
 	if (ShowAiEcho == true) aiEcho("setEarlyEcon: ");
     int gathererCount = kbUnitCount(cMyID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer, 0), cUnitStateAlive);

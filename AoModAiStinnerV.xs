@@ -217,6 +217,230 @@ if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSuprema
  }
  }
  
+/*     // DISABLED,  in order to enable all this: remove this line with SLASH STAR, and the one at the very bottom of this document as well. 
+ 
+// MODDED BUILD SETTLEMENTS
+//==============================================================================
+rule ModifiedbuildSettlements
+    minInterval 15 //starts in cAge3
+    inactive
+{
+    	if (xsGetTime() > ModdedTCTimer*60*1000)
+        {
+            AllyTcLimit = false;
+			xsEnableRule("buildSettlements");
+			xsDisableSelf();
+            return;
+        }
+		
+    if (ShowAiEcho == true) aiEcho("buildSettlements:");
+
+    //Figure out if we have any active BuildSettlements.
+    int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
+    int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
+
+    int numberSettlementsPlanned = numberSettlements + numberBuildSettlementGoals;
+
+    if (numberSettlementsPlanned >= cvMaxSettlements)
+        return;        // Don't go over script limit
+
+    if (numberBuildSettlementGoals > 1)	// Allow 2 in progress, no more
+        return;
+    if (findASettlement() == false)
+        return;
+    if (numberSettlements > 1)  // Test for all the normal reasons to not build a settlement, unless we have only one
+    {
+        int popCapBuffer = 50;
+        if (numberSettlements == 3)
+            popCapBuffer = 30;
+        else if (numberSettlements == 4)
+            popCapBuffer = 20;
+        else if (numberSettlements > 4)
+            popCapBuffer = 10;
+        popCapBuffer = popCapBuffer + ((-1*cvRushBoomSlider)+1)*5 + 5;  // Add 5 for extreme rush, 15 for extreme boom
+        int currentPopNeeds=kbGetPop();
+        int adjustedPopCap=getSoftPopCap()-popCapBuffer;
+
+        //Don't do this unless we need the pop
+        if (currentPopNeeds < adjustedPopCap)
+            return;
+      
+
+        //If we're on Easy and we have 3 settlements, go away.
+        if ((aiGetWorldDifficulty() == cDifficultyEasy) && (numberSettlementsPlanned >= 3))
+        {
+            xsDisableSelf();
+            return;
+        }
+    }
+
+
+    //Don't get too many more than our human allies.
+    int largestAllyCount=-1;
+    for (i=1; < cNumberPlayers)
+    {
+        if (i == cMyID)
+            continue;
+        if (kbIsPlayerAlly(i) == true)
+            continue;
+
+        int count = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, i);
+        if (count > largestAllyCount)
+            largestAllyCount=count;
+    }
+    
+    //Never have more than 1 more settlements than any ally.
+    int difference=numberSettlementsPlanned-largestAllyCount;
+    if ((difference > 1) && (largestAllyCount>=0))     // If ally exists and we have more than 2 more...quit
+        return;
+
+    //See if there is another human on my team.
+    bool haveHumanTeammate=false;
+    for (i=1; < cNumberPlayers)
+    {
+        if (i == cMyID)
+            continue;
+        //Find the human player
+        if (kbIsPlayerAlly(i) != true)
+            continue;
+
+        //This player is a human ally and not resigned.
+        if ((kbIsPlayerAlly(i) == true) && (kbIsPlayerResigned(i) == false))
+        {
+            haveHumanTeammate=true;
+            break;
+        }
+    }
+    
+    if (haveHumanTeammate == true)
+    {
+        if (kbGetAge() == cAge3)
+        {
+            if (numberSettlementsPlanned > 4)
+                return;
+        }
+        else if (kbGetAge() == cAge4)
+        {
+            if (numberSettlementsPlanned >= cvMaxSettlements)
+                return;
+        }
+    }
+    if (ShowAiEcho == true) aiEcho("Creating another settlement goal.");
+
+    int numBuilders = 3;
+    if (cMyCulture == cCultureAtlantean)
+        numBuilders = 1;
+        
+    int builderType = cUnitTypeAbstractVillager;
+    if (cMyCulture == cCultureNorse)
+        builderType = cUnitTypeAbstractInfantry;
+        
+    //Else, do it.
+    createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
+} 
+ 
+
+ 
+// ALTERNATE ATTACK GOAL
+//==============================================================================
+rule AttackStrongestPlayer   //Updates the player we should be attacking.
+    minInterval 5 //starts in cAge1
+    inactive
+{
+    
+    static int lastTargetPlayerIDSaveTime = -1;
+    static int lastTargetPlayerID = -1;
+    static int randNum = 0;
+    static bool increaseStartIndex = false;
+
+    if (ShowAiEcho == true) aiEcho("updatePlayerToAttack:");
+    //Determine a random start index for our hate loop.
+    static int startIndex = -1;
+    if (increaseStartIndex == true)
+    {
+        if (startIndex >= cNumberPlayers - 1)
+            startIndex = 0;
+        else
+            startIndex = startIndex + 1;
+        increaseStartIndex = false;
+        if (ShowAiEcho == true) aiEcho("increasing startIndex. startIndex is now: "+startIndex);
+    }
+
+	
+    if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (15)*60*1000))
+    {
+        startIndex = aiRandInt(cNumberPlayers);
+        if (ShowAiEcho == true) aiEcho("getting new random startIndex. startIndex is now: "+startIndex);
+    }
+
+    //Find the "first" enemy player that's still in the game.  This will be the
+    //script's recommendation for who we should attack.
+    int comparePlayerID = -1;
+    for (i = 0; < cNumberPlayers)
+    {
+        //If we're past the end of our players, go back to the start.
+        int actualIndex = i + startIndex;
+        if (actualIndex >= cNumberPlayers)
+            actualIndex = actualIndex - cNumberPlayers;
+        if (actualIndex <= 0)
+            continue;
+        if ((kbIsPlayerEnemy(actualIndex) == true) &&
+            (kbIsPlayerResigned(actualIndex) == false) &&
+            (kbHasPlayerLost(actualIndex) == false))
+        {
+            comparePlayerID = actualIndex;
+            if ((actualIndex == lastTargetPlayerID) && (aiRandInt(4) < 1))
+            {
+                if (ShowAiEcho == true) aiEcho("actualIndex == lastTargetPlayerID, looking for other enemies");
+                increaseStartIndex = true;
+                continue;
+            }
+            break;
+        }
+    }
+
+    //Pass the comparePlayerID into the AI to see what he thinks.  He'll take care
+    //of modifying the player in the event of wonders, etc.
+    int actualPlayerID = -1;
+   
+    if (cvPlayerToAttack == -1 )
+        actualPlayerID = aiCalculateMostHatedPlayerID(comparePlayerID);
+    else
+        actualPlayerID = cvPlayerToAttack;
+		
+		if (HardFocus == true)
+		{
+		 if (cvPlayerToAttack == -1 )
+        actualPlayerID = aiCalculateMostHatedPlayerID(HateChoice);
+    else
+        actualPlayerID = HateChoice;
+		}
+    
+    if (actualPlayerID != lastTargetPlayerID)
+    {
+        lastTargetPlayerID = actualPlayerID;
+        lastTargetPlayerIDSaveTime = xsGetTime();
+        if (ShowAiEcho == true) aiEcho("lastTargetPlayerID: "+lastTargetPlayerID);
+        if (ShowAiEcho == true) aiEcho("lastTargetPlayerIDSaveTime: "+lastTargetPlayerIDSaveTime);
+        randNum = aiRandInt(5);
+    }
+
+	
+    if (actualPlayerID != -1 && aiGetWorldDifficulty() < cDifficultyNightmare)
+    {
+        //Default us off.
+        aiSetMostHatedPlayerID(actualPlayerID);
+        if (ShowAiEcho == true) aiEcho("most hated playerID = "+actualPlayerID);
+    }
+	
+    if (actualPlayerID != -1 && aiGetWorldDifficulty() > cDifficultyHard)
+    {
+        //Default us off.
+        aiSetMostHatedPlayerID(HateChoice);
+        if (ShowAiEcho == true) aiEcho("most hated playerID = "+actualPlayerID);
+    }	
+}
+// END OF ALTERNATE ATTACK GOAL 
  
  //==============================================================================
 // CountEnemyUnitsOnMap
@@ -872,26 +1096,6 @@ if (kbIsPlayerEnemy(MHP) && kbIsPlayerValid(MHP))
    
    int MHPUnits1=kbUnitQueryExecute(MHPunitQueryID1);
   }
-   /*
-       //BuildingUnits for Player 1
-   if (MHPBuildingMHPunitQueryID1 < 0)
-   MHPBuildingMHPunitQueryID1=kbUnitQueryCreate("My Unit Query");
-   
-   //Define a query to get all matching BuildingUnits
-   if (MHPBuildingMHPunitQueryID1 != -1)
-   {
-		kbUnitQuerySetPlayerID(MHPBuildingMHPunitQueryID1, MHP);
-		kbUnitQuerySetUnitType(MHPBuildingMHPunitQueryID1, cUnitTypeBuilding);
-	        kbUnitQuerySetState(MHPBuildingMHPunitQueryID1, cUnitStateAlive);
-			
-   }
-   if (kbIsPlayerEnemy(MHP) && kbIsPlayerValid(MHP))
-{
-   kbUnitQueryResetResults(MHPBuildingMHPunitQueryID1);
-   int MHPBuildingUnits1=kbUnitQueryExecute(MHPBuildingMHPunitQueryID1);
-  }
-  
-*/  
    int MHPTotalUnits1 = MHPUnits1;
    
    if (MHPTotalUnits1 > 30)
@@ -905,3 +1109,5 @@ if (kbIsPlayerEnemy(MHP) && kbIsPlayerValid(MHP))
    return;  
   }
   }
+  
+  */       //end SLASH STAR
