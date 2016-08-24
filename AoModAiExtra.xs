@@ -1969,6 +1969,9 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     
     int baseID=-1;
     int startAreaID=-1;
+    static vector KOTHPlace = cInvalidVector;
+    KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);	
+	int NumSelf = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, KOTHPlace, 25.0);
     
     int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
 	
@@ -2025,6 +2028,8 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     }
 	// prepare other units too
 	
+	/*
+	TEMP REMOVED
 	static int HeroType =-1;
 	if (cMyCulture == cCultureGreek)
 	HeroType = cUnitTypeLogicalTypeGreekHeroes;
@@ -2041,31 +2046,34 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	int numInfMU = kbUnitCount(cMyID, cUnitTypeMythUnitInfantry, cUnitStateAlive);
 	int numCavMU = kbUnitCount(cMyID, cUnitTypeMythUnitCavalry, cUnitStateAlive);
 	int numArcMU = kbUnitCount(cMyID, cUnitTypeMythUnitArcher, cUnitStateAlive);
-	
+	*/
 	
 	if (KoTHOkNow == true)
     {
     KOTHTHomeTransportPlan=createTransportPlan("GO HOME AGAIN", kbAreaGetIDByPosition(where), startAreaID,
                                                       false, transportPUID, 97, kbAreaGetIDByPosition(where));
 	aiPlanAddUnitType(KOTHTHomeTransportPlan, cUnitTypeHumanSoldier, 3, 6, 10);
-	aiPlanAddUnitType(KOTHTHomeTransportPlan, HeroType, 1, 1, 4);
+	//aiPlanAddUnitType(KOTHTHomeTransportPlan, HeroType, 1, 1, 4);
     KoTHOkNow = false;
 	aiEcho("GO HOME TRIGGERED");
     return;													  
     }
     else 
 	{
-    KOTHTransportPlan=createTransportPlan("TRANSPORT TO KOTH VAULT", startAreaID, kbAreaGetIDByPosition(where), false, transportPUID, 97, baseID);
+    KOTHTransportPlan=createTransportPlan("TRANSPORT TO KOTH VAULT", startAreaID, kbAreaGetIDByPosition(where), false, transportPUID, 70, baseID);
 
     // add the units to the transport plan
 
 	
 	int numAvailableUnits = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
-
+    numAvailableUnits = numAvailableUnits-NumSelf;
 	
 	if (numAvailableUnits < 15)
     aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, 10, 12, 15);
 	else aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, 12, 16, 20);
+	
+	/*
+	TEMP REMOVED
 	if (numInfMU > 0)
 	aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeMythUnitInfantry, numInfMU/2, numInfMU, numInfMU);
 	if (numCavMU > 0)
@@ -2074,6 +2082,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeMythUnitArcher, numArcMU/2, numArcMU, numArcMU);
 	if (numHeroUnits > 0)
     aiPlanAddUnitType(KOTHTransportPlan, HeroType, numHeroUnits*0.6, numHeroUnits*0.7, numHeroUnits*0.8);		
+	*/
 	
 	aiEcho("GO TO VAULT TRIGGERED");
 	}
@@ -2214,7 +2223,6 @@ inactive
 				return;  // will this skip the code below?
 				 
 				 if (NumSelf > NumEnemy + 14 && WaterVersion == true)
-				 {
 				 SendBackCount = SendBackCount+1;
 				 
 				 if (SendBackCount > 6)
@@ -2224,11 +2232,10 @@ inactive
 				 SendBackCount = 0;
                  return;				 
 				 }
-				 }	 
+				 	 
 				 
-                 if (NumEnemy + 11 > NumSelf && WaterVersion == true)
+                 if (14 > NumSelf && WaterVersion == true)
                  {
-			     aiPlanDestroy(gDefendPlentyVault);
 	             xsEnableRule("GetKOTHVault");
 				 LandNeedReCalculation = false;
 				 xsEnableRule("GatherAroundKOTH");
@@ -2244,60 +2251,13 @@ rule GatherAroundKOTH  // modified hate script that launches a defend plan on th
    minInterval 22
    inactive
 {
-   static int unitQueryID=-1;
-   static int enemyQueryID=-1;
-   static int gDefendPlentyVaultWater=-1;
    static vector KOTHPlace = cInvalidVector;
    KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);
    static bool PlanActive = false;   
-
-   //If we don't have the query yet, create one.
-   if (unitQueryID < 0)
-   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   int NumSelf = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, KOTHPlace, 30.0);
    
-   //Define a query to get all matching units
-   if (unitQueryID != -1)
-   {
-		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeHumanSoldier);			
-	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-   }
-
-   kbUnitQueryResetResults(unitQueryID);
-   int siegeFound=kbUnitQueryExecute(unitQueryID);
-
-   if (siegeFound < 1)
-	return;
-
-   //If we don't have the query yet, create one.
-   if (enemyQueryID < 0)
-   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
-   
-   //Define a query to get all matching units
-   if (enemyQueryID != -1)
-   {
-		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationAny);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypePlentyVaultKOTH);
-	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
-		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
-		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 35);
-   }
-
-   int numberFoundTemp = 0;
-   int enemyUnitIDTemp = 0;
-
-   for (i=0; < siegeFound)
-   {
-	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-	   kbUnitQueryResetResults(enemyQueryID);
-	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
-	   
-        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
-            continue;
-			
-	   if (numberFoundTemp > 0)
-	   {
+   if (NumSelf <= 0)
+   return;
 	   
 		if (PlanActive == false)
 		{
@@ -2306,7 +2266,7 @@ rule GatherAroundKOTH  // modified hate script that launches a defend plan on th
                 
         
 
-        aiPlanSetDesiredPriority(gDefendPlentyVaultWater, 95);                       // prio
+        aiPlanSetDesiredPriority(gDefendPlentyVaultWater, 40);                       // prio
         aiPlanSetVariableVector(gDefendPlentyVaultWater, cDefendPlanDefendPoint, 0, KOTHPlace);
         aiPlanSetVariableFloat(gDefendPlentyVaultWater, cDefendPlanEngageRange, 0, 25.0);
         aiPlanSetVariableBool(gDefendPlentyVaultWater, cDefendPlanPatrol, 0, false);
@@ -2327,14 +2287,11 @@ rule GatherAroundKOTH  // modified hate script that launches a defend plan on th
 		}
 		if (PlanActive == true)
 		{
-		//aiPlanRemoveVariableValue(gDefendPlentyVaultWater,  kbUnitQueryGetResult(unitQueryID, i));
-		aiPlanAddUnitType(gDefendPlentyVaultWater, cUnitTypeLogicalTypeLandMilitary, kbUnitQueryGetResult(unitQueryID, i), kbUnitQueryGetResult(unitQueryID, i), kbUnitQueryGetResult(unitQueryID, i));
+		aiPlanAddUnitType(gDefendPlentyVaultWater, cUnitTypeLogicalTypeLandMilitary, NumSelf, NumSelf, NumSelf);
 		}
 		
 		
 	   }
-   }
-}
 
 //==============================================================================
 rule KOTHMonitor
