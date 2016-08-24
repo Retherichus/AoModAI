@@ -1343,8 +1343,8 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
 
     xsSetRuleMinIntervalSelf(40);
 	
-///EXPANSION    if (cMyCulture == cCultureNorse && kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive) > 0)
-///EXPANSION	return;
+    if (cMyCulture == cCultureNorse && kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive) > 0)
+	return;
 	
     //If no scout, go away.
     if (gLandScout == -1)
@@ -1399,8 +1399,6 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
     xsDisableSelf();
 }
 //==============================================================================
-/*
-DISABLED FOR VANILLA
 //==============================================================================
 rule startLandScoutingSpecialUlfsark  //grabs the first scout in the scout list and starts scouting with it.
     minInterval 1 //starts in cAge1
@@ -1434,7 +1432,7 @@ rule startLandScoutingSpecialUlfsark  //grabs the first scout in the scout list 
     //Go away now.
     xsDisableSelf();
 }
-*/
+
 //==============================================================================
 // RULE: autoBuildOutpost
 rule autoBuildOutpost   //Restrict Egyptians from building outposts until they have a temple.
@@ -1594,14 +1592,14 @@ void econAge4Handler(int age=0)
                 bigBuildingType = cUnitTypePalace;
                 break;
             }
-///CHINESE            case cCultureChinese:
-///CHINESE            {
-///CHINESE                numBuilders = 3;
-///CHINESE                createSimpleBuildPlan(cUnitTypeBarracksChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-///CHINESE				createSimpleBuildPlan(cUnitTypeStableChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-///CHINESE               bigBuildingType = cUnitTypeCastle;
-///CHINESE                break;
-///CHINESE            }			
+            case cCultureChinese:
+            {
+                numBuilders = 3;
+                createSimpleBuildPlan(cUnitTypeBarracksChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+				createSimpleBuildPlan(cUnitTypeStableChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                bigBuildingType = cUnitTypeCastle;
+                break;
+            }			
         }
 		if (aiGetGameMode() == cGameModeDeathmatch)
         createSimpleBuildPlan(bigBuildingType, 3, 80, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), numBuilders);

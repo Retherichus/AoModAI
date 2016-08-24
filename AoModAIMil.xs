@@ -3335,11 +3335,11 @@ rule createRaidingParty
         aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeMaceman, 1, 1, 1);
         aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeSwordsman, 1, 1, 2);
     }
-///CHINESE    else if (cMyCulture == cCultureChinese)
-///CHINESE    {
-///CHINESE        aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeChuKoNu, 1, 3, 6);
-///CHINESE        aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeHalberdier, 1, 2, 3);
-///CHINESE    }	
+    else if (cMyCulture == cCultureChinese)
+    {
+        aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeChuKoNu, 1, 3, 6);
+        aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeHalberdier, 1, 2, 3);
+    }	
     
     if (targetIsMarket == true)
     {

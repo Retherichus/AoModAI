@@ -17,17 +17,17 @@ rule maintainTradeUnits
     
 
 	
-///CHINESE	if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa && IsRunTradeUnits1 == false)
-///CHINESE	{
-///CHINESE	gMaxTradeCarts = 3;
-///CHINESE	IsRunTradeUnits1  = true;
-///CHINESE   }
+	if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa && IsRunTradeUnits1 == false)
+	{
+	gMaxTradeCarts = 3;
+	IsRunTradeUnits1  = true;
+    }
 	
-///CHINESE	if (kbGetAge() > cAge2 && cMyCiv == cCivNuwa && IsRunTradeUnits2 == false)
-///CHINESE	{
-///CHINESE	gMaxTradeCarts = 22;
-///CHINESE	IsRunTradeUnits2  = true;
-///CHINESE    }	
+	if (kbGetAge() > cAge2 && cMyCiv == cCivNuwa && IsRunTradeUnits2 == false)
+	{
+	gMaxTradeCarts = 22;
+	IsRunTradeUnits2  = true;
+    }	
     int tradeCartPUID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0);
     int numTradeUnits = kbUnitCount(cMyID, tradeCartPUID, cUnitStateAlive);
     
@@ -520,9 +520,7 @@ rule trainMythUnit
         else if (gAge4MinorGod == cTechAge4Hekate)
             age4MythUnitID = cUnitTypeLampades;
     }
-///CHINESE    
-/*
-else if (cMyCulture == cCultureChinese)
+    else if (cMyCulture == cCultureChinese)
     {
         // age2 myth units
         if (gAge2MinorGod == cTechAge2Change)
@@ -548,8 +546,7 @@ else if (cMyCulture == cCultureChinese)
         else if (gAge4MinorGod == cTechAge4Chongli)
             age4MythUnitID = cUnitTypeVermilionBird;
     }	
-*/
-////CHINESE END    
+    
     if (number < 0)
     {
         if (ShowAiEcho == true) aiEcho(" strange: number < 0, returning!");
@@ -725,12 +722,12 @@ rule maintainMilitaryTroops
         unitType2 = cUnitTypeMaceman;
         unitType3 = cUnitTypeSwordsman;
     }
-///CHINESE    else if (cMyCulture == cCultureChinese)
-///CHINESE    {
-///CHINESE        unitType1 = cUnitTypeChuKoNu;
-///CHINESE        unitType2 = cUnitTypeHalberdier;
-///CHINESE       //unitType3 = cUnitTypeScoutChinese;  // Not for now.
-///CHINESE    }	
+    else if (cMyCulture == cCultureChinese)
+    {
+        unitType1 = cUnitTypeChuKoNu;
+        unitType2 = cUnitTypeHalberdier;
+       //unitType3 = cUnitTypeScoutChinese;  // Not for now.
+    }	
     
     bool unitType1BeingTrained = false;
     bool unitType2BeingTrained = false;
@@ -882,10 +879,10 @@ rule maintainSiegeUnits
     {
         siegeUnitType1 = cUnitTypeBallista;
     }
-///CHINESE    else if (cMyCulture == cCultureChinese)
-///CHINESE    {
-///CHINESE        siegeUnitType1 = cUnitTypeSittingTiger;
-///CHINESE    }	
+    else if (cMyCulture == cCultureChinese)
+    {
+        siegeUnitType1 = cUnitTypeSittingTiger;
+    }	
     else if (cMyCulture == cCultureAtlantean)
     {
         if (kbGetAge() < cAge4)

@@ -1737,12 +1737,12 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 	gGoldForecast = RethLAGAge4+.0;
 	gWoodForecast = RethLAWAge4+.0;
     }	
-///CHINESE	if (cMyCulture == cCultureChinese)
-///CHINESE    {
-///CHINESE	gFoodForecast = RethLCFAge4+.0;
-///CHINESE	gGoldForecast = RethLCGAge4+.0;
-///CHINESE	gWoodForecast = RethLCWAge4+.0;
-///CHINESE    }
+	if (cMyCulture == cCultureChinese)
+    {
+	gFoodForecast = RethLCFAge4+.0;
+	gGoldForecast = RethLCGAge4+.0;
+	gWoodForecast = RethLCWAge4+.0;
+    }
     }	
 
 // for titan
@@ -1775,12 +1775,12 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 	gGoldForecast = TRethLAGAge4+.0 ;
 	gWoodForecast = TRethLAWAge4+.0 ;
     }	
-///CHINESE	if (cMyCulture == cCultureChinese)
-///CHINESE    {
-///CHINESE	gFoodForecast = TRethLCFAge4+.0 ;
-///CHINESE	gGoldForecast = TRethLCGAge4+.0 ;
-///CHINESE	gWoodForecast = TRethLCWAge4+.0 ;
-///CHINESE    }			
+	if (cMyCulture == cCultureChinese)
+    {
+	gFoodForecast = TRethLCFAge4+.0 ;
+	gGoldForecast = TRethLCGAge4+.0 ;
+	gWoodForecast = TRethLCWAge4+.0 ;
+    }			
 	}
 	
 
@@ -1929,12 +1929,12 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 	gGoldForecast = RethLAGAge3+.0;
 	gWoodForecast = RethLAWAge3+.0;
     }	
-///CHINESE	if (cMyCulture == cCultureChinese)
-///CHINESE    {
-///CHINESE	gFoodForecast = RethLCFAge3+.0;
-///CHINESE	gGoldForecast = RethLCGAge3+.0;
-///CHINESE	gWoodForecast = RethLCWAge3+.0;
-///CHINESE    }
+	if (cMyCulture == cCultureChinese)
+    {
+	gFoodForecast = RethLCFAge3+.0;
+	gGoldForecast = RethLCGAge3+.0;
+	gWoodForecast = RethLCWAge3+.0;
+    }
     }	
 
 	// for titan
@@ -1967,12 +1967,12 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 	gGoldForecast = TRethLAGAge3+.0 ;
 	gWoodForecast = TRethLAWAge3+.0 ;
     }	
-///CHINESE	if (cMyCulture == cCultureChinese)
-///CHINESE    {
-///CHINESE	gFoodForecast = TRethLCFAge3+.0 ;
-///CHINESE	gGoldForecast = TRethLCGAge3+.0 ;
-///CHINESE	gWoodForecast = TRethLCWAge3+.0 ;
-///CHINESE    }	
+	if (cMyCulture == cCultureChinese)
+    {
+	gFoodForecast = TRethLCFAge3+.0 ;
+	gGoldForecast = TRethLCGAge3+.0 ;
+	gWoodForecast = TRethLCWAge3+.0 ;
+    }	
     }	
 	
     float goldSupply = kbResourceGet(cResourceGold);
@@ -2166,12 +2166,12 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 	gGoldForecast = RethLAGAge2+.0;
 	gWoodForecast = RethLAWAge2+.0;
     }
-///CHINESE	if (cMyCulture == cCultureChinese)
-///CHINESE    {
-///CHINESE	gFoodForecast = RethLCFAge2+.0;
-///CHINESE	gGoldForecast = RethLCGAge2+.0;
-///CHINESE	gWoodForecast = RethLCWAge2+.0;
-///CHINESE    }
+	if (cMyCulture == cCultureChinese)
+    {
+	gFoodForecast = RethLCFAge2+.0;
+	gGoldForecast = RethLCGAge2+.0;
+	gWoodForecast = RethLCWAge2+.0;
+    }
     }
 
 	// for titan
@@ -2204,12 +2204,12 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 	gGoldForecast = TRethLAGAge2+.0 ;
 	gWoodForecast = TRethLAWAge2+.0 ;
     }	
-///CHINESE	if (cMyCulture == cCultureChinese)
-///CHINESE    {
-///CHINESE	gFoodForecast = TRethLCFAge2+.0 ;
-///CHINESE	gGoldForecast = TRethLCGAge2+.0 ;
-///CHINESE	gWoodForecast = TRethLCWAge2+.0 ;
-///CHINESE    }	
+	if (cMyCulture == cCultureChinese)
+    {
+	gFoodForecast = TRethLCFAge2+.0 ;
+	gGoldForecast = TRethLCGAge2+.0 ;
+	gWoodForecast = TRethLCWAge2+.0 ;
+    }	
 	}
 
     float goldSupply = kbResourceGet(cResourceGold);
@@ -2692,7 +2692,7 @@ void initNorse(void)
     }
     //Norse scout types.
     gLandScout=cUnitTypeUlfsark;
-///CHINESE	gLandScoutSpecialUlfsark=cUnitTypeUlfsarkStarting;
+	gLandScoutSpecialUlfsark=cUnitTypeUlfsarkStarting;
     gAirScout=-1;
     gWaterScout=cUnitTypeFishingShipNorse;
     //Norse gather with their heros.
@@ -2733,8 +2733,8 @@ void initAtlantean(void)
     // Atlantean
 
    
-///CHINESE    if (aiGetWorldDifficulty() != cDifficultyEasy)
-///CHINESE    createSimpleMaintainPlan(cUnitTypeOnager, 4, false, kbBaseGetMainID(cMyID));
+    if (aiGetWorldDifficulty() != cDifficultyEasy)
+    createSimpleMaintainPlan(cUnitTypeOnager, 4, false, kbBaseGetMainID(cMyID));
 
    gLandScout=cUnitTypeOracleScout;
     gWaterScout=cUnitTypeFishingShipAtlantean;
@@ -2805,8 +2805,7 @@ void initAtlantean(void)
         xsEnableRule("buildSkyPassages");
 }
 
-///CHINESE
-/*
+
 //==============================================================================
 void initChinese(void)
 {
@@ -2903,8 +2902,6 @@ inactive
 	
 
 }
-*/
-///CHINESE END
 //==============================================================================
 int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
     int maxUnits=80, int minPop=-1, int maxPop=-1, int numberBuildings=1,
@@ -3100,7 +3097,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else if (upRand == 1)
                 {
@@ -3110,7 +3107,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else
                 {
@@ -3120,7 +3117,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 break;
             }
@@ -3135,7 +3132,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else if (upRand == 1)
                 {
@@ -3145,7 +3142,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 else
                 {
@@ -3155,7 +3152,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
                 }
                 break;
             }
@@ -3170,7 +3167,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeRhinocerosofSet, 0.1);
                 }
                 else if (upRand == 1)
@@ -3181,7 +3178,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeRhinocerosofSet, 0.1);
                 }
                 else
@@ -3192,7 +3189,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeRhinocerosofSet, 0.1);
                 }
                 break;
@@ -3208,7 +3205,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
                 }
                 else if (upRand == 1)
                 {
@@ -3219,7 +3216,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
                 }
                 else
                 {
@@ -3230,7 +3227,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
                 }
                 break;
             }
@@ -3246,7 +3243,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeJarl, 0.9);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
 
                 }
                 else if (upRand == 1)
@@ -3259,7 +3256,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeJarl, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
                 }
                 else
                 {
@@ -3271,7 +3268,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeJarl, 0.4);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
                 }
                 break;
             }
@@ -3286,7 +3283,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
                 }
                 else if (upRand == 1)
                 {
@@ -3297,7 +3294,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
                 }
                 else
                 {
@@ -3308,7 +3305,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-///CHINESE					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
                 }
                 break;
             }
@@ -3399,9 +3396,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                 }
                 break;
             }
-///CHINESE
-/* 
- //Shennong.
+  //Shennong.
             case cCivShennong:
             {
                 if (upRand == 0)
@@ -3506,8 +3501,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                 }
                 break;			
         }
-		*/
-		///CHINESE END
 }		
         kbUnitPickSetPreferenceFactor(upID, cUnitTypeDryad, 0.0);      // This should *only* be produced through the hesperides rule
     }  // End if / cvPrimaryMilitaryUnit
@@ -3676,11 +3669,11 @@ void init(void)
             initAtlantean();
             break;
         }
-///CHINESE        case cCultureChinese:
-///CHINESE        {
-///CHINESE            initChinese();
-///CHINESE           break;
-///CHINESE        }		
+        case cCultureChinese:
+        {
+            initChinese();
+            break;
+        }		
     }
     //Setup the progression to follow these minor gods.
     kbTechTreeAddMinorGodPref(gAge2MinorGod);
@@ -4834,9 +4827,7 @@ void age2Handler(int age=1)
             xsEnableRule("getSafePassage");
         }
     }
-///CHINESE
-/*
-	else if (cMyCulture == cCultureChinese)
+ else if (cMyCulture == cCultureChinese)
     {
         //Force Chinese Stables to go down.
         int ChineseStablesPlanID=aiPlanCreate("ChineseStables", cPlanBuild);
@@ -4893,9 +4884,7 @@ void age2Handler(int age=1)
             aiPlanSetBaseID(WarAcademyPlanID, kbBaseGetMainID(cMyID));
             aiPlanSetActive(WarAcademyPlanID);
         }
-    }
-*/
-///CHINESE END	
+    }	
 
     //Build walls if we should.
     if (gBuildWalls == true)
@@ -4906,7 +4895,7 @@ void age2Handler(int age=1)
 			xsEnableRule("MBSecondaryWall");
 			
 
-           if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek) /* || (cMyCulture == cCultureChinese) */)
+           if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek) || (cMyCulture == cCultureChinese))
               xsEnableRule("destroyUnnecessaryDropsites");
             
             if (aiGetGameMode() != cGameModeDeathmatch)
@@ -4940,7 +4929,7 @@ void age2Handler(int age=1)
         xsEnableRule("fixUnfinishedWalls");
         
         //enable the rule to destroy unnecessary dropsites near our mainbase
-        if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian) /* || (cMyCulture == cCultureChinese) */)
+        if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureChinese))
             xsEnableRule("destroyUnnecessaryDropsites");
     }
 
@@ -5131,12 +5120,12 @@ void age3Handler(int age=2)
             numBuilders = 1;
             break;
         }
-///CHINESE        case cCultureChinese:
-///CHINESE        {
-///CHINESE            buildingType = cUnitTypeCastle;
-///CHINESE            numBuilders = 4;
-///CHINESE            break;
-///CHINESE        }		
+        case cCultureChinese:
+        {
+            buildingType = cUnitTypeCastle;
+            numBuilders = 4;
+            break;
+        }		
     }
     
     int builderType = cUnitTypeAbstractVillager;

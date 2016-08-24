@@ -2,7 +2,6 @@
 //This file contains all Chinese god specific techs.
 //by Reth
 
-/*
 
 //Chinese
 //NuWa
@@ -651,4 +650,3 @@ rule getEastSea
         if (ShowAiEcho == true) aiEcho("Getting EastSea");
     }
 }
-*/

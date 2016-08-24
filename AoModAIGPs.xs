@@ -881,7 +881,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         return (true);
     }
 
-/*
+
 // Chinese GPS, copy paste from WarriorMario  ////////////
 
 // Set up the Barrage power
@@ -1045,7 +1045,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 		xsEnableRule("rYearOfTheGoat");
 		return (false);  
 	}
-*/
+
    return (false);
 }
 //==============================================================================
@@ -1943,8 +1943,8 @@ rule rShiftingSand
 			kbUnitQuerySetUnitType(queryID, cUnitTypeMiningCamp);
 		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureGreek)
 			kbUnitQuerySetUnitType(queryID, cUnitTypeStorehouse);
-///CHINESE		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureChinese)
-///CHINESE			kbUnitQuerySetUnitType(queryID, cUnitTypeStoragePit);	
+		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureChinese)
+			kbUnitQuerySetUnitType(queryID, cUnitTypeStoragePit);	
 		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureAtlantean)
 			kbUnitQuerySetUnitType(queryID, cUnitTypeVillagerAtlantean);				
 	        kbUnitQuerySetState(queryID, cUnitStateAlive);
@@ -1973,7 +1973,7 @@ rule rShiftingSand
 
 // Chinese rules, copy paste from WarriorMario //////////
 
-/*
+
 //==============================================================================
 // canAffordSpeedUpConstruction(int queryID, int index)
 // Function to check whether we can afford a speed up
@@ -2254,7 +2254,7 @@ inactive
 	}
 	
 }
-*/
+
 //==============================================================================
 // RULE rCastHeavyGP -- TARTARIAN
 //==============================================================================

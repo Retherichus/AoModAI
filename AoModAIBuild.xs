@@ -3201,8 +3201,8 @@ rule buildFortress
         bigBuildingID = cUnitTypeHillFort;
     else if (cMyCulture == cCultureAtlantean)
         bigBuildingID = cUnitTypePalace;	
-///CHINESE    else if (cMyCulture == cCultureChinese)
-///CHINESE        bigBuildingID = cUnitTypeCastle;		
+    else if (cMyCulture == cCultureChinese)
+        bigBuildingID = cUnitTypeCastle;		
 
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     if (numFortresses >= kbGetBuildLimit(cMyID, bigBuildingID))
@@ -3300,8 +3300,8 @@ rule buildFortress
                     building1ID = cUnitTypeLonghouse;
                 else if (cMyCulture == cCultureAtlantean)
                     building1ID = cUnitTypeBarracksAtlantean;
-///CHINESE                else if (cMyCulture == cCultureChinese)
-///CHINESE                   building1ID = cUnitTypeStableChinese;					
+                else if (cMyCulture == cCultureChinese)
+                    building1ID = cUnitTypeStableChinese;					
                 int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
                 if (numBuilding1NearBase > 3)
                     return;
@@ -3581,8 +3581,8 @@ rule buildBuildingsAtOtherBase
         building1ID = cUnitTypeLonghouse;
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeCounterBuilding;
-///CHINESE    else if (cMyCulture == cCultureChinese)
-///CHINESE        building1ID = cUnitTypeStableChinese;	
+    else if (cMyCulture == cCultureChinese)
+        building1ID = cUnitTypeStableChinese;	
 	
         
     vector location = kbUnitGetPosition(otherBaseUnitID);
@@ -3762,8 +3762,8 @@ rule buildBuildingsAtOtherBase2
         building1ID = cUnitTypeLonghouse;
     else if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
-///CHINESE    else if (cMyCulture == cCultureChinese)
-///CHINESE        building1ID = cUnitTypeBarracksChinese;	
+    else if (cMyCulture == cCultureChinese)
+        building1ID = cUnitTypeBarracksChinese;	
 	
         
     vector location = kbUnitGetPosition(otherBaseUnitID);
@@ -4463,20 +4463,20 @@ rule destroyUnnecessaryDropsites
                         continue;
                     }
                 }
-///CHINESE                else if (cMyCulture == cCultureChinese)
-///CHINESE                {
-///CHINESE                    if (kbUnitIsType(dropsiteID, cUnitTypeStoragePit) == true)
-///CHINESE                    {
-///CHINESE                        if (((numTrees < 1) && (numGoldMines < 1)) || ((otherBaseID != mainBaseID) && (numGoldMines < 1)))
-///CHINESE                        {
-///CHINESE                            if ((kbGetTechStatus(cTechHandAxe) != cTechStatusResearching) && (kbGetTechStatus(cTechPickaxe) != cTechStatusResearching))
-///CHINESE                            {
-///CHINESE                                aiTaskUnitDelete(dropsiteID);
-///CHINESE                            }
-///CHINESE                        }
-///CHINESE                        continue;				
-///CHINESE            }
-///CHINESE        }
+                else if (cMyCulture == cCultureChinese)
+                {
+                    if (kbUnitIsType(dropsiteID, cUnitTypeStoragePit) == true)
+                    {
+                        if (((numTrees < 1) && (numGoldMines < 1)) || ((otherBaseID != mainBaseID) && (numGoldMines < 1)))
+                        {
+                            if ((kbGetTechStatus(cTechHandAxe) != cTechStatusResearching) && (kbGetTechStatus(cTechPickaxe) != cTechStatusResearching))
+                            {
+                                aiTaskUnitDelete(dropsiteID);
+                            }
+                        }
+                        continue;				
+            }
+        }
     }
 }
 }
@@ -5003,8 +5003,8 @@ rule fixJammedDropsiteBuildPlans
     {
         if (cMyCulture == cCultureGreek)
             dropsiteTypeID = cUnitTypeStorehouse;
-///CHINESE        if (cMyCulture == cCultureChinese)
-///CHINESE            dropsiteTypeID = cUnitTypeStoragePit;			
+        if (cMyCulture == cCultureChinese)
+            dropsiteTypeID = cUnitTypeStoragePit;			
         else
         {
             if (i == 0)
@@ -5204,8 +5204,8 @@ rule makeExtraMarket    //If it takes more than 5 minutes to place our trade mar
     minInterval 37 //starts in cAge3, activated in tradeWithCaravans
 {
 
-///CHINESE    if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa)
-///CHINESE	return;
+    if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa)
+	return;
 	
     xsSetRuleMinIntervalSelf(37);
     static int ruleStartTime = -1;
@@ -5305,5 +5305,342 @@ rule makeExtraMarket    //If it takes more than 5 minutes to place our trade mar
         firstRun = false;
     }
 }
+// moved from Extra, expansion stuff etc
 
+//==============================================================================
+// RULE: buildManyBuildings (Age of Buildings strategy --- Poseidon ONLY)
+//==============================================================================
+rule buildManyBuildings
+   minInterval 30
+   inactive
+{
+   float currentWood=kbResourceGet(cResourceWood);
+
+
+   static int unitQueryID=-1;
+
+   if (cMyCiv != cCivPoseidon)
+   {
+	xsDisableSelf();
+	return;
+   }
+  
+   int numberOfArcheryRange=kbUnitCount(cMyID, cUnitTypeArcheryRange, cUnitStateAlive);
+   int numberOfBarracks=kbUnitCount(cMyID, cUnitTypeBarracks, cUnitStateAlive);
+   int numberOfStables=kbUnitCount(cMyID, cUnitTypeStable, cUnitStateAlive);
+   int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAlive);
+   int numberSettlements=kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
+
+   if (numberOfFortresses < 1 || numberSettlements < 2)
+      return;
+
+   if (kbGetAge() < 2)
+      return;
+
+   if (currentWood < 1000)
+      return;
+
+ if (numberOfArcheryRange < 15 || numberOfBarracks < 15 || numberOfStables < 15)
+ {
+   int planID=aiPlanCreate("Build More Buildings", cPlanBuild);
+   if (planID >= 0)
+   {
+      int randSelect=aiRandInt(3);
+
+      if (randSelect == 0)
+	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeArcheryRange);
+      else if (randSelect == 1)
+	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeBarracks);
+      else
+	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeStable);
+
+      aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
+      aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 0.0);
+      aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
+      aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
+      aiPlanSetBaseID(planID, kbBaseGetMainID(cMyID));
+      aiPlanSetDesiredPriority(planID, 20);
+      int builderTypeID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder,0);
+      aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
+      aiPlanSetEscrowID(planID, cRootEscrowID);
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Settlement Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSettlement);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+
+   kbUnitQueryResetResults(unitQueryID);
+   int numberFound=kbUnitQueryExecute(unitQueryID);
+   int unit=kbUnitQueryGetResult(unitQueryID, aiRandInt(numberFound));
+
+    int unitBaseID=kbBaseGetMainID(cMyID);
+    if (unit != -1)
+    {
+       //Get new base ID.
+       unitBaseID=kbUnitGetBaseID(unit);
+    }
+
+      aiPlanSetBaseID(planID, unitBaseID);
+
+      vector location = kbUnitGetPosition(unit);
+
+      vector backVector = kbBaseGetFrontVector(cMyID, unitBaseID);
+
+      float x = xsVectorGetX(backVector);
+      float z = xsVectorGetZ(backVector);
+      x = x * aiRandInt(40) - 20;
+      z = z * aiRandInt(40) - 20;
+
+      backVector = xsVectorSetX(backVector, x);
+      backVector = xsVectorSetZ(backVector, z);
+      backVector = xsVectorSetY(backVector, 0.0);
+      location = location + backVector;
+      aiPlanSetVariableVector(planID, cBuildPlanInfluencePosition, 0, location);
+      aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionDistance, 0, 10.0);
+      aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionValue, 0, 1.0);
+
+      aiPlanSetActive(planID);
+   }
+ }
+}
+
+//==============================================================================
+// buildGarden // Stolen from the Expansion. ):
+//==============================================================================
+rule buildGarden
+   minInterval 14
+   inactive
+{
+	if(cMyCulture != cCultureChinese)
+	{
+		xsDisableSelf();
+		return;
+	}
+
+	int gardenProtoID = cUnitTypeGarden;
+
+   //If we have any houses that are building, skip.
+   if (kbUnitCount(cMyID, gardenProtoID, cUnitStateBuilding) > 0)
+	  return;
+   
+	//If we already have gGardenBuildLimit gardens, we shouldn't build anymore.
+   if (gGardenBuildLimit != -1)
+   {
+	  int numberOfGardens = kbUnitCount(cMyID, gardenProtoID, cUnitStateAliveOrBuilding);
+	  if (numberOfGardens >= gGardenBuildLimit)
+		 return;
+   }
+   //If we already have a garden plan active, skip.
+   if (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, gardenProtoID) > -1)
+	  return;
+
+   //Over time, we will find out what areas are good and bad to build in.  Use that info here, because we want to protect houses.
+	int planID = aiPlanCreate("BuildGarden", cPlanBuild);
+   if (planID >= 0)
+   {
+	  aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, gardenProtoID);
+	  aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, true);
+	  aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 100.0);
+	  aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
+	  aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
+	  aiPlanSetDesiredPriority(planID, 100);
+
+		int builderTypeID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder,0);
+	  if (cMyCulture == cCultureNorse)
+		 builderTypeID = cUnitTypeUlfsark;   // Exact match for land scout, so build plan can steal scout
+	  if(cMyCulture == cCultureChinese)
+		  builderTypeID = cUnitTypeVillagerChinese; // Temp chinese fix
+
+		aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
+	  aiPlanSetEscrowID(planID, cEconomyEscrowID);
+
+	  vector backVector = kbBaseGetBackVector(cMyID, kbBaseGetMainID(cMyID));
+
+	  float x = xsVectorGetX(backVector);
+	  float z = xsVectorGetZ(backVector);
+	  x = x * 40.0;
+	  z = z * 40.0;
+
+	  backVector = xsVectorSetX(backVector, x);
+	  backVector = xsVectorSetZ(backVector, z);
+	  backVector = xsVectorSetY(backVector, 0.0);
+	  vector location = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
+	  int areaGroup1 = kbAreaGroupGetIDByPosition(location);   // Base area group
+	  location = location + backVector;
+	  int areaGroup2 = kbAreaGroupGetIDByPosition(location);   // Back vector area group
+	  if (areaGroup1 != areaGroup2)
+		 location = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));   // Reset to area center if back is in wrong area group
+
+	  aiPlanSetVariableVector(planID, cBuildPlanInfluencePosition, 0, location);
+	  aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionDistance, 0, 20.0);
+	  aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionValue, 0, 1.0);
+
+	  aiPlanSetActive(planID);
+   }
+}
+
+//==============================================================================
+// Rule: ChooseGardenResource  // Redefined to fit this Ai better. (Reth)
+//==============================================================================
+rule ChooseGardenResource
+minInterval 20
+inactive
+{
+    float FoodSupply = kbResourceGet(cResourceFood);
+    float WoodSupply = kbResourceGet(cResourceWood); 
+	float GoldSupply = kbResourceGet(cResourceGold);
+    float MyFavor = kbResourceGet(cResourceFavor); 
+	
+	int res  = cResourceGold;
+	string resname = "Gold";
+if (FoodSupply < 500)
+	{
+		res  = cResourceFood;
+		resname = "Food";
+	}	
+
+	if (WoodSupply < 200 && FoodSupply > 500 && GoldSupply > WoodSupply)
+	{
+		res  = cResourceWood;
+		resname = "Wood";
+	}
+	
+if (GoldSupply < 400 && FoodSupply > 500 && WoodSupply > GoldSupply)
+	{
+		res  = cResourceGold;
+		resname = "Gold";
+	}
+
+	if (MyFavor < 60 && FoodSupply > 600 && WoodSupply > 300 && GoldSupply > 600)
+	{
+		res  = cResourceFavor;
+		resname = "Favor";
+	}
+	
+	if (MyFavor < 30 && FoodSupply > 150)
+	{
+		res  = cResourceFavor;
+		resname = "Favor";
+	}
+	
+else if (FoodSupply > 600 && WoodSupply > 300 && GoldSupply > 400 && MyFavor > 60)
+{	
+    int choice = -1;
+    choice = aiRandInt(3);     // 0-3
+    
+    switch(choice)
+    {
+        case 0:  // Food
+        {
+		res  = cResourceFood;
+		resname = "Food";
+        }
+        case 1:  // Wood
+        {
+		res  = cResourceWood;
+		resname = "Wood";
+        }
+        case 2:  // Gold
+        {
+		res  = cResourceGold;
+		resname = "Gold";
+        }	
+}
+}	
+	if (ShowAiEcho == true) aiEcho("Setting gardens to: " + resname);
+	kbSetGardenResource(res);
+    }		
+
+
+//==============================================================================
+rule getEarthenWall
+    inactive
+    minInterval 37 //starts in cAge2
+{
+    int techID = cTechEarthenWall;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsEnableRule("getStoneWall");
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("getEarhernWall:");
+
+
+    
+    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+       
+    
+    if (kbGetTechStatus(techID) == cTechStatusAvailable)
+    {
+        int x = aiPlanCreate("StoneWall", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 98);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+
+    }
+}
+
+//==============================================================================
+rule getGreatWall
+    inactive
+//    minInterval 31 //starts in cAge3
+    minInterval 37 //starts in cAge2 activated in getStoneWall
+{
+    int techID = cTechGreatWall;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {		
+			
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("getGreatWall:");
+
+    if (kbGetTechStatus(cTechStoneWall) < cTechStatusResearching)
+    {
+        return;
+    }
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+    
+    int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
+    if (numFortresses < 1)
+        return;
+    
+    float goldSupply = kbResourceGet(cResourceGold);
+    float foodSupply = kbResourceGet(cResourceFood);    
+    if ((goldSupply < 600) || (foodSupply < 750))
+        return;
+        
+
+    static int count = 0;        
+    if (count < 1)
+    {
+        count = count + 1;
+        return;
+    }
+
+    if (kbGetTechStatus(techID) == cTechStatusAvailable)
+    {
+        int x = aiPlanCreate("GreatWall", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 90);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting Great Wall");
+    }
+}
 
