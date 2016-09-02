@@ -273,6 +273,15 @@ void initRethlAge1(void)  // Am I doing this right??
 	   if (ShowAiEcho == true) aiEcho("Not going to waste pop slots on Transport ships.");
 	   }
 
+	   if (cMyCulture == cCultureChinese)
+	   {
+	   if (cRandomMapName == "vinlandsaga" || cRandomMapName == "team migration")
+	   {
+	   int areaID=kbAreaGetClosetArea(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)), cAreaTypeWater);
+	   aiUnitCreateCheat(cMyID, cUnitTypeTransportShipChinese, kbAreaGetCenter(areaID), "Spawn missing boat", 1);
+	   xsEnableRule("StartingBoatFailsafe");
+	   }
+	   }
 	   
 }
 
@@ -521,7 +530,8 @@ rule ActivateRethOverridesAge4
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Osiris) == cTechStatusActive)
         xsEnableRuleGroup("Osiris");
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Thoth) == cTechStatusActive)
-        xsEnableRuleGroup("Thoth");		
+        xsEnableRuleGroup("Thoth");	
+		
 		
 		//Norse MINOR GOD SPECIFIC
         if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge4Tyr) == cTechStatusActive)
@@ -1804,13 +1814,13 @@ inactive
                 
 				if (WaterVersion == true)
 				{
-				if (numAvailableUnits < 7 && kbGetPop() <= 39 || kbGetAge() < cAge1)
+				if (numAvailableUnits < 7 && kbGetPop() <= 39 || kbGetAge() < cAge2)
                 return;
 				}
 				
 				if (WaterVersion == false)
 				{
-				if (numAvailableUnits < 3 && kbGetPop() <= 39 || kbGetAge() < cAge1)
+				if (numAvailableUnits < 5 && kbGetPop() <= 39 || kbGetAge() < cAge2)
                 return;
 				}	  
 					if (LandNeedReCalculation == true && WaterVersion == false)
@@ -1822,7 +1832,7 @@ inactive
                 
                         aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.7, numAvailableUnits * 0.8, numAvailableUnits * 0.85);    // Most mil units.
 
-                        aiPlanSetDesiredPriority(gDefendPlentyVault, 65);                       // prio
+                        aiPlanSetDesiredPriority(gDefendPlentyVault, 61);                       // prio
                         aiPlanSetVariableVector(gDefendPlentyVault, cDefendPlanDefendPoint, 0, KOTHPlace);
                         aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanEngageRange, 0, 30.0);
                         aiPlanSetVariableBool(gDefendPlentyVault, cDefendPlanPatrol, 0, false);
@@ -1844,10 +1854,9 @@ inactive
 						LandActive = true; // active, will add more units below.
 						return;
 						}
-						else 
-						//aiPlanRemoveUserVariableValue(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary);
-						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.7, numAvailableUnits * 0.8, numAvailableUnits * 1.00);    // Most mil units.
+						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.7, numAvailableUnits * 0.8, numAvailableUnits * 0.9);    // Most mil units.
 						LandNeedReCalculation = false;
+						
 						keepUnitsWithinRange(gDefendPlentyVault, KOTHPlace);
 						return;
 						}
@@ -1857,7 +1866,6 @@ inactive
                
 			   if (NumEnemy + 5 > NumSelf && WaterVersion == false)
 		       {
-			   NumKOTHEnemies = NumEnemy;
 			   LandNeedReCalculation = true;
 			   xsSetRuleMinIntervalSelf(2);
 			   //aiPlanDestroy(gDefendPlentyVault);  // restarting plan
@@ -1969,5 +1977,18 @@ inactive
 	
 }
 // KOTH COMPLEX END
-
+//==============================================================================
+rule StartingBoatFailsafe  // for vinlandsaga and team migration where ships may fail to spawn.
+minInterval 5
+inactive
+{
+ vector HomeBase = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
+ int boats = kbUnitCount(cMyID, cUnitTypeTransport, cUnitStateAlive);
+ 
+ if (boats <= 0)
+ aiUnitCreateCheat(cMyID, cUnitTypeRoc, HomeBase, "Spawn backup roc", 1);
+ 
+ xsDisableSelf();
+ 
+}
 //Testing ground

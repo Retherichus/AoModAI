@@ -2916,8 +2916,9 @@ rule defendSettlementPosition
         aiPlanSetUnitStance(settlementPosDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(settlementPosDefPlanID, cDefendPlanPatrol, 0, false);
 
-        aiPlanSetNumberVariableValues(settlementPosDefPlanID, cDefendPlanAttackTypeID, 1, true);
+        aiPlanSetNumberVariableValues(settlementPosDefPlanID, cDefendPlanAttackTypeID, 2, true);
         aiPlanSetVariableInt(settlementPosDefPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
+		aiPlanSetVariableInt(settlementPosDefPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeAbstractWall);
 
         if (distToMainBase < 85.0)
         {
@@ -3772,12 +3773,22 @@ rule randomAttackGenerator
                 aiPlanSetVariableBool(randomAttackPlanID, cAttackPlanAutoUseGPs, 0, true);
         }
     }
-    
+	
+
+	
     aiPlanSetInitialPosition(randomAttackPlanID, baseLocationToUse);
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanRefreshFrequency, 0, 40);
+    aiPlanSetNumberVariableValues(randomAttackPlanID, cAttackPlanTargetTypeID, 4, true);
+    aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);	
+    aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
+	aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
+    aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeAbstractWall);	
 
-    aiPlanSetDesiredPriority(randomAttackPlanID, 50);
-    
+	
+    //aiPlanSetDesiredPriority(randomAttackPlanID, 50);
+    aiPlanAddUnitType(randomAttackPlanID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
+	aiPlanSetDesiredPriority(randomAttackPlanID, 52);
+	
     aiPlanSetActive(randomAttackPlanID);
     gRandomAttackPlanID = randomAttackPlanID;
     if (ShowAiEcho == true) aiEcho("Creating randomAttackPlan #: "+gRandomAttackPlanID);
@@ -4124,9 +4135,10 @@ rule createLandAttack
 
     aiPlanSetVariableBool(landAttackPlanID, cAttackPlanAutoUseGPs, 0, false);
     
-    aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetTypeID, 2, true);      
+    aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetTypeID, 3, true);      
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeUnit);
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeBuilding);
+	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeAbstractWall);
 
     aiPlanSetDesiredPriority(landAttackPlanID, 50);
     
@@ -4917,11 +4929,3 @@ rule baseAttackTracker
 
 
 //==============================================================================
-/* TODO: create a new attack plan against:
-
-cUnitTypeShadeofErebus
-cUnitTypeSerpent
-cUnitTypeAnimalPredator
-
-or better against military units of player 0 (=mother nature)
-*/

@@ -2554,32 +2554,34 @@ void initEgyptian(void)
             aiPlanSetEconomy(gEmpowerPlanID, true);
             aiPlanAddUnitType(gEmpowerPlanID, cUnitTypePharaoh, 1, 1, 1);
             aiPlanSetVariableInt(gEmpowerPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeGranary);
-            aiPlanSetActive(gEmpowerPlanID);
+            aiPlanSetDesiredPriority(gEmpowerPlanID, 91);
+			aiPlanSetActive(gEmpowerPlanID);
+			
         }
     }
 
 	//Basic Towncenter empower plan for Son of Osiris
 		
-	    eOsiris=aiPlanCreate("Pharaoh Empower", cPlanEmpower);
+	    eOsiris=aiPlanCreate("Son of Osiris Empower", cPlanEmpower);
         if (eOsiris >= 0)
         {
             aiPlanSetEconomy(eOsiris, true);
             aiPlanAddUnitType(eOsiris, cUnitTypePharaohofOsiris, 1, 1, 1);
             aiPlanSetVariableInt(eOsiris, cEmpowerPlanTargetTypeID, 0, cUnitTypeAbstractSettlement);
-            aiPlanSetDesiredPriority(eOsiris, 60);
+            aiPlanSetDesiredPriority(eOsiris, 91);
 			aiPlanSetActive(eOsiris);
             }
         
 		
 		
-	    Pempowermarket=aiPlanCreate("Pharaoh Empower", cPlanEmpower);
+	    Pempowermarket=aiPlanCreate("Pharaoh Secondary Empower", cPlanEmpower);
         if (Pempowermarket >= 0)
         {
             aiPlanSetEconomy(Pempowermarket, true);
             aiPlanAddUnitType(Pempowermarket, cUnitTypePharaohSecondary, 1, 1, 1);
             aiPlanSetVariableInt(Pempowermarket, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
+			aiPlanSetDesiredPriority(Pempowermarket, 90);
 			aiPlanSetActive(Pempowermarket);
-			aiPlanSetDesiredPriority(Pempowermarket, 60);
             }
         
 
@@ -4637,11 +4639,14 @@ void age2Handler(int age=1)
         if (cMyCiv == cCivRa)
         {
             gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypePriest, 5, true, kbBaseGetMainID(cMyID));
+			
+			APlanID=aiPlanCreate("Mining Camp Empower", cPlanEmpower);
             if (APlanID >= 0)
             {
                 aiPlanSetEconomy(APlanID, true);
                 aiPlanAddUnitType(APlanID, cUnitTypePriest, 1, 1, 1);
                 aiPlanSetVariableInt(APlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMiningCamp);
+				aiPlanSetDesiredPriority(APlanID, 70);			
 				aiPlanSetActive(APlanID);
             }
             BPlanID=aiPlanCreate("Lumber Camp Empower", cPlanEmpower);
@@ -4649,23 +4654,28 @@ void age2Handler(int age=1)
             {
                 aiPlanSetEconomy(BPlanID, true);
                 aiPlanAddUnitType(BPlanID, cUnitTypePriest, 1, 1, 1);
-                aiPlanSetVariableInt(BPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeLumberCamp); 
+                aiPlanSetVariableInt(BPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeLumberCamp);
+                aiPlanSetDesiredPriority(BPlanID, 70);				
 				aiPlanSetActive(BPlanID);
             }
+			/* temp disabled
             CPlanID=aiPlanCreate("Monument Empower", cPlanEmpower);
             if (CPlanID >= 0)
             {
                 aiPlanSetEconomy(CPlanID, true);
                 aiPlanAddUnitType(CPlanID, cUnitTypePriest, 1, 1, 1);
-                aiPlanSetVariableInt(CPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeAbstractMonument);
+                aiPlanSetVariableInt(CPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMonument5);	
+                aiPlanSetDesiredPriority(CPlanID, 5);					
 				aiPlanSetActive(CPlanID);
             }
+			*/
 			DPlanID=aiPlanCreate("Market Priest Empower", cPlanEmpower);
             if (DPlanID >= 0)
             {
                 aiPlanSetEconomy(DPlanID, true);
                 aiPlanAddUnitType(DPlanID, cUnitTypePriest, 1, 1, 1);
                 aiPlanSetVariableInt(DPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
+				aiPlanSetDesiredPriority(DPlanID, 69);							
 				aiPlanSetActive(DPlanID);
             }
 			CPlanID=aiPlanCreate("Citadel Empower", cPlanEmpower);

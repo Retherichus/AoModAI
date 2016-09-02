@@ -2152,6 +2152,8 @@ rule createHerdplan
                     aiPlanSetVariableInt(gHerdPlanID, cHerdPlanBuildingTypeID, 0, cUnitTypeOxCart);
                 else if (cMyCulture == cCultureAtlantean)
                     aiPlanSetVariableInt(gHerdPlanID, cHerdPlanBuildingTypeID, 0, cUnitTypeAbstractVillager);
+                else if (cMyCulture == cCultureChinese)
+                    aiPlanSetVariableInt(gHerdPlanID, cHerdPlanBuildingTypeID, 0, cUnitTypeStoragePit);					
             }
         }
         else

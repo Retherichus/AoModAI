@@ -498,7 +498,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
     if (ShowAiEcho == true) aiEcho("VinlandsagaBaseCallback:");
 
     //Get our water transport type.
-    int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+    int transportPUID=cUnitTypeTransport;
     if (transportPUID < 0)
         return;
     //Get our main base.  This needs to be different than our initial base.
@@ -566,6 +566,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
             if (cMyCulture == cCultureNorse)
                 aiPlanAddUnitType(planID, cUnitTypeOxCart, 0, 1, 4);
             aiPlanAddUnitType(planID, cUnitTypeHerdable, 0, 2, 2);
+			aiPlanSetVariableBool(planID, cTransportPlanReturnWhenDone, 0, true);
         }
         if (ShowAiEcho == true) aiEcho("Transport plan ID is "+planID);
     }

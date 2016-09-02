@@ -1912,6 +1912,7 @@ rule rCitadel
             aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
             aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
             aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTownCenter);
+			aiPlanDestroy(gDefendPlanID); // don't get stuck in a permanent defend plan!
             xsDisableSelf();
         }
     }

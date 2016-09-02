@@ -199,7 +199,6 @@ extern bool ShowAiEcho = false;
 extern bool DisallowPullBack = false;
 extern int KOTHTransportPlan = -1;
 extern int KOTHTHomeTransportPlan = -1;
-extern int NumKOTHEnemies = 1;
 extern int SendBackCount = 0;
 extern bool KoTHOkNow = false;
 extern bool DestroyTransportPlan = false;  
