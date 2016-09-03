@@ -2695,7 +2695,7 @@ rule attackEnemySettlement
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.55, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9);
         }
             
-        aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, -1);
+        aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
         aiPlanSetRequiresAllNeedUnits(enemySettlementAttPlanID, false);
         aiPlanSetUnitStance(enemySettlementAttPlanID, cUnitStanceDefensive);
     }
@@ -2724,7 +2724,7 @@ rule attackEnemySettlement
             else
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.60, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9);
         }
-        aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, -1);
+        aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
         
         aiPlanSetRequiresAllNeedUnits(enemySettlementAttPlanID, false);
         aiPlanSetUnitStance(enemySettlementAttPlanID, cUnitStanceDefensive);
@@ -2749,6 +2749,12 @@ rule attackEnemySettlement
         aiPlanSetDesiredPriority(enemySettlementAttPlanID, 51);
 
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);
+	aiPlanSetNumberVariableValues(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 5, true);
+    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeSettlementLevel1);	
+    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeAbstractVillager);
+	aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeUnit);
+	aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeBuilding);
+    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 4, cUnitTypeAbstractWall);
     
     aiPlanSetActive(enemySettlementAttPlanID);
     
