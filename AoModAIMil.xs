@@ -2695,7 +2695,7 @@ rule attackEnemySettlement
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.55, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9);
         }
             
-        aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
+        aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, -1);
         aiPlanSetRequiresAllNeedUnits(enemySettlementAttPlanID, false);
         aiPlanSetUnitStance(enemySettlementAttPlanID, cUnitStanceDefensive);
     }
@@ -2724,22 +2724,20 @@ rule attackEnemySettlement
             else
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.60, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9);
         }
-        aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
+        aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, -1);
         
         aiPlanSetRequiresAllNeedUnits(enemySettlementAttPlanID, false);
         aiPlanSetUnitStance(enemySettlementAttPlanID, cUnitStanceDefensive);
     }
     
-  //  if (gAge2MinorGod == cTechAge2Okeanus)
   
-    int numScouts = kbUnitCount(cMyID, cUnitTypeAbstractScout, cUnitStateAlive);
-    if ((aiRandInt(2) < 1) || (numTitans > 0) || (numScouts < 2) || (targetSettlementCloseToMB == true)
+    if ((aiRandInt(2) < 1) || (numTitans > 0) || (targetSettlementCloseToMB == true)
       || (distanceToTarget <= veryCloseRange))
         aiPlanSetVariableBool(enemySettlementAttPlanID, cAttackPlanAutoUseGPs, 0, false);
     else
         aiPlanSetVariableBool(enemySettlementAttPlanID, cAttackPlanAutoUseGPs, 0, true);
     
-    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanRefreshFrequency, 0, 40); 
+    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanRefreshFrequency, 0, 12); 
 
     aiPlanSetInitialPosition(enemySettlementAttPlanID, baseLocationToUse);
 
@@ -3350,13 +3348,13 @@ rule createRaidingParty
     
     if (targetIsMarket == true)
     {
-        aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanRefreshFrequency, 0, 40);
+        aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanRefreshFrequency, 0, 12);
         if (numSiegeUnitsIngDefendPlan > 1)
             aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
     }
     else
     {
-        aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanRefreshFrequency, 0, 40);
+        aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanRefreshFrequency, 0, 12);
     }
     
     aiPlanSetInitialPosition(raidingPartyAttackID, baseLocationToUse);
@@ -3675,8 +3673,6 @@ rule randomAttackGenerator
         return;
     }
     
-    int numScouts = kbUnitCount(cMyID, cUnitTypeAbstractScout, cUnitStateAlive);
-    
     int randomAttackPlanID = aiPlanCreate("randomAttackPlan", cPlanAttack);
     if (randomAttackPlanID < 0)
         return;
@@ -3734,7 +3730,7 @@ rule randomAttackGenerator
                 if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
                     aiPlanAddUnitType(randomAttackPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 1, 1);
                 
-                if ((aiRandInt(2) < 1) || (numScouts < 2))
+                if (aiRandInt(2) < 1)
                     aiPlanSetVariableBool(randomAttackPlanID, cAttackPlanAutoUseGPs, 0, false);
                 else
                     aiPlanSetVariableBool(randomAttackPlanID, cAttackPlanAutoUseGPs, 0, true);
@@ -3773,7 +3769,7 @@ rule randomAttackGenerator
                 aiPlanAddUnitType(randomAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 1.0);
             }
             
-            if ((aiRandInt(2) < 1) || (numScouts < 2))
+            if (aiRandInt(2) < 1)
                 aiPlanSetVariableBool(randomAttackPlanID, cAttackPlanAutoUseGPs, 0, false);
             else
                 aiPlanSetVariableBool(randomAttackPlanID, cAttackPlanAutoUseGPs, 0, true);
@@ -3783,7 +3779,7 @@ rule randomAttackGenerator
 
 	
     aiPlanSetInitialPosition(randomAttackPlanID, baseLocationToUse);
-    aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanRefreshFrequency, 0, 40);
+    aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanRefreshFrequency, 0, 12);
     aiPlanSetNumberVariableValues(randomAttackPlanID, cAttackPlanTargetTypeID, 4, true);
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);	
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
@@ -4137,9 +4133,13 @@ rule createLandAttack
 
     
     aiPlanSetInitialPosition(landAttackPlanID, baseLocationToUse);
-    aiPlanSetVariableInt(landAttackPlanID, cAttackPlanRefreshFrequency, 0, 40);
+    aiPlanSetVariableInt(landAttackPlanID, cAttackPlanRefreshFrequency, 0, 12);
 
+    if (aiRandInt(2) < 1)
     aiPlanSetVariableBool(landAttackPlanID, cAttackPlanAutoUseGPs, 0, false);
+    else
+    aiPlanSetVariableBool(landAttackPlanID, cAttackPlanAutoUseGPs, 0, true);
+
     
     aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetTypeID, 3, true);      
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeUnit);

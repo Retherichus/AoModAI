@@ -237,15 +237,8 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetRelicEventHandler("relicHandler");
 	aiSetRetreatEventHandler("retreatHandler");
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
-	// kbLookAtAllUnitsOnMap();   // Semi cheating!.. Disabled due to unstable results.
+	// kbLookAtAllUnitsOnMap();   // Semi cheating!.. Disabled because I hate cheating, you may enable this by removing the double slash (note: all other AIs do cheat)
 	
-	/*
-	if (aiIsMultiplayer() == false)
-	if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("We're in a singleplayer/offline game, nothing can stop us here!");                 // Just to confirm game mode.
-	
-	if (aiIsMultiplayer() == true)
-	if (ShowAiEcho == true || ShowAiGenEcho == true) aiEcho("We're in a multiplayer game, I will make sure not to use any De-sync sensitive Godpowers.");  // ^ Ditto, heh.
-	*/
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
@@ -267,7 +260,7 @@ void initRethlAge1(void)  // Am I doing this right??
         }
       
 	   // Don't build transport ships on these maps!
-	   if ((cRandomMapName == "highlands") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad") || (cRandomMapName == "Deep Jungle") || (cRandomMapName == "Mediterranean") || (cRandomMapName == "mediterranean")))
+	   if ((cRandomMapName == "highland") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad") || (cRandomMapName == "Deep Jungle") || (cRandomMapName == "Mediterranean") || (cRandomMapName == "mediterranean")))
 	   {
 	   gTransportMap=false;
 	   if (ShowAiEcho == true) aiEcho("Not going to waste pop slots on Transport ships.");
@@ -381,26 +374,6 @@ rule ActivateRethOverridesAge1
 		
 		if (aiGetWorldDifficulty() > cDifficultyHard)
 		xsEnableRuleGroup("MassDonations");
-		
-		
-		/*
-		// Force Dock down.
-		if (gWaterMap == true && RethFishEco == true)
-   {
-      int areaID=kbAreaGetClosetArea(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)), cAreaTypeWater);
-      int buildDock=aiPlanCreate("BuildDock", cPlanBuild);
-      if (buildDock >= 0)
-      {
-         aiPlanSetVariableInt(buildDock, cBuildPlanBuildingTypeID, 0, cUnitTypeDock);
-         aiPlanSetDesiredPriority(buildDock, 30);
-         aiPlanSetVariableVector(buildDock, cBuildPlanDockPlacementPoint, 0, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-         aiPlanSetVariableVector(buildDock, cBuildPlanDockPlacementPoint, 1, kbAreaGetCenter(areaID));
-         aiPlanAddUnitType(buildDock, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-         aiPlanSetEscrowID(buildDock, cEconomyEscrowID);
-         aiPlanSetActive(buildDock);
-      }
-   }
-	*/	
 		
 		xsDisableSelf();
            
@@ -600,7 +573,7 @@ rule DockDefenseMonitor
             
 			aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 1); 
             aiPlanSetActive(planID);
-            aiPlanSetDesiredPriority(planID, 20);
+            aiPlanSetDesiredPriority(planID, 5);
 			xsDisableSelf();
          }
       }
@@ -1675,25 +1648,6 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     }
 	// prepare other units too
 	
-	/*
-	TEMP REMOVED due to crashes
-	static int HeroType =-1;
-	if (cMyCulture == cCultureGreek)
-	HeroType = cUnitTypeLogicalTypeGreekHeroes;
-	else if (cMyCulture == cCultureEgyptian)
-	HeroType = cUnitTypePriest;
-    else if (cMyCulture == cCultureNorse)
-	HeroType = cUnitTypeHero;
-	else if (cMyCulture == cCultureAtlantean)
-	HeroType = cUnitTypeHero;
-	else if (cMyCulture == cCultureChinese)
-	HeroType = cUnitTypeHero;
-	
-	int numHeroUnits = kbUnitCount(cMyID, HeroType, cUnitStateAlive);
-	int numInfMU = kbUnitCount(cMyID, cUnitTypeMythUnitInfantry, cUnitStateAlive);
-	int numCavMU = kbUnitCount(cMyID, cUnitTypeMythUnitCavalry, cUnitStateAlive);
-	int numArcMU = kbUnitCount(cMyID, cUnitTypeMythUnitArcher, cUnitStateAlive);
-	*/
 	
 	if (KoTHOkNow == true)
     {
@@ -1719,17 +1673,6 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, 10, 12, 15);
 	else aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeHumanSoldier, 12, 16, 20);
 	
-	/*
-	TEMP REMOVED due to crashes.
-	if (numInfMU > 0)
-	aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeMythUnitInfantry, numInfMU/2, numInfMU, numInfMU);
-	if (numCavMU > 0)
-    aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeMythUnitCavalry, numCavMU/2, numCavMU, numCavMU);
-	if (numArcMU > 0)
-    aiPlanAddUnitType(KOTHTransportPlan, cUnitTypeMythUnitArcher, numArcMU/2, numArcMU, numArcMU);
-	if (numHeroUnits > 0)
-    aiPlanAddUnitType(KOTHTransportPlan, HeroType, numHeroUnits*0.6, numHeroUnits*0.7, numHeroUnits*0.8);		
-	*/
 	
 	if (ShowAiEcho == true) aiEcho("GO TO VAULT TRIGGERED");
 	}
@@ -1854,7 +1797,7 @@ inactive
 						LandActive = true; // active, will add more units below.
 						return;
 						}
-						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.7, numAvailableUnits * 0.8, numAvailableUnits * 0.9);    // Most mil units.
+						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.6, numAvailableUnits * 0.7, numAvailableUnits * 0.8);    // Most mil units.
 						LandNeedReCalculation = false;
 						
 						keepUnitsWithinRange(gDefendPlentyVault, KOTHPlace);

@@ -10,7 +10,6 @@ rule maintainTradeUnits
 {
     if (ShowAiEcho == true) aiEcho("maintainTradeUnits:");
    
-//    int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAlive);
     int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding);
     if (numMarkets < 1)
         return;
@@ -499,8 +498,6 @@ rule trainMythUnit
         // age2 myth units
         if (gAge2MinorGod == cTechAge2Leto)
             age2MythUnitID = cUnitTypeAutomaton;
-   //     else if (gAge2MinorGod == cTechAge2Okeanus)   NO, JUST NO
-     //       age2MythUnitID = cUnitTypeFlyingMedic;    NO, JUST NO
         else if (gAge2MinorGod == cTechAge2Prometheus)
             age2MythUnitID = cUnitTypePromethean;
         

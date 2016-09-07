@@ -650,3 +650,86 @@ rule getEastSea
         if (ShowAiEcho == true) aiEcho("Getting EastSea");
     }
 }
+
+//==============================================================================
+rule getEarthenWall
+    inactive
+    minInterval 37 //starts in cAge2
+{
+    int techID = cTechEarthenWall;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsEnableRule("getStoneWall");
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("getEarhernWall:");
+
+
+    
+    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+       
+    
+    if (kbGetTechStatus(techID) == cTechStatusAvailable)
+    {
+        int x = aiPlanCreate("StoneWall", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 98);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+
+    }
+}
+
+//==============================================================================
+rule getGreatWall
+    inactive
+    minInterval 37 //starts in cAge2 activated in getStoneWall
+{
+    int techID = cTechGreatWall;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {		
+			
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("getGreatWall:");
+
+    if (kbGetTechStatus(cTechStoneWall) < cTechStatusResearching)
+    {
+        return;
+    }
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+    
+    int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
+    if (numFortresses < 1)
+        return;
+    
+    float goldSupply = kbResourceGet(cResourceGold);
+    float foodSupply = kbResourceGet(cResourceFood);    
+    if ((goldSupply < 600) || (foodSupply < 750))
+        return;
+        
+
+    static int count = 0;        
+    if (count < 1)
+    {
+        count = count + 1;
+        return;
+    }
+
+    if (kbGetTechStatus(techID) == cTechStatusAvailable)
+    {
+        int x = aiPlanCreate("GreatWall", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 90);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting Great Wall");
+    }
+}

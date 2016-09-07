@@ -3492,8 +3492,10 @@ rule norseInfantryCheck
     if (ShowAiEcho == true) aiEcho("norseInfantryCheck:");
 
     //Get a count of our ulfsarks.
+	int ulfCountS=kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive);
     int ulfCount=kbUnitCount(cMyID, cUnitTypeUlfsark, cUnitStateAlive);
-    if (ulfCount > 1)     
+	ulfCount = ulfCount + ulfCountS;
+    if (ulfCount >= 1)     
         return;
 
     if (xsGetTime() < 90*1000)

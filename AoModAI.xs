@@ -1587,7 +1587,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (woodAssignment > lastWoodAssignment)
         {
-            woodAssignment = lastWoodAssignment + 0.03;
+            woodAssignment = lastWoodAssignment + 0.05;
             if (woodAssignment > 0.45)
                 woodAssignment = 0.45;
         }
@@ -3686,7 +3686,6 @@ void init(void)
     //Set the Explore Danger Threshold.
     aiSetExploreDangerThreshold(300.0);
     //Auto gather our military units.
-//    aiSetAutoGatherMilitaryUnits(true);
     aiSetAutoGatherMilitaryUnits(false);
 
     //Get our house build limit.
@@ -3701,7 +3700,6 @@ void init(void)
     else if (cMyCulture == cCultureAtlantean)
         gHouseAvailablePopRebuild=6;
     else
-//        gHouseAvailablePopRebuild=4;
         gHouseAvailablePopRebuild=4;
 
     //Set the hard pop caps.
@@ -3730,11 +3728,8 @@ void init(void)
     else if (aiGetWorldDifficulty() == cDifficultyModerate)
         aiSetAttackResponseDistance(30.0);
     else
-//        aiSetAttackResponseDistance(65.0);
         aiSetAttackResponseDistance(33.0);
-//        aiSetAttackResponseDistance(28.0);
-//        aiSetAttackResponseDistance(25.0);
-//        aiSetAttackResponseDistance(22.0);
+
 
     // always consider walling
     float wallOdds = -1.0 * cvOffenseDefenseSlider;    // Now 1 for defense, -1 for offense
@@ -4065,7 +4060,6 @@ void init(void)
         if (aiGetGameMode() == cGameModeDeathmatch)
             lateAttackAge = 3;
 
-//        gLandAttackGoalID = createSimpleAttackGoal("Main Land Attack", -1, gLateUPID, -1, lateAttackAge, -1, kbBaseGetMainID(cMyID), false);
         gLandAttackGoalID = createSimpleAttackGoal("Main Land Attack", -1, gLateUPID, -1, lateAttackAge, -1, kbBaseGetMainID(cMyID), true);
 
         if (gLandAttackGoalID >= 0)
@@ -4089,8 +4083,6 @@ void init(void)
             kbBuildingPlacementSetBaseID(kbBaseGetMainID(cMyID), cBuildingPlacementPreferenceBack);
             kbBuildingPlacementStart();
         }
-
-//        createBuildBuildingGoal("Wonder Goal", cUnitTypeWonder, 1, 3, 4, kbBaseGetMainID(cMyID), 50, cUnitTypeAbstractVillager, true, 100, wonderBPID);
         createBuildBuildingGoal("Wonder Goal", cUnitTypeWonder, 1, 3, 4, kbBaseGetMainID(cMyID), 30, cUnitTypeAbstractVillager, true, 100, wonderBPID);
     }
 
@@ -4316,8 +4308,8 @@ void age2Handler(int age=1)
     xsEnableRule("Helpme");
     xsEnableRule("baseAttackTracker");
     
-    xsEnableRule("otherBasesDefPlans"); // This causes the game to crash in Debug mode.
-    //xsEnableRule("defendAlliedBase"); // Moved to monitor allies.   
+    xsEnableRule("otherBasesDefPlans");
+     
     
     //activate ObeliskClearingPlan if there is an Egyptian enemy,
     //enable the hesperides rule if there's an Oranos or Gaia player
@@ -4376,16 +4368,12 @@ void age2Handler(int age=1)
     else if (cMyCulture == cCultureAtlantean)
         gHouseAvailablePopRebuild=30;
     else
-//        gHouseAvailablePopRebuild=20;
         gHouseAvailablePopRebuild=24;
 
     //Switch the EM rule.
     xsDisableRule("updateEMAge1");
     xsEnableRule("updateEMAge2");
     updateEMAge2();	// Make it run right now
-    
-    //enable our fixBuildSettlementPlans rule
-//    xsEnableRule("fixBuildSettlementPlans");  //disabled for now as it doesn't seem to work as expected
 
     //If we're building towers, do that.  
     if (gBuildTowers == true)
@@ -4481,9 +4469,7 @@ void age2Handler(int age=1)
             aiPlanSetVariableBool(stablePlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
             aiPlanSetVariableFloat(stablePlanID, cBuildPlanRandomBPValue, 0, 0.0);
             
-//            bx = bx * 22;
             bx = bx * 24;
-//            bz = bz * 22;
             bz = bz * 24;
 
             backVector = xsVectorSetX(backVector, bx);
@@ -4492,7 +4478,7 @@ void age2Handler(int age=1)
             location = origLocation + backVector;
 
             aiPlanSetVariableVector(stablePlanID, cBuildPlanInfluencePosition, 0, location);
-//            aiPlanSetVariableFloat(stablePlanID, cBuildPlanInfluencePositionDistance, 0, 15.0);
+
             aiPlanSetVariableFloat(stablePlanID, cBuildPlanInfluencePositionDistance, 0, 12.0);
             aiPlanSetVariableFloat(stablePlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
 
@@ -4658,17 +4644,6 @@ void age2Handler(int age=1)
                 aiPlanSetDesiredPriority(BPlanID, 70);				
 				aiPlanSetActive(BPlanID);
             }
-			/* temp disabled
-            CPlanID=aiPlanCreate("Monument Empower", cPlanEmpower);
-            if (CPlanID >= 0)
-            {
-                aiPlanSetEconomy(CPlanID, true);
-                aiPlanAddUnitType(CPlanID, cUnitTypePriest, 1, 1, 1);
-                aiPlanSetVariableInt(CPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeMonument5);	
-                aiPlanSetDesiredPriority(CPlanID, 5);					
-				aiPlanSetActive(CPlanID);
-            }
-			*/
 			DPlanID=aiPlanCreate("Market Priest Empower", cPlanEmpower);
             if (DPlanID >= 0)
             {
@@ -4919,18 +4894,6 @@ void age2Handler(int age=1)
        
 	   if (cMyCulture == cCultureNorse)
         {
-		/*  TEMP DISABLED
-            // Add 2 ulfsarks from econ budget for walling      //is this really necessary?? maybe disable it after some testing
-            int planID=aiPlanCreate("Wall Ulfsarks", cPlanTrain);
-            if (planID >= 0)
-            {
-                aiPlanSetEconomy(planID, true);
-                aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeUlfsark);
-                aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 2);
-                aiPlanSetDesiredPriority(planID, 98);
-                aiPlanSetActive(planID);
-            }
-            */
             //enable the norseInfantryBuild rule
             xsEnableRule("norseInfantryBuild");
         }
@@ -5108,7 +5071,6 @@ void age3Handler(int age=2)
         case cCultureGreek:
         {
             buildingType = cUnitTypeFortress;
-//            numBuilders = 3;
             numBuilders = 4;
             break;
         }
@@ -5149,9 +5111,8 @@ void age3Handler(int age=2)
         
         float x = xsVectorGetX(frontVector);
         float z = xsVectorGetZ(frontVector);
-//        x = x * 20;
+		
         x = x * 15;
-//        z = z * 20;
         z = z * 15;
 
         frontVector = xsVectorSetX(frontVector, x);
@@ -5164,13 +5125,11 @@ void age3Handler(int age=2)
         aiPlanSetVariableBool(strongBuildPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
         aiPlanSetVariableFloat(strongBuildPlanID, cBuildPlanRandomBPValue, 0, 0.99);
         aiPlanSetVariableVector(strongBuildPlanID, cBuildPlanInfluencePosition, 0, location);
-//        aiPlanSetVariableFloat(strongBuildPlanID, cBuildPlanInfluencePositionDistance, 0, 30.0);
         aiPlanSetVariableFloat(strongBuildPlanID, cBuildPlanInfluencePositionDistance, 0, 40.0);
         aiPlanSetVariableFloat(strongBuildPlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
         
         aiPlanSetVariableInt(strongBuildPlanID, cBuildPlanBuildingTypeID, 0, buildingType);
         aiPlanSetDesiredPriority(strongBuildPlanID, 100);
-//        aiPlanAddUnitType(strongBuildPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), numBuilders, numBuilders, numBuilders);
         aiPlanAddUnitType(strongBuildPlanID, builderType, numBuilders, numBuilders, numBuilders);
         aiPlanSetEscrowID(strongBuildPlanID, cMilitaryEscrowID);
         aiPlanSetBaseID(strongBuildPlanID, kbBaseGetMainID(cMyID));
@@ -5455,7 +5414,6 @@ rule ShouldIResign
 
     if ((numSettlements <= 0) && (numBuilders <= 10) && numAliveVils < 1)
     {
-//        if ((kbCanAffordUnit(cUnitTypeSettlementLevel1, cEconomyEscrowID) == false) || (numBuilders <= 0))
         if (kbCanAffordUnit(cUnitTypeSettlementLevel1, cEconomyEscrowID) == false)
         {
             gResignType = cResignSettlements;
@@ -5465,8 +5423,6 @@ rule ShouldIResign
         }
     }
     //If we don't have any builders, we're not Norse, and we cannot afford anymore, try to resign.
-//    int builderUnitID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0);
-//    int numBuilders=kbUnitCount(cMyID, builderUnitID, cUnitStateAliveOrBuilding);
     if ((numBuilders <= 0) && (cMyCulture != cCultureNorse))
     {
         if (kbCanAffordUnit(builderUnitID, cEconomyEscrowID) == false)
@@ -5600,19 +5556,18 @@ void resignHandler(int result =-1)
 
 //==============================================================================
 rule findFish   //We don't know if this is a water map...if you see fish, it is.
-//    minInterval 11 //starts in cAge1
     minInterval 8 //starts in cAge1
     active
 {
  xsSetRuleMinIntervalSelf(25);
    
    if (ShowAiEcho == true) aiEcho("findFish:");
-		if (xsGetTime() > 15*60*1000)  // Disable if we've tried for too long.
+		if (xsGetTime() > 20*60*1000)  // Disable if we've tried for too long.
         xsDisableSelf();
 	
 			// Disable early fishing for Nomad & Highland, to later be enabled.
 		
-		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") || (cRandomMapName == "vinlandsaga") || (cRandomMapName == "Deep Jungle"))
+		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") || (cRandomMapName == "vinlandsaga") || (cRandomMapName == "team acropolis") || (cRandomMapName == "Deep Jungle"))
 		  {
 		  if (ShowAiEcho == true) aiEcho("FindFish disabled, map forced this.");
 		  xsDisableSelf();
@@ -5665,7 +5620,6 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 //==============================================================================
 rule watchForFirstWonderStart   //Look for any wonder being built.  If found, activate
                                 //the high-speed rule that watches for completion
-//    minInterval 79 //starts in cAge3    // Hopefully nobody will build one faster than this
     minInterval 73 //starts in cAge3    // Hopefully nobody will build one faster than this
     inactive
 {
@@ -5784,25 +5738,21 @@ rule watchForFirstWonderDone    //See who makes the first wonder, note its ID, m
             aiPlanSetVariableInt(gEnemyWonderDefendPlan, cAttackPlanTargetAreaGroups, 0, kbAreaGroupGetIDByPosition(kbUnitGetPosition(wonderID)));
    
             aiPlanSetVariableVector(gEnemyWonderDefendPlan, cAttackPlanGatherPoint, 0, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-//            aiPlanSetVariableFloat(gEnemyWonderDefendPlan, cAttackPlanGatherDistance, 0, 200.0);   // Insta-gather, just GO!
             aiPlanSetVariableFloat(gEnemyWonderDefendPlan, cAttackPlanGatherDistance, 0, 60.0);
 
             aiPlanSetVariableInt(gEnemyWonderDefendPlan, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
             
-//            aiPlanAddUnitType(gEnemyWonderDefendPlan, cUnitTypeLogicalTypeLandMilitary, 0, 200, 200);
             aiPlanAddUnitType(gEnemyWonderDefendPlan, cUnitTypeLogicalTypeLandMilitary, 10, 20, 20);
 
             aiPlanSetInitialPosition(gEnemyWonderDefendPlan, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
             aiPlanSetRequiresAllNeedUnits(gEnemyWonderDefendPlan, false);
 
-//            aiPlanSetDesiredPriority(gEnemyWonderDefendPlan, 80);
             aiPlanSetDesiredPriority(gEnemyWonderDefendPlan, 60);
 
             aiPlanSetUnitStance(gEnemyWonderDefendPlan, cUnitStanceDefensive);
             
             aiPlanSetVariableBool(gEnemyWonderDefendPlan, cAttackPlanAutoUseGPs, 0, true);
             
-//            aiPlanSetVariableBool(gEnemyWonderDefendPlan, cAttackPlanMoveAttack, 0, false);
             aiPlanSetVariableBool(gEnemyWonderDefendPlan, cAttackPlanMoveAttack, 0, true);
             aiPlanSetVariableInt(gEnemyWonderDefendPlan, cAttackPlanSpecificTargetID, 0, wonderID);
             
@@ -5825,10 +5775,8 @@ rule watchForFirstWonderDone    //See who makes the first wonder, note its ID, m
                     if (gEnemyWonderDefendPlan >= 0)
                     {
                         aiPlanAddUnitType(gEnemyWonderDefendPlan, cUnitTypeMilitary, 200, 200, 200);    // All mil units
-//                        aiPlanSetDesiredPriority(gEnemyWonderDefendPlan, 98);                       // Uber-plan, except for norse wonder-build plan
                         aiPlanSetDesiredPriority(gEnemyWonderDefendPlan, 96);                       // Uber-plan, except for norse wonder-build plan
                         aiPlanSetVariableVector(gEnemyWonderDefendPlan, cDefendPlanDefendPoint, 0, wonderLocation);
-//                        aiPlanSetVariableFloat(gEnemyWonderDefendPlan, cDefendPlanEngageRange, 0, 50.0);
                         aiPlanSetVariableFloat(gEnemyWonderDefendPlan, cDefendPlanEngageRange, 0, 60.0);
                         aiPlanSetVariableBool(gEnemyWonderDefendPlan, cDefendPlanPatrol, 0, false);
 
@@ -5884,12 +5832,9 @@ rule watchForWonder  // See if my wonder has been placed.  If so, go build it.
     gWonderDefendPlan =aiPlanCreate("Wonder Defend Plan", cPlanDefend);
     if (gWonderDefendPlan >= 0)
     {
-//        aiPlanAddUnitType(gWonderDefendPlan, cUnitTypeMilitary, 200, 200, 200);    // All mil units
         aiPlanAddUnitType(gWonderDefendPlan, cUnitTypeMilitary, 20, 200, 200);    // most mil units
-//        aiPlanSetDesiredPriority(gWonderDefendPlan, 97);                       // Uber-plan, except for enemy-wonder plan and wonder-build plan
         aiPlanSetDesiredPriority(gWonderDefendPlan, 95);                       // Uber-plan, except for enemy-wonder plan and wonder-build plan
         aiPlanSetVariableVector(gWonderDefendPlan, cDefendPlanDefendPoint, 0, wonderLocation);
-//        aiPlanSetVariableFloat(gWonderDefendPlan, cDefendPlanEngageRange, 0, 50.0);
         aiPlanSetVariableFloat(gWonderDefendPlan, cDefendPlanEngageRange, 0, 60.0);
         aiPlanSetVariableBool(gWonderDefendPlan, cDefendPlanPatrol, 0, false);
 
@@ -5954,7 +5899,6 @@ rule goAndGatherRelics
             aiPlanDestroy(gRelicGatherPlanID);
             gRelicGatherPlanID = -1;
             gatherRelicStartTime = -1;
-//            xsSetRuleMinIntervalSelf(47);
             xsSetRuleMinIntervalSelf(101);
             if (ShowAiEcho == true) aiEcho("destroying gRelicGatherPlanID as it has been active for more than 10 minutes");
             return;
