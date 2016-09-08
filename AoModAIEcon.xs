@@ -1866,6 +1866,12 @@ rule fishing
 
     gHouseAvailablePopRebuild = gHouseAvailablePopRebuild + 5;
 
+	if (cRandomMapName == "Basin" && cMyCiv != cCivPoseidon)
+	{
+	xsDisableSelf();
+	return;
+	}
+	
     if (((gTransportMap == true) || RethFishEco == true || (cRandomMapName == "anatolia")) && (gWaterExploreID == -1))
     {
         //Make a plan to explore with the water scout.
