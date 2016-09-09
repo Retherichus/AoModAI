@@ -318,7 +318,7 @@ void initMapSpecific()
         gVinlandsagaInitialBaseID=kbBaseGetMainID(cMyID);
         if (ShowAiEcho == true) aiEcho("Initial Base="+gVinlandsagaInitialBaseID);
 
-        int transportPUID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+        int transportPUID=cUnitTypeTransport;
 
         // Move the transport toward map center to find continent quickly.
         gTransportUnit = findUnit(transportPUID);
@@ -561,12 +561,13 @@ void vinlandsagaBaseCallback(int parm1=-1)
             else
                 aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, 1, 5, 5);
 
-            aiPlanAddUnitType(planID, cUnitTypeLogicalTypeLandMilitary, 0, 1, 1);
-                aiPlanAddUnitType(planID, gLandScout, 1, 1, 1);
+            aiPlanAddUnitType(planID, cUnitTypeLogicalTypeLandMilitary, 0, 1, 8);
+			aiPlanAddUnitType(planID, cUnitTypeHero, 0, 1, 1);
+            aiPlanAddUnitType(planID, gLandScout, 1, 1, 1);
             if (cMyCulture == cCultureNorse)
                 aiPlanAddUnitType(planID, cUnitTypeOxCart, 0, 1, 4);
             aiPlanAddUnitType(planID, cUnitTypeHerdable, 0, 2, 2);
-			aiPlanSetVariableBool(planID, cTransportPlanReturnWhenDone, 0, true);
+			aiPlanSetVariableBool(planID, cTransportPlanReturnWhenDone, 0, false);
         }
         if (ShowAiEcho == true) aiEcho("Transport plan ID is "+planID);
     }

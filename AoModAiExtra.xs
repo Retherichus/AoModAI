@@ -38,7 +38,8 @@ extern int gDefendPlentyVault = -1;
 extern int gHeavyGPTech=-1;
 extern int gHeavyGPPlan=-1;
 extern int gTradeMaintainPlanID=-1;
-extern int gDefendPlentyVaultWater=-1;	
+extern int gDefendPlentyVaultWater=-1;
+
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -59,7 +60,8 @@ extern bool ShowAiTestEcho = false;
 //==============================================================================
 extern bool mCanIDefendAllies = true;     // Allows the AI to defend his allies.
 extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''.
-extern bool gAgeFaster = true;            // This will lower halt most non economical upgrades until Mythic Age, this will allow the Ai to age up faster.
+extern bool gAgeFaster = false;            // This will lower/halt most non economical upgrades until Mythic Age, this will allow the Ai to age up faster.
+extern int AgeFasterStop = cAge4;
 extern bool gAgeReduceMil = false;         // This will lower the amount of military units the AI will train until Mythic Age, this will also help the AI to advance a little bit faster, more configs below.
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
@@ -74,8 +76,9 @@ extern bool gEarlyMonuments = false;       // This allows the Ai to build Monume
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
 
 //For gAgeReduceMil when true.
-extern int eMaxMilPop = 0;               // Max military pop cap during Classical Age & Heroic Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
-extern int eHMaxMilPop = 0;  
+extern int eMaxMilPop = 15;               // Max military pop cap during Classical Age & Heroic Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
+extern int eHMaxMilPop = 25;              // Heroic age.
+
 
 // If gSuperboom is set to true, the numbers below are what the Ai will attempt to gather in Archaic Age or untill X minutes have passed.
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
@@ -468,7 +471,7 @@ rule ActivateRethOverridesAge3
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge3Hyperion) == cTechStatusActive)
         xsEnableRuleGroup("Hyperion");		
 		
-		if (cMyCiv != cCivThor )
+		if (cMyCiv != cCivThor)
         xsEnableRuleGroup("ArmoryAge2");
         if (cMyCiv == cCivThor)
         xsEnableRuleGroup("ArmoryThor");
@@ -530,11 +533,6 @@ rule ActivateRethOverridesAge4
 	    xsEnableRule("repairTitanGate");
 		if (aiGetWorldDifficulty() > cDifficultyModerate)
 		xsEnableRule("randomUpgrader");
-		
-		if (cMyCiv != cCivThor)
-        xsEnableRuleGroup("ArmoryAge2");
-        if (cMyCiv == cCivThor)
-        xsEnableRuleGroup("ArmoryThor");
 		
 		xsDisableSelf();
            
@@ -647,6 +645,7 @@ rule HuntingDogsAsap
    minInterval 4
    inactive
 {
+   static int age2Count = 0;
 
    int HuntingDogsUpgBuilding = cUnitTypeGranary;
    if (cMyCulture == cCultureChinese)
@@ -1924,15 +1923,32 @@ inactive
 }
 // KOTH COMPLEX END
 //==============================================================================
-rule StartingBoatFailsafe  // for vinlandsaga and team migration where ships may fail to spawn.
+rule StartingBoatFailsafe  // for vinlandsaga and team migration where ships may fail to spawn, will also scout the mainland.
 minInterval 5
 inactive
 {
  vector HomeBase = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
  int boats = kbUnitCount(cMyID, cUnitTypeTransport, cUnitStateAlive);
- 
- if (boats <= 0)
+ static int TransportUnit=-1;
+ static bool CheckCenter = false;
+ static bool Spawned = false;
+ if (boats <= 0 && Spawned == false)
+ {
  aiUnitCreateCheat(cMyID, cUnitTypeRoc, HomeBase, "Spawn backup roc", 1);
+ Spawned = true;
+ return;
+ }
+ if (CheckCenter == false && boats >= 1)
+ {
+ int transportPUID=cUnitTypeTransport;
+ vector nearCenter = kbGetMapCenter();
+        TransportUnit = findUnit(transportPUID);
+        nearCenter = kbGetMapCenter();
+        nearCenter = (nearCenter + kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) / 2.0;
+        nearCenter = (nearCenter + kbGetMapCenter()) / 2.0;   
+        aiTaskUnitMove(TransportUnit, nearCenter);
+		CheckCenter = true;
+		}	
  
  xsDisableSelf();
  

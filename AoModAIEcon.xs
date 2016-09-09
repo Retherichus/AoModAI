@@ -3082,7 +3082,7 @@ rule sendIdleTradeUnitsToRandomBase
 	int numTcs = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
     float minRequiredDistance = 37.0;
 	if (numTcs <= 1)
-    minRequiredDistance = 26.0;
+    minRequiredDistance = 30.0;
 	else minRequiredDistance = 37.0;
 	
 	

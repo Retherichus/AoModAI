@@ -1583,15 +1583,12 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (goldAssignment > lastGoldAssignment)
         {
-		    if (gAgeFaster == true && kbGetAge() < cAge4)
-            goldAssignment = lastGoldAssignment + 0.22;
-			else
             goldAssignment = lastGoldAssignment + 0.03;
             if (goldAssignment > 0.45)
                 goldAssignment = 0.45;
         }
         else if (goldAssignment < lastGoldAssignment)
-        {	
+        {
             goldAssignment = lastGoldAssignment - 0.03;
             if (goldAssignment < 0.05)
                 goldAssignment = 0.05;
@@ -1601,9 +1598,6 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (woodAssignment > lastWoodAssignment)
         {
-		    if (gAgeFaster == true && kbGetAge() < cAge4)
-            woodAssignment = lastWoodAssignment + 0.05;
-			else		
             woodAssignment = lastWoodAssignment + 0.03;
             if (woodAssignment > 0.45)
                 woodAssignment = 0.45;
@@ -1619,23 +1613,15 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (foodAssignment > lastFoodAssignment)
         {
-		    if (gAgeFaster == true && kbGetAge() < cAge4)
-			    foodAssignment = lastFoodAssignment + 0.08;
-			else		
             foodAssignment = lastFoodAssignment + 0.03;
             if ((foodAssignment > 0.65) && (kbGetAge() > cAge1))
             {
                 if (foodOverride == false)
                     foodAssignment = 0.65;
-                if (foodOverride == false && gAgeFaster == true && kbGetAge() < cAge4)
-                    foodAssignment = 0.35;					
             }
         }
         else if (foodAssignment < lastFoodAssignment)
         {
-		    if (gAgeFaster == true && kbGetAge() < cAge4)
-            foodAssignment = lastFoodAssignment - 0.20;
-			else			
             foodAssignment = lastFoodAssignment - 0.03;
             if (foodAssignment < 0.25)
                 foodAssignment = 0.25;
@@ -5166,7 +5152,7 @@ void age3Handler(int age=2)
   
     //get tax collectors and ambassadors
     xsEnableRule("getTaxCollectors");  
-    // xsEnableRule("getAmbassadors"); //AI is not affected by tribute penalty.
+    // xsEnableRule("getAmbassadors"); //AI is not affected by tribute penalty so this is removed.
 
     //enable the tacticalSiege rule
     xsEnableRule("tacticalSiege");
@@ -5631,9 +5617,11 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
             createSimpleMaintainPlan(gWaterScout, gMaintainNumberWaterScouts, true, kbBaseGetMainID(cMyID));
 
         //Fire up.
-        if (gMaintainWaterXPortPlanID < 0 && gTransportMap == true)
-            gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 1, false, kbBaseGetMainID(cMyID));
-
+        if (gMaintainWaterXPortPlanID < 0 && gTransportMap == true) 
+	    {
+        gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 1, false, -1);
+        aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 55);
+        }
 
 
 	

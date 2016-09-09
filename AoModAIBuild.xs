@@ -1599,8 +1599,6 @@ rule mainBaseAreaWallTeam2
     minInterval 29 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
     inactive
 {
-xsDisableSelf();
-return;
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
 
     if ((cMyCulture == cCultureAtlantean) && (xsGetTime() < 15*60*1000))
@@ -2726,8 +2724,6 @@ rule buildFortress
     minInterval 19 //starts in cAge3
     inactive
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;
     if (ShowAiEcho == true) aiEcho("buildFortress:");
 
     if ((kbGetAge() > cAge3) && (gAge4MinorGod == cTechAge4Hephaestus) && (kbGetTechStatus(cTechForgeofOlympus) < cTechStatusResearching))
@@ -2964,8 +2960,6 @@ rule buildTowerAtOtherBase
     minInterval 61 //starts in cAge2
     inactive
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;
     if (ShowAiEcho == true) aiEcho("buildTowerAtOtherBase: ");
 
     int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
@@ -3103,8 +3097,6 @@ rule buildBuildingsAtOtherBase
     minInterval 31 //starts in cAge2
     inactive
 {	
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;
     if (ShowAiEcho == true) aiEcho("buildBuildingsAtOtherBase:");
  
     float woodSupply = kbResourceGet(cResourceWood);
@@ -3275,9 +3267,7 @@ rule buildBuildingsAtOtherBase
 rule buildBuildingsAtOtherBase2
     minInterval 31 //starts in cAge2
     inactive
-{
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;	
+{	
     if (ShowAiEcho == true) aiEcho("buildBuildingsAtOtherBase2:");
 	if (aiGetWorldDifficulty() < cDifficultyNightmare && kbGetAge() < 3)
 	return; // Wait untill age 3 for Hard difficulty and lower.
@@ -4248,8 +4238,6 @@ rule buildGoldMineTower
     minInterval 47 //starts in cAge2
     inactive
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;
     float goldSupply = kbResourceGet(cResourceGold);
 	if (kbGetAge() < cAge3 && goldSupply < 750)
 	return; // We need the gold to advance quicker.

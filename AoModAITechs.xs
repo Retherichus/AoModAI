@@ -274,8 +274,6 @@ rule getEnclosedDeck
     minInterval 32 //starts in cAge2
     inactive
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;
     int techID = cTechEnclosedDeck;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1301,49 +1299,9 @@ rule getFloodControl
         update = false;
     }
 }
-
-//==============================================================================
-rule getAmbassadors
-    inactive
-    minInterval 131 //starts in cAge3
-{
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;
-    int techID = cTechAmbassadors;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-    }
-    
-    if (ShowAiEcho == true) aiEcho("getAmbassadors:");
-
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-        return;
-    
-    if (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) < 1)
-        return;
-        
-    float goldSupply = kbResourceGet(cResourceGold);
-    if ((goldSupply < 2000) || (kbGetAge() < cAge4))
-        return;
-    
-    if (kbGetTechStatus(techID) == cTechStatusAvailable)
-    {
-        int x = aiPlanCreate("Ambassadors", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);
-        aiPlanSetActive(x);
-        xsSetRuleMinIntervalSelf(307);
-        if (ShowAiEcho == true) aiEcho("Getting Ambassadors");
-    }
-}
-
 //==============================================================================
 rule getTaxCollectors
     inactive
-//    minInterval 31 //starts in cAge3
     minInterval 47 //starts in cAge3
 {
     if (gAgeFaster == true && kbGetAge() < cAge4)
@@ -1856,7 +1814,6 @@ rule getFortifiedWall
 //==============================================================================
 rule getCitadelWall
     inactive
-//    minInterval 31 //starts in cAge4
     minInterval 37 //starts in cAge2 activated in getFortifiedWall
 {
     if (gAgeFaster == true && kbGetAge() < cAge4)
@@ -2063,7 +2020,6 @@ rule getHandsOfThePharaoh
 //==============================================================================
 rule getAxeOfMuspell
     inactive
-//    minInterval 37 //starts in cAge3
     minInterval 43 //starts in cAge3
 {
     if (gAgeFaster == true && kbGetAge() < cAge4)
@@ -2394,8 +2350,6 @@ rule getChampionInfantry
     minInterval 18 //starts in cAge4
     group championGreek
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;
     int techID = cTechChampionInfantry;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2434,9 +2388,7 @@ rule getChampionCavalry
     inactive
     minInterval 16 //starts in cAge4
     group championGreek
-{  
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;  
+{
     int techID = cTechChampionCavalry;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2476,8 +2428,6 @@ rule getChampionArchers
     minInterval 15 //starts in cAge4
     group championGreek
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;
     int techID = cTechChampionArchers;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2574,8 +2524,6 @@ rule getEngineers
     inactive
     minInterval 20 //starts in cAge4
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
-        return;
     int techID = cTechEngineers;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
