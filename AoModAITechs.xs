@@ -33,6 +33,8 @@ rule getMasons
     minInterval 131 //starts in cAge2
     inactive
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechMasons;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -96,6 +98,8 @@ rule getArchitects
     minInterval 131 //starts in cAge3, activated in getMasons
     inactive
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechArchitects;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -223,6 +227,8 @@ rule getFortifiedTownCenter
 //    minInterval 21 //starts in cAge3
     minInterval 41 //starts in cAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechFortifyTownCenter;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -268,6 +274,8 @@ rule getEnclosedDeck
     minInterval 32 //starts in cAge2
     inactive
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechEnclosedDeck;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1299,6 +1307,8 @@ rule getAmbassadors
     inactive
     minInterval 131 //starts in cAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechAmbassadors;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1336,6 +1346,8 @@ rule getTaxCollectors
 //    minInterval 31 //starts in cAge3
     minInterval 47 //starts in cAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechTaxCollectors;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1389,6 +1401,8 @@ rule getHeroicFleet
     inactive
     minInterval 300 //starts in cAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechHeroicFleet;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1426,6 +1440,8 @@ rule getCrenellations
     inactive
     minInterval 79 //starts in cAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechCrenellations;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1479,6 +1495,8 @@ rule getSignalFires
 //    minInterval 70 //starts in cAge2
     minInterval 107 //starts in cAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechSignalFires;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1516,6 +1534,8 @@ rule getBoilingOil
 //    minInterval 60 //starts in cAge3
     minInterval 79 //starts in cAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechBoilingOil;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1556,6 +1576,8 @@ rule getCarrierPigeons
     inactive
     minInterval 107 //starts in cAge2 activated in getSignalFires
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechCarrierPigeons;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1622,6 +1644,8 @@ rule getGuardTower
     inactive
     minInterval 43 //starts in cAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechGuardTower;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1677,6 +1701,8 @@ rule getBallistaTower
     inactive
     minInterval 47 //starts in cAge3 activated in getGuardTower
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechBallistaTower;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1711,6 +1737,8 @@ rule getStoneWall
     inactive
     minInterval 37 //starts in cAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechStoneWall;
 	if (cMyCulture == cCultureChinese)
 	techID = cTechStoneWallChinese;
@@ -1771,6 +1799,8 @@ rule getFortifiedWall
     inactive
     minInterval 37 //starts in cAge2 activated in getStoneWall
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechFortifiedWall;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1829,6 +1859,8 @@ rule getCitadelWall
 //    minInterval 31 //starts in cAge4
     minInterval 37 //starts in cAge2 activated in getFortifiedWall
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechCitadelWall;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1866,6 +1898,8 @@ rule getBronzeWall
     inactive
     minInterval 37 //starts in cAge2 activated in getStoneWall
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechBronzeWall;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1912,6 +1946,8 @@ rule getIronWall
     inactive
     minInterval 37 //starts in cAge2 activated in getBronzeWall
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechIronWall;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -1960,6 +1996,8 @@ rule getOreichalkosWall
     inactive
     minInterval 37 //starts in cAge2 activated in getIronWall
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechOreichalkosWall;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2028,6 +2066,8 @@ rule getAxeOfMuspell
 //    minInterval 37 //starts in cAge3
     minInterval 43 //starts in cAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechAxeofMuspell;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2136,6 +2176,8 @@ rule getMediumInfantry
     minInterval 13 //starts in cAge2
     group mediumGreek
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechMediumInfantry;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2206,6 +2248,8 @@ rule getMediumCavalry
     minInterval 12 //starts in cAge2
     group mediumGreek
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechMediumCavalry;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2277,6 +2321,8 @@ rule getMediumArchers
     minInterval 11 //starts in cAge2
     group mediumGreek
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechMediumArchers;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2348,6 +2394,8 @@ rule getChampionInfantry
     minInterval 18 //starts in cAge4
     group championGreek
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechChampionInfantry;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2386,7 +2434,9 @@ rule getChampionCavalry
     inactive
     minInterval 16 //starts in cAge4
     group championGreek
-{    
+{  
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;  
     int techID = cTechChampionCavalry;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2426,6 +2476,8 @@ rule getChampionArchers
     minInterval 15 //starts in cAge4
     group championGreek
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechChampionArchers;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2464,6 +2516,8 @@ rule getDraftHorses
     inactive
     minInterval 20 //starts in cAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechDraftHorses;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2520,6 +2574,8 @@ rule getEngineers
     inactive
     minInterval 20 //starts in cAge4
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechEngineers;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -2608,6 +2664,8 @@ rule researchCopperShields
     inactive
     group ArmoryAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
     
@@ -2675,6 +2733,8 @@ rule researchCopperMail
     inactive
     group ArmoryAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
 
@@ -2741,6 +2801,8 @@ rule researchCopperWeapons
     inactive
     group ArmoryAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
 
@@ -2817,6 +2879,8 @@ rule researchCopperShieldsThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
 
@@ -2871,6 +2935,8 @@ rule researchCopperMailThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
  
@@ -2924,6 +2990,8 @@ rule researchCopperWeaponsThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
 
@@ -2986,6 +3054,8 @@ rule researchBronzeShieldsThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechBronzeShieldsThor;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3046,6 +3116,8 @@ rule researchBronzeMailThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechBronzeMailThor;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3104,6 +3176,8 @@ rule researchBronzeWeaponsThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechBronzeWeaponsThor;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3171,6 +3245,8 @@ rule researchIronShieldsThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechIronShieldsThor;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3219,6 +3295,8 @@ rule researchIronMailThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechIronMailThor;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3266,6 +3344,8 @@ rule researchIronWeaponsThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechIronWeaponsThor;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3321,6 +3401,8 @@ rule researchBurningPitchThor
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechBurningPitchThor;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3376,6 +3458,8 @@ rule researchDragonscaleShields
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechDragonscaleShields;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3423,6 +3507,8 @@ rule researchMeteoricIronMail
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechMeteoricIronMail;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3469,6 +3555,8 @@ rule researchHammerOfTheGods
     inactive
     group ArmoryThor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechHammeroftheGods;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3522,6 +3610,8 @@ rule getMediumAxemen
     minInterval 13 //starts in cAge2
     group mediumEgyptian
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechMediumAxemen;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3570,6 +3660,8 @@ rule getMediumSpearmen
     minInterval 12 //starts in cAge2
     group mediumEgyptian
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechMediumSpearmen;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3618,6 +3710,8 @@ rule getMediumSlingers
     minInterval 11 //starts in cAge2
     group mediumEgyptian
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechMediumSlingers;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -3667,6 +3761,7 @@ rule getSecretsOfTheTitan
     minInterval 17 //starts in cAge4
     inactive
 {
+
     if (ShowAiEcho == true) aiEcho("getSecretsOfTheTitan:");
     
     if ((gAge4MinorGod == cTechAge4Hephaestus) && (kbGetTechStatus(cTechForgeofOlympus) < cTechStatusResearching))

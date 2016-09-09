@@ -937,6 +937,11 @@ rule updateEMAge2
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
             civPopTarget = 35;  
         milPopTarget = getSoftPopCap() - civPopTarget;
+        if (gAgeFaster == true && gAgeReduceMil == true && aiGetWorldDifficulty() == cDifficultyNightmare)
+		{
+	    if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
+	    milPopTarget = eMaxMilPop;
+		}		
     }
 
 
@@ -989,6 +994,12 @@ rule updateEMAge3
       civPopTarget = 60 - (cvRushBoomSlider*5.99);    // +/- 5
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
+      
+	  if (gAgeFaster == true && gAgeReduceMil == true &&  aiGetWorldDifficulty() == cDifficultyNightmare)
+	  {
+	  if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
+	  milPopTarget = eHMaxMilPop;
+	  }		 
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
       kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);
     }
@@ -1572,12 +1583,15 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (goldAssignment > lastGoldAssignment)
         {
+		    if (gAgeFaster == true && kbGetAge() < cAge4)
+            goldAssignment = lastGoldAssignment + 0.22;
+			else
             goldAssignment = lastGoldAssignment + 0.03;
             if (goldAssignment > 0.45)
                 goldAssignment = 0.45;
         }
         else if (goldAssignment < lastGoldAssignment)
-        {
+        {	
             goldAssignment = lastGoldAssignment - 0.03;
             if (goldAssignment < 0.05)
                 goldAssignment = 0.05;
@@ -1587,7 +1601,10 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (woodAssignment > lastWoodAssignment)
         {
+		    if (gAgeFaster == true && kbGetAge() < cAge4)
             woodAssignment = lastWoodAssignment + 0.05;
+			else		
+            woodAssignment = lastWoodAssignment + 0.03;
             if (woodAssignment > 0.45)
                 woodAssignment = 0.45;
         }
@@ -1602,15 +1619,23 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (foodAssignment > lastFoodAssignment)
         {
+		    if (gAgeFaster == true && kbGetAge() < cAge4)
+			    foodAssignment = lastFoodAssignment + 0.08;
+			else		
             foodAssignment = lastFoodAssignment + 0.03;
             if ((foodAssignment > 0.65) && (kbGetAge() > cAge1))
             {
                 if (foodOverride == false)
                     foodAssignment = 0.65;
+                if (foodOverride == false && gAgeFaster == true && kbGetAge() < cAge4)
+                    foodAssignment = 0.35;					
             }
         }
         else if (foodAssignment < lastFoodAssignment)
         {
+		    if (gAgeFaster == true && kbGetAge() < cAge4)
+            foodAssignment = lastFoodAssignment - 0.20;
+			else			
             foodAssignment = lastFoodAssignment - 0.03;
             if (foodAssignment < 0.25)
                 foodAssignment = 0.25;
@@ -4919,9 +4944,9 @@ void age2Handler(int age=1)
     if (gRushCount < 1)
     {
         //research age2 armor and weapon upgrades
-        if (cMyCiv != cCivThor && Age3Armory == false)
+        if (cMyCiv != cCivThor)
             xsEnableRuleGroup("ArmoryAge2");
-        if (cMyCiv == cCivThor && Age3Armory == false)
+        if (cMyCiv == cCivThor)
             xsEnableRuleGroup("ArmoryThor");
 
         //research age2 military upgrades

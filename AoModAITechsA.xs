@@ -12,6 +12,8 @@ rule getChannels
     inactive
     minInterval 23
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechChannels) == cTechStatusAvailable)
     {
         int x=-1;
@@ -32,6 +34,8 @@ rule getFocus
     inactive
     minInterval 23
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechFocus) == cTechStatusAvailable)
     {
         int x=-1;
@@ -52,6 +56,8 @@ rule getSafePassage
     inactive
     minInterval 23
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechSafePassage;
     int techStatus = kbGetTechStatus(techID);
     if (techStatus > cTechStatusResearching)
@@ -99,6 +105,8 @@ rule getHephaestusRevenge
     minInterval 27
     group Leto
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
 
     if (kbGetAge() < cAge3 && goldSupply < 650)
@@ -123,6 +131,8 @@ rule getVolcanicForge
     minInterval 29
     group Leto
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
 
@@ -150,6 +160,8 @@ rule getBiteOfTheShark
     minInterval 27
     group Oceanus
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float foodSupply = kbResourceGet(cResourceFood);
 
     if (kbGetAge() < cAge3 && foodSupply < 1000)
@@ -174,6 +186,8 @@ rule getWeightlessMace
     minInterval 29
     group Oceanus
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float foodSupply = kbResourceGet(cResourceFood);
     if (kbGetAge() < cAge3 && foodSupply < 1000)
 	return;
@@ -198,6 +212,8 @@ rule getHeartOfTheTitans
     minInterval 27
     group Prometheus
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
 
     if (kbGetAge() < cAge3 && goldSupply < 650)
@@ -222,6 +238,8 @@ rule getAlluvialClay
     minInterval 29
     group Prometheus
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
 
     if (kbGetAge() < cAge3 && goldSupply < 750)
@@ -249,6 +267,8 @@ rule getMailOfOrichalkos
     minInterval 27
     group Rheia
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechMailofOrichalkos) == cTechStatusAvailable)
     {
         int x=-1;
@@ -269,6 +289,8 @@ rule getHornsOfConsecration
     minInterval 29
     group Rheia
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechHornsofConsecration) == cTechStatusAvailable)
     {
         int x=-1;
@@ -289,6 +311,8 @@ rule getRheiasGift
     minInterval 31
     group Rheia
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechRheiasGift) == cTechStatusAvailable)
     {
         int x=-1;
@@ -311,6 +335,8 @@ rule getLemurianDescendants
     minInterval 27
     group Theia
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechLemurianDescendants) == cTechStatusAvailable)
     {
         int x=-1;
@@ -331,6 +357,8 @@ rule getPoseidonsSecret
     minInterval 29
     group Theia
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechPoseidonsSecret) == cTechStatusAvailable)
     {
         int x=-1;
@@ -351,6 +379,8 @@ rule getLanceOfStone
     minInterval 31
     group Theia
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechLanceofStone) == cTechStatusAvailable)
     {
         int x=-1;
@@ -372,6 +402,8 @@ rule getHeroicRenewal
     minInterval 27
     group Hyperion
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechHeroicRenewal) == cTechStatusAvailable)
     {
         int x=-1;
@@ -392,6 +424,8 @@ rule getGemino
     minInterval 29
     group Hyperion
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechGemino) == cTechStatusAvailable)
     {
         int x=-1;

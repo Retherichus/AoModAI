@@ -12,6 +12,8 @@ rule getAcupuncture
     inactive
     minInterval 23
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechAcupuncture) == cTechStatusAvailable)
     {
         int x=-1;
@@ -32,6 +34,8 @@ rule getDomestication
     inactive
     minInterval 23
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechDomestication) == cTechStatusAvailable)
     {
         int x=-1;
@@ -79,6 +83,8 @@ rule getElixirofImmortality
     minInterval 27
     group Change
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
 	
     if (kbGetAge() < cAge3 && goldSupply < 650)
@@ -103,6 +109,8 @@ rule getHouyisBow
     minInterval 29
     group Change
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
     if (kbGetAge() < cAge3 && woodSupply < 650)
@@ -127,6 +135,8 @@ rule getJadeRabbit
     minInterval 29
     group Change
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float foodSupply = kbResourceGet(cResourceFood);
 	
     if (kbGetAge() < cAge3 && foodSupply < 1000)
@@ -152,6 +162,8 @@ rule getGoldenBandedStaff
     minInterval 27
     group Sunwukong
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
     if (kbGetAge() < cAge3 && woodSupply < 650)
@@ -176,6 +188,8 @@ rule getPaperTalisman
     minInterval 27
     group Sunwukong
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
     if (kbGetAge() < cAge3 && woodSupply < 500)
@@ -205,6 +219,8 @@ rule getStoneArmor
     minInterval 27
     group Huangdi
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
     if (kbGetAge() < cAge3 && woodSupply < 650)
@@ -249,6 +265,8 @@ rule getOracleBoneScript
     minInterval 27
     group Huangdi
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float foodSupply = kbResourceGet(cResourceFood);
 	
     if (kbGetAge() < cAge3 && foodSupply < 1000)
@@ -276,6 +294,7 @@ rule getLandlordSpirit
     minInterval 27
     group Dabogong
 {
+
     if (kbGetTechStatus(cTechLandlordSpirit) == cTechStatusAvailable)
     {
         int x=-1;
@@ -317,6 +336,8 @@ rule getHouseAltars
     minInterval 27
     group Dabogong
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechHouseAltars) == cTechStatusAvailable)
     {
         int x=-1;
@@ -343,6 +364,8 @@ rule getLifeDrain
     minInterval 27
     group Zhongkui
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechLifeDrain) == cTechStatusAvailable)
     {
         int x=-1;
@@ -385,6 +408,8 @@ rule getUnbridledAnger
     minInterval 27
     group Zhongkui
  {
+     if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechUnbrideledAnger) == cTechStatusAvailable)
       {
           int x=-1;
@@ -408,6 +433,8 @@ rule getSacrifices
     minInterval 27
     group Hebo
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechSacrifices) == cTechStatusAvailable)
     {
         int x=-1;
@@ -428,6 +455,8 @@ rule getLordoftheRiver
     minInterval 27
     group Hebo
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechLordoftheRiver) == cTechStatusAvailable)
     {
         int x=-1;
@@ -449,6 +478,8 @@ rule getRammedEarth
     minInterval 27
     group Hebo
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechRammedEarth) == cTechStatusAvailable)
     {
         int x=-1;

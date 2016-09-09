@@ -38,8 +38,7 @@ extern int gDefendPlentyVault = -1;
 extern int gHeavyGPTech=-1;
 extern int gHeavyGPPlan=-1;
 extern int gTradeMaintainPlanID=-1;
-extern int gDefendPlentyVaultWater=-1;
-
+extern int gDefendPlentyVaultWater=-1;	
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -60,12 +59,12 @@ extern bool ShowAiTestEcho = false;
 //==============================================================================
 extern bool mCanIDefendAllies = true;     // Allows the AI to defend his allies.
 extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''.
-extern bool gAgeFaster = false;            // This will lower the amount of military units the AI will train in Classical Age, this will allow the Ai to progress faster to Heroic Age, config below.
+extern bool gAgeFaster = true;            // This will lower halt most non economical upgrades until Mythic Age, this will allow the Ai to age up faster.
+extern bool gAgeReduceMil = false;         // This will lower the amount of military units the AI will train until Mythic Age, this will also help the AI to advance a little bit faster, more configs below.
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
 extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
 extern bool bWallUp = true;              // This ensures that the Ai will build walls(almost always), regardless of personality.
-extern bool Age3Armory = false;           // Prevents the Ai from researching armory upgrades before reaching Heroic Age.
 extern bool OneMBDefPlanOnly = true;      // Only allow one active "idle defense plan for Mainbase (6 units, 12 if set to false)"
 
 extern bool ResInflate = true;            // Sets the food multiplier to 1.0 once above 5k food.
@@ -74,9 +73,9 @@ extern bool CanIChat = true;              // This will allow the Ai to send chat
 extern bool gEarlyMonuments = false;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
 
-//For gAgefaster when true.
-extern int eMaxMilPop = 50;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
-
+//For gAgeReduceMil when true.
+extern int eMaxMilPop = 0;               // Max military pop cap during Classical Age & Heroic Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
+extern int eHMaxMilPop = 0;  
 
 // If gSuperboom is set to true, the numbers below are what the Ai will attempt to gather in Archaic Age or untill X minutes have passed.
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
@@ -469,9 +468,9 @@ rule ActivateRethOverridesAge3
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge3Hyperion) == cTechStatusActive)
         xsEnableRuleGroup("Hyperion");		
 		
-		if (cMyCiv != cCivThor && Age3Armory == true)
+		if (cMyCiv != cCivThor )
         xsEnableRuleGroup("ArmoryAge2");
-        if (cMyCiv == cCivThor && Age3Armory == true)
+        if (cMyCiv == cCivThor)
         xsEnableRuleGroup("ArmoryThor");
 		
 		if (cMyCiv == cCivPoseidon)
@@ -531,6 +530,11 @@ rule ActivateRethOverridesAge4
 	    xsEnableRule("repairTitanGate");
 		if (aiGetWorldDifficulty() > cDifficultyModerate)
 		xsEnableRule("randomUpgrader");
+		
+		if (cMyCiv != cCivThor)
+        xsEnableRuleGroup("ArmoryAge2");
+        if (cMyCiv == cCivThor)
+        xsEnableRuleGroup("ArmoryThor");
 		
 		xsDisableSelf();
            
@@ -643,7 +647,6 @@ rule HuntingDogsAsap
    minInterval 4
    inactive
 {
-   static int age2Count = 0;
 
    int HuntingDogsUpgBuilding = cUnitTypeGranary;
    if (cMyCulture == cCultureChinese)

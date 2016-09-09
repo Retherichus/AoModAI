@@ -32,6 +32,8 @@ rule getSkinOfTheRhino
     inactive
     minInterval 23
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechSkinOfTheRhino) == cTechStatusAvailable)
     {
         int x=-1;
@@ -52,6 +54,8 @@ rule getFeral
     inactive
     minInterval 23
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechFeral) == cTechStatusAvailable)
     {
         int x=-1;
@@ -74,6 +78,8 @@ rule getFeetOfTheJackal
     minInterval 27
     group Anubis
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
 
     if (kbGetAge() < cAge3 && goldSupply < 650)
@@ -98,6 +104,8 @@ rule getSerpentSpear
     minInterval 29
     group Anubis
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float foodSupply = kbResourceGet(cResourceFood);
 
     if (kbGetAge() < cAge3 && foodSupply < 1000)
@@ -122,6 +130,8 @@ rule getNecropolis
     minInterval 31
     group Anubis
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
 
     if (kbGetAge() < cAge3 && goldSupply < 650)
@@ -147,6 +157,8 @@ rule getAdzeOfWepwawet
     minInterval 27
     group Bast
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechAdzeofWepwawet) == cTechStatusAvailable)
     {
         int x=-1;
@@ -187,6 +199,8 @@ rule getCriosphinx
     minInterval 31
     group Bast
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechCriosphinx) == cTechStatusAvailable)
     {
         int x=-1;
@@ -207,6 +221,8 @@ rule getHieracosphinx
     minInterval 33
     group Bast
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechHieracosphinx) == cTechStatusAvailable)
     {
         int x=-1;
@@ -248,6 +264,8 @@ rule getScallopedAxe
     minInterval 29
     group Ptah
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float foodSupply = kbResourceGet(cResourceFood);
 
     if (kbGetAge() < cAge3 && foodSupply < 1000)
@@ -272,6 +290,8 @@ rule getLeatherFrameShield
     minInterval 31
     group Ptah
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechLeatherFrameShield) == cTechStatusAvailable)
     {
         int x=-1;
@@ -292,6 +312,8 @@ rule getElectrumBullets
     minInterval 33
     group Ptah
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
 
     if (kbGetAge() < cAge3 && goldSupply < 650)
@@ -318,6 +340,8 @@ rule getSundriedMudBrick
     minInterval 27
     group Hathor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechSundriedMudBrick) == cTechStatusAvailable)
     {
         int x=-1;
@@ -338,6 +362,8 @@ rule getMedjay
     minInterval 29
     group Hathor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechMedjay) == cTechStatusAvailable)
     {
         int x=-1;
@@ -358,6 +384,8 @@ rule getCrocodopolis
     minInterval 31
     group Hathor
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechCrocodopolis) == cTechStatusAvailable)
     {
         int x=-1;
@@ -379,6 +407,8 @@ rule getBoneBow
     minInterval 27
     group Sekhmet
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechBoneBow) == cTechStatusAvailable)
     {
         int x=-1;
@@ -399,6 +429,8 @@ rule getSlingsOfTheSun
     minInterval 29
     group Sekhmet
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechSlingsoftheSun) == cTechStatusAvailable)
     {
         int x=-1;
@@ -419,6 +451,8 @@ rule getStonesOfRedLinen
     minInterval 31
     group Sekhmet
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechStonesofRedLinen) == cTechStatusAvailable)
     {
         int x=-1;
@@ -439,6 +473,8 @@ rule getRamOfTheWestWind
     minInterval 33
     group Sekhmet
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechRamoftheWestWind) == cTechStatusAvailable)
     {
         int x=-1;
@@ -460,6 +496,8 @@ rule getSpiritOfMaat
     minInterval 27
     group Nephthys
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechSpiritofMaat) == cTechStatusAvailable)
     {
         int x=-1;
@@ -480,6 +518,8 @@ rule getFuneralRites
     minInterval 29
     group Nephthys
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechFuneralRites) == cTechStatusAvailable)
     {
         int x=-1;
@@ -500,6 +540,8 @@ rule getCityOfTheDead
     minInterval 31
     group Nephthys
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechCityoftheDead) == cTechStatusAvailable)
     {
         int x=-1;

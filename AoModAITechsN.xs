@@ -11,6 +11,8 @@ rule getPigSticker
     inactive
     minInterval 16 //starts in cAge1
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechPigSticker;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -45,6 +47,8 @@ rule getLoneWanderer
     inactive
     minInterval 36 //starts in cAge1
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechLoneWanderer) == cTechStatusAvailable)
     {
         int x=-1;
@@ -64,6 +68,8 @@ rule getEyesInTheForest
     inactive
     minInterval 36 //starts in cAge1
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechEyesintheForest) == cTechStatusAvailable)
     {
         int x=-1;
@@ -85,6 +91,8 @@ rule getThunderingHooves
     minInterval 60 //starts in cAge2
     group Freyja
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float foodSupply = kbResourceGet(cResourceFood);
 
     if (kbGetAge() < cAge3 && foodSupply < 1000)
@@ -108,6 +116,8 @@ rule getAuroraBorealis
     minInterval 60 //starts in cAge2
     group Freyja
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
 
     if (kbGetAge() < cAge3 && goldSupply < 650)
@@ -132,6 +142,8 @@ rule getSafeguard
     minInterval 60 //starts in cAge2
     group Heimdall
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechSafeguard) > cTechStatusResearching)
     {
         xsDisableSelf();
@@ -163,6 +175,8 @@ rule getElhrimnirKettle
     minInterval 60 //starts in cAge2
     group Heimdall
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float foodSupply = kbResourceGet(cResourceFood);
 
     if (kbGetAge() < cAge3 && foodSupply < 1000)
@@ -185,6 +199,8 @@ rule getArcticWinds
     minInterval 60 //starts in cAge2
     group Heimdall
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float woodSupply = kbResourceGet(cResourceWood);
 
     if (kbGetAge() < cAge3 && woodSupply < 450)
@@ -210,6 +226,8 @@ rule getHallOfThanes
     minInterval 60 //starts in cAge2
     group Forseti
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
     if (kbGetAge() < cAge3 && woodSupply < 550)
@@ -233,6 +251,8 @@ rule getHamarrtroll
     minInterval 60 //starts in cAge2
     group Forseti
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
     if (kbGetAge() < cAge3 && woodSupply < 650)
@@ -256,6 +276,8 @@ rule getMithrilBreastplate
     minInterval 60 //starts in cAge2
     group Forseti
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     float goldSupply = kbResourceGet(cResourceGold);
 	
     if (kbGetAge() < cAge3 && goldSupply < 650)
@@ -282,6 +304,8 @@ rule getRingGiver
     minInterval 60 //starts in cAge3
     group Njord
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechRingGiver) == cTechStatusAvailable)
     {
         int x=-1;
@@ -300,6 +324,8 @@ rule getLongSerpent
     minInterval 60 //starts in cAge3
     group Njord
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechLongSerpent) == cTechStatusAvailable)
     {
         int x=-1;
@@ -318,6 +344,8 @@ rule getWrathOfTheDeep
     minInterval 60 //starts in cAge3
     group Njord
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechWrathOfTheDeep) == cTechStatusAvailable)
     {
         int x=-1;
@@ -338,6 +366,8 @@ rule getRime
     minInterval 60 //starts in cAge3
     group Skadi
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechRime) == cTechStatusAvailable)
     {
         int x=-1;
@@ -375,6 +405,8 @@ rule getHuntressAxe
     minInterval 60 //starts in cAge3
     group Skadi
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechHuntressAxe) == cTechStatusAvailable)
     {
         int x=-1;
@@ -395,6 +427,8 @@ rule getSwineArray
     minInterval 60 //starts in cAge3
     group Bragi
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechSwineArray) == cTechStatusAvailable)
     {
         int x=-1;
@@ -414,6 +448,8 @@ rule getCallOfValhalla
     minInterval 60 //starts in cAge3
     group Bragi
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechCallOfValhalla) == cTechStatusAvailable)
     {
         int x=-1;
@@ -432,6 +468,8 @@ rule getThurisazRune
     minInterval 60 //starts in cAge3
     group Bragi
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (kbGetTechStatus(cTechThurisazRune) == cTechStatusAvailable)
     {
         int x=-1;
@@ -453,6 +491,7 @@ rule getArcticGale
     minInterval 60 //starts in cAge4
     group Baldr
 {
+
     if (kbGetTechStatus(cTechArcticGale) == cTechStatusAvailable)
     {
         int x=-1;

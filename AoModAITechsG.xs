@@ -47,6 +47,9 @@ rule getLordOfHorses
     inactive
     minInterval 23 //starts in cAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
+
     int techID = cTechLordofHorses;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -90,6 +93,8 @@ rule getOlympicParentage
     minInterval 23 //starts in cAge2
     inactive
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechOlympicParentage;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
@@ -133,7 +138,9 @@ rule getLabyrinthOfMinos
     inactive
     minInterval 20 //starts in cAge2
     group techsGreekMinorGodAge2
-{       
+{ 
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;      
     int techID = cTechLabyrinthofMinos;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -182,6 +189,8 @@ rule getWingedMessenger
     minInterval 27 //starts in cAge2
     group techsGreekMinorGodAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechWingedMessenger;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -224,6 +233,8 @@ rule getSylvanLore
     minInterval 31 //starts in cAge2
     group techsGreekMinorGodAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechSylvanLore;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -271,6 +282,8 @@ rule getWillOfKronos
     minInterval 33 //starts in cAge2
     group techsGreekMinorGodAge2
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechWillofKronos;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -338,6 +351,8 @@ rule getDivineBlood
     minInterval 27 //starts in cAge3
     group techsGreekMinorGodAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechDivineBlood;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -405,7 +420,9 @@ rule getGoldenApples
     inactive
     minInterval 29 //starts in cAge3
     group techsGreekMinorGodAge3
-{    
+{   
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return; 
     int techID = cTechGoldenApples;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -466,6 +483,8 @@ rule getRoarOfOrthus
     minInterval 31 //starts in cAge3
     group techsGreekMinorGodAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechRoarofOrthus;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -529,6 +548,8 @@ rule getTempleOfHealing
     minInterval 30 //starts in cAge3
     group techsGreekMinorGodAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechTempleofHealing;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -559,6 +580,8 @@ rule getOracle
     minInterval 31 //starts in cAge3
     group techsGreekMinorGodAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechOracle;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -607,6 +630,8 @@ rule getBacchanalia
     minInterval 33 //starts in cAge3
     group techsGreekMinorGodAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     int techID = cTechBacchanalia;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
@@ -649,6 +674,8 @@ rule getAnastrophe
     minInterval 29 //starts in cAge3
     group techsGreekMinorGodAge3
 {
+    if (gAgeFaster == true && kbGetAge() < cAge4)
+        return;
     if (gTransportMap == false)
     {
         xsDisableSelf();
@@ -719,6 +746,7 @@ rule getFlamesOfTyphon
     minInterval 29 //starts in cAge4
     group techsGreekMinorGodAge4
 {
+
     int techID = cTechFlamesofTyphon;
     int techStatus = kbGetTechStatus(techID);
     if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
