@@ -12,7 +12,7 @@ rule getAcupuncture
     inactive
     minInterval 23
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechAcupuncture) == cTechStatusAvailable)
     {
@@ -34,7 +34,7 @@ rule getDomestication
     inactive
     minInterval 23
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechDomestication) == cTechStatusAvailable)
     {
@@ -83,7 +83,7 @@ rule getElixirofImmortality
     minInterval 27
     group Change
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 	
@@ -109,7 +109,7 @@ rule getHouyisBow
     minInterval 29
     group Change
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
@@ -135,7 +135,7 @@ rule getJadeRabbit
     minInterval 29
     group Change
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float foodSupply = kbResourceGet(cResourceFood);
 	
@@ -162,7 +162,7 @@ rule getGoldenBandedStaff
     minInterval 27
     group Sunwukong
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
@@ -188,7 +188,7 @@ rule getPaperTalisman
     minInterval 27
     group Sunwukong
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
@@ -219,7 +219,7 @@ rule getStoneArmor
     minInterval 27
     group Huangdi
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
@@ -265,7 +265,7 @@ rule getOracleBoneScript
     minInterval 27
     group Huangdi
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float foodSupply = kbResourceGet(cResourceFood);
 	
@@ -336,7 +336,7 @@ rule getHouseAltars
     minInterval 27
     group Dabogong
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechHouseAltars) == cTechStatusAvailable)
     {
@@ -364,7 +364,7 @@ rule getLifeDrain
     minInterval 27
     group Zhongkui
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechLifeDrain) == cTechStatusAvailable)
     {
@@ -408,7 +408,7 @@ rule getUnbridledAnger
     minInterval 27
     group Zhongkui
  {
-     if (gAgeFaster == true && kbGetAge() < cAge4)
+     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechUnbrideledAnger) == cTechStatusAvailable)
       {
@@ -433,7 +433,7 @@ rule getSacrifices
     minInterval 27
     group Hebo
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechSacrifices) == cTechStatusAvailable)
     {
@@ -455,7 +455,7 @@ rule getLordoftheRiver
     minInterval 27
     group Hebo
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechLordoftheRiver) == cTechStatusAvailable)
     {
@@ -478,7 +478,7 @@ rule getRammedEarth
     minInterval 27
     group Hebo
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechRammedEarth) == cTechStatusAvailable)
     {

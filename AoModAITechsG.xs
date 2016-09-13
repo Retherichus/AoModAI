@@ -47,7 +47,7 @@ rule getLordOfHorses
     inactive
     minInterval 23 //starts in cAge2
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
 
     int techID = cTechLordofHorses;
@@ -93,7 +93,7 @@ rule getOlympicParentage
     minInterval 23 //starts in cAge2
     inactive
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechOlympicParentage;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
@@ -139,7 +139,7 @@ rule getLabyrinthOfMinos
     minInterval 20 //starts in cAge2
     group techsGreekMinorGodAge2
 { 
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;      
     int techID = cTechLabyrinthofMinos;
     int techStatus = kbGetTechStatus(techID);
@@ -189,7 +189,7 @@ rule getWingedMessenger
     minInterval 27 //starts in cAge2
     group techsGreekMinorGodAge2
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechWingedMessenger;
     int techStatus = kbGetTechStatus(techID);
@@ -233,7 +233,7 @@ rule getSylvanLore
     minInterval 31 //starts in cAge2
     group techsGreekMinorGodAge2
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechSylvanLore;
     int techStatus = kbGetTechStatus(techID);
@@ -282,7 +282,7 @@ rule getWillOfKronos
     minInterval 33 //starts in cAge2
     group techsGreekMinorGodAge2
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechWillofKronos;
     int techStatus = kbGetTechStatus(techID);
@@ -351,7 +351,7 @@ rule getDivineBlood
     minInterval 27 //starts in cAge3
     group techsGreekMinorGodAge3
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechDivineBlood;
     int techStatus = kbGetTechStatus(techID);
@@ -421,7 +421,7 @@ rule getGoldenApples
     minInterval 29 //starts in cAge3
     group techsGreekMinorGodAge3
 {   
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return; 
     int techID = cTechGoldenApples;
     int techStatus = kbGetTechStatus(techID);
@@ -483,7 +483,7 @@ rule getRoarOfOrthus
     minInterval 31 //starts in cAge3
     group techsGreekMinorGodAge3
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechRoarofOrthus;
     int techStatus = kbGetTechStatus(techID);
@@ -548,7 +548,7 @@ rule getTempleOfHealing
     minInterval 30 //starts in cAge3
     group techsGreekMinorGodAge3
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechTempleofHealing;
     int techStatus = kbGetTechStatus(techID);
@@ -580,7 +580,7 @@ rule getOracle
     minInterval 31 //starts in cAge3
     group techsGreekMinorGodAge3
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechOracle;
     int techStatus = kbGetTechStatus(techID);
@@ -630,7 +630,7 @@ rule getBacchanalia
     minInterval 33 //starts in cAge3
     group techsGreekMinorGodAge3
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechBacchanalia;
     int techStatus = kbGetTechStatus(techID);
@@ -674,7 +674,7 @@ rule getAnastrophe
     minInterval 29 //starts in cAge3
     group techsGreekMinorGodAge3
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (gTransportMap == false)
     {

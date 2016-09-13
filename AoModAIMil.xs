@@ -3388,7 +3388,7 @@ rule createRaidingParty
 
 //==============================================================================
 rule randomAttackGenerator
-    minInterval 21 //starts in cAge2
+    minInterval 41 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("******* randomAttackGenerator:");
@@ -3468,7 +3468,7 @@ rule randomAttackGenerator
     float goldSupply = kbResourceGet(cResourceGold);
 
     
-    if ((woodSupply < 50) || (foodSupply < 100) || (goldSupply < 100))
+    if ((woodSupply < 200) || (foodSupply < 200 || (goldSupply < 200)))
     {
         return;
     }
@@ -3499,7 +3499,7 @@ rule randomAttackGenerator
     bool targetIsDropsite = false;
     int index = 0;
     int playerID = -1;
-    closeRangeRadius = 300.0;
+    closeRangeRadius = 100.0;
     
     for (playerID = 1; < cNumberPlayers)
     {
@@ -3789,7 +3789,7 @@ rule randomAttackGenerator
 	
     //aiPlanSetDesiredPriority(randomAttackPlanID, 50);
     aiPlanAddUnitType(randomAttackPlanID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
-	aiPlanSetDesiredPriority(randomAttackPlanID, 52);
+	aiPlanSetDesiredPriority(randomAttackPlanID, 50);
 	
     aiPlanSetActive(randomAttackPlanID);
     gRandomAttackPlanID = randomAttackPlanID;
@@ -3809,7 +3809,7 @@ rule randomAttackGenerator
 
 //==============================================================================
 rule createLandAttack
-    minInterval 33 //starts in cAge2
+    minInterval 53 //starts in cAge2
     inactive
 {
 
@@ -4146,7 +4146,7 @@ rule createLandAttack
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeBuilding);
 	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeAbstractWall);
 
-    aiPlanSetDesiredPriority(landAttackPlanID, 50);
+    aiPlanSetDesiredPriority(landAttackPlanID, 52);
     
     aiPlanSetActive(landAttackPlanID);
     

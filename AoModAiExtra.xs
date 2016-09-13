@@ -39,6 +39,9 @@ extern int gHeavyGPTech=-1;
 extern int gHeavyGPPlan=-1;
 extern int gTradeMaintainPlanID=-1;
 extern int gDefendPlentyVaultWater=-1;
+extern int WallAllyPlanID=-1;
+extern int WallAllyOtherPlanID=-1;
+
 
 
 //////////////// aiEchoDEBUG ////////////////
@@ -61,7 +64,7 @@ extern bool ShowAiTestEcho = false;
 extern bool mCanIDefendAllies = true;     // Allows the AI to defend his allies.
 extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''.
 extern bool gAgeFaster = false;            // This will lower/halt most non economical upgrades until Mythic Age, this will allow the Ai to age up faster.
-extern int AgeFasterStop = cAge4;
+extern int AgeFasterStop = cAge3;         // Age to stop gAgeFaster if enabled. "cAge1" Archaic, "cAge2" Classical, "cAge3" Heroic, "cAge4" Mythic.
 extern bool gAgeReduceMil = false;         // This will lower the amount of military units the AI will train until Mythic Age, this will also help the AI to advance a little bit faster, more configs below.
 extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
@@ -74,6 +77,8 @@ extern bool gHuntEarly = true;            // This will make villagers hunt aggre
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
 extern bool gEarlyMonuments = false;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
+extern bool bWonderDefense = true;         // Builds towers/fortresses around friendly wonders.
+extern bool bWallAllyMB = true;          // Walls up the mainbase of a human ally (don't use this if you plan on having more than 1 AomodAI ally!)
 
 //For gAgeReduceMil when true.
 extern int eMaxMilPop = 15;               // Max military pop cap during Classical Age & Heroic Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
@@ -358,6 +363,9 @@ void initRethlAge2(void)
 	
 	// Check with allies and enable donations
     xsEnableRule("MonitorAllies");
+	
+	if (bWallAllyMB == true)
+	xsEnableRule("WallAllyMB");
 
 
 }	

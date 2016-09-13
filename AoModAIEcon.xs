@@ -3501,7 +3501,7 @@ rule norseInfantryCheck
 	int ulfCountS=kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive);
     int ulfCount=kbUnitCount(cMyID, cUnitTypeUlfsark, cUnitStateAlive);
 	ulfCount = ulfCount + ulfCountS;
-    if (ulfCount >= 1)     
+    if (ulfCount >= 2)     
         return;
 
     if (xsGetTime() < 90*1000)

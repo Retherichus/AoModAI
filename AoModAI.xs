@@ -995,7 +995,7 @@ rule updateEMAge3
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
       
-	  if (gAgeFaster == true && gAgeReduceMil == true &&  aiGetWorldDifficulty() == cDifficultyNightmare)
+	  if (gAgeFaster == true && gAgeReduceMil == true && aiGetWorldDifficulty() == cDifficultyNightmare)
 	  {
 	  if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
 	  milPopTarget = eHMaxMilPop;
@@ -3539,6 +3539,7 @@ void init(void)
     aiSetRandomMap(true);
     if (cvRandomMapName == "None")
         cvRandomMapName = cRandomMapName;
+		aiEcho("MAP NAME "+cRandomMapName+".");
 
     //Adjust control variable sliders by random amount
     cvRushBoomSlider = (cvRushBoomSlider - cvSliderNoise) + (cvSliderNoise * (aiRandInt(201))/100.0);
@@ -4997,6 +4998,7 @@ void age3Handler(int age=2)
     // build as many fortresses as possible 
     xsEnableRule("buildFortress");
 
+	if ((aiGetGameMode() != cGameModeConquest) && (aiGetGameMode() != cGameModeDeathmatch))
     xsEnableRule("watchForFirstWonderStart");
   
     if (cMyCulture == cCultureGreek)
@@ -5567,7 +5569,7 @@ void resignHandler(int result =-1)
 
 //==============================================================================
 rule findFish   //We don't know if this is a water map...if you see fish, it is.
-    minInterval 8 //starts in cAge1
+    minInterval 1 //starts in cAge1
     active
 {
  xsSetRuleMinIntervalSelf(25);
@@ -5578,13 +5580,14 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 	
 			// Disable early fishing for Nomad & Highland, to later be enabled.
 		
-		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") || (cRandomMapName == "vinlandsaga") || (cRandomMapName == "team acropolis") || (cRandomMapName == "Deep Jungle"))
+		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") || NoFishing == true)
 		  {
-		  if (ShowAiEcho == true) aiEcho("FindFish disabled, map forced this.");
+		  aiEcho("FindFish disabled, map forced this.");
 		  xsDisableSelf();
 		  return;
-	}
-        
+	      }
+
+        aiEcho("Looking for fish..");
 		// Let's not try to run this query too often if it fails to find anything, Reth.
 		if (xsGetTime() > 3*60*1000)
         xsSetRuleMinIntervalSelf(180);	
@@ -5607,7 +5610,6 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
     {
         gWaterMap=true;
 		ConfirmFish=true;
-      
         //Tell the AI what kind of map we are on.
         aiSetWaterMap(gWaterMap);
 
@@ -5735,6 +5737,9 @@ rule watchForFirstWonderDone    //See who makes the first wonder, note its ID, m
             gEnemyWonderDefendPlan=aiPlanCreate("Enemy wonder attack plan", cPlanAttack);
             if (gEnemyWonderDefendPlan < 0)
                return;
+			   
+			if (bWonderDefense == true)
+			xsEnableRuleGroup("WonderDefense");			   
 
             int n=0;
             for (n=1; <= cNumberPlayers)
@@ -5804,7 +5809,7 @@ rule watchForFirstWonderDone    //See who makes the first wonder, note its ID, m
                         aiPlanSetVariableInt(gEnemyWonderDefendPlan, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
                         
                         wonderDefendPlanStartTime = xsGetTime();
-
+                        
                         aiPlanSetActive(gEnemyWonderDefendPlan);
                         if (ShowAiEcho == true) aiEcho("Creating ally wonder defend plan");
                     }

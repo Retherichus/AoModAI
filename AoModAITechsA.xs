@@ -12,7 +12,7 @@ rule getChannels
     inactive
     minInterval 23
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechChannels) == cTechStatusAvailable)
     {
@@ -34,7 +34,7 @@ rule getFocus
     inactive
     minInterval 23
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechFocus) == cTechStatusAvailable)
     {
@@ -56,7 +56,7 @@ rule getSafePassage
     inactive
     minInterval 23
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechSafePassage;
     int techStatus = kbGetTechStatus(techID);
@@ -105,7 +105,7 @@ rule getHephaestusRevenge
     minInterval 27
     group Leto
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
@@ -131,7 +131,7 @@ rule getVolcanicForge
     minInterval 29
     group Leto
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -160,7 +160,7 @@ rule getBiteOfTheShark
     minInterval 27
     group Oceanus
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float foodSupply = kbResourceGet(cResourceFood);
 
@@ -186,7 +186,7 @@ rule getWeightlessMace
     minInterval 29
     group Oceanus
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float foodSupply = kbResourceGet(cResourceFood);
     if (kbGetAge() < cAge3 && foodSupply < 1000)
@@ -212,7 +212,7 @@ rule getHeartOfTheTitans
     minInterval 27
     group Prometheus
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
@@ -238,7 +238,7 @@ rule getAlluvialClay
     minInterval 29
     group Prometheus
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
@@ -267,7 +267,7 @@ rule getMailOfOrichalkos
     minInterval 27
     group Rheia
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechMailofOrichalkos) == cTechStatusAvailable)
     {
@@ -289,7 +289,7 @@ rule getHornsOfConsecration
     minInterval 29
     group Rheia
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechHornsofConsecration) == cTechStatusAvailable)
     {
@@ -311,7 +311,7 @@ rule getRheiasGift
     minInterval 31
     group Rheia
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechRheiasGift) == cTechStatusAvailable)
     {
@@ -335,7 +335,7 @@ rule getLemurianDescendants
     minInterval 27
     group Theia
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechLemurianDescendants) == cTechStatusAvailable)
     {
@@ -357,7 +357,7 @@ rule getPoseidonsSecret
     minInterval 29
     group Theia
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechPoseidonsSecret) == cTechStatusAvailable)
     {
@@ -379,7 +379,7 @@ rule getLanceOfStone
     minInterval 31
     group Theia
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechLanceofStone) == cTechStatusAvailable)
     {
@@ -402,7 +402,7 @@ rule getHeroicRenewal
     minInterval 27
     group Hyperion
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechHeroicRenewal) == cTechStatusAvailable)
     {
@@ -424,7 +424,7 @@ rule getGemino
     minInterval 29
     group Hyperion
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechGemino) == cTechStatusAvailable)
     {

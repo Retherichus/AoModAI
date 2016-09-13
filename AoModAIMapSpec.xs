@@ -20,13 +20,13 @@
 //==============================================================================
 
 extern int gTransportUnit=-1;
-
+extern bool NoFishing = false;
 
 //==============================================================================
 void preInitMap()
 {
     if (ShowAiEcho == true) aiEcho("preInitMap:");    
-
+ 
     int transport = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
     // Decide if we have a water map.
     if ((cRandomMapName == "archipelago") ||
@@ -100,7 +100,6 @@ void preInitMap()
         gWaterMap = true;
         gTransportMap=false;
         xsEnableRule("fishing");
-
     }
     else if ((cRandomMapName == "alfheim") ||
       (cRandomMapName == "alternate-alfheim") ||
@@ -139,6 +138,7 @@ void preInitMap()
       (cRandomMapName == "alexandriax2") ||
       (cRandomMapName == "arabia") ||
       (cRandomMapName == "acropolis") ||
+	  (cRandomMapName == "team acropolis") ||
       (cRandomMapName == "alternate-acropolis") ||
       (cRandomMapName == "oasis") ||
       (cRandomMapName == "alternate-oasis") ||
@@ -153,6 +153,7 @@ void preInitMap()
       (cRandomMapName == "marsh") ||
       (cRandomMapName == "alternate-marsh") ||
       (cRandomMapName == "megalopolis") ||
+	  (cRandomMapName == "Megaopolis") ||
       (cRandomMapName == "alternate-megalopolis") ||
       (cRandomMapName == "tundra") ||
       (cRandomMapName == "alternate-tundra") ||
@@ -165,6 +166,7 @@ void preInitMap()
       (cRandomMapName == "rocky mountains") ||
       (cRandomMapName == "cherimoya") ||
       (cRandomMapName == "ghost lake") ||
+	  (cRandomMapName == "Deep Jungle") || // Not guaranteed to have a pool generated nearby, fishing in an enemy pool is a bad idea!
       (cRandomMapName == "sudden death")) // imho: does'nt make much sense to fish here
     {
         gWaterMap=false;
@@ -172,6 +174,7 @@ void preInitMap()
         gNumBoatsToMaintain = 0;
         xsDisableRule("findFish"); 
         xsDisableRule("fishing");
+		NoFishing = true;
     }
     else
     // king of the hill
