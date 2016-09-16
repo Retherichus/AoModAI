@@ -2343,9 +2343,9 @@ rule attackEnemySettlement
                     }
                 }
                 else if (((planState == cPlanStateGather) || (planState == cPlanStateExplore) || (planState == cPlanStateNone))
-                 && (xsGetTime() > attackPlanStartTime + 2.5*60*1000) && (attackPlanStartTime != -1))
+                 && (xsGetTime() > attackPlanStartTime + 3.5*60*1000) && (attackPlanStartTime != -1))
                 {
-                    if ((xsGetTime() > attackPlanStartTime + 3*60*1000) && (attackPlanStartTime != -1))
+                    if ((xsGetTime() > attackPlanStartTime + 5*60*1000) && (attackPlanStartTime != -1))
                     {
                         aiPlanDestroy(attackPlanID);
                         gEnemySettlementAttPlanTargetUnitID = -1;
@@ -2455,7 +2455,7 @@ rule attackEnemySettlement
             if (ShowAiEcho == true) aiEcho("returning as we don't have a Titan, a siege weapon, or a military myth unit");
             return;
         }
-        else if (((woodSupply < 100) || (goldSupply < 100) || (foodSupply < 100)) && (currentPop <= currentPopCap - 2))
+        else if (((woodSupply < 300) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap - 2))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;
@@ -2464,7 +2464,7 @@ rule attackEnemySettlement
     else
     {
 
-        if (((woodSupply < 100) || (goldSupply < 100) || (foodSupply < 100)) && (currentPop <= currentPopCap - 2))
+        if (((woodSupply < 150) || (goldSupply <150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 2))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;
@@ -2669,7 +2669,7 @@ rule attackEnemySettlement
     {
         if (targetSettlementCloseToMB == true)
         {
-            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
+            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeAbstractSiegeWeapon, 1, 1, 2);
             aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeHero, 0, 1, 1);
             
             if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
@@ -2747,13 +2747,13 @@ rule attackEnemySettlement
         aiPlanSetDesiredPriority(enemySettlementAttPlanID, 51);
 
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);
-	aiPlanSetNumberVariableValues(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 5, true);
-    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeSettlementLevel1);	
-    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeAbstractVillager);
-	aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeUnit);
-	aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeBuilding);
-    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 4, cUnitTypeAbstractWall);
-    
+	
+    aiPlanSetNumberVariableValues(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 2, true);      
+    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeUnit);
+    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeBuilding);
+    aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID); // add an extra just in case.
+	
+	
     aiPlanSetActive(enemySettlementAttPlanID);
     
     if (lastTargetUnitID == targetSettlementID)
@@ -3780,12 +3780,14 @@ rule randomAttackGenerator
 	
     aiPlanSetInitialPosition(randomAttackPlanID, baseLocationToUse);
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanRefreshFrequency, 0, 12);
-    aiPlanSetNumberVariableValues(randomAttackPlanID, cAttackPlanTargetTypeID, 4, true);
+	/*
+	does this make the AI retreat more often?
+    aiPlanSetNumberVariableValues(randomAttackPlanID, cAttackPlanTargetTypeID, 4, false);
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);	
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
 	aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeAbstractWall);	
-
+    */
 	
     //aiPlanSetDesiredPriority(randomAttackPlanID, 50);
     aiPlanAddUnitType(randomAttackPlanID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
@@ -4110,7 +4112,7 @@ rule createLandAttack
 
     if (numEnemySettlements < 1)
     {
-        aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.5, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.9);
+        aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.75, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.9);
         aiPlanSetVariableInt(landAttackPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeNone);
     }
     else
@@ -4125,7 +4127,7 @@ rule createLandAttack
         if (kbGetAge() == cAge2)
             aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, requiredUnits * 0.6, requiredUnits + 3, requiredUnits + 3);
         else
-            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.6, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9); 
+            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9); 
             
         aiPlanSetVariableInt(landAttackPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
     }
@@ -4133,7 +4135,7 @@ rule createLandAttack
 
     
     aiPlanSetInitialPosition(landAttackPlanID, baseLocationToUse);
-    aiPlanSetVariableInt(landAttackPlanID, cAttackPlanRefreshFrequency, 0, 12);
+    aiPlanSetVariableInt(landAttackPlanID, cAttackPlanRefreshFrequency, 0, 10);
 
     if (aiRandInt(2) < 1)
     aiPlanSetVariableBool(landAttackPlanID, cAttackPlanAutoUseGPs, 0, false);
@@ -4141,10 +4143,10 @@ rule createLandAttack
     aiPlanSetVariableBool(landAttackPlanID, cAttackPlanAutoUseGPs, 0, true);
 
     
-    aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetTypeID, 3, true);      
+    aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetTypeID, 2, true);      
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeUnit);
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeBuilding);
-	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeAbstractWall);
+	
 
     aiPlanSetDesiredPriority(landAttackPlanID, 50);
     

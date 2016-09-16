@@ -167,7 +167,7 @@ extern int RethLEWAge4 = 1200;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 800;             // Food
+extern int RethLNFAge2 = 1000;             // Food
 extern int RethLNGAge2 = 600;              // Gold
 extern int RethLNWAge2 = 400;              // Wood
 
@@ -1758,7 +1758,7 @@ inactive
                if (WaterVersion == true)
                xsSetRuleMinIntervalSelf(30+aiRandInt(12));
 			   else
-			   xsSetRuleMinIntervalSelf(35+aiRandInt(12));
+			   xsSetRuleMinIntervalSelf(20+aiRandInt(12));
 			   
                static vector KOTHPlace = cInvalidVector;
                KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);
@@ -1801,7 +1801,7 @@ inactive
 				
 				if (WaterVersion == false)
 				{
-				if (numAvailableUnits < 7 && kbGetPop() <= 39 || kbGetAge() < cAge2)
+				if ((numAvailableUnits < 7 && kbGetPop() <= 39) || (kbGetAge() < cAge2) || (numAvailableUnits < 11 && (xsGetTime() > 18*60*1000)))
                 return;
 				}	  
 					if (LandNeedReCalculation == true && WaterVersion == false)
@@ -1818,7 +1818,7 @@ inactive
                         aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanEngageRange, 0, 30.0);
                         aiPlanSetVariableBool(gDefendPlentyVault, cDefendPlanPatrol, 0, false);
 
-                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanGatherDistance, 0, 15.0);
+                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanGatherDistance, 0, 10.0);
                         aiPlanSetInitialPosition(gDefendPlentyVault, KOTHPlace);
                         aiPlanSetUnitStance(gDefendPlentyVault, cUnitStanceDefensive);
 

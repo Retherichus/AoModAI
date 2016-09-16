@@ -1530,7 +1530,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 	//if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Treecount:  "+TotalTreesNearMB+" ");
     
 	float neededWoodGatherers = desiredWoodUnits;
-    if (woodSupply > goldSupply+1500 || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 60*60*1000)
+    if (woodSupply > goldSupply+2000 || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 120*60*1000)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -2670,8 +2670,8 @@ void initNorse(void)
         xsEnableRule("ulfsarkMaintain");
     }
 
-    // Get two extra oxcarts ASAP before we're at econ pop cap, not on Easy though.
-    if (aiGetWorldDifficulty() > cDifficultyEasy )
+    // On easy or moderate, get two extra oxcarts ASAP before we're at econ pop cap
+    if ( aiGetWorldDifficulty() <= cDifficultyModerate )
     {
         int easyOxPlan=aiPlanCreate("Easy/Moderate Oxcarts", cPlanTrain);
         if (easyOxPlan >= 0)
