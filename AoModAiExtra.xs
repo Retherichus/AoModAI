@@ -11,7 +11,7 @@
 
 //==============================================================================
 //PART 1 Int & Handler
-//Below, you'll find the Plan handler. 
+//Below, you'll find the external calls and Plan handlers. 
 //you don't really want to touch this.. and if you do, you'll break stuff.
 //==============================================================================
 mutable bool persWantForwardBase() {}
@@ -41,6 +41,7 @@ extern int gDefendPlentyVaultWater=-1;
 extern int WallAllyPlanID=-1;
 extern bool KOTHStopRefill = false;
 extern vector KOTHGlobal = cInvalidVector;
+extern bool IhaveAllies = false;
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -51,7 +52,7 @@ extern bool ShowAiMilEcho = false;
 extern bool ShowAiDefEcho = false;
 extern bool ShowAiTestEcho = false;
 
-//////////////// END OF aiEchoDEBUG ////////////////
+//////////////// END OF aiEchoDEBUG ///////////
 
 //==============================================================================
 //PART 2 Bools & Stuff you can change!
@@ -167,7 +168,7 @@ extern int RethLEWAge4 = 1200;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 800;             // Food
+extern int RethLNFAge2 = 1000;             // Food
 extern int RethLNGAge2 = 600;              // Gold
 extern int RethLNWAge2 = 400;              // Wood
 
@@ -244,7 +245,6 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetRetreatEventHandler("retreatHandler");
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
 	// kbLookAtAllUnitsOnMap();   // Semi cheating!.. Disabled because I hate cheating, you may enable this by removing the double slash (note: all other AIs do cheat)
-	
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
@@ -1598,11 +1598,13 @@ inactive
 		 {
          xsEnableRuleGroup("Donations");
 		 xsEnableRule("defendAlliedBase");
+		 IhaveAllies = true;
 		 return;
 		 }
 		 else 
 		 xsDisableRuleGroup("Donations"); 
 		 xsDisableRule("defendAlliedBase");
+		 IhaveAllies = false;
 	}
 }
 }
@@ -1758,7 +1760,7 @@ inactive
                if (WaterVersion == true)
                xsSetRuleMinIntervalSelf(30+aiRandInt(12));
 			   else
-			   xsSetRuleMinIntervalSelf(35+aiRandInt(12));
+			   xsSetRuleMinIntervalSelf(20+aiRandInt(12));
 			   
                static vector KOTHPlace = cInvalidVector;
                KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);
@@ -1801,7 +1803,7 @@ inactive
 				
 				if (WaterVersion == false)
 				{
-				if (numAvailableUnits < 7 && kbGetPop() <= 39 || kbGetAge() < cAge2)
+				if ((numAvailableUnits < 7 && kbGetPop() <= 39) || (kbGetAge() < cAge2) || (numAvailableUnits < 11 && (xsGetTime() > 17*60*1000)))
                 return;
 				}	  
 					if (LandNeedReCalculation == true && WaterVersion == false)
@@ -1813,12 +1815,12 @@ inactive
                 
                         aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.7, numAvailableUnits * 0.8, numAvailableUnits * 0.85);    // Most mil units.
 
-                        aiPlanSetDesiredPriority(gDefendPlentyVault, 61);                       // prio
+                        aiPlanSetDesiredPriority(gDefendPlentyVault, 70);                       // prio
                         aiPlanSetVariableVector(gDefendPlentyVault, cDefendPlanDefendPoint, 0, KOTHPlace);
                         aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanEngageRange, 0, 30.0);
                         aiPlanSetVariableBool(gDefendPlentyVault, cDefendPlanPatrol, 0, false);
 
-                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanGatherDistance, 0, 15.0);
+                        aiPlanSetVariableFloat(gDefendPlentyVault, cDefendPlanGatherDistance, 0, 10.0);
                         aiPlanSetInitialPosition(gDefendPlentyVault, KOTHPlace);
                         aiPlanSetUnitStance(gDefendPlentyVault, cUnitStanceDefensive);
 

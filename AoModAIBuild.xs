@@ -1599,8 +1599,7 @@ rule mainBaseAreaWallTeam2
     minInterval 29 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
     inactive
 {
-xsDisableSelf();
-return;
+
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
 
     if ((cMyCulture == cCultureAtlantean) && (xsGetTime() < 15*60*1000))

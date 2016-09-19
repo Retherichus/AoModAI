@@ -84,7 +84,7 @@ rule updateWoodBreakdown
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 12;
     if (cMyCulture == cCultureAtlantean)
-        minVillagers = 7;
+        minVillagers = 5;
     else if (cMyCulture == cCultureGreek)
         minVillagers = 14;
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
@@ -118,9 +118,7 @@ rule updateWoodBreakdown
     //Get the count of plans we currently have going.
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
-    int desiredWoodPlans = 1 + (woodGathererCount/12);
-    if (cMyCulture == cCultureAtlantean)
-   desiredWoodPlans = 1 + (woodGathererCount/5);
+    int desiredWoodPlans = 2;
     
 	if (xsGetTime() < 10*60*1000)
         desiredWoodPlans = 1;
@@ -316,7 +314,7 @@ rule updateGoldBreakdown
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 12;
     if (cMyCulture == cCultureAtlantean)
-        minVillagers = 6;
+        minVillagers = 5;
     else if (cMyCulture == cCultureGreek)
         minVillagers = 14;
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
@@ -350,9 +348,7 @@ rule updateGoldBreakdown
     //Get the count of plans we currently have going.
     int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 
-    int desiredGoldPlans = 1 + (goldGathererCount/12);
-	if (cMyCulture == cCultureAtlantean)
-   goldGathererCount = 1 + (goldGathererCount/5);
+    int desiredGoldPlans = 2;
     
     int numGoldMinesNearMBInR50 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0);
     
@@ -600,7 +596,7 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 26;
+    int desiredFarmers = 28;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
         desiredFarmers = 11;		
 	
@@ -684,7 +680,7 @@ rule updateFoodBreakdown
             {
                 requiredTowers = 0;
                 if (distanceToMainBase < 65.0)
-                    farmsWanted = 3;
+                    farmsWanted = 5;
                 else if (distanceToMainBase < 90.0)
                     farmsWanted = 2;
             }
@@ -814,22 +810,22 @@ rule updateFoodBreakdown
             {
                 if ((unassigned > 1) && ((totalNumberResourceSpots < 2) || (farmerReserve < 7)))
                 {
-                    farmerPreBuild = 2;  // Starting prebuild
+                    farmerPreBuild = 3;  // Starting prebuild
                 }
                 else
                 {
-                    farmerPreBuild = 1;
+                    farmerPreBuild = 2;
                 }
             }
             else
             {
                 if ((unassigned > 1) && ((totalNumberResourceSpots < 2) || (farmerReserve < 17)))
                 {
-                    farmerPreBuild = 4;  // Starting prebuild
+                    farmerPreBuild = 6;  // Starting prebuild
                 }
                 else
                 {
-                    farmerPreBuild = 2;
+                    farmerPreBuild = 5;
                 }
             }
 

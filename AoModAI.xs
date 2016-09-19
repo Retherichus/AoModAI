@@ -1530,7 +1530,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 	//if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Treecount:  "+TotalTreesNearMB+" ");
     
 	float neededWoodGatherers = desiredWoodUnits;
-    if (woodSupply > goldSupply+1500 || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 60*60*1000)
+    if (woodSupply > goldSupply+2000 || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 120*60*1000)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -2670,8 +2670,8 @@ void initNorse(void)
         xsEnableRule("ulfsarkMaintain");
     }
 
-    // Get two extra oxcarts ASAP before we're at econ pop cap, not on Easy though.
-    if (aiGetWorldDifficulty() > cDifficultyEasy )
+    // On easy or moderate, get two extra oxcarts ASAP before we're at econ pop cap
+    if ( aiGetWorldDifficulty() <= cDifficultyModerate )
     {
         int easyOxPlan=aiPlanCreate("Easy/Moderate Oxcarts", cPlanTrain);
         if (easyOxPlan >= 0)
@@ -5375,14 +5375,8 @@ rule ShouldIResign
         checkTeamedWithHuman=false;
     }
 
-	if (cMyCulture == cCultureNorse)
+	if ((cMyCulture == cCultureNorse) && (IhaveAllies == true))
 	 {
-      for (i=1; < cNumberPlayers)
-      {
-         if (i == cMyID)
-            continue;
-         if (kbIsPlayerMutualAlly(i) == true && kbIsPlayerResigned(i) == false && kbIsPlayerValid(i) == true && kbHasPlayerLost(i) == false)
-		 {
 		 int NorseBuilders=kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive);
 		 int NorseLonghouse=kbUnitCount(cMyID, cUnitTypeLonghouse, cUnitStateAlive);
 		 int NorseFortress=kbUnitCount(cMyID, cUnitTypeHillFort, cUnitStateAlive);
@@ -5391,8 +5385,7 @@ rule ShouldIResign
 		 if ((NorseBuilders > 0) || (NorseTotalMilBuildings > 0 && kbGetPopCap() > 0))
 		 return;
 		 }
-      }
-	}	
+      
 	
     int numSettlements=kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
     //If on easy, don't only resign if you have no settlements.
@@ -5418,14 +5411,14 @@ rule ShouldIResign
     
 	//Don't resign if we still have villagers and teamed up.
 	int numAliveVils=kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
-	if (numAliveVils > 0)
+	if ((numAliveVils > 0) && (IhaveAllies == true))
 	return;
 	
 		
     int builderUnitID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0);
     int numBuilders=kbUnitCount(cMyID, builderUnitID, cUnitStateAliveOrBuilding);   
 
-    if ((numSettlements <= 0) && (numBuilders <= 10) && numAliveVils < 1)
+    if ((numSettlements <= 0) && (numBuilders <= 10))
     {
         if (kbCanAffordUnit(cUnitTypeSettlementLevel1, cEconomyEscrowID) == false)
         {
