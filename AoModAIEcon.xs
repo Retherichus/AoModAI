@@ -78,7 +78,7 @@ rule updateWoodBreakdown
       float woodSupply = kbResourceGet(cResourceWood);
 	  float goldSupply = kbResourceGet(cResourceGold);
   
-    if ((woodSupply > goldSupply+1500) && (xsGetTime() > 20*60*1000) || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 60*60*1000)
+    if ((woodSupply > goldSupply+3500) && (xsGetTime() > 20*60*1000))
         woodGathererCount = 0;	
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -227,7 +227,7 @@ rule updateWoodBreakdown
 
 //==============================================================================
 rule updateGoldBreakdown
-    minInterval 12
+    minInterval 10
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateGoldBreakdown: ");
@@ -475,12 +475,11 @@ rule updateGoldBreakdown
 rule updateFoodBreakdown
     minInterval 1
     inactive
-	runImmediately
 {
     if (ShowAiEcho == true) aiEcho("updateFoodBreakdown: ");
     
 	if (xsGetTime() > 20*1*1000)
-	xsSetRuleMinIntervalSelf(10);
+	xsSetRuleMinIntervalSelf(9);
 	
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
@@ -680,7 +679,7 @@ rule updateFoodBreakdown
             {
                 requiredTowers = 0;
                 if (distanceToMainBase < 65.0)
-                    farmsWanted = 5;
+                    farmsWanted = 4;
                 else if (distanceToMainBase < 90.0)
                     farmsWanted = 2;
             }
@@ -1621,8 +1620,6 @@ void initEcon() //setup the initial Econ stuff.
     
 	int mainBaseID = kbBaseGetMainID(cMyID);
 	vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, mainBaseLocation, 55.0, false);
-	TotalTreesNearMB = numTeesNearMainBase;
     
 	//Set our update resource handler.
     aiSetUpdateResourceEventHandler("updateResourceHandler");
@@ -1925,7 +1922,7 @@ rule collectIdleVills
     bool noTrees = false;
 
 	float woodSupply = kbResourceGet(cResourceWood);
-    if (woodSupply > 4200 && xsGetTime() > 20*60*1000 || TotalTreesNearMB < 1 && xsGetTime() > 45*60*1000)
+    if ((woodSupply > 3000) && (xsGetTime() > 20*60*1000))
         noTrees = true;
         
     bool noGoldMines = false;

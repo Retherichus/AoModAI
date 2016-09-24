@@ -31,7 +31,6 @@ extern bool IsRunTradeUnits1 = false;
 extern bool IsRunTradeUnits2 = false;
 extern bool IsRunHuntingDogs = false;
 extern bool IsRunWallSize = false;
-extern int TotalTreesNearMB = -1;
 extern int numTeesNearMainBase = -1;
 extern int gDefendPlentyVault = -1;
 extern int gHeavyGPTech=-1;
@@ -77,11 +76,12 @@ extern bool CanIChat = true;              // This will allow the Ai to send chat
 extern bool gEarlyMonuments = false;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
 extern bool bWonderDefense = true;         // Builds towers/fortresses around friendly wonders.
-extern bool bWallAllyMB = false;          // Walls up the mainbase of a human ally (don't use this if you plan on having more than 1 AomodAI ally!)
+extern bool bWallAllyMB = false;          // Walls up the mainbase of a human ally (don't use this if you plan on having more than 1 AoModAI ally!)
+extern bool bWallCleanup = true;          // Prevents the AI from building small wall pieces inside of gates and/or deletes them if one were to slip through the check.
 extern bool CheatResources = false;        // For those who finds titan (difficulty) to be just 	too easy, enable this and you'll have the AI cheat in some resources as it ages up.
 
 //For gAgeReduceMil when true.
-extern int eMaxMilPop = 15;               // Max military pop cap during Classical Age & Heroic Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
+extern int eMaxMilPop = 15;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
 extern int eHMaxMilPop = 25;              // Heroic age.
 
 
@@ -369,6 +369,10 @@ void initRethlAge2(void)
 	
 	if (bWallAllyMB == true)
 	xsEnableRule("WallAllyMB");
+	
+	if (bWallCleanup == true)
+	xsEnableRuleGroup("WallCleanup");
+	
 }	
 
 //==============================================================================
@@ -2007,12 +2011,254 @@ inactive
  
 }
 
-/*
-//Testing ground
-rule TESTTEST  
-minInterval 1
+//==============================================================================
+rule RemoveWConnectors
+minInterval 5
+group WallCleanup
 inactive
 {
 
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+   xsSetRuleMinIntervalSelf(5);
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeGate);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+			kbUnitQuerySetAscendingSort(unitQueryID, false);
+			kbUnitQuerySetMaximumDistance(unitQueryID, 0);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+	if (siegeFound < 1)
+	return;
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationSelf);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeWallConnector);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp >= 1)
+	   {
+	    xsSetRuleMinIntervalSelf(2);
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitDelete(enemyUnitIDTemp);
+		aiEcho("I deleted cUnitTypeWallConnector");
+	   }
+   }
 }
-*/
+
+//==============================================================================
+rule RemoveWMedium
+minInterval 20
+group WallCleanup
+inactive
+{
+
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+   xsSetRuleMinIntervalSelf(20);
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeGate);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+			kbUnitQuerySetAscendingSort(unitQueryID, false);
+			kbUnitQuerySetMaximumDistance(unitQueryID, 0);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+	if (siegeFound < 1)
+	return;
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationSelf);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeWallMedium);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp >= 1)
+	   {
+	    xsSetRuleMinIntervalSelf(2);
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitDelete(enemyUnitIDTemp);
+		if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Removing a piece of cUnitTypeWallMedium");
+	   }
+   }
+}
+//==============================================================================
+rule RemoveWShort
+minInterval 20
+group WallCleanup
+inactive
+{
+
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+   xsSetRuleMinIntervalSelf(18);
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeGate);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+			kbUnitQuerySetAscendingSort(unitQueryID, false);
+			kbUnitQuerySetMaximumDistance(unitQueryID, 0);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+	if (siegeFound < 1)
+	return;
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationSelf);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeWallShort);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp >= 1)
+	   {
+	    xsSetRuleMinIntervalSelf(2);
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitDelete(enemyUnitIDTemp);
+		if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Removing a piece of cUnitTypeWallShort");
+	   }
+   }
+}
+//==============================================================================
+rule RemoveWLong  
+minInterval 20
+group WallCleanup
+inactive
+{
+
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+   xsSetRuleMinIntervalSelf(18);
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeGate);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+			kbUnitQuerySetAscendingSort(unitQueryID, false);
+			kbUnitQuerySetMaximumDistance(unitQueryID, 0);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+	if (siegeFound < 1)
+	return;
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationSelf);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeWallLong);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   if (numberFoundTemp >= 1)
+	   {
+	    xsSetRuleMinIntervalSelf(2);
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitDelete(enemyUnitIDTemp);
+		if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Removing a piece of cUnitTypeWallLong");
+	   }
+   }
+}
+
+//Testing ground

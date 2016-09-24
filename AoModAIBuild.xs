@@ -542,7 +542,7 @@ rule buildMonuments
 
 //==============================================================================
 rule buildHouse
-    minInterval 11 //starts in cAge1
+    minInterval 10 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("buildHouse:");
@@ -4896,7 +4896,7 @@ rule buildManyBuildings
    if (currentWood < 1000)
       return;
 
- if (numberOfArcheryRange < 15 || numberOfBarracks < 15 || numberOfStables < 15)
+ if (numberOfArcheryRange+numberOfBarracks+numberOfStables <= 40)
  {
    int planID=aiPlanCreate("Build More Buildings", cPlanBuild);
    if (planID >= 0)
@@ -4906,7 +4906,7 @@ rule buildManyBuildings
       if (randSelect == 0)
 	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeArcheryRange);
       else if (randSelect == 1)
-	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeBarracks);
+	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeAcademy);
       else
 	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeStable);
 

@@ -457,7 +457,7 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
 
 //==============================================================================
 rule checkEscrow    //Verify that escrow totals and real inventory are in sync
-    minInterval 10 //starts in cAge1
+    minInterval 7 //starts in cAge1
     active
 {
     if (ShowAiEcho == true) aiEcho("checkEscrow:");
@@ -1062,11 +1062,12 @@ rule updateEMAge4
          civPopTarget = 35;
       milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.95);   }
-   else
- {
-      int num1 =aiRandInt(3);
-      int num2 =aiRandInt(9);
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.95);   
+	  }
+      else
+      {
+      //int num1 =aiRandInt(3);
+      //int num2 =aiRandInt(9);
       civPopTarget = 45; 
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
@@ -1078,7 +1079,7 @@ rule updateEMAge4
         milPopTarget = getSoftPopCap() - civPopTarget;
         kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
         kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.95);
-        kbUnitPickSetCostWeight(gLateUPID, num1+2.+num2);
+        //kbUnitPickSetCostWeight(gLateUPID, num1+2.+num2);
 
    }
 
@@ -1478,59 +1479,10 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         if (neededGoldGatherers < minGoldGatherers)
             neededGoldGatherers = minGoldGatherers;
     }
-   
-    
-    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
 	
-	
-	// Lets not do this calculation too often, as it is a resource hog.
-	static int Count=0;  
- 
-    if (Count > 38)
-    Count = 0; 
-	
-	if (Count < 1)
-	int numTeesNearMainBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, 0, 0, mainBaseLocation, 50.0);
-	else numTeesNearMainBase = TotalTreesNearMB;
-	TotalTreesNearMB = numTeesNearMainBase;
-	
-	if (numTeesNearMainBase < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 60*60*1000 && Count < 1)
-	{
-    int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
-
-    static int lastBaseID = -1;
-	
-    for (i = 0; < numSettlements)
-    {
-        int otherBaseUnitID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive);
-        if (otherBaseUnitID < 0)
-            continue;
-        else
-        {
-            //Get the base ID
-            int otherBaseID = kbUnitGetBaseID(otherBaseUnitID);
-            if (otherBaseID == -1)
-                continue;
-				
-		if (otherBaseID != mainBaseID)		
-		{		
-		vector otherBaseLocation = kbBaseGetLocation(cMyID, otherBaseID);
-		int numTeesNearOtherBase = getNumUnits(cUnitTypeTree, cUnitStateAlive, 0, 0, otherBaseLocation, 35.0);
-		numTeesNearMainBase = TotalTreesNearMB+numTeesNearOtherBase;
-	    TotalTreesNearMB = numTeesNearMainBase;
-		}
-	}
-	}
-	}
-	Count = Count + 1;
-	
-	//int ResetTime = Count - 40;
-	
-    //if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("NumTrees calculation, runs in:  "+ResetTime+" ");
-	//if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Treecount:  "+TotalTreesNearMB+" ");
     
 	float neededWoodGatherers = desiredWoodUnits;
-    if (woodSupply > goldSupply+2000 || TotalTreesNearMB < 1 && cvRandomMapName != "Deep Jungle" && xsGetTime() > 120*60*1000)
+    if (woodSupply > goldSupply+3500)
         neededWoodGatherers = 0;
     
     bool foodOverride = false;
@@ -4043,7 +3995,7 @@ void init(void)
         minPop=40+aiRandInt(20);
         maxPop=70;
         if (aiGetWorldDifficulty() > cDifficultyModerate)
-            maxPop = 100;
+            maxPop = 90;
 
         //If we're on KOTH, make the attack groups smaller.
         if (cvRandomMapName == "king of the hill")
@@ -4059,10 +4011,10 @@ void init(void)
             if ((gBuildWallsAtMainBase == false) || (gTransportMap == true))
                 gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
             else
-                gLateUPID=initUnitPicker("Late", 2, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
+                gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
         }
         else  // Double buildings in DM
-            gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
+            gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, 2*gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
     }
     
     int lateAttackAge = 2;

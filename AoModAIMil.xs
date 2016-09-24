@@ -3883,7 +3883,7 @@ rule createLandAttack
                 if (ShowAiEcho == true) aiEcho("attackPlanID == gLandAttackPlanID");
 
                 if ((aiPlanGetState(attackPlanID) < cPlanStateAttack)
-                 && (((xsGetTime() > attackPlanStartTime + 4*60*1000) && (attackPlanStartTime != -1))
+                 && (((xsGetTime() > attackPlanStartTime + 5*60*1000) && (attackPlanStartTime != -1))
                   || (aiPlanGetVariableInt(attackPlanID, cAttackPlanNumberAttacks, 0) > 1)))
                 {
                     aiPlanDestroy(attackPlanID);

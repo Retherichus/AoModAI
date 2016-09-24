@@ -155,6 +155,7 @@
 		<nameID>62008<culture>Chinese</culture></nameID>
 		<nameID>62009<culture>Chinese</culture></nameID>
 		<nameID>62010<culture>Chinese</culture></nameID>
-		<nameID>62011<culture>Chinese</culture></nameID>	  
+		<nameID>62011<culture>Chinese</culture></nameID>
+        <name>Nǐ hǎo<culture>Chinese</culture></name>		
    </playerNames>
 </AI>
