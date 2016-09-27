@@ -27,7 +27,7 @@ void persDecidePersonality(void)
     {
         case 0:  // Defensive Boomer (protector)
         {
-            if (ShowAiEcho == true) aiEcho("Choosing personality:  Defensive Boomer (Protector)");
+            aiEcho("Choosing personality:  Defensive Boomer (Protector)");
             cvRushBoomSlider = -0.9;
             cvMilitaryEconSlider = 0.3;
             cvOffenseDefenseSlider = -0.9;
@@ -36,7 +36,7 @@ void persDecidePersonality(void)
         }
         case 1:  // Defensive Rusher (defender)
         {
-            if (ShowAiEcho == true) aiEcho("Choosing personality:  Defensive Rusher (Defender)");
+            aiEcho("Choosing personality:  Defensive Rusher (Defender)");
             cvRushBoomSlider = 0.9;
             cvMilitaryEconSlider = 0.9;
             cvOffenseDefenseSlider = -0.9;
@@ -45,7 +45,7 @@ void persDecidePersonality(void)
         }
         case 2:  // Economic Boomer (builder)
         {
-            if (ShowAiEcho == true) aiEcho("Choosing personality:  Economic Boomer (Builder)");
+            aiEcho("Choosing personality:  Economic Boomer (Builder)");
             cvRushBoomSlider = -0.9;
             cvMilitaryEconSlider = -0.9;
             cvOffenseDefenseSlider = 0.0;
@@ -54,7 +54,7 @@ void persDecidePersonality(void)
         }
         case 3:  // Balanced
         {
-            if (ShowAiEcho == true) aiEcho("Choosing personality:  Balanced (Standard)");
+            aiEcho("Choosing personality:  Balanced (Standard)");
             cvRushBoomSlider = 0.0;            
             cvMilitaryEconSlider = 0.0;
             cvOffenseDefenseSlider = 0.0;
@@ -63,7 +63,7 @@ void persDecidePersonality(void)
         }
         case 4:  // Aggressive Boomer (conqueror)
         {
-            if (ShowAiEcho == true) aiEcho("Choosing personality:  Aggressive Boomer (Conqueror)");
+            aiEcho("Choosing personality:  Aggressive Boomer (Conqueror)");
             cvRushBoomSlider = -0.9;
             cvMilitaryEconSlider = 0.3;
             cvOffenseDefenseSlider = 0.9;
@@ -72,7 +72,7 @@ void persDecidePersonality(void)
         }
         case 5:  // Aggressive Rusher (attacker)
         {
-            if (ShowAiEcho == true) aiEcho("Choosing personality:  Aggressive Rusher (Attacker)");
+            aiEcho("Choosing personality:  Aggressive Rusher (Attacker)");
             cvRushBoomSlider = 0.9;
             cvMilitaryEconSlider = 0.9;
             cvOffenseDefenseSlider = 0.9;

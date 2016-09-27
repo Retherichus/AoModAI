@@ -542,7 +542,7 @@ rule buildMonuments
 
 //==============================================================================
 rule buildHouse
-    minInterval 10 //starts in cAge1
+    minInterval 11 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("buildHouse:");
@@ -576,7 +576,7 @@ rule buildHouse
         {
             if (kbUnitGetHealth(houseID) < 1.0)
             {
-                if (count > 3)
+                if (count > 4)
                 {
                     aiPlanDestroy(housePlanID);
                     aiTaskUnitDelete(houseID);
@@ -3922,7 +3922,7 @@ rule buildResearchGranary   //or a guild for Atlanteans or a house for Norse
 
 //==============================================================================
 rule destroyUnnecessaryDropsites
-    inactive
+    active
     minInterval 97 //starts in cAge2
 {
     if (ShowAiEcho == true) aiEcho("destroyUnnecessaryDropsites:");
@@ -3967,10 +3967,11 @@ rule destroyUnnecessaryDropsites
                 int numWildCrops = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int numGoldMines = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
-                
+                int NumFarms = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, -1, cMyID, dropsiteLocation, 20.0);
+				
                 if (kbUnitIsType(dropsiteID, cUnitTypeGranary) == true)
                 {
-                    if (((numAnimals < 2) && (numWildCrops < 1)) || (otherBaseID != mainBaseID))
+                    if ((numAnimals < 2) && (numWildCrops < 1) && (NumFarms < 1) || (otherBaseID != mainBaseID))
                     {
                         if ((kbGetTechStatus(cTechPlow) != cTechStatusResearching) && (kbGetTechStatus(cTechHuntingDogs) != cTechStatusResearching) && (kbGetTechStatus(cTechHusbandry) != cTechStatusResearching))
                         {
@@ -4022,7 +4023,7 @@ rule destroyUnnecessaryDropsites
                 {
                     if (kbUnitIsType(dropsiteID, cUnitTypeStoragePit) == true)
                     {
-                        if (((numTrees < 1) && (numGoldMines < 1)) || ((otherBaseID != mainBaseID) && (numGoldMines < 1)))
+                        if (((numTrees < 1) && (numGoldMines < 1) && (NumFarms < 1) || ((otherBaseID != mainBaseID) && (numGoldMines < 1))))
                         {
                             if ((kbGetTechStatus(cTechHandAxe) != cTechStatusResearching) && (kbGetTechStatus(cTechPickaxe) != cTechStatusResearching))
                             {

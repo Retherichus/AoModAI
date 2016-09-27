@@ -568,7 +568,7 @@ rule updateFoodBreakdown
 
     float aggressiveAmount = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
     float easyAmount = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, distance);
-    easyAmount = easyAmount + 100 * numHerdables;      // Add in the herdables, overlooked by the kbGetAmount call.
+    easyAmount = easyAmount + 50 * numHerdables;      // Add in the herdables, overlooked by the kbGetAmount call.
 
     float totalAmount = aggressiveAmount + easyAmount;
    
@@ -794,6 +794,8 @@ rule updateFoodBreakdown
     
     if ((aiGetGameMode() == cGameModeLightning) || (aiGetGameMode() == cGameModeDeathmatch))
         totalAmount = 200;   // Fake a shortage so that farming always starts early in these game modes
+		
+		//totalAmount = 200; // TEST
 	
 
     int numAggrResourceSpotsInR70 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, 70.0);
@@ -802,7 +804,7 @@ rule updateFoodBreakdown
     
     if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)))   // can build farms
     {
-        if ((totalNumberResourceSpots < 2) || (totalAmount < 1900) || (gFarming == true) || (kbGetAge() == cAge3)
+        if ((totalNumberResourceSpots < 2) || (totalAmount < 2050) || (gFarming == true) || (kbGetAge() == cAge3)
            || ((numResourceSpotsInR70 < 2) && (xsGetTime() > 9*60*1000)))
         {
             if (cMyCulture == cCultureAtlantean)
@@ -1837,7 +1839,7 @@ rule fishing
     int fishPlanID = aiPlanCreate("FishPlan", cPlanFish);
     if (fishPlanID >= 0)
     {
-        aiPlanSetDesiredPriority(fishPlanID, 52);
+        aiPlanSetDesiredPriority(fishPlanID, 30);
         aiPlanSetVariableVector(fishPlanID, cFishPlanLandPoint, 0, mainBaseLocation);
         //If you don't explicitly set the water point, the plan will find one for you.
         if ((gDockToUse != -1) && (kbUnitGetCurrentHitpoints(gDockToUse) > 0))
@@ -3489,7 +3491,7 @@ rule airScout2  //air scout plan that doesn't avoid attacked areas
 
 //==============================================================================
 rule norseInfantryCheck
-    minInterval 10 //starts in cAge2
+    minInterval 1 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("norseInfantryCheck:");
@@ -3498,9 +3500,15 @@ rule norseInfantryCheck
 	int ulfCountS=kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive);
     int ulfCount=kbUnitCount(cMyID, cUnitTypeUlfsark, cUnitStateAlive);
 	ulfCount = ulfCount + ulfCountS;
-    if (ulfCount >= 2)     
+    
+	if (ulfCount >= 2)     
         return;
-
+		
+	if ((kbGetAge() < cAge2) && (ulfCount >= 1))   
+    {	   
+	return;
+	}
+	
     if (xsGetTime() < 90*1000)
         return;     // Don't do it in first 90 seconds
 

@@ -316,7 +316,6 @@ mutable void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVec
 //Basics Include.
 include "AoModAIBasics.xs";
 
-
 // Placeholder Reth
 include "AoModAiExtra.xs";
 include "AoModAiStinnerV.xs";
@@ -2689,6 +2688,7 @@ void initNorse(void)
 	xsEnableRule("startLandScoutingSpecialUlfsark");
 	xsEnableRule("trainDwarves");
 	
+	
 }
 
 //==============================================================================
@@ -3663,8 +3663,10 @@ void init(void)
         gHouseAvailablePopRebuild=6;
     else if (cMyCulture == cCultureAtlantean)
         gHouseAvailablePopRebuild=6;
+    else if (cMyCulture == cCultureNorse)
+        gHouseAvailablePopRebuild=8;		
     else
-        gHouseAvailablePopRebuild=4;
+        gHouseAvailablePopRebuild=6;
 
     //Set the hard pop caps.
     if (aiGetGameMode() == cGameModeLightning)

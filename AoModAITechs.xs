@@ -133,7 +133,7 @@ rule getArchitects
     if (ruleStartTime == -1)
         ruleStartTime = xsGetTime();
         
-    if ((gBuildTowers == true) && ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) || (xsGetTime() - ruleStartTime < 15*60*1000)))
+    if ((gBuildTowers == true) && ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) || (xsGetTime() - ruleStartTime < 5*60*1000)))
         return;
     
     if (kbGetAge() == cAge3)
