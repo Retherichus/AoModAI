@@ -316,6 +316,8 @@ rule getBurials
     minInterval 27
     group Dabogong
 {
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
     if (kbGetTechStatus(cTechBurials) == cTechStatusAvailable)
     {
         int x=-1;
@@ -387,6 +389,8 @@ rule getDemonSlayer
     minInterval 27
     group Zhongkui
 {
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
     if (kbGetTechStatus(cTechDemonSlayer) == cTechStatusAvailable)
     {
         int x=-1;

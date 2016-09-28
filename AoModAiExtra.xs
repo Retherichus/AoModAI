@@ -79,7 +79,7 @@ extern bool bWonderDefense = true;         // Builds towers/fortresses around fr
 extern bool bWallAllyMB = false;          // Walls up the mainbase of a human ally (don't use this if you plan on having more than 1 AoModAI ally!)
 extern bool bWallCleanup = true;          // Prevents the AI from building small wall pieces inside of gates and/or deletes them if one were to slip through the check.
 extern bool CheatResources = false;        // For those who finds titan (difficulty) to be just 	too easy, enable this and you'll have the AI cheat in some resources as it ages up.
-
+extern bool mPopLandAttack = true;         //Dynamically scales the min total pop needed before it can attack, 6 pop slots per TC after 4 and beyond.
 //For gAgeReduceMil when true.
 extern int eMaxMilPop = 15;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
 extern int eHMaxMilPop = 25;              // Heroic age.
@@ -125,9 +125,9 @@ extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wo
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 800;             // Food
+extern int RethLGFAge2 = 850;             // Food
 extern int RethLGGAge2 = 550;              // Gold
-extern int RethLGWAge2 = 800;              // Wood
+extern int RethLGWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -2069,7 +2069,7 @@ inactive
 	    xsSetRuleMinIntervalSelf(2);
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitDelete(enemyUnitIDTemp);
-		if (ShowAiEcho == true) aiEcho("I deleted cUnitTypeWallConnector");
+		if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("I deleted cUnitTypeWallConnector");
 	   }
    }
 }
@@ -2083,7 +2083,7 @@ inactive
 
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
-   xsSetRuleMinIntervalSelf(20);
+   xsSetRuleMinIntervalSelf(15);
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
@@ -2145,7 +2145,7 @@ inactive
 
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
-   xsSetRuleMinIntervalSelf(18);
+   xsSetRuleMinIntervalSelf(15);
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
@@ -2207,7 +2207,7 @@ inactive
 
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
-   xsSetRuleMinIntervalSelf(18);
+   xsSetRuleMinIntervalSelf(15);
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
@@ -2256,15 +2256,9 @@ inactive
 	    xsSetRuleMinIntervalSelf(2);
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
 		aiTaskUnitDelete(enemyUnitIDTemp);
-		if (ShowAiEcho == true) aiEcho("Removing a piece of cUnitTypeWallLong");
+		if (ShowAiEcho == true || ShowAiTestEcho == true) aiEcho("Removing a piece of cUnitTypeWallLong");
 	   }
    }
 }
 
 //Testing ground
-rule CHEATLOOK
-minInterval 1
-inactive
-{
-
-	}

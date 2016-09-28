@@ -3922,7 +3922,7 @@ rule buildResearchGranary   //or a guild for Atlanteans or a house for Norse
 
 //==============================================================================
 rule destroyUnnecessaryDropsites
-    active
+    inactive
     minInterval 97 //starts in cAge2
 {
     if (ShowAiEcho == true) aiEcho("destroyUnnecessaryDropsites:");

@@ -316,6 +316,7 @@ mutable void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVec
 //Basics Include.
 include "AoModAIBasics.xs";
 
+
 // Placeholder Reth
 include "AoModAiExtra.xs";
 include "AoModAiStinnerV.xs";
@@ -2687,7 +2688,6 @@ void initNorse(void)
     xsEnableRule("norseInfantryCheck");
 	xsEnableRule("startLandScoutingSpecialUlfsark");
 	xsEnableRule("trainDwarves");
-	
 	
 }
 
