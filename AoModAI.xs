@@ -4026,7 +4026,7 @@ void init(void)
         if (aiGetGameMode() == cGameModeDeathmatch)
             lateAttackAge = 3;
 
-        gLandAttackGoalID = createSimpleAttackGoal("Main Land Attack", -1, gLateUPID, -1, lateAttackAge, -1, kbBaseGetMainID(cMyID), true);
+        gLandAttackGoalID = createSimpleAttackGoal("Main Land Attack", -1, gLateUPID, -1, lateAttackAge, -1, -1, true);
 
         if (gLandAttackGoalID >= 0)
         {

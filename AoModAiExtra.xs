@@ -2262,3 +2262,10 @@ inactive
 }
 
 //Testing ground
+rule ECHO
+minInterval 1  
+inactive
+
+{
+
+	}
