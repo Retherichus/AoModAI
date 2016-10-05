@@ -495,7 +495,7 @@ rule updateFoodBreakdown
     
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
-    float distance = 75;
+    float distance = 85;
     if (kbGetAge() >= cAge3 || (xsGetTime() > 15*60*1000)) distance=40.0;
 
 

@@ -1649,6 +1649,116 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
 }
 
+
+// MIL Forecast
+//==============================================================================
+// setMilitaryUnitCostForecast
+// Checks the current age, looks into the appropriate unit picker,
+// calculates approximate resource needs for the next few (3?) minutes,
+// adds this amount to the global vars.
+//==============================================================================
+void setMilitaryUnitCostForecast(void)
+{
+	int upID = -1;  // ID of the unit picker to query
+	float totalAmount = 0.0;	// Total resources to be spent in near future
+	if (kbGetAge() == cAge2)
+	{
+		upID = gRushUPID;
+		totalAmount = 1200;
+	}
+	if (kbGetAge() == cAge3)
+	{
+		upID = gLateUPID;
+		totalAmount = 3000;
+	}
+	if (kbGetAge() >= cAge4)
+	{
+		upID = gLateUPID;
+		totalAmount = 5000;
+	}
+
+   int origGold = gGoldForecast;
+   int origWood = gWoodForecast;
+   int origFood = gFoodForecast;
+		
+
+   float goldCost = 0.0;
+   float woodCost = 0.0;
+   float foodCost = 0.0;
+   float totalCost = 0.0;
+
+	int unitID = kbUnitPickGetResult( upID, 0); // Primary unit
+	float weight = 1.0;
+   int numUnits = kbUnitPickGetDesiredNumberUnitTypes(upID);
+
+   if (numUnits == 2)
+	  weight = 0.67; // 2/3 and 1/3
+   if (numUnits >= 3)
+	  weight = 0.50; // 1/2, 1/3, 1/6
+   aiEcho("Military Unit Cost Forecast:");
+   aiEcho(" Main unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+   
+   goldCost = kbUnitCostPerResource(unitID, cResourceGold);
+   woodCost = kbUnitCostPerResource(unitID, cResourceWood);
+   foodCost = kbUnitCostPerResource(unitID, cResourceFood);
+   totalCost = goldCost+woodCost+foodCost;
+	
+	gGoldForecast = gGoldForecast + goldCost * (totalAmount*weight/totalCost);
+	gWoodForecast = gWoodForecast + woodCost * (totalAmount*weight/totalCost);
+	gFoodForecast = gFoodForecast + foodCost * (totalAmount*weight/totalCost);
+
+   if (numUnits > 1)
+   {  // Do second unit
+	  unitID = kbUnitPickGetResult(upID, 1);
+	  weight = 0.33;	// Second is 1/3 regardless 
+	  aiEcho("   Secondary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+	  goldCost = kbUnitCostPerResource(unitID, cResourceGold);
+	  woodCost = kbUnitCostPerResource(unitID, cResourceWood);
+	  foodCost = kbUnitCostPerResource(unitID, cResourceFood);
+	  totalCost = goldCost+woodCost+foodCost;
+	   
+	   gGoldForecast = gGoldForecast + goldCost * (totalAmount*weight/totalCost);
+	   gWoodForecast = gWoodForecast + woodCost * (totalAmount*weight/totalCost);
+	   gFoodForecast = gFoodForecast + foodCost * (totalAmount*weight/totalCost);
+   }
+
+   if (numUnits > 2)
+   {  // Do third unit
+	  unitID = kbUnitPickGetResult(upID, 2);
+	  weight = 0.167;   // Third unit, if used, is 1/6
+	  aiEcho("   Tertiary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+	  goldCost = kbUnitCostPerResource(unitID, cResourceGold);
+	  woodCost = kbUnitCostPerResource(unitID, cResourceWood);
+	  foodCost = kbUnitCostPerResource(unitID, cResourceFood);
+	  totalCost = goldCost+woodCost+foodCost;
+	   
+	   gGoldForecast = gGoldForecast + goldCost * (totalAmount*weight/totalCost);
+	   gWoodForecast = gWoodForecast + woodCost * (totalAmount*weight/totalCost);
+	   gFoodForecast = gFoodForecast + foodCost * (totalAmount*weight/totalCost);
+   }
+   aiEcho(" Mil forecast gold: "+(gGoldForecast-origGold)+", wood: "+(gWoodForecast-origWood)+", food: "+(gFoodForecast-origFood));
+}
+
+void addUnitForecast(int unitTypeID=-1, int qty=1)
+{
+   if (unitTypeID < 0)
+	  return;
+   gGoldForecast = gGoldForecast + kbUnitCostPerResource(unitTypeID, cResourceGold)*qty;
+   gWoodForecast = gWoodForecast + kbUnitCostPerResource(unitTypeID, cResourceWood)*qty;
+   gFoodForecast = gFoodForecast + kbUnitCostPerResource(unitTypeID, cResourceFood)*qty;
+}
+
+
+void addTechForecast(int techID=-1)
+{
+   if (techID < 0)
+	  return;
+   gGoldForecast = gGoldForecast + kbTechCostPerResource(techID, cResourceGold);
+   gWoodForecast = gWoodForecast + kbTechCostPerResource(techID, cResourceWood);
+   gFoodForecast = gFoodForecast + kbTechCostPerResource(techID, cResourceFood);
+}
+
+
 //==============================================================================
 rule econForecastAge4		// Rule activates when age 4 research begins
     minInterval 23
@@ -1814,7 +1924,8 @@ rule econForecastAge4		// Rule activates when age 4 research begins
             gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
 
-    
+    setMilitaryUnitCostForecast(); 
+	
     if (woodSupply > 1700)
         gWoodForecast = gWoodForecast * 0.5;
     else if (woodSupply > 1600)
@@ -2030,6 +2141,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
             gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
     
+	setMilitaryUnitCostForecast();  // add units before scaling down
 
     if (woodSupply > 1100)
         gWoodForecast = gWoodForecast * 0.5;

@@ -2265,3 +2265,10 @@ inactive
 }
 
 //Testing ground
+
+rule TEST  
+minInterval 5
+inactive
+{
+
+}
