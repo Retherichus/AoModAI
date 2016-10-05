@@ -41,6 +41,8 @@ extern int WallAllyPlanID=-1;
 extern bool KOTHStopRefill = false;
 extern vector KOTHGlobal = cInvalidVector;
 extern bool IhaveAllies = false;
+extern bool mRusher = false;
+extern int MoreFarms = 28;
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -96,7 +98,7 @@ extern int eBoomWood = 200;              // Wood, duh.
 
 //Egyptians have their own, because they don't like wood as much.
 
-extern int egBoomGold = 250;              // Gold
+extern int egBoomGold = 300;              // Gold
 extern int egBoomWood = 0;              // Wood
 
 
@@ -506,6 +508,7 @@ rule ActivateRethOverridesAge3
 	    aiResourceCheat(cMyID, cResourceGold, 600);
 	    }		
 		
+		mRusher = false;
 		xsDisableSelf();
            
     }
@@ -1989,13 +1992,13 @@ inactive
  static int TransportUnit=-1;
  static bool CheckCenter = false;
  static bool Spawned = false;
- if (boats <= 0 && Spawned == false)
+ if ((boats <= 0) && (Spawned == false))
  {
  aiUnitCreateCheat(cMyID, cUnitTypeRoc, HomeBase, "Spawn backup roc", 1);
  Spawned = true;
  return;
  }
- if (CheckCenter == false && boats >= 1)
+ if ((CheckCenter == false) && (boats >= 1))
  {
  int transportPUID=cUnitTypeTransport;
  vector nearCenter = kbGetMapCenter();
@@ -2262,10 +2265,3 @@ inactive
 }
 
 //Testing ground
-rule ECHO
-minInterval 1  
-inactive
-
-{
-
-	}

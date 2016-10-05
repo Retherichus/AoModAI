@@ -880,12 +880,12 @@ rule updateEMAge1       // i.e. cAge1
       }
       else if (aiGetWorldDifficulty() == cDifficultyHard)
       {
-         civPopTarget = 30;
+         civPopTarget = 25;
          milPopTarget = 60;
       }
       else
       {
-         civPopTarget = 30;
+         civPopTarget = 25;
          milPopTarget = 80;
       }
    }
@@ -2197,7 +2197,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
             gGoldForecast = gGoldForecast + (800 - goldSupply);
         if (foodSupply < 1200)
             gFoodForecast = gFoodForecast + (1200 - foodSupply);
-        if (woodSupply < 500)
+        if (woodSupply < 500) 
             gWoodForecast = gWoodForecast + (500 - woodSupply);
     }
     else
@@ -2296,6 +2296,15 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     {
         if ((kbUnitCount(cMyID, cUnitTypeBarracksAtlantean, cUnitStateAliveOrBuilding) < 1)
          || (kbUnitCount(cMyID, cUnitTypeCounterBuilding, cUnitStateAliveOrBuilding) < 1))
+        {
+            if (woodSupply < 300)
+                gWoodForecast = gWoodForecast + (300 - woodSupply);
+        }
+    }
+    else if (cMyCulture == cCultureChinese)
+    {
+        if ((kbUnitCount(cMyID, cUnitTypeBarracksChinese, cUnitStateAliveOrBuilding) < 1)
+         || (kbUnitCount(cMyID, cUnitTypeStableChinese, cUnitStateAliveOrBuilding) < 1))
         {
             if (woodSupply < 300)
                 gWoodForecast = gWoodForecast + (300 - woodSupply);
@@ -3936,7 +3945,14 @@ void init(void)
 
     if (ShowAiEcho == true) aiEcho("gRushCount: "+gRushCount+", gRushSize: "+gRushSize+", gFirstRushSize: "+gFirstRushSize);
 
-    
+	
+	if (gRushCount >= 2)
+	{
+	gRushCount = gRushCount + aiRandInt(3);
+	mRusher = true;
+	//aiEcho("Rush count: "+gRushCount+"");
+    }
+	
     //Create our UP.
     if (gRushUPID >= 0)
     {
@@ -4026,7 +4042,7 @@ void init(void)
         if (aiGetGameMode() == cGameModeDeathmatch)
             lateAttackAge = 3;
 
-        gLandAttackGoalID = createSimpleAttackGoal("Main Land Attack", -1, gLateUPID, -1, lateAttackAge, -1, -1, true);
+        gLandAttackGoalID = createSimpleAttackGoal("Main Land Attack", -1, gLateUPID, -1, lateAttackAge, -1, kbBaseGetMainID(cMyID), true);
 
         if (gLandAttackGoalID >= 0)
         {
@@ -4918,8 +4934,8 @@ void age2Handler(int age=1)
     //research masons
     xsEnableRule("getMasons");
         
-    //enable the rebuildDropsites rule for Greeks and Egyptians
-    if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
+    //enable the rebuildDropsites rule for Greeks, Egyptians and chinese.
+    if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureChinese))
         xsEnableRule("rebuildDropsites");
     
     //enable the buildGoldMineTower rule

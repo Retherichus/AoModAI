@@ -644,7 +644,7 @@ rule buildHouse
 	   
 	    else if ((findNumUnitsInBase(cMyID, kbBaseGetMain(cMyID), cUnitTypeTower) > 0)
               && (mapPreventsHousesAtTowers() == false) && (gBuildWallsAtMainBase == false)
-              && (otherBaseID == mainBaseID) || (bHouseBunkering == true && mapPreventsHousesAtTowers() == false))
+              && (otherBaseID == mainBaseID) || (bHouseBunkering == true) && (mapPreventsHousesAtTowers() == false))
 			  
         {
             //If we don't have the query yet, create one.
@@ -777,7 +777,10 @@ rule buildSettlements
 {
     if (ShowAiEcho == true) aiEcho("buildSettlements:");
 
-	if (AllyTcLimit == true && aiGetWorldDifficulty() > cDifficultyHard)
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;
+	
+	if  ((AllyTcLimit == true) && (aiGetWorldDifficulty() > cDifficultyHard))
         {
             xsEnableRule("ModifiedbuildSettlements");
 			xsDisableSelf();
@@ -800,12 +803,7 @@ rule buildSettlements
     if (numberSettlements > 1)  // Test for all the normal reasons to not build a settlement, unless we have only one
     {
         int popCapBuffer = 50;
-        if (numberSettlements == 3)
-            popCapBuffer = 30;
-        else if (numberSettlements == 4)
-            popCapBuffer = 20;
-        else if (numberSettlements > 4)
-            popCapBuffer = 10;
+
 			
         popCapBuffer = popCapBuffer + ((-1*cvRushBoomSlider)+1)*5 + 5;  // Add 5 for extreme rush, 15 for extreme boom
         int currentPopNeeds=kbGetPop();
@@ -912,7 +910,8 @@ rule buildSettlementsEarly  //age 1/2 handler
     inactive
 {
     if (ShowAiEcho == true) aiEcho("buildSettlementsEarly:");
-    
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals = aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
     int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
@@ -1150,7 +1149,9 @@ rule mainBaseAreaWallTeam1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam1:");
-
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;
+	
     static bool alreadyStarted = false;
     int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
     if ((alreadyStarted == false) && (numHeroes < 1) && (xsGetTime() < 7*60*1000))
@@ -1601,7 +1602,8 @@ rule mainBaseAreaWallTeam2
 {
 
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
-
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;
     if ((cMyCulture == cCultureAtlantean) && (xsGetTime() < 15*60*1000))
         return;
     float goldSupply = kbResourceGet(cResourceGold);
@@ -1871,7 +1873,8 @@ rule otherBaseRingWallTeam1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("otherBaseRingWallTeam1:");
-  
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;  
     float goldSupply = kbResourceGet(cResourceGold);
     
     int mainBaseID=kbBaseGetMainID(cMyID);
@@ -2065,7 +2068,8 @@ rule otherBase1RingWallTeam
     inactive
 {
     if (ShowAiEcho == true) aiEcho("otherBase1RingWallTeam:");
-    
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;    
     float goldSupply = kbResourceGet(cResourceGold);
     
 	if (aiGetWorldDifficulty() < cDifficultyNightmare)
@@ -2222,7 +2226,8 @@ rule otherBase2RingWallTeam
     inactive
 {
     if (ShowAiEcho == true) aiEcho("otherBase2RingWallTeam:");
-    
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;    
     float goldSupply = kbResourceGet(cResourceGold);
     
     if (aiGetWorldDifficulty() < cDifficultyNightmare)
@@ -2379,7 +2384,8 @@ rule otherBase3RingWallTeam
     inactive
 {
     if (ShowAiEcho == true) aiEcho("otherBase3RingWallTeam:");
-    
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;    
     float goldSupply = kbResourceGet(cResourceGold);
     
     if (aiGetWorldDifficulty() < cDifficultyNightmare)
@@ -2536,7 +2542,8 @@ rule otherBase4RingWallTeam
     inactive
 {
     if (ShowAiEcho == true) aiEcho("otherBase4RingWallTeam:");
-    
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;    
     float goldSupply = kbResourceGet(cResourceGold);
     
 	if (aiGetWorldDifficulty() < cDifficultyNightmare)
@@ -2725,7 +2732,7 @@ rule buildFortress
     minInterval 19 //starts in cAge3
     inactive
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop))
         return;
     if (ShowAiEcho == true) aiEcho("buildFortress:");
 
@@ -2963,9 +2970,10 @@ rule buildTowerAtOtherBase
     minInterval 61 //starts in cAge2
     inactive
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop))
         return;
     if (ShowAiEcho == true) aiEcho("buildTowerAtOtherBase: ");
+	
 
     int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
     
@@ -3102,8 +3110,10 @@ rule buildBuildingsAtOtherBase
     minInterval 31 //starts in cAge2
     inactive
 {	
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop))
         return;
+	if ((mRusher == true) && (kbGetAge() < cAge3))
+	return;    	
     if (ShowAiEcho == true) aiEcho("buildBuildingsAtOtherBase:");
  
     float woodSupply = kbResourceGet(cResourceWood);
@@ -3143,24 +3153,9 @@ rule buildBuildingsAtOtherBase
 
     //return if we already have a building1 at the other base
     int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
-    if (cMyCulture == cCultureGreek)
+    if (cMyCiv == cCivOuranos)
     {
-        if ((gTransportMap == false) || (numBuilding1NearBase > 0))
-        {
-            building1ID = cUnitTypeTemple;
-            int numTemplesNearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
-            if (numTemplesNearBase > 0)
-                return;
-        }
-        else
-        {
-            if (numBuilding1NearBase > 0)
-                return;
-        }
-    }
-    else if (cMyCiv == cCivOuranos)
-    {
-        if ((gTransportMap == false) || (numBuilding1NearBase > 0))
+        if ((gTransportMap == false) && (numBuilding1NearBase > 0))
         {
             building1ID = cUnitTypeSkyPassage;
             int numSkyPassagesNearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
@@ -3253,10 +3248,8 @@ rule buildBuildingsAtOtherBase
         aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanRandomBPValue, 0, 0.99);
         
         aiPlanSetVariableVector(buildBuilding1AtOtherBasePlanID, cBuildPlanCenterPosition, 0, location);
-        if (building1ID == cUnitTypeTemple)
-            aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 11.0);
-        else if (building1ID == cUnitTypeSkyPassage)
-            aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 9.0);
+        if (building1ID == cUnitTypeSkyPassage)
+        aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 9.0);
         else
             aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 10.0);
         aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
@@ -3275,8 +3268,10 @@ rule buildBuildingsAtOtherBase2
     minInterval 31 //starts in cAge2
     inactive
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop))
         return;	
+
+	
     if (ShowAiEcho == true) aiEcho("buildBuildingsAtOtherBase2:");
 	if (aiGetWorldDifficulty() < cDifficultyNightmare && kbGetAge() < 3)
 	return; // Wait untill age 3 for Hard difficulty and lower.
@@ -3305,13 +3300,11 @@ rule buildBuildingsAtOtherBase2
         building1ID = cUnitTypeBarracks;
     else if (cMyCulture == cCultureGreek)
 	{
-	int RandomBuilding = aiRandInt(3);
+	int RandomBuilding = aiRandInt(2);
 	            if (RandomBuilding == 0)
                 building1ID = cUnitTypeAcademy;
             else if (RandomBuilding == 1)
                 building1ID = cUnitTypeArcheryRange;
-            else if (RandomBuilding == 2)
-                building1ID = cUnitTypeStable;
 	}
     else if (cMyCulture == cCultureNorse)
         building1ID = cUnitTypeLonghouse;
@@ -3329,10 +3322,10 @@ rule buildBuildingsAtOtherBase2
 
 	
 
-            if (numBuilding1NearBase > 2 && cMyCulture != cCultureGreek)
+            if ((numBuilding1NearBase > 2) && (cMyCulture != cCultureGreek))
                 return;
 				
-	            if (numBuilding1NearBase > 1 && cMyCulture == cCultureGreek)
+	            if ((numBuilding1NearBase >= 1) && (cMyCulture == cCultureGreek))
                 return;			
    
     
@@ -4144,6 +4137,10 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
             {
                     dropsiteTypeID = cUnitTypeMiningCamp; //only gold for now
             }
+            else if (cMyCulture == cCultureChinese)
+            {
+                    dropsiteTypeID = cUnitTypeStoragePit;
+            }
             
             if (ShowAiEcho == true) aiEcho("gatherPlanID: "+gatherPlanID);
             if (ShowAiEcho == true) aiEcho("resource: "+resource);
@@ -4248,10 +4245,10 @@ rule buildGoldMineTower
     minInterval 47 //starts in cAge2
     inactive
 {
-    if (gAgeFaster == true && kbGetAge() < cAge4)
+    if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop))
         return;
     float goldSupply = kbResourceGet(cResourceGold);
-	if (kbGetAge() < cAge3 && goldSupply < 750)
+	if ((kbGetAge() < cAge3) && (goldSupply < 750))
 	return; // We need the gold to advance quicker.
 	
 	if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
@@ -4654,7 +4651,7 @@ rule buildExtraFarms
     
     int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 30.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > 19))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 6))
     {
         xsSetRuleMinIntervalSelf(67);
         return;
@@ -4679,11 +4676,12 @@ rule buildExtraFarms
     if (cMyCulture == cCultureEgyptian)
         resourceSupply = kbResourceGet(cResourceGold);
     
-    if (resourceSupply < 150)
+    if (resourceSupply < 200)
     {
         return;
     }
     float distance = 85.0;
+	if (kbGetAge() >= cAge3 || (xsGetTime() > 20*60*1000)) distance=40.0;
     int numAggressiveResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
     int numEasyResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, distance);
     int totalNumResourceSpots = numAggressiveResourceSpots + numEasyResourceSpots;

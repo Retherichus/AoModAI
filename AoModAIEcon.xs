@@ -51,7 +51,7 @@ rule updateWoodBreakdown
         }
     
     
-     if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv != cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
+     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv != cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 2 && goldGathererCount > 0)
 			woodGathererCount = 1;
@@ -59,19 +59,17 @@ rule updateWoodBreakdown
 			//woodGathererCount = 2;        
    }
    
-   if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv == cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
+   if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv == cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 2)
-			woodGathererCount = 1;
-			//if (foodGathererCount > 3 && goldGathererCount > 0)
-			//woodGathererCount = 2;        
+			woodGathererCount = 1;       
    }
    
-   if (kbGetAge() < cAge2 && cMyCulture != cCultureAtlantean &&  cMyCulture != cCultureEgyptian && gHuntingDogsASAP == true && ConfirmFish == false)
+   if ((kbGetAge() < cAge2) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 6)
-			woodGathererCount = 2;
-			if (foodGathererCount > 9 && goldGathererCount > 2)
+			woodGathererCount = 3;
+			if ((foodGathererCount > 9) && (goldGathererCount > 2))
 			woodGathererCount = 4;        
    }   
 
@@ -276,31 +274,29 @@ rule updateGoldBreakdown
         }
     }
 	
-     if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv == cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
+     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv == cCivGaia) && (gHuntingDogsASAP) == true && (ConfirmFish == false))
    {
-            if (foodGathererCount > 2 && woodGathererCount > 0)
+            if ((foodGathererCount > 2) && (woodGathererCount > 0))
 			goldGathererCount = 1;
 			//if (foodGathererCount > 4 && woodGathererCount > 2)
 			//goldGathererCount = 2;        
    }
    
-      if (kbGetAge() < cAge2 && cMyCulture == cCultureAtlantean && cMyCiv != cCivGaia && gHuntingDogsASAP == true && ConfirmFish == false)
+      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv != cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 1)
-			goldGathererCount = 1;
-			//if (foodGathererCount > 4 && woodGathererCount > 2)
-			//goldGathererCount = 2;        
+			goldGathererCount = 1;      
    }   
    
-      if (kbGetAge() < cAge2 && cMyCulture != cCultureAtlantean &&  cMyCulture != cCultureEgyptian && gHuntingDogsASAP == true && ConfirmFish == false)
+      if ((kbGetAge() < cAge2) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
-            if (foodGathererCount > 7 && woodGathererCount > 1)
+            if ((foodGathererCount > 7) && (woodGathererCount > 1))
 			goldGathererCount = 2;
-			if (foodGathererCount > 10 && woodGathererCount > 3)
+			if ((foodGathererCount > 10) && (woodGathererCount > 3))
 			goldGathererCount = 4;        
    }   
    
-      if (kbGetAge() < cAge2 && cMyCulture == cCultureEgyptian && gHuntingDogsASAP == true && ConfirmFish == false)
+      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 7)
 			goldGathererCount = 3;
@@ -348,7 +344,9 @@ rule updateGoldBreakdown
     //Get the count of plans we currently have going.
     int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 
-    int desiredGoldPlans = 2;
+    int desiredGoldPlans = 1 + (goldGathererCount/12);
+	if (cMyCulture == cCultureAtlantean)
+	desiredGoldPlans = 2;
     
     int numGoldMinesNearMBInR50 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0);
     
@@ -363,7 +361,8 @@ rule updateGoldBreakdown
         }
     }
     
-   if (xsGetTime() < 10*60*1000)
+	
+   if (xsGetTime() < 12*60*1000)
       desiredGoldPlans = 1;
         
     if (goldGathererCount < desiredGoldPlans)
@@ -496,11 +495,9 @@ rule updateFoodBreakdown
     
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
-    float distance = kbBaseGetMaximumResourceDistance(cMyID, mainBaseID);
-	if (kbGetAge() < 2 && xsGetTime() < 2*60*1000)
-	distance = 40;
-    else if (kbGetAge() < 2 && xsGetTime() > 3*60*1000)
-	distance = 85;
+    float distance = 75;
+    if (kbGetAge() >= cAge3 || (xsGetTime() > 15*60*1000)) distance=40.0;
+
 
 
     //Get the number of valid resources spots.
@@ -615,6 +612,8 @@ rule updateFoodBreakdown
     desiredFarmers = 18;
 	 if (cMyCulture == cCultureAtlantean) //override for Atlantean
         desiredFarmers = 9;
+	
+	MoreFarms = desiredFarmers; // Update build more farms
 	
 	}
     if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
@@ -799,10 +798,11 @@ rule updateFoodBreakdown
     int numAggrResourceSpotsInR70 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, 70.0);
     int numEasyResourceSpotsInR70 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 70.0);
     int numResourceSpotsInR70 = numAggrResourceSpotsInR70 + numEasyResourceSpotsInR70;
-    
-    if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)))   // can build farms
+    int TempleUp = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
+	
+    if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)) && (TempleUp > 0))   // can build farms
     {
-        if ((totalNumberResourceSpots < 2) || (totalAmount < 2150) || (gFarming == true) || (kbGetAge() == cAge3)
+        if ((totalNumberResourceSpots < 2) || (totalAmount < 1500) || (gFarming == true) || (kbGetAge() == cAge3)
            || ((numResourceSpotsInR70 < 2) && (xsGetTime() > 9*60*1000)))
         {
             if (cMyCulture == cCultureAtlantean)

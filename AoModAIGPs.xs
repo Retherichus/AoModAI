@@ -1774,8 +1774,6 @@ rule rGaiaForestPower
         aiPlanSetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0, false);
     }
     
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     bool JustCastIt = true;
     if (JustCastIt == true)
     {
@@ -1912,7 +1910,6 @@ rule rCitadel
             aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
             aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
             aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTownCenter);
-			aiPlanDestroy(gDefendPlanID); // don't get stuck in a permanent defend plan!
             xsDisableSelf();
         }
     }
@@ -1928,7 +1925,6 @@ rule rShiftingSand
    static int queryID = -1;
 
    int planID = gShiftingSandPlanID;
-   int mostHatedPlayerID=aiGetMostHatedPlayerID();
 
 
    //-- create the query used for evaluation
@@ -1938,29 +1934,23 @@ rule rShiftingSand
    if (queryID != -1)
    {
 		kbUnitQuerySetPlayerRelation(queryID, cPlayerRelationEnemy);
-		if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureNorse)
-			kbUnitQuerySetUnitType(queryID, cUnitTypeOxCart);
-		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureEgyptian)
-			kbUnitQuerySetUnitType(queryID, cUnitTypeMiningCamp);
-		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureGreek)
-			kbUnitQuerySetUnitType(queryID, cUnitTypeStorehouse);
-		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureChinese)
-			kbUnitQuerySetUnitType(queryID, cUnitTypeStoragePit);	
-		else if (kbGetCultureForPlayer(mostHatedPlayerID) == cCultureAtlantean)
-			kbUnitQuerySetUnitType(queryID, cUnitTypeVillagerAtlantean);				
-	        kbUnitQuerySetState(queryID, cUnitStateAlive);
+		kbUnitQuerySetUnitType(queryID, cUnitTypeAbstractVillager);
+		kbUnitQuerySetSeeableOnly(queryID, true);
+		kbUnitQuerySetAscendingSort(queryID, true);
+		kbUnitQuerySetMaximumDistance(queryID, 12);
+        kbUnitQuerySetState(cUnitStateAlive);
    }
 
    kbUnitQueryResetResults(queryID);
    int numberFound=kbUnitQueryExecute(queryID);
 
-   if (numberFound < 1)
+   if (numberFound < 3)
 	return;
 
    aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true);
      
    aiPlanSetVariableInt(planID, cGodPowerPlanQueryID, 0, queryID);
-   aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, aiGetMostHatedPlayerID());
+   aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, cPlayerRelationEnemy);
 
    aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, kbUnitGetPosition(kbUnitQueryGetResult(queryID, 0)));
    aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 1, kbBaseGetMilitaryGatherPoint(cMyID, kbBaseGetMainID(cMyID)));
