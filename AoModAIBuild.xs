@@ -4651,7 +4651,7 @@ rule buildExtraFarms
     
     int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 30.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 6))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 5))
     {
         xsSetRuleMinIntervalSelf(67);
         return;

@@ -1,0 +1,40 @@
+Expect grammars and stuff, because this ain't going through a spellchecker.
+
+
+Norse ox carts will now prioritize Hunters before anything else during Archaic Age.
+Ox carts are driven by plan priority, so this is how we control it... but as for training them, no.. that's another story.
+
+Removed an ulfsark maintain plan.
+
+Norse players will now build a house very early so they don't get pop stuck because the Starting ulfsark is taking too long getting back to the base.
+
+Fixed dynamic farms not working correctly on hard difficulty
+
+Introduced Mil eco goals for Heroic age and beyond, this will be added on top of the normal eco goals to secure an even better economy late game.
+
+Removed tons of code that would manually try to research armory techs and medium/heavy/champion techs on barracks etc, the unit picker do handle this by default so there is no point on having plans for doing it.
+though I may revisit this later and add them back and disable automatic upgrades from the unit picker all together ( yes it can be done!).
+
+Wall detection/deletion will now be checked more frequently, it is still not perfect and may slip a wall through every now and then.. but it's this or the AI getting stuck.. sorry!
+
+
+Combat:
+Removed tons of odd requirements for all attack plans such as always requiring 1 siege or myth unit to go off.. 
+this also includes retreating behaviour, as the AI would run away if you killed his siege and there was still at least 1 tower up... regardless if he had 50 units or 1.
+
+Settlement defend plans will now end after 1 min if no enemy units are around, down from 2.5 min.. so please don't take advantage of it. ):
+
+Attack plans should now do its ready checkes way more frequently to promote more attacks in late game, though they are still limited to 1 main attack plan at a time.
+I've also adjusted the plan to pick up to |00% of all available units, and beyond this, the AI should no longer wait until it 5 pop within its pop cap.. this will now scale dynamically, up to 50.
+meaning it can launch attacks if it is at 250 / 300 pop for example, insteading of always waiting until it is 5- within current pop cap.
+
+Rushers. the Ai will now have a rusher personality, this means it will try to attack early, up to 5 times during classical age, 
+this personality will also delay the initial walls until Heroic age.. because walls takes a huge chunk off their mil eco and this will only get worse if we get the Voobly patch(those wall prices!). :P
+
+Naval:
+Improved naval combat and transport of units in all attack plans.
+Though units that get stuck on other islands are stuck forever, untill I find a way to call upon them from other area groups..
+Yes, this system is incredibly wonky and Microsoft messed up big time.. basically, once units leaves the main base area, they'll lose the connection as if you were to cut a human brain in two.. it simply just stops communicating once separated.
+Sure, the initial plan will finish, but after that it will simply not receive any more information on what to do next.
+
+

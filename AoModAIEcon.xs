@@ -490,7 +490,9 @@ rule updateFoodBreakdown
     int aggressivePriority = 45;
     int mainFarmPriority = 90;
     int otherFarmPriority = 89;
-
+    if ((cMyCulture == cCultureNorse) && (kbGetAge() < 2))
+	aggressivePriority = 65; // above wood/gold so it doesn't steal the oxcart
+	
     int numFarms = kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive);
     
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
@@ -609,12 +611,9 @@ rule updateFoodBreakdown
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)
     {  
-    desiredFarmers = 18;
+    desiredFarmers = 20;
 	 if (cMyCulture == cCultureAtlantean) //override for Atlantean
         desiredFarmers = 9;
-	
-	MoreFarms = desiredFarmers; // Update build more farms
-	
 	}
     if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
     {
@@ -622,7 +621,7 @@ rule updateFoodBreakdown
         modifiedFoodGathererCount = true;
     }
 
-    
+    MoreFarms = desiredFarmers; // Update build more farms
     // Preference order is existing farms (except in age 1), new farms if low on food sites, aggressive hunt (size permitting), easy, then age 1 farms.  
     int aggHunters = 0;
     int easy = 0;
