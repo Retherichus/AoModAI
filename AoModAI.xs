@@ -1695,8 +1695,8 @@ void setMilitaryUnitCostForecast(void)
 	  weight = 0.67; // 2/3 and 1/3
    if (numUnits >= 3)
 	  weight = 0.50; // 1/2, 1/3, 1/6
-   aiEcho("Military Unit Cost Forecast:");
-   aiEcho(" Main unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+   if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Military Unit Cost Forecast:");
+   if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho(" Main unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
    
    goldCost = kbUnitCostPerResource(unitID, cResourceGold);
    woodCost = kbUnitCostPerResource(unitID, cResourceWood);
@@ -1711,7 +1711,7 @@ void setMilitaryUnitCostForecast(void)
    {  // Do second unit
 	  unitID = kbUnitPickGetResult(upID, 1);
 	  weight = 0.33;	// Second is 1/3 regardless 
-	  aiEcho("   Secondary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+	  if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("   Secondary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
 	  goldCost = kbUnitCostPerResource(unitID, cResourceGold);
 	  woodCost = kbUnitCostPerResource(unitID, cResourceWood);
 	  foodCost = kbUnitCostPerResource(unitID, cResourceFood);
@@ -1726,7 +1726,7 @@ void setMilitaryUnitCostForecast(void)
    {  // Do third unit
 	  unitID = kbUnitPickGetResult(upID, 2);
 	  weight = 0.167;   // Third unit, if used, is 1/6
-	  aiEcho("   Tertiary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+	  if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("   Tertiary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
 	  goldCost = kbUnitCostPerResource(unitID, cResourceGold);
 	  woodCost = kbUnitCostPerResource(unitID, cResourceWood);
 	  foodCost = kbUnitCostPerResource(unitID, cResourceFood);
@@ -1736,7 +1736,7 @@ void setMilitaryUnitCostForecast(void)
 	   gWoodForecast = gWoodForecast + woodCost * (totalAmount*weight/totalCost);
 	   gFoodForecast = gFoodForecast + foodCost * (totalAmount*weight/totalCost);
    }
-   aiEcho(" Mil forecast gold: "+(gGoldForecast-origGold)+", wood: "+(gWoodForecast-origWood)+", food: "+(gFoodForecast-origFood));
+   if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho(" Mil forecast gold: "+(gGoldForecast-origGold)+", wood: "+(gWoodForecast-origWood)+", food: "+(gFoodForecast-origFood));
 }
 
 void addUnitForecast(int unitTypeID=-1, int qty=1)

@@ -677,7 +677,7 @@ rule updateFoodBreakdown
             {
                 requiredTowers = 0;
                 if (distanceToMainBase < 65.0)
-                    farmsWanted = 4;
+                    farmsWanted = 3;
                 else if (distanceToMainBase < 90.0)
                     farmsWanted = 2;
             }
@@ -765,6 +765,8 @@ rule updateFoodBreakdown
                 else if (distanceToMainBase < 90.0)
                     farmsWanted = 2;
             }
+			if (cMyCulture == cCultureAtlantean)
+			farmsWanted = 1; // just one for atlanteans.
             
             if (((numFortressesNearBase > 0) && ((numBuilding1NearBase > 0) || (numTowersNearBase > requiredTowers)))
              || ((numBuilding1NearBase > 0) && (numTowersNearBase > requiredTowers + 1)))

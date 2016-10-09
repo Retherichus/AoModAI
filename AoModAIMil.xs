@@ -785,7 +785,7 @@ rule monitorAttPlans
                     else
                     {
                         float distanceToTarget = xsVectorLength(mainBaseLocation - kbUnitGetPosition(gEnemySettlementAttPlanTargetUnitID));
-                        if ((numMythInPlan < 1) && (numSiegeInPlan < 1) && (currentPop <= currentPopCap - 3 - number) && (distanceToTarget > 110.0))
+                        if ((currentPop <= currentPopCap - 3 - number) && (distanceToTarget > 110.0) && (aiRandInt(5) < 1))
                         {
                             aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                             aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
@@ -2477,12 +2477,12 @@ rule attackEnemySettlement
             if (ShowAiEcho == true) aiEcho("returning as there is a landAttackPlan active");
             return;
         }
-        else if ((numSiegeWeapons < 1) && (currentPop <= currentPopCap - 2 - number))
+        else if ((numSiegeWeapons < 1) && (currentPop <= currentPopCap - 3 - number))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have a Titan, a siege weapon, or a military myth unit");
             return;
         }
-        else if (((woodSupply < 300) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap - 2 - number))
+        else if (((woodSupply < 300) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap - 3 - number))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;
@@ -2491,7 +2491,7 @@ rule attackEnemySettlement
     else
     {
 
-        if (((woodSupply < 150) || (goldSupply <150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 2 - number))
+        if (((woodSupply < 150) || (goldSupply <150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 3 - number))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;
@@ -2884,13 +2884,13 @@ rule defendSettlementPosition
                     return;
                 }
 
-                if ((xsGetTime() > defendPlanStartTime + 2.5*60*1000) || (alliedBaseAtDefPlanPosition > 0)
+                if ((xsGetTime() > defendPlanStartTime + 1.1*60*1000) || (alliedBaseAtDefPlanPosition > 0)
                  || ((myBaseAtDefPlanPosition > 0) && ((numAttEnemyMilUnitsInR40 < 10) && (myBuildingsThatShootAtDefPlanPosition > 1))
                  || (equal(aiPlanGetVariableVector(gBaseUnderAttackDefPlanID, cDefendPlanDefendPoint, 0), defPlanDefPoint) == true)))
                  
                 {
-                    if (xsGetTime() > defendPlanStartTime + 2.5*60*1000)
-                        if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as it has been active for more than 2.5 Minutes");
+                    if (xsGetTime() > defendPlanStartTime + 1.1*60*1000)
+                        if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as it has been active for more than 1.1 Minutes");
                     else if (alliedBaseAtDefPlanPosition > 0)
                         if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as an ally has built a settlement at the defend position");
                     else
@@ -4114,8 +4114,6 @@ rule createLandAttack
             return;
         }
     }
-	//  int currentPop = kbGetPop();
-    //int currentPopCap = kbGetPopCap();
     
     if (numMilUnitsInDefPlans < requiredUnits * 0.8)
     {

@@ -978,6 +978,7 @@ int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
     //Retreat.
     aiPlanSetVariableBool(goalID, cGoalPlanAllowRetreat, 0, allowRetreat);
     // Upgrade Building prefs.
+	/*
     aiPlanSetNumberVariableValues(goalID, cGoalPlanUpgradeBuilding, 3, true);
     aiPlanSetVariableInt(goalID, cGoalPlanUpgradeBuilding, 0, cUnitTypeTemple);
     aiPlanSetVariableInt(goalID, cGoalPlanUpgradeBuilding, 1, cUnitTypeSettlementLevel1);
@@ -985,6 +986,7 @@ int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
         aiPlanSetVariableInt(goalID, cGoalPlanUpgradeBuilding, 2, cUnitTypeDwarfFoundry);
     else
         aiPlanSetVariableInt(goalID, cGoalPlanUpgradeBuilding, 2, cUnitTypeArmory);
+		*/
     //Handle maps where the enemy player is usually on a diff island.
     if (gTransportMap == true)
     {

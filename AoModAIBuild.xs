@@ -4651,13 +4651,13 @@ rule buildExtraFarms
     
     int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 30.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 5))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 6) || (numFarmsNearMainBaseInR30 >= 37))
     {
-        xsSetRuleMinIntervalSelf(67);
+        xsSetRuleMinIntervalSelf(50);
         return;
     }
     else
-        xsSetRuleMinIntervalSelf(29);
+        xsSetRuleMinIntervalSelf(18);
 
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
     if (activeBuildPlans > 0)
