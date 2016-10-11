@@ -34,6 +34,7 @@ rule updateWoodBreakdown
     if (cMyCulture == cCultureEgyptian)
         woodPriority=40;
 
+	
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
     int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
@@ -44,9 +45,11 @@ rule updateWoodBreakdown
     
     bool reducedWoodGathererCount = false;
 
-    if (woodGathererCount <= 0) //always some units on wood, unless there are less than 15 trees
+    if ((woodGathererCount <= 0 ) && (kbGetAge() < cAge2)) //always some units on wood, unless there are less than 15 trees
     {
-            woodGathererCount = 1;
+            woodGathererCount = 2;
+			if (cMyCulture == cCultureAtlantean)
+			woodGathererCount = 1;
             reducedWoodGathererCount = true;
         }
     
@@ -486,7 +489,7 @@ rule updateFoodBreakdown
     float foodSupply = kbResourceGet(cResourceFood);
     float woodSupply = kbResourceGet(cResourceWood);
     
-    int easyPriority = 65;
+    int easyPriority = 64;
     int aggressivePriority = 45;
     int mainFarmPriority = 90;
     int otherFarmPriority = 89;
@@ -498,7 +501,8 @@ rule updateFoodBreakdown
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
     float distance = 85;
-    if (kbGetAge() >= cAge3 || (xsGetTime() > 15*60*1000)) distance=40.0;
+    if ((kbGetAge() >= cAge3) || (xsGetTime() > 15*60*1000)) 
+	distance=40.0;
 
 
 
@@ -680,6 +684,8 @@ rule updateFoodBreakdown
                     farmsWanted = 3;
                 else if (distanceToMainBase < 90.0)
                     farmsWanted = 2;
+			    if (cMyCulture == cCultureAtlantean)
+			    farmsWanted = 1; // just one for atlanteans.	
             }
             
             if (((numFortressesNearBase > 0) && ((numBuilding1NearBase > 0) || (numTowersNearBase > requiredTowers)))
@@ -708,6 +714,8 @@ rule updateFoodBreakdown
                     farmsWanted = 3;
                 else if (distanceToMainBase < 90.0)
                     farmsWanted = 2;
+			    if (cMyCulture == cCultureAtlantean)
+			    farmsWanted = 1; // just one for atlanteans.					
             }
             
             if (((numFortressesNearBase > 0) && ((numBuilding1NearBase > 0) || (numTowersNearBase > requiredTowers)))
@@ -736,6 +744,8 @@ rule updateFoodBreakdown
                     farmsWanted = 3;
                 else if (distanceToMainBase < 90.0)
                     farmsWanted = 2;
+			    if (cMyCulture == cCultureAtlantean)
+			    farmsWanted = 1; // just one for atlanteans.					
             }
             
             if (((numFortressesNearBase > 0) && ((numBuilding1NearBase > 0) || (numTowersNearBase > requiredTowers)))
@@ -764,9 +774,9 @@ rule updateFoodBreakdown
                     farmsWanted = 3;
                 else if (distanceToMainBase < 90.0)
                     farmsWanted = 2;
+			    if (cMyCulture == cCultureAtlantean)
+			    farmsWanted = 1; // just one for atlanteans.					
             }
-			if (cMyCulture == cCultureAtlantean)
-			farmsWanted = 1; // just one for atlanteans.
             
             if (((numFortressesNearBase > 0) && ((numBuilding1NearBase > 0) || (numTowersNearBase > requiredTowers)))
              || ((numBuilding1NearBase > 0) && (numTowersNearBase > requiredTowers + 1)))
@@ -810,11 +820,11 @@ rule updateFoodBreakdown
             {
                 if ((unassigned > 1) && ((totalNumberResourceSpots < 2) || (farmerReserve < 7)))
                 {
-                    farmerPreBuild = 3;  // Starting prebuild
+                    farmerPreBuild = 2;  // Starting prebuild
                 }
                 else
                 {
-                    farmerPreBuild = 2;
+                    farmerPreBuild = 1;
                 }
             }
             else

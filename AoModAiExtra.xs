@@ -1077,7 +1077,7 @@ rule tacticalHeroAttackMyth
 	    int NoMeleeHeroPlease = kbUnitQueryGetResult(unitQueryID, i);
 	   	int NoFlyingPlease = kbUnitQueryGetResult(enemyQueryID, 0);
 		if ((kbUnitIsType(NoFlyingPlease, cUnitTypePegasus) || kbUnitIsType(NoFlyingPlease, cUnitTypeRoc) || kbUnitIsType(NoFlyingPlease, cUnitTypeFlyingMedic) || 
-		kbUnitIsType(NoFlyingPlease, cUnitTypeStymphalianBird) || kbUnitIsType(NoFlyingPlease, cUnitTypePhoenix) || kbUnitIsType(NoFlyingPlease, cUnitTypeVermilionBird)))
+		kbUnitIsType(NoFlyingPlease, cUnitTypeStymphalianBird) || kbUnitIsType(NoFlyingPlease, cUnitTypePhoenix) || kbUnitIsType(NoFlyingPlease, cUnitTypeVermilionBird) || kbUnitIsType(NoFlyingPlease, cUnitTypeRaven)))
 		{
         if (cMyCulture == cCultureGreek) if (kbUnitIsType(NoMeleeHeroPlease, Hero1ID) || kbUnitIsType(NoMeleeHeroPlease, Hero3ID) || kbUnitIsType(NoMeleeHeroPlease, Hero4ID))    
 			continue;
@@ -2056,7 +2056,7 @@ inactive
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 3);
    }
 
    int numberFoundTemp = 0;
@@ -2086,7 +2086,7 @@ inactive
 
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
-   xsSetRuleMinIntervalSelf(15);
+   xsSetRuleMinIntervalSelf(12);
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
@@ -2119,7 +2119,7 @@ inactive
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 3);
    }
 
    int numberFoundTemp = 0;
@@ -2148,7 +2148,7 @@ inactive
 
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
-   xsSetRuleMinIntervalSelf(15);
+   xsSetRuleMinIntervalSelf(12);
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
@@ -2210,7 +2210,7 @@ inactive
 
    static int unitQueryID=-1;
    static int enemyQueryID=-1;
-   xsSetRuleMinIntervalSelf(15);
+   xsSetRuleMinIntervalSelf(12);
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
@@ -2243,7 +2243,7 @@ inactive
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 3);
    }
 
    int numberFoundTemp = 0;

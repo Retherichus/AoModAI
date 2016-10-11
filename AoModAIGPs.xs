@@ -2257,7 +2257,13 @@ rule rCastHeavyGP
 	static int fortressQuery=-1;
 	static int farmQuery=-1;
 	static int CastAttempt=0;
-
+    int TartGate = kbUnitCount(cMyID, cUnitTypeTartarianGate, cUnitStateAlive);
+	if (TartGate > 1)
+	{
+	xsDisableSelf();
+	return;
+	}
+	
 	if(settleQuery < 0)
 	{
 	   settleQuery=kbUnitQueryCreate("Enemy Settle Query");

@@ -622,27 +622,10 @@ rule buildHouse
 
         aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
 
-        // Hack to test norse scout-building if only one ulfsark exists
-        if ((cMyCulture == cCultureNorse) && (kbUnitCount(cMyID, cUnitTypeUlfsark, cUnitStateAlive) == 1) 
-         && (equal(aiPlanGetLocation(gLandExplorePlanID), cInvalidVector) == false))
-        {
-            aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, true);
-            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 100.0);
-            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
-            aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
 
-            location = aiPlanGetLocation(gLandExplorePlanID);
-            aiPlanSetBaseID(planID, -1);
-            aiPlanSetVariableInt(planID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(location));
-
-            aiPlanSetVariableVector(planID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionDistance, 0, 20.0);
-            aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionValue, 0, 1.0);
-        }
-       
 	   // Added a little override as this rule didn't seem to work properly. // Reth.
 	   
-	    else if ((findNumUnitsInBase(cMyID, kbBaseGetMain(cMyID), cUnitTypeTower) > 0)
+	     if ((findNumUnitsInBase(cMyID, kbBaseGetMain(cMyID), cUnitTypeTower) > 0)
               && (mapPreventsHousesAtTowers() == false) && (gBuildWallsAtMainBase == false)
               && (otherBaseID == mainBaseID) || (bHouseBunkering == true) && (mapPreventsHousesAtTowers() == false))
 			  
@@ -3322,7 +3305,7 @@ rule buildBuildingsAtOtherBase2
 
 	
 
-            if ((numBuilding1NearBase > 2) && (cMyCulture != cCultureGreek))
+            if ((numBuilding1NearBase >= 2) && (cMyCulture != cCultureGreek))
                 return;
 				
 	            if ((numBuilding1NearBase >= 1) && (cMyCulture == cCultureGreek))
@@ -4649,7 +4632,7 @@ rule buildExtraFarms
     backVector = xsVectorSetY(backVector, 0.0);
     backLocation = mainBaseLocation + backVector;
     
-    int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 30.0);
+    int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 70.0);
     
     if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 6) || (numFarmsNearMainBaseInR30 >= 37))
     {
