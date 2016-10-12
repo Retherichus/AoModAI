@@ -896,7 +896,7 @@ rule monitorAttPlans
                     countB = 0;
                     if ((numMilUnitsInPlan < 3)
                      || ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.3) && ((numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan) 
-                     || ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMythInPlan < 1) && (numSiegeInPlan < 1) && (numMilUnitsInPlan < 15)))))
+                     || ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 5)))))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
@@ -2472,7 +2472,7 @@ rule attackEnemySettlement
             if (ShowAiEcho == true) aiEcho("returning as there is a landAttackPlan active");
             return;
         }
-        else if ((numSiegeWeapons < 1) && (currentPop <= currentPopCap - 3 - number))
+        else if ((numSiegeWeapons < 1) && (currentPop <= currentPopCap - 3 - number) && (aiRandInt(3) == 1))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have a Titan, a siege weapon, or a military myth unit");
             return;
@@ -2584,7 +2584,7 @@ rule attackEnemySettlement
         else
         {
             if ((numTitansIngDefendPlan > 0)
-             || ((numMilUnitsInDefPlans > 14) && ((numSiegeUnitsIngDefendPlan > 1) || (numMilUnitsInDefPlans > 20) && (aiRandInt(4) == 1) || (numMythUnitsIngDefendPlan > 1)
+             || ((numMilUnitsInDefPlans > 14) && ((numSiegeUnitsIngDefendPlan > 1) || (numMilUnitsInDefPlans > 25) && (aiRandInt(4) == 1) || (numMythUnitsIngDefendPlan > 1)
               || ((numSiegeUnitsIngDefendPlan > 0) && (numMythUnitsIngDefendPlan > 0)))))
             {
                 targetIsEnemyMainBase = true;

@@ -43,7 +43,7 @@ extern vector KOTHGlobal = cInvalidVector;
 extern bool IhaveAllies = false;
 extern bool mRusher = false;
 extern int MoreFarms = 28;
-
+extern bool TitanAvailable = false;
 //////////////// aiEchoDEBUG ////////////////
 
 extern bool ShowAiEcho = false; // All aiEcho, see specific below to override.
@@ -92,8 +92,8 @@ extern int eHMaxMilPop = 25;              // Heroic age.
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
 extern int eBoomFood = 600;              // Food
-extern int eBoomGold = 150;              // Gold
-extern int eBoomWood = 200;              // Wood, duh.
+extern int eBoomGold = 200;              // Gold
+extern int eBoomWood = 250;              // Wood, duh.
 
 
 //Egyptians have their own, because they don't like wood as much.
@@ -127,9 +127,9 @@ extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wo
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 850;             // Food
+extern int RethLGFAge2 = 900;             // Food
 extern int RethLGGAge2 = 550;              // Gold
-extern int RethLGWAge2 = 400;              // Wood
+extern int RethLGWAge2 = 550;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -149,7 +149,7 @@ extern int RethLGWAge4 = 2300;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLEFAge2 = 800;              // Food
+extern int RethLEFAge2 = 900;              // Food
 extern int RethLEGAge2 = 700;              // Gold
 extern int RethLEWAge2 = 100;              // Wood
 
@@ -172,7 +172,7 @@ extern int RethLEWAge4 = 1200;              // Wood
 //Age 2 (Classical Age)
 extern int RethLNFAge2 = 1000;             // Food
 extern int RethLNGAge2 = 600;              // Gold
-extern int RethLNWAge2 = 400;              // Wood
+extern int RethLNWAge2 = 550;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -191,9 +191,9 @@ extern int RethLNWAge4 = 2300;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 800;              // Food
+extern int RethLAFAge2 = 900;              // Food
 extern int RethLAGAge2 = 600;              // Gold
-extern int RethLAWAge2 = 400;              // Wood
+extern int RethLAWAge2 = 500;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -213,9 +213,9 @@ extern int RethLAWAge4 = 2300;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLCFAge2 = 800;              // Food
-extern int RethLCGAge2 = 550;              // Gold
-extern int RethLCWAge2 = 400;              // Wood
+extern int RethLCFAge2 = 900;              // Food
+extern int RethLCGAge2 = 650;              // Gold
+extern int RethLCWAge2 = 600;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -283,7 +283,8 @@ void initRethlAge1(void)  // Am I doing this right??
 	   xsEnableRule("StartingBoatFailsafe");
 	   }
 	   }
-	   
+	   if ((kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusUnobtainable) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusActive))
+       TitanAvailable = true:
 }
 
 //==============================================================================
@@ -2056,7 +2057,7 @@ inactive
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 3);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
    }
 
    int numberFoundTemp = 0;
@@ -2119,7 +2120,7 @@ inactive
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 3);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
    }
 
    int numberFoundTemp = 0;
@@ -2243,7 +2244,7 @@ inactive
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAliveOrBuilding);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 3);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 4);
    }
 
    int numberFoundTemp = 0;

@@ -133,7 +133,7 @@ rule getArchitects
     if (ruleStartTime == -1)
         ruleStartTime = xsGetTime();
         
-    if ((gBuildTowers == true) && ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) || (xsGetTime() - ruleStartTime < 5*60*1000)))
+    if ((gBuildTowers == true) && ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) || (xsGetTime() - ruleStartTime < 15*60*1000)))
         return;
     
     if (kbGetAge() == cAge3)
@@ -2161,6 +2161,340 @@ rule getBeastSlayer
     }
 }
 
+//==============================================================================
+rule getMediumInfantry
+    inactive
+    minInterval 13 //starts in cAge2
+    group mediumGreek
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechMediumInfantry;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("getMediumInfantry:");
+    
+//test    
+    if (cMyCulture == cCultureAtlantean)
+    {
+        xsDisableSelf();
+        return;
+    }
+//test end         
+
+    float goldSupply = kbResourceGet(cResourceGold);
+    float foodSupply = kbResourceGet(cResourceFood);    
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
+    {
+        if (kbGetTechStatus(techID) < cTechStatusResearching)
+        {
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+            {
+                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
+                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
+                xsSetRuleMinIntervalSelf(13);
+            }
+        }
+        return;
+    }
+    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+
+    int numInfantry = kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive);
+    if ((numInfantry < 5) && (kbGetAge() < cAge3))
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numInfantry < 9)
+        {
+            if ((goldSupply < 300) || (foodSupply < 300))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("MediumInfantry", cPlanProgression);
+        aiPlanSetVariableInt(x, cProgressionPlanGoalTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 100);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting MediumInfantry");
+        xsSetRuleMinIntervalSelf(11);
+    }
+}
+
+//==============================================================================
+rule getMediumCavalry
+    inactive
+    minInterval 12 //starts in cAge2
+    group mediumGreek
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechMediumCavalry;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("getMediumCavalry:");
+    
+//test    
+    if (cMyCulture == cCultureAtlantean)
+    {
+        xsDisableSelf();
+        return;
+    }
+//test end    
+
+    float goldSupply = kbResourceGet(cResourceGold);
+    float foodSupply = kbResourceGet(cResourceFood);    
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
+    {
+        if (kbGetTechStatus(techID) < cTechStatusResearching)
+        {
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+            {
+                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
+                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
+                xsSetRuleMinIntervalSelf(12);
+            }
+        }
+        return;
+    }
+    
+    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+        
+    int numCavalry = kbUnitCount(cMyID, cUnitTypeAbstractCavalry, cUnitStateAlive);
+    if ((numCavalry < 5) && (kbGetAge() < cAge3))
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numCavalry < 9)
+        {
+            if ((goldSupply < 200) || (foodSupply < 400))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("MediumCavalry", cPlanProgression);
+        aiPlanSetVariableInt(x, cProgressionPlanGoalTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 100);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting MediumCavalry");
+        xsSetRuleMinIntervalSelf(11);
+    }
+}
+
+//==============================================================================
+rule getMediumArchers
+    inactive
+    minInterval 11 //starts in cAge2
+    group mediumGreek
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechMediumArchers;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("getMediumArchers:");   
+
+//test    
+    if (cMyCulture == cCultureAtlantean)
+    {
+        xsDisableSelf();
+        return;
+    }
+//test end      
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    float woodSupply = kbResourceGet(cResourceWood);
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+    {
+        if (kbGetTechStatus(techID) < cTechStatusResearching)
+        {
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+            {
+                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
+                xsSetRuleMinIntervalSelf(11);
+            }
+        }
+        return;
+    }
+    
+    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+    
+    int numArchers = kbUnitCount(cMyID, cUnitTypeAbstractArcher, cUnitStateAlive);
+    if ((numArchers < 5) && (kbGetAge() < cAge3))
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numArchers < 9)
+        {
+            if ((goldSupply < 300) || (woodSupply < 300))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("MediumArchers", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 100);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting MediumArchers");
+        xsSetRuleMinIntervalSelf(11);
+    }
+}
+
+//==============================================================================
+rule getChampionInfantry
+    inactive
+    minInterval 18 //starts in cAge4
+    group championGreek
+{
+    int techID = cTechChampionInfantry;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("getChampionInfantry:");
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
+        return;
+    
+    int numberOfInfantry = kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive);
+    if (numberOfInfantry < 5)
+        return;
+    
+    float goldSupply = kbResourceGet(cResourceGold);
+    float foodSupply = kbResourceGet(cResourceFood);
+    if ((goldSupply < 500) || (foodSupply < 600))
+        return;
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("ChampionInfantry", cPlanProgression);
+        aiPlanSetVariableInt(x, cProgressionPlanGoalTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 98);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting ChampionInfantry");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule getChampionCavalry
+    inactive
+    minInterval 16 //starts in cAge4
+    group championGreek
+{
+    int techID = cTechChampionCavalry;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("getChampionCavalry:");
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
+        return;
+    
+    int numberOfCavalry = kbUnitCount(cMyID, cUnitTypeAbstractCavalry, cUnitStateAlive);
+    if (numberOfCavalry < 5)
+        return;
+    
+    float goldSupply = kbResourceGet(cResourceGold);
+    float foodSupply = kbResourceGet(cResourceFood);
+    if ((goldSupply < 300) || (foodSupply < 800))
+        return;
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("ChampionCavalry", cPlanProgression);
+        aiPlanSetVariableInt(x, cProgressionPlanGoalTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 98);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting ChampionCavalry");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule getChampionArchers
+    inactive
+    minInterval 15 //starts in cAge4
+    group championGreek
+{
+    int techID = cTechChampionArchers;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("getChampionArchers:");
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numberOfArchers = kbUnitCount(cMyID, cUnitTypeAbstractArcher, cUnitStateAlive);
+    if (numberOfArchers < 5)
+        return;
+    
+    float goldSupply = kbResourceGet(cResourceGold);
+    float woodSupply = kbResourceGet(cResourceWood);
+    if ((goldSupply < 500) || (woodSupply < 600))
+        return;
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("ChampionArchers", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 98);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting ChampionArchers");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
 
 //==============================================================================
 rule getDraftHorses
@@ -2304,6 +2638,1103 @@ rule getCoinage
             if (ShowAiEcho == true) aiEcho("Getting coinage upgrade.");
             xsSetRuleMinIntervalSelf(307);
         }
+    }
+}
+
+//==============================================================================
+rule researchCopperShields
+    minInterval 14 //starts in cAge2
+    inactive
+    group ArmoryAge2
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+    
+    int techID = cTechCopperShields;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("researchCopperShields:");
+    
+   
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    float woodSupply = kbResourceGet(cResourceWood);
+            
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+    {
+        if (kbGetTechStatus(techID) < cTechStatusResearching)
+        {
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+            {
+                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
+                xsSetRuleMinIntervalSelf(14);
+            }
+        }
+        return;
+    }
+    
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 13)
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numHumanSoldiers + numHeroes + numMilitaryShips < 21)
+        {
+            if ((goldSupply < 300) || (woodSupply < 300))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchCopperShields", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 99);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching CopperShields");
+        xsSetRuleMinIntervalSelf(11);
+    }
+}
+
+//==============================================================================
+rule researchCopperMail
+    minInterval 15 //starts in cAge2
+    inactive
+    group ArmoryAge2
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+
+    if (ShowAiEcho == true) aiEcho("researchCopperMail:");
+    
+  
+    
+    int techID = cTechCopperMail;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+    {
+        if (kbGetTechStatus(techID) < cTechStatusResearching)
+        {
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+            {
+                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
+                xsSetRuleMinIntervalSelf(15);
+            }
+        }
+        return;
+    }
+    
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 13)
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numHumanSoldiers + numHeroes + numMilitaryShips < 21)
+        {
+            if ((goldSupply < 300) || (foodSupply < 300))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchCopperMail", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 99);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching CopperMail");
+        xsSetRuleMinIntervalSelf(11);
+    }
+}
+
+//==============================================================================
+rule researchCopperWeapons
+    minInterval 16 //starts in cAge2
+    inactive
+    group ArmoryAge2
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+
+    if (ShowAiEcho == true) aiEcho("researchCopperWeapons:");
+    
+
+
+    int techID = cTechCopperWeapons;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    float woodSupply = kbResourceGet(cResourceWood);  
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+    {
+        if (kbGetTechStatus(techID) < cTechStatusResearching)
+        {
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+            {
+                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
+                xsSetRuleMinIntervalSelf(16);
+            }
+        }
+        return;
+    }
+    
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    int numBuildingsThatShoot = kbUnitCount(cMyID, cUnitTypeBuildingsThatShoot, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips + numBuildingsThatShoot < 15)
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numHumanSoldiers + numHeroes + numMilitaryShips + numBuildingsThatShoot < 31)
+        {
+            if ((goldSupply < 400) || (foodSupply < 400))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+    
+    static int count = 0;        
+    if (count < 1)
+    {
+        count = count + 1;
+        return;
+    }
+
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchCopperWeapons", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 99);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching CopperWeapons");
+        xsSetRuleMinIntervalSelf(11);
+    }
+}
+
+
+//==============================================================================
+rule researchCopperShieldsThor
+    minInterval 14 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+
+    if (ShowAiEcho == true) aiEcho("researchCopperShieldsThor:");
+
+    int techID = cTechCopperShieldsThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+    
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 13)
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numHumanSoldiers + numHeroes + numMilitaryShips < 20)
+        {
+            float foodSupply = kbResourceGet(cResourceFood);
+            float goldSupply = kbResourceGet(cResourceGold);
+            float woodSupply = kbResourceGet(cResourceWood);
+            if ((goldSupply < 200) || (woodSupply < 200))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchCopperShieldsThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 99);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching CopperShieldsThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchCopperMailThor
+    minInterval 15 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+ 
+    if (ShowAiEcho == true) aiEcho("researchCopperMailThor:");
+
+    int techID = cTechCopperMailThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+   
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 13)
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numHumanSoldiers + numHeroes + numMilitaryShips < 20)
+        {
+            float foodSupply = kbResourceGet(cResourceFood);
+            float goldSupply = kbResourceGet(cResourceGold);
+            if ((goldSupply < 200) || (foodSupply < 200))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchCopperMailThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 99);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching CopperMailThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchCopperWeaponsThor
+    minInterval 16 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+        return;
+
+    int techID = cTechCopperWeaponsThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("researchCopperWeaponsThor:");
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+    
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    int numBuildingsThatShoot = kbUnitCount(cMyID, cUnitTypeBuildingsThatShoot, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips + numBuildingsThatShoot < 15)
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numHumanSoldiers + numHeroes + numMilitaryShips + numBuildingsThatShoot < 25)
+        {
+            float foodSupply = kbResourceGet(cResourceFood);
+            float goldSupply = kbResourceGet(cResourceGold);
+            float woodSupply = kbResourceGet(cResourceWood);
+            if ((goldSupply < 300) || (foodSupply < 300))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+   
+    static int count = 0;        
+    if (count < 1)
+    {
+        count = count + 1;
+        return;
+    }
+
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchCopperWeaponsThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 99);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching CopperWeaponsThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchBronzeShieldsThor
+    minInterval 14 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechBronzeShieldsThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("researchBronzeShieldsThor:");
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+    
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 14)
+        return;
+    
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 20)
+    {
+        float foodSupply = kbResourceGet(cResourceFood);
+        float goldSupply = kbResourceGet(cResourceGold);
+        float woodSupply = kbResourceGet(cResourceWood);
+        
+        if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+        {
+            if ((goldSupply < 200) || (woodSupply < 400))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+                
+            if ((foodSupply > 700) && (goldSupply > 700))
+                return;
+        }
+        else
+        {
+            if ((goldSupply < 150) || (woodSupply < 300))
+                return;
+        }
+    }
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchBronzeShieldsThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 98);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching BronzeShieldsThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchBronzeMailThor
+    minInterval 15 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechBronzeMailThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("researchBronzeMailThor:");
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+    
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 14)
+        return;
+    
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 20)
+    {
+        float foodSupply = kbResourceGet(cResourceFood);
+        float goldSupply = kbResourceGet(cResourceGold);
+        if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+        {
+            if ((goldSupply < 200) || (foodSupply < 400))
+                return;
+            
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+
+            if ((foodSupply > 700) && (goldSupply > 700))
+                return;
+        }
+        else
+        {
+            if ((goldSupply < 150) || (foodSupply < 300))
+                return;
+        }
+    }
+
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchBronzeMailThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 98);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching BronzeMailThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchBronzeWeaponsThor
+    minInterval 16 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechBronzeWeaponsThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("researchBronzeWeaponsThor:");
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+    
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    int numBuildingsThatShoot = kbUnitCount(cMyID, cUnitTypeBuildingsThatShoot, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips + numBuildingsThatShoot < 15)
+        return;
+
+    if (numHumanSoldiers + numHeroes + numMilitaryShips + numBuildingsThatShoot < 25)
+    {
+        float foodSupply = kbResourceGet(cResourceFood);
+        float goldSupply = kbResourceGet(cResourceGold);
+
+        if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+        {
+            if ((goldSupply < 400) || (foodSupply < 400))
+                return;
+                
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+
+            if ((foodSupply > 700) && (goldSupply > 700))
+                return;
+        }
+        else
+        {
+            if ((goldSupply < 300) || (foodSupply < 300))
+                return;
+        }
+    }
+
+    static int count = 0;        
+    if (count < 1)
+    {
+        count = count + 1;
+        return;
+    }
+   
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchBronzeWeaponsThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 98);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching BronzeWeaponsThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchIronShieldsThor
+    minInterval 14 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechIronShieldsThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("researchIronShieldsThor:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 15)
+        return;
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    float woodSupply = kbResourceGet(cResourceWood);
+    if ((goldSupply < 400) || (woodSupply < 500))
+        return;
+
+    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+        return;
+                
+    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching))
+        return;
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchIronShieldsThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 97);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching IronShieldsThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchIronMailThor
+    minInterval 15 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechIronMailThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("researchIronMailThor:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips < 15)
+        return;
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    if ((goldSupply < 500) || (foodSupply < 500))
+        return;
+
+    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+        return;
+                
+    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching))
+        return;
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchIronMailThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 97);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching IronMailThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchIronWeaponsThor
+    minInterval 16 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechIronWeaponsThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("researchIronWeaponsThor:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numMilitaryShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeShipNotFishinghip, cUnitStateAlive);
+    int numBuildingsThatShoot = kbUnitCount(cMyID, cUnitTypeBuildingsThatShoot, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numMilitaryShips + numBuildingsThatShoot < 15)
+        return;
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    if ((goldSupply < 600) || (foodSupply < 600))
+        return;
+        
+    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+        return;
+                
+    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching))
+        return;
+    
+    static int count = 0;        
+    if (count < 1)
+    {
+        count = count + 1;
+        return;
+    }
+
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchIronWeaponsThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 97);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching IronWeaponsThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchBurningPitchThor
+    minInterval 17 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechBurningPitchThor;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("researchBurningPitchThor:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    int numArcherShips = kbUnitCount(cMyID, cUnitTypeArcherShip, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes + numArcherShips < 15)
+        return;
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    float woodSupply = kbResourceGet(cResourceWood);
+    if ((goldSupply < 300) || (woodSupply < 500))
+        return;
+
+    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+        return;
+                
+    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching))
+        return;
+                
+    static int count = 0;        
+    if (count < 1)
+    {
+        count = count + 1;
+        return;
+    }
+
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchBurningPitchThor", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 97);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching BurningPitchThor");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchDragonscaleShields
+    minInterval 14 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechDragonscaleShields;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+    
+    if (ShowAiEcho == true) aiEcho("researchDragonscaleShields:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes < 15)
+        return;
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    float woodSupply = kbResourceGet(cResourceWood);
+    if ((goldSupply < 600) || (woodSupply < 600))
+        return;
+
+    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+        return;
+                
+    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching))
+        return;
+        
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchDragonscaleShields", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 96);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching DragonscaleShields");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchMeteoricIronMail
+    minInterval 15 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechMeteoricIronMail;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("researchMeteoricIronMail:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes < 15)
+        return;
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    if ((goldSupply < 600) || (foodSupply < 600))
+        return;
+
+    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+        return;
+                
+    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching))
+        return;
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchMeteoricIronMail", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 96);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching MeteoricIronMail");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule researchHammerOfTheGods
+    minInterval 16 //starts in cAge2
+    inactive
+    group ArmoryThor
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechHammeroftheGods;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("researchHammerOfTheGods:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    if (numHumanSoldiers + numHeroes < 15)
+        return;
+
+    float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    if ((goldSupply < 600) || (foodSupply < 600))
+        return;
+    
+    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+        return;
+                
+    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching))
+        return;
+
+    static int count = 0;        
+    if (count < 1)
+    {
+        count = count + 1;
+        return;
+    }
+
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("researchHammerOfTheGods", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 96);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("researching HammerOfTheGods");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule getMediumAxemen
+    inactive
+    minInterval 13 //starts in cAge2
+    group mediumEgyptian
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechMediumAxemen;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("getMediumAxemen:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numAxemen = kbUnitCount(cMyID, cUnitTypeAxeman, cUnitStateAlive);
+    if ((numAxemen < 6) && (kbGetAge() < cAge3))
+        return;  
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numAxemen < 9)
+        {
+            float goldSupply = kbResourceGet(cResourceGold);
+            float foodSupply = kbResourceGet(cResourceFood);
+            if ((goldSupply < 200) || (foodSupply < 200))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("MediumAxemen", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 100);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting MediumAxemen");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule getMediumSpearmen
+    inactive
+    minInterval 12 //starts in cAge2
+    group mediumEgyptian
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechMediumSpearmen;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("getMediumSpearmen:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numSpearmen = kbUnitCount(cMyID, cUnitTypeSpearman, cUnitStateAlive);
+    if ((numSpearmen < 6) && (kbGetAge() < cAge3))
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numSpearmen < 9)
+        {
+            float goldSupply = kbResourceGet(cResourceGold);
+            float foodSupply = kbResourceGet(cResourceFood);
+            if ((goldSupply < 200) || (foodSupply < 200))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("MediumSpearmen", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 100);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting MediumSpearmen");
+        xsSetRuleMinIntervalSelf(307);
+    }
+}
+
+//==============================================================================
+rule getMediumSlingers
+    inactive
+    minInterval 11 //starts in cAge2
+    group mediumEgyptian
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    int techID = cTechMediumSlingers;
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    if (ShowAiEcho == true) aiEcho("getMediumSlingers:");
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+
+    int numSlingers = kbUnitCount(cMyID, cUnitTypeSlinger, cUnitStateAlive);
+    if ((numSlingers < 6) && (kbGetAge() < cAge3))
+        return;
+    
+    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
+    {
+        if (numSlingers < 9)
+        {
+            float foodSupply = kbResourceGet(cResourceFood);
+            float goldSupply = kbResourceGet(cResourceGold);
+            float woodSupply = kbResourceGet(cResourceWood);
+            if ((goldSupply < 200) || (woodSupply < 200))
+                return;
+        
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+                return;
+        }
+    }
+    
+    if (kbGetTechStatus(techID) < cTechStatusResearching)
+    {
+        int x = aiPlanCreate("MediumSlingers", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 100);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
+        aiPlanSetActive(x);
+        if (ShowAiEcho == true) aiEcho("Getting MediumSlingers");
+        xsSetRuleMinIntervalSelf(307);
     }
 }
 

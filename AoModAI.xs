@@ -1781,7 +1781,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     gWoodForecast = 600;
     gFoodForecast = 600;
 	
-	if (RethEcoGoals == true && aiGetWorldDifficulty() < cDifficultyNightmare)
+	if (RethEcoGoals == true && aiGetWorldDifficulty() > cDifficultyModerate)
 	{
 	if (cMyCulture == cCultureGreek)
     {
@@ -1821,40 +1821,10 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 // for titan
     if (RethEcoGoals == true && aiGetWorldDifficulty() > cDifficultyHard)
 	{
-	if (cMyCulture == cCultureGreek)
-    {
-	gFoodForecast = TRethLGFAge4+.0;
-	gGoldForecast = TRethLGGAge4+.0 ;
-	gWoodForecast = TRethLGWAge4+.0 ;
-    }
-	
-	if (cMyCulture == cCultureEgyptian)
-    {
-	gFoodForecast = TRethLEFAge4+.0;
-	gGoldForecast = TRethLEGAge4+.0;
-	gWoodForecast = TRethLEWAge4+.0;
-    }
-	
-	if (cMyCulture == cCultureNorse)
-    {
-	gFoodForecast = TRethLNFAge4+.0 ;
-	gGoldForecast = TRethLNGAge4+.0 ;
-	gWoodForecast = TRethLNWAge4+.0 ;
-    }
-	
-	if (cMyCulture == cCultureAtlantean)
-    {
-	gFoodForecast = TRethLAFAge4+.0 ;
-	gGoldForecast = TRethLAGAge4+.0 ;
-	gWoodForecast = TRethLAWAge4+.0 ;
+    gFoodForecast = gFoodForecast * 1.5;
+	gGoldForecast = gGoldForecast * 1.5;
+	gWoodForecast = gWoodForecast * 1.5;
     }	
-	if (cMyCulture == cCultureChinese)
-    {
-	gFoodForecast = TRethLCFAge4+.0 ;
-	gGoldForecast = TRethLCGAge4+.0 ;
-	gWoodForecast = TRethLCWAge4+.0 ;
-    }			
-	}
 	
 
     float goldSupply = kbResourceGet(cResourceGold);
@@ -1926,15 +1896,13 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 
     setMilitaryUnitCostForecast(); 
 	
-    if (woodSupply > 1700)
-        gWoodForecast = gWoodForecast * 0.5;
-    else if (woodSupply > 1600)
+    if (woodSupply > 2000)
         gWoodForecast = gWoodForecast * 0.6;
-    else if (woodSupply > 1500)
+    else if (woodSupply > 1600)
         gWoodForecast = gWoodForecast * 0.7;
-    else if (woodSupply > 1400)
+    else if (woodSupply > 1500)
         gWoodForecast = gWoodForecast * 0.8;
-    else if (woodSupply > 1300)
+    else if (woodSupply > 1400)
         gWoodForecast = gWoodForecast * 0.9;
     
 
@@ -1974,7 +1942,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     gFoodForecast = 500;
 	
 
-	if (RethEcoGoals == true && aiGetWorldDifficulty() < cDifficultyNightmare)
+	if (RethEcoGoals == true && aiGetWorldDifficulty() > cDifficultyModerate)
 	{
 	if (cMyCulture == cCultureGreek)
     {
@@ -2014,39 +1982,9 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 	// for titan
     if (RethEcoGoals == true && aiGetWorldDifficulty() > cDifficultyHard)
 	{
-	if (cMyCulture == cCultureGreek)
-    {
-	gFoodForecast = TRethLGFAge3+.0;
-	gGoldForecast = TRethLGGAge3+.0 ;
-	gWoodForecast = TRethLGWAge3+.0 ;
-    }
-	
-	if (cMyCulture == cCultureEgyptian)
-    {
-	gFoodForecast = TRethLEFAge3+.0;
-	gGoldForecast = TRethLEGAge3+.0;
-	gWoodForecast = TRethLEWAge3+.0;
-    }
-	
-	if (cMyCulture == cCultureNorse)
-    {
-	gFoodForecast = TRethLNFAge3+.0 ;
-	gGoldForecast = TRethLNGAge3+.0 ;
-	gWoodForecast = TRethLNWAge3+.0 ;
-    }
-	
-	if (cMyCulture == cCultureAtlantean)
-    {
-	gFoodForecast = TRethLAFAge3+.0 ;
-	gGoldForecast = TRethLAGAge3+.0 ;
-	gWoodForecast = TRethLAWAge3+.0 ;
-    }	
-	if (cMyCulture == cCultureChinese)
-    {
-	gFoodForecast = TRethLCFAge3+.0 ;
-	gGoldForecast = TRethLCGAge3+.0 ;
-	gWoodForecast = TRethLCWAge3+.0 ;
-    }	
+    gFoodForecast = gFoodForecast * 1.5;
+	gGoldForecast = gGoldForecast * 1.5;
+	gWoodForecast = gWoodForecast * 1.5;
     }	
 	
     float goldSupply = kbResourceGet(cResourceGold);
@@ -2212,7 +2150,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     gWoodForecast = 400;
     gFoodForecast = 400;
 	
-	if (RethEcoGoals == true && aiGetWorldDifficulty() < cDifficultyNightmare)
+	if (RethEcoGoals == true && aiGetWorldDifficulty() > cDifficultyModerate)
 	{
 	if (cMyCulture == cCultureGreek)
     {
@@ -2252,40 +2190,11 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 	// for titan
     if (RethEcoGoals == true && aiGetWorldDifficulty() > cDifficultyHard)
 	{
-	if (cMyCulture == cCultureGreek)
-    {
-	gFoodForecast = TRethLGFAge2+.0;
-	gGoldForecast = TRethLGGAge2+.0 ;
-	gWoodForecast = TRethLGWAge2+.0 ;
+    gFoodForecast = gFoodForecast * 1.3;
+	gGoldForecast = gGoldForecast * 1.3;
+	gWoodForecast = gWoodForecast * 1.3;
     }
-	
-	if (cMyCulture == cCultureEgyptian)
-    {
-	gFoodForecast = TRethLEFAge2+.0;
-	gGoldForecast = TRethLEGAge2+.0;
-	gWoodForecast = TRethLEWAge2+.0;
-    }
-	
-	if (cMyCulture == cCultureNorse)
-    {
-	gFoodForecast = TRethLNFAge2+.0 ;
-	gGoldForecast = TRethLNGAge2+.0 ;
-	gWoodForecast = TRethLNWAge2+.0 ;
-    }
-	
-	if (cMyCulture == cCultureAtlantean)
-    {
-	gFoodForecast = TRethLAFAge2+.0 ;
-	gGoldForecast = TRethLAGAge2+.0 ;
-	gWoodForecast = TRethLAWAge2+.0 ;
-    }	
-	if (cMyCulture == cCultureChinese)
-    {
-	gFoodForecast = TRethLCFAge2+.0 ;
-	gGoldForecast = TRethLCGAge2+.0 ;
-	gWoodForecast = TRethLCWAge2+.0 ;
-    }	
-	}
+    
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
@@ -2493,8 +2402,8 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     // If we've made it here, we're in age 1 (cAge1), we've been in the age at least 2 minutes,
     // and we haven't started the age 2 upgrade.  Let's see what we need.
 	
-    gGoldForecast = 100.0;
-    gWoodForecast = 100.0;
+    gGoldForecast = 150.0;
+    gWoodForecast = 200.0;
     gFoodForecast = 700.0;
 
 	if (RethFishEco == true && gWaterMap == true && ConfirmFish == true	&& xsGetTime() < eFishTimer*1*1000)
@@ -2990,7 +2899,7 @@ inactive
 }
 //==============================================================================
 int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
-    int maxUnits=80, int minPop=-1, int maxPop=-1, int numberBuildings=1,
+    int maxUnits=20, int minPop=-1, int maxPop=-1, int numberBuildings=1,
     bool guessEnemyUnitType=false)
 {
     //Create it.
@@ -3493,7 +3402,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.3); // Override as AbstractArcher does not work.
                 }
                 else if (upRand == 1)
                 {
@@ -3503,7 +3411,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.6); // Override as AbstractArcher does not work.
                 }
                 else
                 {
@@ -3513,7 +3420,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.4); // Override as AbstractArcher does not work.
                 }
                 break;			
         }
@@ -3528,7 +3434,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.4); // Override as AbstractArcher does not work.
                 }
                 else if (upRand == 1)
                 {
@@ -3538,7 +3443,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.6); // Override as AbstractArcher does not work.
                 }
                 else
                 {
@@ -3548,7 +3452,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.3); // Override as AbstractArcher does not work.
                 }
                 break;			
         }
@@ -3563,7 +3466,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.3); // Override as AbstractArcher does not work.
                 }
                 else if (upRand == 1)
                 {
@@ -3573,7 +3475,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.4); // Override as AbstractArcher does not work.
                 }
                 else
                 {
@@ -3583,7 +3484,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeChuKoNu, 0.6); // Override as AbstractArcher does not work.
                 }
                 break;			
         }
@@ -4004,14 +3904,14 @@ void init(void)
 
     if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureNorse))
     {
-	    if ((gBuildWallsAtMainBase == false) || (gTransportMap == true))
+	    if (gTransportMap == true)
             gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 3, true);  // 3 buildings if egyptian or norse
         else
             gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2, true);  // 2 buildings if egyptian or norse
     }    
     else
     {
-	    if ((gBuildWallsAtMainBase == false) || (gTransportMap == true))
+	    if (gTransportMap == true)
             gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2, true); // Rush with rushSize pop slots of two types, 2 buildings, do guess enemy unit type
 	    else
             gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 1, true); // Rush with rushSize pop slots of two types, 1 buildings, do guess enemy unit type

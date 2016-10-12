@@ -119,8 +119,10 @@ rule updateWoodBreakdown
     //Get the count of plans we currently have going.
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
-    int desiredWoodPlans = 2;
-    
+    int desiredWoodPlans = 1 + (woodGathererCount/12);
+    if (cMyCulture == cCultureAtlantean)
+	desiredWoodPlans = 1 + (woodGathererCount/5);
+	
 	if (xsGetTime() < 10*60*1000)
         desiredWoodPlans = 1;
     
@@ -349,7 +351,7 @@ rule updateGoldBreakdown
 
     int desiredGoldPlans = 1 + (goldGathererCount/12);
 	if (cMyCulture == cCultureAtlantean)
-	desiredGoldPlans = 2;
+	desiredGoldPlans = 1 + (goldGathererCount/6);
     
     int numGoldMinesNearMBInR50 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0);
     
@@ -683,7 +685,7 @@ rule updateFoodBreakdown
                 if (distanceToMainBase < 65.0)
                     farmsWanted = 3;
                 else if (distanceToMainBase < 90.0)
-                    farmsWanted = 2;
+                    farmsWanted = 1;
 			    if (cMyCulture == cCultureAtlantean)
 			    farmsWanted = 1; // just one for atlanteans.	
             }
