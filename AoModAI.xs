@@ -835,8 +835,8 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
         vilPop = 34;
         
 
-    if (kbUnitCount(cMyID, cUnitTypePlentyVault, cUnitStateAlive) > 0)
-        vilPop = vilPop - 3;
+    //if (kbUnitCount(cMyID, cUnitTypePlentyVault, cUnitStateAlive) > 0)
+     //   vilPop = vilPop - 3;
     
     if (cMyCulture == cCultureAtlantean)
         vilPop = vilPop / 3;

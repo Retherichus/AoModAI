@@ -896,14 +896,14 @@ rule monitorAttPlans
                     countB = 0;
                     if ((numMilUnitsInPlan < 3)
                      || ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.3) && ((numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan) 
-                     || ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 5)))))
+                     || ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 5) && (numSiegeInPlan < 1)))))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                         if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killRandomAttPlanCount = 0;
-                        if (numMilUnitsInPlan < 3)
+                        if ((numMilUnitsInPlan < 3) && (numSiegeInPlan < 1))
                             if (ShowAiEcho == true) aiEcho("Destroying gRandomAttackPlanID as less than 3 units in the plan");
                         else
                             if (ShowAiEcho == true) aiEcho("Destroying gRandomAttackPlanID as there are too many enemies");
@@ -959,7 +959,7 @@ rule monitorAttPlans
                 }
                 else if (planState == cPlanStateAttack)
                 {
-                    if ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.5) && ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0)
+                    if ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.5) && ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numSiegeInPlan < 1)
                      || (numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan)))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
@@ -1092,9 +1092,9 @@ rule monitorAttPlans
                 else if (planState == cPlanStateAttack)
                 {
                     countD = 0;
-                    if (((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5))
+                    if (((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5) && (numSiegeInPlan < 1))
                      || ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.3) && ((numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan)
-                     || ((kbGetAge() > cAge2) && (numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 4)))))
+                     || ((kbGetAge() > cAge2) && (numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 4) && (numSiegeInPlan < 1)))))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
@@ -1102,7 +1102,7 @@ rule monitorAttPlans
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killLandAttPlanCount = 0;
                         
-                        if ((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5))
+                        if ((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5) && (numSiegeInPlan < 1))
                              if (ShowAiEcho == true) aiEcho("Destroying gLandAttackPlanID as there less than 5 units in the plan");
                         else
                              if (ShowAiEcho == true) aiEcho("Destroying gLandAttackPlanID as there are too many enemies");
@@ -2744,7 +2744,7 @@ rule attackEnemySettlement
             if (currentPopCap > 160)
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.80, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
             else
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.60, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.80, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
         }
         aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, -1);
         
@@ -2885,8 +2885,8 @@ rule defendSettlementPosition
                  || (equal(aiPlanGetVariableVector(gBaseUnderAttackDefPlanID, cDefendPlanDefendPoint, 0), defPlanDefPoint) == true)))
                  
                 {
-                    if (xsGetTime() > defendPlanStartTime + 1*60*1000)
-                        if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as it has been active for more than 1 Minutes");
+                    if (xsGetTime() > defendPlanStartTime + 2.5*60*1000)
+                        if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as it has been active for more than 2.5 Minutes");
                     else if (alliedBaseAtDefPlanPosition > 0)
                         if (ShowAiEcho == true) aiEcho("destroying gSettlementPosDefPlan as an ally has built a settlement at the defend position");
                     else
@@ -4195,6 +4195,12 @@ rule createLandAttack
 	// Specify other continent so that armies will transport
     aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetAreaGroups, 1, true);  
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetAreaGroups, 0, kbAreaGroupGetIDByPosition(targetSettlementPos));
+	int myAreaGroup = kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, mainBaseID));
+    if (kbAreaGroupGetIDByPosition(targetSettlementPos) != myAreaGroup)
+	{
+	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);  // don't stop until their TC is down.
+	aiEcho("Other island!");
+	}
 	}
 	
     aiPlanSetInitialPosition(landAttackPlanID, baseLocationToUse);

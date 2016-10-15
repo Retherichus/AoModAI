@@ -61,7 +61,7 @@ rule getLordOfHorses
         return;
 
     int numCavalry = kbUnitCount(cMyID, cUnitTypeAbstractCavalry, cUnitStateAlive);
-    if ((numCavalry < 5) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
+    if ((numCavalry < 5) && (TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
         return;
         
     float goldSupply = kbResourceGet(cResourceGold);
@@ -391,7 +391,7 @@ rule getDivineBlood
     }
     else
     {
-        if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 85))
+        if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 85))
             return;
     }
         
@@ -708,7 +708,7 @@ rule getAnastrophe
     }
     
     int numRammingShipGreek = kbUnitCount(cMyID, cUnitTypeRammingShipGreek, cUnitStateAlive);
-    if ((numRammingShipGreek < 5) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
+    if ((numRammingShipGreek < 5) && (TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
         return;
     
     if ((foodSupply < 600) || (favorSupply < 40))
@@ -760,7 +760,7 @@ rule getFlamesOfTyphon
     
     float foodSupply = kbResourceGet(cResourceFood);
     float favorSupply = kbResourceGet(cResourceFavor);
-    if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 70))
+    if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 70))
         return;
     
     if ((foodSupply < 800) || (favorSupply < 30))
@@ -802,7 +802,7 @@ rule getTrierarch
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
     
-    if (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching)
+    if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
         return;
     
     float goldSupply = kbResourceGet(cResourceGold);
@@ -886,7 +886,7 @@ rule getWeaponOfTheTitans
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
     {
-        if (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching)
+        if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
         {
             if ((favorSupply > 20) && (goldSupply > 500) && (foodSupply > 500) && (woodSupply > 500))
             {
@@ -909,11 +909,11 @@ rule getWeaponOfTheTitans
         specialUnitID = cUnitTypeHetairoi;
     
     int numSpecialUnits = kbUnitCount(cMyID, specialUnitID, cUnitStateAlive);
-    if ((numSpecialUnits < 1) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
+    if ((numSpecialUnits < 1) && (TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
         return;
     
     
-    if (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching)
+    if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
     {
         if ((favorSupply < 40) && (goldSupply > 400) && (foodSupply > 400) && (woodSupply > 400))
             return;
@@ -959,7 +959,7 @@ rule getHandOfTalos
     if ((woodSupply < 600) || (favorSupply < 30))
         return;
     
-    if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 75))
+    if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 75))
         return;
         
     if (techStatus == cTechStatusAvailable)
@@ -1004,7 +1004,7 @@ rule getShoulderOfTalos
     if ((goldSupply < 600) || (favorSupply < 30))
         return;
     
-    if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 75))
+    if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 75))
         return;
     
     if (techStatus == cTechStatusAvailable)
@@ -1044,7 +1044,7 @@ rule getAthenianWall
     float foodSupply = kbResourceGet(cResourceFood);
     float woodSupply = kbResourceGet(cResourceWood);
     float favorSupply = kbResourceGet(cResourceFavor);
-    if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 80))
+    if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 80))
         return;
     
     if ((woodSupply < 800) || (favorSupply < 45))
@@ -1083,7 +1083,7 @@ rule getMonstrousRage
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
     float favorSupply = kbResourceGet(cResourceFavor);
-    if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 75))
+    if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 75))
         return;
     
     if ((foodSupply < 500) || (favorSupply < 37))
@@ -1123,7 +1123,7 @@ rule getFaceOfTheGorgon
     float foodSupply = kbResourceGet(cResourceFood);
     float woodSupply = kbResourceGet(cResourceWood);
     float favorSupply = kbResourceGet(cResourceFavor);
-    if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 80))
+    if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (favorSupply < 80))
         return;
     
     if ((woodSupply < 600) || (favorSupply < 45))

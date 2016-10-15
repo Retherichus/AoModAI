@@ -284,7 +284,7 @@ void initRethlAge1(void)  // Am I doing this right??
 	   }
 	   }
 	   if ((kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusUnobtainable) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusActive))
-       TitanAvailable = true:
+       TitanAvailable = true;
 }
 
 //==============================================================================

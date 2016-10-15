@@ -123,6 +123,9 @@ rule updateWoodBreakdown
     if (cMyCulture == cCultureAtlantean)
 	desiredWoodPlans = 1 + (woodGathererCount/5);
 	
+	if (desiredWoodPlans > 2)
+	desiredWoodPlans = 2;
+	
 	if (xsGetTime() < 10*60*1000)
         desiredWoodPlans = 1;
     
@@ -351,7 +354,10 @@ rule updateGoldBreakdown
 
     int desiredGoldPlans = 1 + (goldGathererCount/12);
 	if (cMyCulture == cCultureAtlantean)
-	desiredGoldPlans = 1 + (goldGathererCount/6);
+	desiredGoldPlans = 1 + (goldGathererCount/5);
+	
+	if (desiredGoldPlans > 2)
+	desiredGoldPlans = 2;
     
     int numGoldMinesNearMBInR50 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0);
     
@@ -487,7 +493,7 @@ rule updateFoodBreakdown
 	
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 30.0);
+    int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
     float foodSupply = kbResourceGet(cResourceFood);
     float woodSupply = kbResourceGet(cResourceWood);
     
