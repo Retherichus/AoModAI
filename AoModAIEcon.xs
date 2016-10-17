@@ -34,7 +34,6 @@ rule updateWoodBreakdown
     if (cMyCulture == cCultureEgyptian)
         woodPriority=40;
 
-	
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
     int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
@@ -1825,7 +1824,7 @@ rule fishing
         xsDisableSelf();
         return;
     }
-    
+    WaitForDock = true;
     if (ShowAiEcho == true) aiEcho("fishing:");
     
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -1844,7 +1843,7 @@ rule fishing
     //Get our fish gatherer.
     int fishGatherer = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish,0);
 
-    if ((gTransportMap == false) && (xsGetTime() < 1*60*1000) && (cRandomMapName != "anatolia"))
+    if ((gTransportMap == false) && (xsGetTime() < 1*30*1000) && (cRandomMapName != "anatolia"))
         return;
 	
     if (gTransportMap == true)

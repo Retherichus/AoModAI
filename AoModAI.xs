@@ -319,7 +319,6 @@ include "AoModAIBasics.xs";
 
 // Placeholder Reth
 include "AoModAiExtra.xs";
-include "AoModAiStinnerV.xs";
 
 //==============================================================================
 
@@ -3681,13 +3680,13 @@ void init(void)
         
     //Set the housing rebuild bound to 4 for the first age.
     if (cMyCulture == cCultureEgyptian)
-        gHouseAvailablePopRebuild=6;
+        gHouseAvailablePopRebuild=5;
     else if (cMyCulture == cCultureAtlantean)
         gHouseAvailablePopRebuild=6;
     else if (cMyCulture == cCultureNorse)
         gHouseAvailablePopRebuild=8;		
     else
-        gHouseAvailablePopRebuild=6;
+        gHouseAvailablePopRebuild=5;
 
     //Set the hard pop caps.
     if (aiGetGameMode() == cGameModeLightning)
@@ -3800,8 +3799,8 @@ void init(void)
         gTargetNumTowers = towerOdds / 10;    // Up to 14 for a mil/econ balanced player
         gTargetNumTowers = gTargetNumTowers * (40+(cvMilitaryEconSlider/2));  // +/- 50% based on mil/econ
         
-        if (gTargetNumTowers > 20)  //max 10 towers
-            gTargetNumTowers = 20;
+        if (gTargetNumTowers > 10)  //max 4-8 towers
+            gTargetNumTowers = 4+(aiRandInt(5));
         
       //  if ( gBuildWalls == true)
          //   gTargetNumTowers = gTargetNumTowers * 2;     // Halve the towers if we're doing walls
@@ -3813,10 +3812,12 @@ void init(void)
     if (gBuildTowers == false)  // If we don't build towers, get upgrades
     {
         gBuildTowers = true;
-        gTargetNumTowers = 0;   // Just do some upgrades
+        gTargetNumTowers = 4;   // Just do some upgrades
     }
-    
-    if (cvOkToBuildTowers == false)
+	if (gTargetNumTowers < 4)
+	gTargetNumTowers = 4;
+   
+   if (cvOkToBuildTowers == false)
     {
         gBuildTowers = false;
         gTargetNumTowers = 0;
@@ -4275,12 +4276,6 @@ void init(void)
     //update player to attack
     xsEnableRule("updatePlayerToAttack");
 	
-	if (HardFocus == true)
-	{
-	xsEnableRule("AttackStrongestPlayer");
-	xsEnableRule("CountEnemyUnitsOnMap");
-	xsDisableRule("updatePlayerToAttack");
-    }
 	
     //Force an armory to go down
     xsEnableRule("buildArmory");
@@ -4385,7 +4380,7 @@ void age2Handler(int age=1)
     }
 
     //Maintain a water transport, if this is a transport map.
-    if ((gTransportMap == true) && (gMaintainWaterXPortPlanID < 0))
+    if ((gTransportMap == true) && (gMaintainWaterXPortPlanID < 0) || (cvRandomMapName == "king of the hill"))
     {
         gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 2, false, -1);
         aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 95);

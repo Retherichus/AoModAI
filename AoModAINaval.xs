@@ -47,7 +47,8 @@ void navalAge2Handler(int age=1)
     }
     
     if ((cRandomMapName == "anatolia") // TODO: maybe on (cRandomMapName == "highlands") too?
-     || (cRandomMapName == "mediterranean") 
+     || (cRandomMapName == "mediterranean")
+     || (cRandomMapName == "king of the hill")	 
 	 || (cRandomMapName == "midgard"))
         xsEnableRule("NavalGoalMonitor");
 }

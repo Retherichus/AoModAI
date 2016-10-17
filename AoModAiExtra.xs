@@ -44,6 +44,9 @@ extern bool IhaveAllies = false;
 extern bool mRusher = false;
 extern int MoreFarms = 28;
 extern bool TitanAvailable = false;
+extern int KOTHBASE = -1;
+extern bool WaitForDock = false;
+
 //////////////// aiEchoDEBUG ////////////////
 
 extern bool ShowAiEcho = false; // All aiEcho, see specific below to override.
@@ -86,6 +89,14 @@ extern bool mPopLandAttack = true;         //Dynamically scales the min total po
 extern int eMaxMilPop = 15;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
 extern int eHMaxMilPop = 25;              // Heroic age.
 
+
+//STINNERV Stuff, or rather what's left of it.
+extern int gTitanTradeCarts = 15;         // Max trade carts for Titan (+5)
+extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, (All modes).
+extern bool DisallowPullBack = false;  // set true to make the AI no longer retreat(All modes).
+extern int ModdedTCTimer = 25;
+extern bool AllyTcLimit = false; // This enables the modified rule and disables the original one.
+// End of STINNERV
 
 // If gSuperboom is set to true, the numbers below are what the Ai will attempt to gather in Archaic Age or untill X minutes have passed.
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
@@ -510,6 +521,8 @@ rule ActivateRethOverridesAge3
 	    }		
 		
 		mRusher = false;
+		if (gBuildTowers == true)
+        towerInBase("Towers in MB", false, gTargetNumTowers, cMilitaryEscrowID); 
 		xsDisableSelf();
            
     }
@@ -682,14 +695,15 @@ rule HuntingDogsAsap
    minInterval 4
    inactive
 {
-   static int age2Count = 0;
-
+   
    int HuntingDogsUpgBuilding = cUnitTypeGranary;
    if (cMyCulture == cCultureChinese)
    HuntingDogsUpgBuilding = cUnitTypeStoragePit;
    if (cMyCulture == cCultureAtlantean)
    HuntingDogsUpgBuilding = cUnitTypeGuild;
    
+   if ((WaitForDock == true) && (kbUnitCount(cMyID, cUnitTypeDock, cUnitStateAliveOrBuilding) <= 0))
+   return;
    
       if (cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse && kbUnitCount(cMyID, HuntingDogsUpgBuilding, cUnitStateAlive) < 1)
 	  return;
@@ -794,7 +808,92 @@ rule DONATEGold
 	  }  	
  }
  }
+
+//==============================================================================
+// RULE DONATEMassiveFood
+//==============================================================================
+rule DONATEMASSFood
+   minInterval 15
+   maxInterval 40
+   inactive
+   group MassDonations
+{
+if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy) || (aiGetWorldDifficulty() < cDifficultyNightmare))
+  {
+        xsDisableSelf();
+        return;    
+    }
+   for (i = aiRandInt(12); <= cNumberPlayers)
+   {
+           if (i == cMyID)
+         continue;
+      
+	       float foodSupply = kbResourceGet(cResourceFood);
+	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && foodSupply > 5000)
+		   {
+		             if (ShowAiEcho == true) aiEcho("Tributing 1000 food to one of my allies!");
+	  aiTribute(i, cResourceFood, 1000);
+	  }  	
+ }
+ }
  
+ //==============================================================================
+// RULE DONATEMassiveWood
+//==============================================================================
+rule DONATEMASSWood
+   minInterval 15
+   maxInterval 40
+   inactive
+   group MassDonations
+{
+if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy) || (aiGetWorldDifficulty() < cDifficultyNightmare))
+  {
+        xsDisableSelf();
+        return;    
+    }
+   for (i = aiRandInt(12); <= cNumberPlayers)
+   {
+           if (i == cMyID)
+         continue;
+      
+	       float woodSupply = kbResourceGet(cResourceWood);
+	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && woodSupply > 3500)
+		   {
+		             if (ShowAiEcho == true) aiEcho("Tributing 750 wood to one of my allies!");
+	  aiTribute(i, cResourceWood, 750);
+	  return;
+	  }  	
+ }
+ }
+ 
+ //==============================================================================
+// RULE DONATEMassiveGold
+//==============================================================================
+rule DONATEMASSGold
+   minInterval 15
+   maxInterval 40
+   inactive
+   group MassDonations
+{
+if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy) || (aiGetWorldDifficulty() < cDifficultyNightmare))
+  {
+        xsDisableSelf();
+        return;    
+    }
+   for (i = aiRandInt(12); <= cNumberPlayers)
+   {
+           if (i == cMyID)
+         continue;
+      
+	       float goldSupply = kbResourceGet(cResourceGold);
+	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && goldSupply > 5000)
+		   {
+		             if (ShowAiEcho == true) aiEcho("Tributing 1000 gold to one of my allies!");
+	  aiTribute(i, cResourceGold, 1000);
+	  return;
+	  }  	
+ }
+ } 
  //==============================================================================
 // RULE introChat
 //==============================================================================
@@ -916,7 +1015,7 @@ rule Helpme
 //==============================================================================
 rule IHateSiege
    minInterval 5
-   active
+   inactive
    group HateScripts
 {
    static int unitQueryID=-1;
@@ -971,9 +1070,11 @@ rule IHateSiege
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
 	   int NoArcherPlease = kbUnitQueryGetResult(unitQueryID, i);
-        if (kbUnitIsType(NoArcherPlease, cUnitTypeAbstractArcher) || (kbUnitIsType(NoArcherPlease, cUnitTypeAbstractSiegeWeapon)))
+        if (kbUnitIsType(NoArcherPlease, cUnitTypeAbstractSiegeWeapon) || 
+		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractArcher) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLance) != true)) ||
+		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLance) == true)))
             continue;
-	   
+		
 	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
@@ -1630,6 +1731,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	
     int baseID=-1;
     int startAreaID=-1;
+	int startAreaID2=-1;
     static vector KOTHPlace = cInvalidVector;
     KOTHPlace = kbUnitGetPosition(gKOTHPlentyUnitID);	
 	int NumSelf = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, KOTHPlace, 25.0);
@@ -1677,6 +1779,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     }
 
     vector baseLoc = kbBaseGetLocation(cMyID, baseID); 
+	vector baseLoc2 = kbBaseGetLocation(cMyID, baseID); 
     startAreaID = kbAreaGetIDByPosition(baseLoc);
     
 	
@@ -1692,8 +1795,8 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	
 	if (KoTHOkNow == true)
     {
-    KOTHTHomeTransportPlan=createTransportPlan("GO HOME AGAIN", kbAreaGetIDByPosition(where), startAreaID,
-                                                      false, transportPUID, 97, kbAreaGetIDByPosition(where));
+	baseID = KOTHBASE;
+    KOTHTHomeTransportPlan=createTransportPlan("GO HOME AGAIN", kbAreaGetIDByPosition(where), startAreaID, false, transportPUID, 97, baseID);
 	aiPlanAddUnitType(KOTHTHomeTransportPlan, cUnitTypeHumanSoldier, 3, 6, 10);
 	//aiPlanAddUnitType(KOTHTHomeTransportPlan, HeroType, 1, 1, 4);
     KoTHOkNow = false;
@@ -1791,7 +1894,10 @@ inactive
 			   WaterVersion = true;
 			   if (ShowAiEcho == true) aiEcho("Water version of KOTH detected.");
 			   DestroyKOTHLandPlan = true;  // never again!
+			   vector KOTHPOS=kbUnitGetPosition(gKOTHPlentyUnitID);
+               KOTHBASE = kbBaseCreate(cMyID, "KOTH BASE", KOTHPOS, 5.0);
 			   xsEnableRule("KOTHMonitor");
+			   xsEnableRule("getEnclosedDeck");
 			   return;
                } 
                }			   
@@ -2268,8 +2374,13 @@ inactive
 //Testing ground
 
 rule TEST  
-minInterval 5
+minInterval 1
 inactive
 {
 
+
+
 }
+
+
+

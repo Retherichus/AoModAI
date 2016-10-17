@@ -58,8 +58,7 @@ void preInitMap()
       (cRandomMapName == "tos_northamerica-v1-1") ||  
       (cRandomMapName == "Yellow River") || 	  
       (cRandomMapName == "vesuvius-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||
-      (cRandomMapName == "river styx") ||
-      (cRandomMapName == "king of the hill") ||	  	  
+      (cRandomMapName == "river styx") ||  	  
 	  (cRandomMapName == "black sea"))
     {
         // on these maps, the players are on different islands.
@@ -92,6 +91,7 @@ void preInitMap()
       (cRandomMapName == "british columbia") ||
       (cRandomMapName == "riverland") ||
       (cRandomMapName == "alternate-sea-of-worms") ||
+	  (cRandomMapName == "king of the hill") ||	
       (cRandomMapName == "sea of worms"))
     {
         // these maps contain water, which we can use to fish for example.
@@ -295,7 +295,7 @@ void initMapSpecific()
         int numberFound = kbUnitQueryExecute(KOTHunitQueryID);
         gKOTHPlentyUnitID = kbUnitQueryGetResult(KOTHunitQueryID, 0);
         kbSetForwardBasePosition(kbUnitGetPosition(gKOTHPlentyUnitID));
-
+        KOTHGlobal = kbUnitGetPosition(gKOTHPlentyUnitID);
         if (gKOTHPlentyUnitID != -1)
             xsEnableRule("getKingOfTheHillVault");
             

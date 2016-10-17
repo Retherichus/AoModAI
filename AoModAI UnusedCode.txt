@@ -1,9 +1,10 @@
+//All of this is disabled and will not work, if you used any of these configs in the past - let me know and I'll revert the changes.
 //File: StinnerV.xs
 
 
 // This applies to Titan only, with some exceptions like PullBack etc.
 
-extern int gTitanTradeCarts = 14;         // Max trade carts for Titan (+5)
+extern int gTitanTradeCarts = 15;         // Max trade carts for Titan (+5)
 
 extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, (All modes).
 
@@ -21,95 +22,7 @@ extern bool AllyTcLimit = false; // This enables the modified rule and disables 
 
 // These will get automatically activated if on Titan mode.
 
-//==============================================================================
-// RULE DONATEMassiveFood
-//==============================================================================
-rule DONATEMASSFood
-   minInterval 15
-   maxInterval 40
-   inactive
-   group MassDonations
-{
-if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy) || (aiGetWorldDifficulty() < cDifficultyNightmare))
-  {
-        xsDisableSelf();
-        return;    
-    }
-   for (i = aiRandInt(12); <= cNumberPlayers)
-   {
-           if (i == cMyID)
-         continue;
-      
-	       float foodSupply = kbResourceGet(cResourceFood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && foodSupply > 5000)
-		   {
-		             if (ShowAiEcho == true) aiEcho("Tributing 1000 food to one of my allies!");
-	  aiTribute(i, cResourceFood, 1000);
-	  }  	
- }
- }
- 
- //==============================================================================
-// RULE DONATEMassiveWood
-//==============================================================================
-rule DONATEMASSWood
-   minInterval 15
-   maxInterval 40
-   inactive
-   group MassDonations
-{
-if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy) || (aiGetWorldDifficulty() < cDifficultyNightmare))
-  {
-        xsDisableSelf();
-        return;    
-    }
-   for (i = aiRandInt(12); <= cNumberPlayers)
-   {
-           if (i == cMyID)
-         continue;
-      
-	       float woodSupply = kbResourceGet(cResourceWood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && woodSupply > 3500)
-		   {
-		             if (ShowAiEcho == true) aiEcho("Tributing 750 wood to one of my allies!");
-	  aiTribute(i, cResourceWood, 750);
-	  return;
-	  }  	
- }
- }
- 
- //==============================================================================
-// RULE DONATEMassiveGold
-//==============================================================================
-rule DONATEMASSGold
-   minInterval 15
-   maxInterval 40
-   inactive
-   group MassDonations
-{
-if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy) || (aiGetWorldDifficulty() < cDifficultyNightmare))
-  {
-        xsDisableSelf();
-        return;    
-    }
-   for (i = aiRandInt(12); <= cNumberPlayers)
-   {
-           if (i == cMyID)
-         continue;
-      
-	       float goldSupply = kbResourceGet(cResourceGold);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && goldSupply > 5000)
-		   {
-		             if (ShowAiEcho == true) aiEcho("Tributing 1000 gold to one of my allies!");
-	  aiTribute(i, cResourceGold, 1000);
-	  return;
-	  }  	
- }
- }
 
-
- 
-/*     // DISABLED,  in order to enable all this: remove this line with SLASH STAR, and the one at the very bottom of this document as well. 
  
 //==============================================================================
 rule MBSecondaryWall
@@ -554,6 +467,12 @@ rule MBSecondaryWall
  
  
 // MODDED BUILD SETTLEMENTS
+if  ((AllyTcLimit == true) && (aiGetWorldDifficulty() > cDifficultyHard))
+        {
+            xsEnableRule("ModifiedbuildSettlements");
+			xsDisableSelf();
+            return;
+        }
 //==============================================================================
 rule ModifiedbuildSettlements
     minInterval 15 //starts in cAge3
@@ -672,8 +591,13 @@ rule ModifiedbuildSettlements
     //Else, do it.
     createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
 } 
- 
-
+ // needs to be added to the main file
+	if (HardFocus == true)
+	{
+	xsEnableRule("AttackStrongestPlayer");
+	xsEnableRule("CountEnemyUnitsOnMap");
+	xsDisableRule("updatePlayerToAttack");
+    }
  
 // ALTERNATE ATTACK GOAL
 //==============================================================================

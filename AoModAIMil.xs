@@ -1060,7 +1060,7 @@ rule monitorAttPlans
                             if (((numEnemyMilUnitsNearMBInR70 > 14) || (numEnemyMilUnitsNearDefBInR40 > 10)) && (attPlanPriority < 20))
                             {
                                 aiPlanDestroy(attackPlanID);
-                                 if (ShowAiEcho == true) aiEcho("destroying gLandAttackPlanID as there are too many enemies");
+                                if (ShowAiEcho == true) aiEcho("destroying gLandAttackPlanID as there are too many enemies");
                                 continue;
                             }
                             else
@@ -1092,9 +1092,9 @@ rule monitorAttPlans
                 else if (planState == cPlanStateAttack)
                 {
                     countD = 0;
-                    if (((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5) && (numSiegeInPlan < 1))
+                    if (((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5))
                      || ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.3) && ((numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan)
-                     || ((kbGetAge() > cAge2) && (numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 4) && (numSiegeInPlan < 1)))))
+                     || ((kbGetAge() > cAge2) && (numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 4) && (numSiegeInPlan < 1) && (aiRandInt(3) == 1)))))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
@@ -1280,7 +1280,8 @@ rule activateObeliskClearingPlan
         aiPlanSetVariableFloat(gObeliskClearingPlanID, cDefendPlanGatherDistance, 0, 50.0);
 
         aiPlanSetUnitStance(gObeliskClearingPlanID, cUnitStanceDefensive);
-
+        aiPlanSetNumberVariableValues(gObeliskClearingPlanID, cDefendPlanAttackTypeID, 2, false);
+        aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeAbstractVillager);	
         aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeOutpost);
 
         aiPlanAddUnitType(gObeliskClearingPlanID, cUnitTypeAbstractInfantry, 1, 1, 1);
@@ -2557,7 +2558,9 @@ rule attackEnemySettlement
     if (ShowAiEcho == true) aiEcho("numMilUnitsIngDefendPlan: "+numMilUnitsIngDefendPlan);
     if (ShowAiEcho == true) aiEcho("numMilUnitsInBaseUnderAttackDefPlan: "+numMilUnitsInBaseUnderAttackDefPlan);
     if (ShowAiEcho == true) aiEcho("numMilUnitsInSettlementPosDefPlan: "+numMilUnitsInSettlementPosDefPlan);
-    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + numMilUnitsInBaseUnderAttackDefPlan * 0.4 + numMilUnitsInSettlementPosDefPlan * 0.4;
+	int IdleMil = aiNumberUnassignedUnits(cUnitTypeLogicalTypeLandMilitary);
+    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + IdleMil + numMilUnitsInBaseUnderAttackDefPlan * 0.4 + numMilUnitsInSettlementPosDefPlan * 0.4;
+	
     if ((numMilUnitsInMBDefPlan2 > 3) && (numAttEnemyMilUnitsNearMBInR85 < 11) && (numAttEnemyTitansNearMBInR85 < 1))
     {
         numMilUnitsInDefPlans = numMilUnitsInDefPlans + numMilUnitsInMBDefPlan2 * 0.4;
@@ -2760,6 +2763,7 @@ rule attackEnemySettlement
         aiPlanSetVariableBool(enemySettlementAttPlanID, cAttackPlanAutoUseGPs, 0, true);
     
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanRefreshFrequency, 0, 12); 
+    
 
     aiPlanSetInitialPosition(enemySettlementAttPlanID, baseLocationToUse);
 
@@ -3004,6 +3008,7 @@ rule defendSettlementPosition
         if (distToMainBase > 100.0)
 		aiPlanSetDesiredPriority(settlementPosDefPlanID, 52);
 		else aiPlanSetDesiredPriority(settlementPosDefPlanID, 49);
+		aiPlanSetBaseID(settlementPosDefPlanID, mainBaseID);
         aiPlanSetActive(settlementPosDefPlanID);
         gSettlementPosDefPlanID = settlementPosDefPlanID;
         if (ShowAiEcho == true) aiEcho("settlementPosDefPlan set active: "+gSettlementPosDefPlanID);
@@ -3669,8 +3674,8 @@ rule randomAttackGenerator
     int numHumanSoldiersInBaseUnderAttackDefPlan = aiPlanGetNumberUnits(gBaseUnderAttackDefPlanID, cUnitTypeHumanSoldier);
     int numHumanSoldiersInSettlementPosDefPlan = aiPlanGetNumberUnits(gSettlementPosDefPlanID, cUnitTypeHumanSoldier);
     int numMythUnitsIngDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeLogicalTypeMythUnitNotTitan);
-    
-    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + numMilUnitsInBaseUnderAttackDefPlan * 0.4 + numMilUnitsInSettlementPosDefPlan * 0.4;
+    int IdleMil = aiNumberUnassignedUnits(cUnitTypeLogicalTypeLandMilitary);
+    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + IdleMil + numMilUnitsInBaseUnderAttackDefPlan * 0.4 + numMilUnitsInSettlementPosDefPlan * 0.4;
     int numHumanSoldiersInDefPlans = numHumanSoldiersIngDefendPlan + numHumanSoldiersInBaseUnderAttackDefPlan * 0.4 + numHumanSoldiersInSettlementPosDefPlan * 0.4;
     if ((numMilUnitsInMBDefPlan2 > 3) && (numEnemyMilUnitsNearMBInR85 < 11) && (numEnemyTitansNearMBInR85 < 1))
     {
@@ -3917,8 +3922,6 @@ rule createLandAttack
             int attackPlanID = aiPlanGetIDByIndex(cPlanAttack, -1, true, i);
             if (attackPlanID == -1)
                 continue;
-				
-		int planState = aiPlanGetState(attackPlanID);
             
             if (attackPlanID == gLandAttackPlanID)
             {
@@ -4076,7 +4079,8 @@ rule createLandAttack
     if (ShowAiEcho == true) aiEcho("numMilUnitsIngDefendPlan: "+numMilUnitsIngDefendPlan);
     if (ShowAiEcho == true) aiEcho("numMilUnitsInBaseUnderAttackDefPlan: "+numMilUnitsInBaseUnderAttackDefPlan);
     if (ShowAiEcho == true) aiEcho("numMilUnitsInSettlementPosDefPlan: "+numMilUnitsInSettlementPosDefPlan);
-    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + numMilUnitsInBaseUnderAttackDefPlan * 0.4 + numMilUnitsInSettlementPosDefPlan * 0.4;
+	int IdleMil = aiNumberUnassignedUnits(cUnitTypeLogicalTypeLandMilitary);
+    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + IdleMil + numMilUnitsInBaseUnderAttackDefPlan * 0.4 + numMilUnitsInSettlementPosDefPlan * 0.4;
     if ((numMilUnitsInMBDefPlan2 > 3) && (numEnemyMilUnitsNearMBInR85 < 11) && (numEnemyTitansNearMBInR85 < 1))
     {
         numMilUnitsInDefPlans = numMilUnitsInDefPlans + numMilUnitsInMBDefPlan2 * 0.4;

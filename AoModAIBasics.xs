@@ -17,7 +17,7 @@
 extern bool cvDoExploreOtherIslands = false;
 
 // Behavior modifiers - "control variable" sliders that range from -1 to +1 to adjust AI personalities.  Set them in setParameters().
-extern float cvRushBoomSlider = -1;         // +1 is extreme rush, -1 is extreme boom.  Rush will age up fast and light
+extern float cvRushBoomSlider = 0.0;         // +1 is extreme rush, -1 is extreme boom.  Rush will age up fast and light
                                              // with few upgrades, and will start a military sooner.  Booming will hit
                                              // age 2 earlier, but will buy upgrades sooner, make more villagers, and 
                                              // will put a priority on additional settlements...but starts a military
@@ -204,7 +204,8 @@ extern bool KoTHOkNow = false;
 extern bool DestroyTransportPlan = false;  
 extern bool DestroyHTransportPlan = false;
 extern bool DestroyKOTHLandPlan = false;
-
+extern int gTowerEscrowID=cMilitaryEscrowID;
+mutable void towerInBase( string planName="BUG", bool los = true, int numTowers = 6, int escrowID=-1 ) { }
 //==============================================================================
 int getAreaGroupByArea(int areaID=-1)   //this is such shit, but there is no other possibility
                                         //as far as I can see :-(
@@ -1715,9 +1716,9 @@ void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
         //if (ShowAiEcho == true) aiEcho("*_!_*_!_*_!_pullBackUnits: ");
         //Limited the maximum number of loops
         int min = 0;
-        int max = 3;
+        int max = 16;
         if (cMyCulture == cCultureAtlantean)
-            max = 1;
+            max = 9;
         
         int unitID = -1;
         static int flipFlop = 0;
@@ -2229,4 +2230,51 @@ void taskMilUnitTrainAtBase(int baseID = -1)
     {
         if (ShowAiEcho == true) aiEcho("a unit with puid: "+puid+" is already being trained near baseID: "+baseID);
     }
+}
+
+//==============================================================================
+// towerInBase
+//==============================================================================
+void towerInBase(string planName="BUG", bool los = true, int numTowers = 6, int escrowID=-1)
+{
+   if (ShowAiEcho == true) aiEcho("Starting plan to build "+numTowers+" towers.");
+   int baseID = kbBaseGetMainID(cMyID);
+   int planID=aiPlanCreate(planName, cPlanTower);
+   if (planID >= 0)
+   {
+
+      //Save the escrow ID.
+      if (escrowID == -1)
+         escrowID = cMilitaryEscrowID;
+      gTowerEscrowID=escrowID;
+
+      float spacing = 0.9;
+      if (kbGetAge() > cAge2)
+         spacing = 1.4;
+      aiPlanSetVariableFloat(planID, cTowerPlanDistanceFromCenter, 0, 45.0);    // Absolute max?
+
+      aiPlanSetVariableVector(planID, cTowerPlanCenterLocation, 0, kbBaseGetLocation(cMyID, baseID) );
+      if(los == true)
+      {
+         aiPlanSetVariableBool(planID, cTowerPlanMaximizeLOS, 0, true);
+         aiPlanSetVariableBool(planID, cTowerPlanMaximizeAttack, 0, false);
+         aiPlanSetVariableFloat(planID, cTowerPlanLOSModifier, 0, spacing);
+         aiPlanSetVariableFloat(planID, cTowerPlanAttackLOSModifier, 0, spacing);
+      }
+      else
+      {
+         aiPlanSetVariableBool(planID, cTowerPlanMaximizeLOS, 0, false);
+         aiPlanSetVariableBool(planID, cTowerPlanMaximizeAttack, 0, true);
+         aiPlanSetVariableFloat(planID, cTowerPlanAttackLOSModifier, 0, spacing);
+         aiPlanSetVariableFloat(planID, cTowerPlanLOSModifier, 0, spacing);
+      }
+      
+      aiPlanSetVariableInt(planID, cTowerPlanNumberToBuild, 0, numTowers);
+      aiPlanSetVariableInt(planID, cTowerPlanProtoIDToBuild, 0, cUnitTypeTower);
+      
+      aiPlanSetDesiredPriority(planID, 100);
+      aiPlanSetEscrowID(planID, gTowerEscrowID);
+      aiPlanSetBaseID(planID, baseID);
+      aiPlanSetActive(planID);
+   }
 }
