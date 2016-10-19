@@ -202,7 +202,7 @@ extern int RethLNWAge4 = 2300;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 900;              // Food
+extern int RethLAFAge2 = 1000;              // Food
 extern int RethLAGAge2 = 600;              // Gold
 extern int RethLAWAge2 = 500;              // Wood
 
@@ -521,8 +521,7 @@ rule ActivateRethOverridesAge3
 	    }		
 		
 		mRusher = false;
-		if (gBuildTowers == true)
-        towerInBase("Towers in MB Age 3", false, gTargetNumTowers / 2, cMilitaryEscrowID); 
+		
 		xsDisableSelf();
            
     }
@@ -584,8 +583,7 @@ rule ActivateRethOverridesAge4
 	    aiResourceCheat(cMyID, cResourceWood, 800);
 	    aiResourceCheat(cMyID, cResourceGold, 900);
 	    }		
-		if (gBuildTowers == true)
-        towerInBase("Towers in MB Age 4", false, gTargetNumTowers / 2, cMilitaryEscrowID);	
+
 		
 		xsDisableSelf();
            

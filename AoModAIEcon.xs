@@ -3513,7 +3513,8 @@ rule norseInfantryCheck
     //Get a count of our ulfsarks.
 	int ulfCountS=kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive);
     int ulfCount=kbUnitCount(cMyID, cUnitTypeUlfsark, cUnitStateAlive);
-	ulfCount = ulfCount + ulfCountS;
+	int AllBuilders=kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive); // just do it!
+	ulfCount = ulfCount + ulfCountS + AllBuilders;
     
 	if (ulfCount >= 2)     
         return;

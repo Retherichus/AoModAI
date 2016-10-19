@@ -3120,7 +3120,7 @@ rule buildTowerAtOtherBase
         if (ShowAiEcho == true) aiEcho("numTowersNearBase #"+otherBaseID+": "+numTowersNearBase);
         if ((numTowersNearBase > 1) && (kbGetAge() == cAge2))
             return;
-        else if (numTowersNearBase > 3)
+        else if (numTowersNearBase >= 3)
             return;
 
         baseID = otherBaseID;
@@ -4461,7 +4461,7 @@ rule buildGoldMineTower
 //==============================================================================
 rule buildMBTower
 //    minInterval 70 //starts in cAge2
-    minInterval 73 //starts in cAge2
+    minInterval 30 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("buildMBTower:");
@@ -4549,18 +4549,18 @@ rule buildMBTower
         {
             case 0: //front
             {
-                fx = fxOrig * 20;
-                fz = fzOrig * 20;
+                fx = fxOrig * 25;
+                fz = fzOrig * 25;
             }
             case 1: //left
             {
-                fx = fzOrig * (-20);
-                fz = fxOrig * 20;
+                fx = fzOrig * (-25);
+                fz = fxOrig * 25;
             }
             case 2: //right
             {
-                fx = fzOrig * 20;
-                fz = fxOrig * (-20);
+                fx = fzOrig * 25;
+                fz = fxOrig * (-25);
             }
         }
         frontVector = xsVectorSetX(frontVector, fx);
@@ -4574,31 +4574,31 @@ rule buildMBTower
             vector rightLocation = centerLocation + frontVector;
     }
     
-    int numTowersNearFront = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, frontLocation, 18.0);
-    int numTowersNearLeft = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, leftLocation, 18.0);
-    int numTowersNearRight = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, rightLocation, 18.0);
-    if ((numTowersNearFront < 2) && (numTowersNearFront <= numTowersNearLeft) && (numTowersNearFront <= numTowersNearRight))
+    int numTowersNearFront = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, frontLocation, 20.0);
+    int numTowersNearLeft = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, leftLocation, 20.0);
+    int numTowersNearRight = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, rightLocation, 20.0);
+    if ((numTowersNearFront < 3) && (numTowersNearFront <= numTowersNearLeft) && (numTowersNearFront <= numTowersNearRight))
     {
         location = frontLocation;
         if (ShowAiEcho == true) aiEcho("using frontLocation");
     }
     else
     {
-        if ((numTowersNearLeft < 2) && (numTowersNearLeft <= numTowersNearRight))
+        if ((numTowersNearLeft < 3) && (numTowersNearLeft <= numTowersNearRight))
         {
             location = leftLocation;
             if (ShowAiEcho == true) aiEcho("using leftLocation");
         }
         else
         {
-            if (numTowersNearLeft < 2)
+            if (numTowersNearLeft < 3)
             {
                 location = rightLocation;
                 if (ShowAiEcho == true) aiEcho("using rightLocation");
             }
             else
             {
-                if (ShowAiEcho == true) aiEcho("returning, as there are 2 towers near the front, left and right location");
+                if (ShowAiEcho == true) aiEcho("returning, as there are 3 towers near the front, left and right location");
                 return;
             }
         }

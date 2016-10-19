@@ -635,10 +635,14 @@ rule trainMythUnit
         aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 2);
         aiPlanSetVariableInt(planID, cTrainPlanFrequency, 0, 30);
     }
-    else
+    else if (puid == age4MythUnitID)
     {
-        aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 1);
+        aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 2);
     }
+	else
+	{
+	aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 1);
+	}
 
     if (mainBaseID >= 0)
     {
