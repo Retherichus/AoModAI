@@ -346,29 +346,32 @@ rule monitorDefPlans
                  && (numAttEnemyMilUnitsInR55 - numAttEnemyMilUnitsInR45 > 0))
                 {
                     aiPlanSetVariableFloat(defendPlanID, cDefendPlanEngageRange, 0, 55.0);
-                    aiPlanSetNumberVariableValues(defendPlanID, cDefendPlanAttackTypeID, 1, true);
+                    aiPlanSetNumberVariableValues(defendPlanID, cDefendPlanAttackTypeID, 2, true);
                     aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
+					aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeAbstractVillager);
                 }
                 else if ((enemyBuilderInR10 < 1) && (numAttEnemyMilUnitsInR35 < 3) && ((numAttEnemySiegeInR45 - numAttEnemySiegeInR35 > 0)
                        || ((numMilUnitsInDefPlan >= enemyMilUnitsInR55) && (numAttEnemyMilUnitsInR45 - numAttEnemyMilUnitsInR35 > 0))))
                 {
                     aiPlanSetVariableFloat(defendPlanID, cDefendPlanEngageRange, 0, 45.0);
-                    aiPlanSetNumberVariableValues(defendPlanID, cDefendPlanAttackTypeID, 1, true);
+                    aiPlanSetNumberVariableValues(defendPlanID, cDefendPlanAttackTypeID, 2, true);
                     aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
+					aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeAbstractVillager);
                 }
                 else if ((enemyBuilderInR10 < 1) && (numAttEnemyMilUnitsInR25 < 3) && ((numAttEnemySiegeInR35 - numAttEnemySiegeInR25 > 0)
                        || ((numMilUnitsInDefPlan >= enemyMilUnitsInR45 - 1) && (numAttEnemyMilUnitsInR35 - numAttEnemyMilUnitsInR25 > 0))))
                 {
                     aiPlanSetVariableFloat(defendPlanID, cDefendPlanEngageRange, 0, 35.0);
-                    aiPlanSetNumberVariableValues(defendPlanID, cDefendPlanAttackTypeID, 1, true);
+                    aiPlanSetNumberVariableValues(defendPlanID, cDefendPlanAttackTypeID, 2, true);
                     aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
+					aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeAbstractVillager);
                 }
                 else
                 {
                     aiPlanSetVariableFloat(defendPlanID, cDefendPlanEngageRange, 0, 34.0);  //just a little less, keepUnitsWithinRange will pull them farther back
-                    aiPlanSetNumberVariableValues(defendPlanID, cDefendPlanAttackTypeID, 2, true);
-                    aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeAbstractVillager);
-                    aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeMilitary);
+                    aiPlanSetNumberVariableValues(defendPlanID, cDefendPlanAttackTypeID, 2, true);                    
+                    aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
+					aiPlanSetVariableInt(defendPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeAbstractVillager);
                 }
                 
                 keepUnitsWithinRange(defendPlanID, defPlanDefPoint);
@@ -1203,9 +1206,10 @@ rule defendPlanRule
         aiPlanSetUnitStance(defPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(defPlanID, cDefendPlanPatrol, 0, false);
 
-        aiPlanSetNumberVariableValues(defPlanID, cDefendPlanAttackTypeID, 2, true);
+        aiPlanSetNumberVariableValues(defPlanID, cDefendPlanAttackTypeID, 3, true);
         aiPlanSetVariableInt(defPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
         aiPlanSetVariableInt(defPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
+		aiPlanSetVariableInt(defPlanID, cDefendPlanAttackTypeID, 2, cUnitTypeAbstractVillager);
 
         aiPlanAddUnitType(defPlanID, cUnitTypeLogicalTypeLandMilitary, 0, 200, 200);  // was 0 200, 200
 
@@ -1281,8 +1285,9 @@ rule activateObeliskClearingPlan
 
         aiPlanSetUnitStance(gObeliskClearingPlanID, cUnitStanceDefensive);
         aiPlanSetNumberVariableValues(gObeliskClearingPlanID, cDefendPlanAttackTypeID, 2, false);
-        aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeAbstractVillager);	
-        aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeOutpost);
+		aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeOutpost);
+        aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeAbstractVillager);	
+        
 
         aiPlanAddUnitType(gObeliskClearingPlanID, cUnitTypeAbstractInfantry, 1, 1, 1);
         aiPlanSetDesiredPriority(gObeliskClearingPlanID, 16);
@@ -1372,9 +1377,10 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
         aiPlanSetUnitStance(mainBaseDefPlan1ID, cUnitStanceDefensive);
         aiPlanSetVariableBool(mainBaseDefPlan1ID, cDefendPlanPatrol, 0, false);
 
-        aiPlanSetNumberVariableValues(mainBaseDefPlan1ID, cDefendPlanAttackTypeID, 2, true);
+        aiPlanSetNumberVariableValues(mainBaseDefPlan1ID, cDefendPlanAttackTypeID, 3, true);
         aiPlanSetVariableInt(mainBaseDefPlan1ID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
         aiPlanSetVariableInt(mainBaseDefPlan1ID, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
+		aiPlanSetVariableInt(mainBaseDefPlan1ID, cDefendPlanAttackTypeID, 2, cUnitTypeAbstractVillager);
 
         if (kbGetAge() > cAge1)
         {
@@ -1511,9 +1517,10 @@ rule mainBaseDefPlan2   //Make a second defend plan that protects the main base
         aiPlanSetUnitStance(mainBaseDefPlan2ID, cUnitStanceDefensive);
         aiPlanSetVariableBool(mainBaseDefPlan2ID, cDefendPlanPatrol, 0, false);
 
-        aiPlanSetNumberVariableValues(mainBaseDefPlan2ID, cDefendPlanAttackTypeID, 2, true);
+        aiPlanSetNumberVariableValues(mainBaseDefPlan2ID, cDefendPlanAttackTypeID, 3, true);
         aiPlanSetVariableInt(mainBaseDefPlan2ID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
         aiPlanSetVariableInt(mainBaseDefPlan2ID, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
+		aiPlanSetVariableInt(mainBaseDefPlan2ID, cDefendPlanAttackTypeID, 2, cUnitTypeAbstractVillager);
 
         if (kbGetAge() > cAge2)
         {
@@ -2033,9 +2040,10 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
         aiPlanSetUnitStance(otherBaseDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(otherBaseDefPlanID, cDefendPlanPatrol, 0, false);
 
-        aiPlanSetNumberVariableValues(otherBaseDefPlanID, cDefendPlanAttackTypeID, 2, true);
+        aiPlanSetNumberVariableValues(otherBaseDefPlanID, cDefendPlanAttackTypeID, 3, true);
         aiPlanSetVariableInt(otherBaseDefPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
         aiPlanSetVariableInt(otherBaseDefPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
+		aiPlanSetVariableInt(otherBaseDefPlanID, cDefendPlanAttackTypeID, 2, cUnitTypeAbstractVillager);
 
         if (distToMainBase > 80.0)
         {
@@ -2947,9 +2955,11 @@ rule defendSettlementPosition
         aiPlanSetUnitStance(settlementPosDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(settlementPosDefPlanID, cDefendPlanPatrol, 0, false);
 
-        aiPlanSetNumberVariableValues(settlementPosDefPlanID, cDefendPlanAttackTypeID, 2, true);
+        aiPlanSetNumberVariableValues(settlementPosDefPlanID, cDefendPlanAttackTypeID, 3, true);
         aiPlanSetVariableInt(settlementPosDefPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
 		aiPlanSetVariableInt(settlementPosDefPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeAbstractWall);
+		aiPlanSetVariableInt(settlementPosDefPlanID, cDefendPlanAttackTypeID, 2, cUnitTypeAbstractVillager);
+		
 
         if (distToMainBase < 85.0)
         {
@@ -3005,7 +3015,7 @@ rule defendSettlementPosition
         if (enemyMilUnitsInR50 > 18)
             aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 11, enemyMilUnitsInR50 + 8, enemyMilUnitsInR50 + 8);
         
-        if (distToMainBase > 100.0)
+        if (distToMainBase > 130.0)
 		aiPlanSetDesiredPriority(settlementPosDefPlanID, 52);
 		else aiPlanSetDesiredPriority(settlementPosDefPlanID, 49);
 		aiPlanSetBaseID(settlementPosDefPlanID, mainBaseID);
@@ -4203,7 +4213,7 @@ rule createLandAttack
     if (kbAreaGroupGetIDByPosition(targetSettlementPos) != myAreaGroup)
 	{
 	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);  // don't stop until their TC is down.
-	aiEcho("Other island!");
+	if (ShowAiEcho == true) aiEcho("Other island!");
 	}
 	}
 	
@@ -4412,9 +4422,10 @@ rule defendBaseUnderAttack
         aiPlanSetUnitStance(baseUnderAttackDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(baseUnderAttackDefPlanID, cDefendPlanPatrol, 0, false);
 
-        aiPlanSetNumberVariableValues(baseUnderAttackDefPlanID, cDefendPlanAttackTypeID, 2, true);
+        aiPlanSetNumberVariableValues(baseUnderAttackDefPlanID, cDefendPlanAttackTypeID, 3, true);
         aiPlanSetVariableInt(baseUnderAttackDefPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
         aiPlanSetVariableInt(baseUnderAttackDefPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
+		aiPlanSetVariableInt(baseUnderAttackDefPlanID, cDefendPlanAttackTypeID, 2, cUnitTypeAbstractVillager);
 
         if (distToMainBase < 80.0)
         {
@@ -4650,10 +4661,10 @@ rule defendAlliedBase   //TODO: check all allied bases not just the main base of
         aiPlanSetUnitStance(alliedBaseDefPlanID, cUnitStanceDefensive);
         aiPlanSetVariableBool(alliedBaseDefPlanID, cDefendPlanPatrol, 0, false);
 
-        aiPlanSetNumberVariableValues(alliedBaseDefPlanID, cDefendPlanAttackTypeID, 2, true);
+        aiPlanSetNumberVariableValues(alliedBaseDefPlanID, cDefendPlanAttackTypeID, 3, true);
         aiPlanSetVariableInt(alliedBaseDefPlanID, cDefendPlanAttackTypeID, 0, cUnitTypeMilitary);
         aiPlanSetVariableInt(alliedBaseDefPlanID, cDefendPlanAttackTypeID, 1, cUnitTypeMilitaryBuilding);
-
+        aiPlanSetVariableInt(alliedBaseDefPlanID, cDefendPlanAttackTypeID, 2, cUnitTypeAbstractVillager);
         if (cMyCulture == cCultureNorse)
         {
             aiPlanAddUnitType(alliedBaseDefPlanID, cUnitTypeHero, 1, 2, 2);

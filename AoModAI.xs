@@ -1482,7 +1482,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     
 	float neededWoodGatherers = desiredWoodUnits;
     if (woodSupply > goldSupply+3500)
-        neededWoodGatherers = 0;
+        neededWoodGatherers = neededWoodGatherers / 2;
     
     bool foodOverride = false;
     float neededFoodGatherers = desiredFoodUnits - numFishBoats;

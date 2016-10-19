@@ -2250,7 +2250,7 @@ void towerInBase(string planName="BUG", bool los = true, int numTowers = 6, int 
 
       float spacing = 0.9;
       if (kbGetAge() > cAge2)
-         spacing = 1.4;
+         spacing = 1.3;
       aiPlanSetVariableFloat(planID, cTowerPlanDistanceFromCenter, 0, 45.0);    // Absolute max?
 
       aiPlanSetVariableVector(planID, cTowerPlanCenterLocation, 0, kbBaseGetLocation(cMyID, baseID) );

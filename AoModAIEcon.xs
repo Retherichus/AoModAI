@@ -44,7 +44,7 @@ rule updateWoodBreakdown
     
     bool reducedWoodGathererCount = false;
 
-    if ((woodGathererCount <= 0 ) && (kbGetAge() < cAge2)) //always some units on wood, unless there are less than 15 trees
+    if ((woodGathererCount <= 0 ) && (kbGetAge() >= cAge1)) //always some units on wood, unless there are less than 15 trees
     {
             woodGathererCount = 2;
 			if (cMyCulture == cCultureAtlantean)
@@ -77,9 +77,7 @@ rule updateWoodBreakdown
 
       float woodSupply = kbResourceGet(cResourceWood);
 	  float goldSupply = kbResourceGet(cResourceGold);
-  
-    if ((woodSupply > goldSupply+3500) && (xsGetTime() > 20*60*1000))
-        woodGathererCount = 0;	
+  	
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 12;

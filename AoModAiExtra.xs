@@ -522,7 +522,7 @@ rule ActivateRethOverridesAge3
 		
 		mRusher = false;
 		if (gBuildTowers == true)
-        towerInBase("Towers in MB", false, gTargetNumTowers, cMilitaryEscrowID); 
+        towerInBase("Towers in MB Age 3", false, gTargetNumTowers / 2, cMilitaryEscrowID); 
 		xsDisableSelf();
            
     }
@@ -584,6 +584,8 @@ rule ActivateRethOverridesAge4
 	    aiResourceCheat(cMyID, cResourceWood, 800);
 	    aiResourceCheat(cMyID, cResourceGold, 900);
 	    }		
+		if (gBuildTowers == true)
+        towerInBase("Towers in MB Age 4", false, gTargetNumTowers / 2, cMilitaryEscrowID);	
 		
 		xsDisableSelf();
            
@@ -2375,7 +2377,7 @@ inactive
 
 rule TEST  
 minInterval 1
-inactive
+active
 {
 
 
