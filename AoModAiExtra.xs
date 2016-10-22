@@ -327,6 +327,8 @@ void initRethlAge2(void)
 	if (cMyCiv == cCivOdin)		
 	{	
 	xsEnableRule("getLoneWanderer");
+	aiPlanDestroy(gLandExplorePlanID);
+	aiPlanDestroy(gLandExplorePlanID2);
     }
 	if (cMyCiv == cCivLoki)
     {
@@ -451,7 +453,6 @@ rule ActivateRethOverridesAge2
 		if (cMyCulture == cCultureNorse)
 		{
 		aiPlanDestroy(gLandExplorePlanID2);
-		xsDisableRule("startLandScouting");
 		}
 		
 	    if (CheatResources == true)
@@ -2381,6 +2382,3 @@ active
 
 
 }
-
-
-

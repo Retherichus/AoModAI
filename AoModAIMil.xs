@@ -1097,7 +1097,7 @@ rule monitorAttPlans
                     countD = 0;
                     if (((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5))
                      || ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.3) && ((numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan)
-                     || ((kbGetAge() > cAge2) && (numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 4) && (numSiegeInPlan < 1) && (aiRandInt(3) == 1)))))
+                     || ((kbGetAge() > cAge2) && (numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 4) && (aiRandInt(3) == 1)))))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
@@ -1105,7 +1105,7 @@ rule monitorAttPlans
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killLandAttPlanCount = 0;
                         
-                        if ((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5) && (numSiegeInPlan < 1))
+                        if ((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5))
                              if (ShowAiEcho == true) aiEcho("Destroying gLandAttackPlanID as there less than 5 units in the plan");
                         else
                              if (ShowAiEcho == true) aiEcho("Destroying gLandAttackPlanID as there are too many enemies");
@@ -2571,7 +2571,7 @@ rule attackEnemySettlement
 	
     if ((numMilUnitsInMBDefPlan2 > 3) && (numAttEnemyMilUnitsNearMBInR85 < 11) && (numAttEnemyTitansNearMBInR85 < 1))
     {
-        numMilUnitsInDefPlans = numMilUnitsInDefPlans + numMilUnitsInMBDefPlan2 * 0.4;
+        numMilUnitsInDefPlans = numMilUnitsInDefPlans + numMilUnitsInMBDefPlan2;
     }
     if (ShowAiEcho == true) aiEcho("total numMilUnitsInDefPlans: "+numMilUnitsInDefPlans);
 

@@ -1761,11 +1761,15 @@ rule rGaiaForestPower
         xsDisableSelf();
         return;
     }
-    
+    bool JustCastIt = false;
     //Don't cast it too early?
     if (xsGetTime() < 1*20*1000)
         return;
-    
+		    int mainBaseID = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+    int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 30.0);
+	if (NumTreesMB < 3)
+	JustCastIt = true;
     static int count = 0;
     bool autoCast = aiPlanGetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0);
     if (autoCast == true)
@@ -1774,7 +1778,7 @@ rule rGaiaForestPower
         aiPlanSetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0, false);
     }
     
-    bool JustCastIt = true;
+    
     if (JustCastIt == true)
     {
         aiPlanSetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0, true);

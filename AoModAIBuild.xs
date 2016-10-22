@@ -763,7 +763,7 @@ rule buildSettlements
 	if ((mRusher == true) && (kbGetAge() < cAge3))
 	return;
 	
-	if  ((AllyTcLimit == true) && (aiGetWorldDifficulty() > cDifficultyHard))
+	if  ((AllyTcLimit == true) && (aiGetWorldDifficulty() >= cDifficultyHard))
         {
             xsEnableRule("ModifiedbuildSettlements");
 			xsDisableSelf();
@@ -1004,7 +1004,7 @@ rule buildSettlementsEarly  //age 1/2 handler
     inactive
 {
     if (ShowAiEcho == true) aiEcho("buildSettlementsEarly:");
-	if ((mRusher == true) && (kbGetAge() < cAge3))
+	if ((mRusher == true) && (xsGetTime() < 15*60*1000))
 	return;
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals = aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
@@ -1243,7 +1243,7 @@ rule mainBaseAreaWallTeam1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam1:");
-	if ((mRusher == true) && (kbGetAge() < cAge3))
+	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000))
 	return;
 	
     static bool alreadyStarted = false;
@@ -1696,9 +1696,9 @@ rule mainBaseAreaWallTeam2
 {
 
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
-	if ((mRusher == true) && (kbGetAge() < cAge3))
+	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000))
 	return;
-    if ((cMyCulture == cCultureAtlantean) && (xsGetTime() < 15*60*1000))
+    if ((cMyCulture == cCultureAtlantean) && (kbGetAge() < cAge3))
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
