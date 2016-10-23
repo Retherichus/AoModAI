@@ -2376,9 +2376,76 @@ inactive
 
 rule TEST  
 minInterval 1
-active
+inactive
 {
 
 
 
+}
+
+rule SetSpecialGP  
+minInterval 15
+inactive
+{
+    xsSetRuleMinIntervalSelf(15);
+	static int CastAttempt=0;
+	static bool CastNow = false;
+	static bool TargetSettlement = false;
+    static bool TargetTitanGate = false;
+	int eUnitID = -1;
+	vector eLocation = cInvalidVector;
+	int enemyPlayerID = aiGetMostHatedPlayerID();
+    if (TitanAvailable == true)
+	TargetTitanGate = true;
+	else TargetSettlement = true;
+	
+	if (xsGetTime() > 60*60*1000) // Let it go..
+	{
+	TargetTitanGate = false;
+	TargetSettlement = true;
+	}
+	
+	if ((TargetTitanGate == true) && (TargetSettlement == false))
+	{
+    int NumGates = kbUnitCount(enemyPlayerID, cUnitTypeTitanGate, cUnitStateAliveOrBuilding);
+	for (j = 0; < NumGates)
+    {
+    eUnitID = findUnitByIndex(cUnitTypeTitanGate, j, cUnitStateAliveOrBuilding, -1, enemyPlayerID);
+    eLocation = kbUnitGetPosition(eUnitID);
+    }
+   }
+ 
+	if ((TargetSettlement == true) && (TargetTitanGate == false))
+	{
+    eUnitID = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
+    eLocation = kbUnitGetPosition(eUnitID);
+	int NumEnemyFarms = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, 0, enemyPlayerID, eLocation, 35.0);
+	//aiEcho("FARMS "+NumEnemyFarms+"");
+    if (NumEnemyFarms < 5)
+       return;	
+    }
+
+	if ((eUnitID > 0) && (aiGetGodPowerTechIDForSlot(3) == cTechMeteor) || (eUnitID > 0) && (aiGetGodPowerTechIDForSlot(3) == cTechTornado))
+    {
+	 if((aiGetGodPowerTechIDForSlot(0) == cTechVision) && (CastNow == false))
+	 {
+     if(aiCastGodPowerAtPosition(cTechVision, kbUnitGetPosition(eUnitID)) == true)
+     CastNow = true;
+	 if (ShowAiEcho == true) aiEcho("CASTING VISION");
+     xsSetRuleMinIntervalSelf(1);
+	 return;
+	 }
+       if((kbLocationVisible(eLocation) == true) && (CastNow == true))
+	   {
+        if(aiCastGodPowerAtPosition(aiGetGodPowerTechIDForSlot(3), kbUnitGetPosition(eUnitID)) == true)
+   	    {   
+   	     CastAttempt = CastAttempt+1;
+	     if (CastAttempt >= 2)
+		 xsDisableSelf();
+		 if (ShowAiEcho == true) aiEcho("CASTING 4 GP");
+		 xsSetRuleMinIntervalSelf(1);
+   		 return;
+   		}
+	}
+ }
 }

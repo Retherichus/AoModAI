@@ -375,7 +375,9 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     {
         gHeavyGPTechID = cTechMeteor;
         gHeavyGPPlanID = planID;
+		if (cMyCiv != cCivSet)
         xsEnableRule("castHeavyGP");
+        else xsEnableRule("SetSpecialGP");
         
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false); 
         aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
@@ -448,8 +450,9 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     {
         gHeavyGPTechID = cTechTornado;
         gHeavyGPPlanID = planID;
+		if (cMyCiv != cCivSet)
         xsEnableRule("castHeavyGP");
-        
+        else xsEnableRule("SetSpecialGP");
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false); 
         aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
         aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
@@ -574,7 +577,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     //-- setup the vision power
     if (powerProtoID == cPowerVision)
     {
-        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false); 
         //-- don't need visiblity to cast this one.
         aiPlanSetVariableBool(planID, cGodPowerPlanCheckVisibility, 0, false);
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
