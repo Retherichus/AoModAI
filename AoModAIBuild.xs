@@ -4549,18 +4549,18 @@ rule buildMBTower
         {
             case 0: //front
             {
-                fx = fxOrig * 25;
-                fz = fzOrig * 25;
+                fx = fxOrig * 20;
+                fz = fzOrig * 20;
             }
             case 1: //left
             {
-                fx = fzOrig * (-25);
-                fz = fxOrig * 25;
+                fx = fzOrig * (-20);
+                fz = fxOrig * 20;
             }
             case 2: //right
             {
-                fx = fzOrig * 25;
-                fz = fxOrig * (-25);
+                fx = fzOrig * 20;
+                fz = fxOrig * (-20);
             }
         }
         frontVector = xsVectorSetX(frontVector, fx);
@@ -4574,9 +4574,9 @@ rule buildMBTower
             vector rightLocation = centerLocation + frontVector;
     }
     
-    int numTowersNearFront = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, frontLocation, 20.0);
-    int numTowersNearLeft = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, leftLocation, 20.0);
-    int numTowersNearRight = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, rightLocation, 20.0);
+    int numTowersNearFront = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, frontLocation, 18.0);
+    int numTowersNearLeft = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, leftLocation, 18.0);
+    int numTowersNearRight = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, rightLocation, 18.0);
     if ((numTowersNearFront < 3) && (numTowersNearFront <= numTowersNearLeft) && (numTowersNearFront <= numTowersNearRight))
     {
         location = frontLocation;

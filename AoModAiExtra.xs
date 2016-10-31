@@ -140,7 +140,7 @@ extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wo
 //Age 2 (Classical Age)
 extern int RethLGFAge2 = 900;             // Food
 extern int RethLGGAge2 = 550;              // Gold
-extern int RethLGWAge2 = 550;              // Wood
+extern int RethLGWAge2 = 600;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -183,7 +183,7 @@ extern int RethLEWAge4 = 1200;              // Wood
 //Age 2 (Classical Age)
 extern int RethLNFAge2 = 1000;             // Food
 extern int RethLNGAge2 = 600;              // Gold
-extern int RethLNWAge2 = 550;              // Wood
+extern int RethLNWAge2 = 700;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -204,7 +204,7 @@ extern int RethLNWAge4 = 2300;              // Wood
 //Age 2 (Classical Age)
 extern int RethLAFAge2 = 1000;              // Food
 extern int RethLAGAge2 = 600;              // Gold
-extern int RethLAWAge2 = 500;              // Wood
+extern int RethLAWAge2 = 650;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -225,8 +225,8 @@ extern int RethLAWAge4 = 2300;              // Wood
 
 //Age 2 (Classical Age)
 extern int RethLCFAge2 = 900;              // Food
-extern int RethLCGAge2 = 650;              // Gold
-extern int RethLCWAge2 = 600;              // Wood
+extern int RethLCGAge2 = 600;              // Gold
+extern int RethLCWAge2 = 700;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -279,7 +279,9 @@ void initRethlAge1(void)  // Am I doing this right??
         }
       
 	   // Don't build transport ships on these maps!
-	   if ((cRandomMapName == "highland") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad") || (cRandomMapName == "Deep Jungle") || (cRandomMapName == "Mediterranean") || (cRandomMapName == "mediterranean")))
+	   if ((cRandomMapName == "highland") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") 
+	   || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad") || (cRandomMapName == "Deep Jungle") 
+	   || (cRandomMapName == "Mediterranean") || (cRandomMapName == "mediterranean")))
 	   {
 	   gTransportMap=false;
 	   if (ShowAiEcho == true) aiEcho("Not going to waste pop slots on Transport ships.");
@@ -462,6 +464,8 @@ rule ActivateRethOverridesAge2
 	    aiResourceCheat(cMyID, cResourceGold, 300);
 	    }
 		
+		xsEnableRule("activateObeliskClearingPlan"); // this also looks for villagers, don't get confused by the name.
+		
 		xsDisableSelf();
 		
            
@@ -568,10 +572,6 @@ rule ActivateRethOverridesAge4
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge4Hekate) == cTechStatusActive)
         xsEnableRuleGroup("Hekate");				
 		
-		
-		
-		if (cMyCulture == cCultureNorse)
-		xsEnableRule("getMediumArchers");	
     
 	    if (kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusObtainable)
 	    xsEnableRule("repairTitanGate");
@@ -2383,69 +2383,3 @@ inactive
 
 }
 
-rule SetSpecialGP  
-minInterval 15
-inactive
-{
-    xsSetRuleMinIntervalSelf(15);
-	static int CastAttempt=0;
-	static bool CastNow = false;
-	static bool TargetSettlement = false;
-    static bool TargetTitanGate = false;
-	int eUnitID = -1;
-	vector eLocation = cInvalidVector;
-	int enemyPlayerID = aiGetMostHatedPlayerID();
-    if (TitanAvailable == true)
-	TargetTitanGate = true;
-	else TargetSettlement = true;
-	
-	if (xsGetTime() > 60*60*1000) // Let it go..
-	{
-	TargetTitanGate = false;
-	TargetSettlement = true;
-	}
-	
-	if ((TargetTitanGate == true) && (TargetSettlement == false))
-	{
-    int NumGates = kbUnitCount(enemyPlayerID, cUnitTypeTitanGate, cUnitStateAliveOrBuilding);
-	for (j = 0; < NumGates)
-    {
-    eUnitID = findUnitByIndex(cUnitTypeTitanGate, j, cUnitStateAliveOrBuilding, -1, enemyPlayerID);
-    eLocation = kbUnitGetPosition(eUnitID);
-    }
-   }
- 
-	if ((TargetSettlement == true) && (TargetTitanGate == false))
-	{
-    eUnitID = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
-    eLocation = kbUnitGetPosition(eUnitID);
-	int NumEnemyFarms = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, 0, enemyPlayerID, eLocation, 35.0);
-	//aiEcho("FARMS "+NumEnemyFarms+"");
-    if (NumEnemyFarms < 5)
-       return;	
-    }
-
-	if ((eUnitID > 0) && (aiGetGodPowerTechIDForSlot(3) == cTechMeteor) || (eUnitID > 0) && (aiGetGodPowerTechIDForSlot(3) == cTechTornado))
-    {
-	 if((aiGetGodPowerTechIDForSlot(0) == cTechVision) && (CastNow == false))
-	 {
-     if(aiCastGodPowerAtPosition(cTechVision, kbUnitGetPosition(eUnitID)) == true)
-     CastNow = true;
-	 if (ShowAiEcho == true) aiEcho("CASTING VISION");
-     xsSetRuleMinIntervalSelf(1);
-	 return;
-	 }
-       if((kbLocationVisible(eLocation) == true) && (CastNow == true))
-	   {
-        if(aiCastGodPowerAtPosition(aiGetGodPowerTechIDForSlot(3), kbUnitGetPosition(eUnitID)) == true)
-   	    {   
-   	     CastAttempt = CastAttempt+1;
-	     if (CastAttempt >= 2)
-		 xsDisableSelf();
-		 if (ShowAiEcho == true) aiEcho("CASTING 4 GP");
-		 xsSetRuleMinIntervalSelf(1);
-   		 return;
-   		}
-	}
- }
-}

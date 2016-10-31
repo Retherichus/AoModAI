@@ -1620,7 +1620,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
             }
             else
             {
-                if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (foodSupply > 500) && (goldSupply > 500) && (woodSupply > 500) && (favorSupply <= 70))
+                if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (foodSupply > 500) && (goldSupply > 500) && (woodSupply > 500) && (favorSupply <= 70))
                 {
                     aiSetResourceGathererPercentage(cResourceFavor, 0.18, false, cRGPScript);
                     favorPriority = 50;
@@ -3900,8 +3900,8 @@ void init(void)
     if ((rushCount > 0) && (rushSize < 20))
         rushSize = 20;    // anything less isn't worth sending
 
-    if (rushSize < 5)
-        rushSize = 5;  // Give unitpicker something to do...
+    if (rushSize < 10)
+        rushSize = 10;  // Give unitpicker something to do...
 
     if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureNorse))
     {
@@ -3988,14 +3988,14 @@ void init(void)
         else
         {
             //Create an idle attack goal that will maintain our military until the next age.
-            gIdleAttackGID = createSimpleAttackGoal("Idle Force", -1, gRushUPID, -1, 1, 1, -1, );
+            gIdleAttackGID = createSimpleAttackGoal("Idle Force", -1, gRushUPID, -1, 1, 1, kbBaseGetMainID(cMyID), true);
             if (gIdleAttackGID >= 0)
             {
                 aiPlanSetVariableBool(gIdleAttackGID, cGoalPlanIdleAttack, 0, true);
                 //Go for hitpoint upgrades.
                 aiPlanSetVariableInt(gIdleAttackGID, cGoalPlanUpgradeFilterType, 0, cUpgradeTypeHitpoints);
                 //Reset the rushUPID down to 1 unit type and 1 building.
-                kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 1, 1, true);
+                kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 2, 1, true);
             }
         }
     }
@@ -4665,8 +4665,8 @@ void age2Handler(int age=1)
         aiPlanSetVariableInt(gUlfsarkMaintainPlanID, cTrainPlanNumberToMaintain, 0, aiPlanGetVariableInt(gUlfsarkMaintainPlanID, cTrainPlanNumberToMaintain, 0)+1);
         aiPlanSetVariableInt(gUlfsarkMaintainMilPlanID, cTrainPlanNumberToMaintain, 0, aiPlanGetVariableInt(gUlfsarkMaintainMilPlanID, cTrainPlanNumberToMaintain, 0)+1);
 
-        //We always want 4 Norse heroes.
-        gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypeHeroNorse, 4, false, kbBaseGetMainID(cMyID));
+        //We always want 3 Norse heroes.
+        gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypeHeroNorse, 3, false, kbBaseGetMainID(cMyID));
         aiPlanSetDesiredPriority(gHero1MaintainPlan, 100);
 
         //Force longhouse #1 to go down.

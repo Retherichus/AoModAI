@@ -1716,9 +1716,7 @@ void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
         //if (ShowAiEcho == true) aiEcho("*_!_*_!_*_!_pullBackUnits: ");
         //Limited the maximum number of loops
         int min = 0;
-        int max = 16;
-        if (cMyCulture == cCultureAtlantean)
-            max = 9;
+        int max = 9;
         
         int unitID = -1;
         static int flipFlop = 0;

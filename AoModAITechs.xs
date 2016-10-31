@@ -1304,6 +1304,9 @@ rule getAmbassadors
     inactive
     minInterval 60 //starts in cAge3
 {
+    if (IhaveAllies == false)
+	return;
+	
     int techID = cTechAmbassadors;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {

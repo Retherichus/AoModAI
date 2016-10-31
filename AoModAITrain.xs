@@ -34,6 +34,7 @@ rule maintainTradeUnits
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     
+	int NumTcs = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
     int mainBaseID = kbBaseGetMainID(cMyID);
     int activeTrainPlans = aiPlanGetNumber(cPlanTrain, -1, true);
     if (activeTrainPlans > 0)
@@ -44,13 +45,13 @@ rule maintainTradeUnits
             if ((tradeCartPUID == aiPlanGetVariableInt(trainPlanIndexID, cTrainPlanUnitType, 0)) && (aiPlanGetBaseID(trainPlanIndexID) == mainBaseID))
             {
                 int trainPlanBuildingID = aiPlanGetVariableInt(trainPlanIndexID, cTrainPlanBuildingID, 0);
-                if ((kbUnitGetCurrentHitpoints(gTradeMarketUnitID) <= 0) && (trainPlanBuildingID != -1))
+                if ((kbUnitGetCurrentHitpoints(gTradeMarketUnitID) <= 0) && (trainPlanBuildingID != -1) || (NumTcs < 1))
                 {
                     aiPlanDestroy(trainPlanIndexID);
                     if (ShowAiEcho == true) aiEcho("destroying plan to train trade unit to remove trainPlanBuildingID");
                 }
                 else if (((trainPlanBuildingID != -1) && (trainPlanBuildingID != gTradeMarketUnitID))
-                      || ((kbUnitGetCurrentHitpoints(gTradeMarketUnitID) > 0) && (trainPlanBuildingID == -1)))
+                      || ((kbUnitGetCurrentHitpoints(gTradeMarketUnitID) > 0) && (trainPlanBuildingID == -1)) || (NumTcs < 1))
                 {
                     aiPlanDestroy(trainPlanIndexID);
                     if (ShowAiEcho == true) aiEcho("destroying plan to train trade unit to reset trainPlanBuildingID to gTradeMarketUnitID");
@@ -72,7 +73,11 @@ rule maintainTradeUnits
             }
         }
     } 
-    
+
+	
+	if (NumTcs < 1) // don't train caravans if you have no TC.
+    return;
+   
     int tradeTargetPop = gMaxTradeCarts;
     if ((cvMaxTradePop >= 0) && (tradeTargetPop > cvMaxTradePop))    // Stay under control variable limit
         tradeTargetPop = cvMaxTradePop;

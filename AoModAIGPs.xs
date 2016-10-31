@@ -306,13 +306,13 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     //-- the valid distance is 40 meters
     if (powerProtoID == cPowerForestFire)
     {
-        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false); 
         aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
         aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
         aiPlanSetVariableFloat(planID,cGodPowerPlanDistance, 0, 40.0);
         aiPlanSetVariableInt(planID,  cGodPowerPlanUnitTypeID, 0, cUnitTypeAbstractSettlement);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
-        return (true);  
+        return (false); 
     }
 
     //-- setup the frost power
@@ -657,7 +657,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     if (powerProtoID == cPowerWalkingWoods) 
     {
         //-- basic plan type and eval model
-        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false); 
         aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
 
         //-- setup the nearby unit type to cast on
@@ -668,7 +668,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 40.0);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
-        return (true);  
+        return (false); 
     }
 
      
@@ -1016,8 +1016,8 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	{
 		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
 		aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
-		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
-		aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceGold);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 14);
+		aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceWood);
 		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
 		return (true);
 	}
@@ -1036,9 +1036,9 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
 		aiPlanSetVariableInt(planID,  cGodPowerPlanQueryPlayerID, 0, aiGetMostHatedPlayerID());
 		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
-		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 50.0);
-		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 6);
-		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeLogicalTypeBuildingNotTitanGate);
+		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 25.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
+		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeLogicalTypeHouses);
 		return (true);  
 	}
 	// Set up the Year of the Goat power
@@ -1932,7 +1932,8 @@ rule rShiftingSand
    static int queryID = -1;
 
    int planID = gShiftingSandPlanID;
-
+   int mainBaseID = kbBaseGetMainID(cMyID);
+   vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
 
    //-- create the query used for evaluation
    if (queryID < 0)
@@ -1960,7 +1961,7 @@ rule rShiftingSand
    aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, cPlayerRelationEnemy);
 
    aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, kbUnitGetPosition(kbUnitQueryGetResult(queryID, 0)));
-   aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 1, kbBaseGetMilitaryGatherPoint(cMyID, kbBaseGetMainID(cMyID)));
+   aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 1, mainBaseLocation);
 
    aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 1);
    aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
@@ -2319,4 +2320,74 @@ rule rCastHeavyGP
 			}
 		}
 	}
+}
+
+//==============================================================================
+// RULE SetSpecialGP // Goodbye Titan gate.
+//==============================================================================
+rule SetSpecialGP  
+minInterval 15
+inactive
+{
+    xsSetRuleMinIntervalSelf(15);
+	static int CastAttempt=0;
+	static bool CastNow = false;
+	static bool TargetSettlement = false;
+    static bool TargetTitanGate = false;
+	int eUnitID = -1;
+	vector eLocation = cInvalidVector;
+	int enemyPlayerID = aiGetMostHatedPlayerID();
+    if (TitanAvailable == true)
+	TargetTitanGate = true;
+	else TargetSettlement = true;
+	
+	if (xsGetTime() > 100*60*1000) // Let it go..
+	{
+	TargetTitanGate = false;
+	TargetSettlement = true;
+	}
+	
+	if ((TargetTitanGate == true) && (TargetSettlement == false))
+	{
+    int NumGates = kbUnitCount(enemyPlayerID, cUnitTypeTitanGate, cUnitStateAliveOrBuilding);
+	for (j = 0; < NumGates)
+    {
+    eUnitID = findUnitByIndex(cUnitTypeTitanGate, j, cUnitStateAliveOrBuilding, -1, enemyPlayerID);
+    eLocation = kbUnitGetPosition(eUnitID);
+    }
+   }
+ 
+	if ((TargetSettlement == true) && (TargetTitanGate == false))
+	{
+    eUnitID = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
+    eLocation = kbUnitGetPosition(eUnitID);
+	int NumEnemyFarms = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, 0, enemyPlayerID, eLocation, 35.0);
+	//aiEcho("FARMS "+NumEnemyFarms+"");
+    if (NumEnemyFarms < 5)
+       return;	
+    }
+
+	if ((eUnitID > 0) && (aiGetGodPowerTechIDForSlot(3) == cTechMeteor) || (eUnitID > 0) && (aiGetGodPowerTechIDForSlot(3) == cTechTornado))
+    {
+	 if((aiGetGodPowerTechIDForSlot(0) == cTechVision) && (CastNow == false))
+	 {
+     if(aiCastGodPowerAtPosition(cTechVision, kbUnitGetPosition(eUnitID)) == true)
+     CastNow = true;
+	 if (ShowAiEcho == true) aiEcho("CASTING VISION");
+     xsSetRuleMinIntervalSelf(1);
+	 return;
+	 }
+       if((kbLocationVisible(eLocation) == true) && (CastNow == true))
+	   {
+        if(aiCastGodPowerAtPosition(aiGetGodPowerTechIDForSlot(3), kbUnitGetPosition(eUnitID)) == true)
+   	    {   
+   	     CastAttempt = CastAttempt+1;
+	     if (CastAttempt >= 2)
+		 xsDisableSelf();
+		 if (ShowAiEcho == true) aiEcho("CASTING A4 GP");
+		 xsSetRuleMinIntervalSelf(1);
+   		 return;
+   		}
+	}
+ }
 }
