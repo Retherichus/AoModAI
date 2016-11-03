@@ -116,7 +116,7 @@ extern int egBoomWood = 0;              // Wood
 // For RethFishEco, this affects Fishing Maps ONLY, if you have it enabled.
 // If the Ai fails to find any valid fishing spot for any reason, it'll scrap this fishing plan and return to normal resource distribution.
 
-extern int eFBoomFood = 0;              // Food
+extern int eFBoomFood = 20;              // Food
 extern int eFBoomGold = 0;              // Gold
 extern int eFBoomWood = 50;             // Wood, The Ai will automatically boost it, if it's too low.
 

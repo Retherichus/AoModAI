@@ -3930,6 +3930,8 @@ rule buildResearchGranary   //or a guild for Atlanteans or a house for Norse
         buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeHouse;
+    else if (cMyCulture == cCultureChinese)
+        buildingType = cUnitTypeStoragePit;		
         
     int mainBaseID = kbBaseGetMainID(cMyID);
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);

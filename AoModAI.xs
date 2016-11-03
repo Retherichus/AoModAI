@@ -3680,7 +3680,7 @@ void init(void)
         
     //Set the housing rebuild bound to 4 for the first age.
     if (cMyCulture == cCultureEgyptian)
-        gHouseAvailablePopRebuild=5;
+        gHouseAvailablePopRebuild=4;
     else if (cMyCulture == cCultureAtlantean)
         gHouseAvailablePopRebuild=6;
     else if (cMyCulture == cCultureNorse)

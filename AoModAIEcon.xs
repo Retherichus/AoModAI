@@ -1976,7 +1976,7 @@ rule collectIdleVills
         int resourceType = -1;
         int unitState = cUnitStateAlive;
         int playerID = 0;
-        int radius = 0;
+        int radius = -1;
         if ((noTrees == true) && (noGoldMines == true) && (noFarmsAvailable == true))
             randomResource = 5;
         else
@@ -2012,7 +2012,7 @@ rule collectIdleVills
             case 0:
             {
                 resourceType = cUnitTypeGold;
-				radius = 85;
+				//radius = 85;
                 if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("sending idle villager to gold");
                 break;
             }
@@ -2028,7 +2028,7 @@ rule collectIdleVills
             {
                 resourceType = cUnitTypeFarm;
 				playerID = cMyID;
-				radius = 85;
+				//radius = 85;
                 if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("sending idle villager to Farm");
                 break;
             }
