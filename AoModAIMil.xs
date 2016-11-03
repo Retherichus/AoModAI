@@ -47,7 +47,6 @@ rule monitorDefPlans
             if (defendPlanID == -1)
                 continue;
             
-            
             int numMilUnitsInDefPlan = aiPlanGetNumberUnits(defendPlanID, cUnitTypeLogicalTypeLandMilitary);
             
             vector defPlanDefPoint = aiPlanGetVariableVector(defendPlanID, cDefendPlanDefendPoint, 0);
@@ -383,24 +382,26 @@ rule monitorDefPlans
                 }
                 
                 keepUnitsWithinRange(defendPlanID, defPlanDefPoint);
-                    
+	            int NumEnemyBuildings = getNumUnitsByRel(cUnitTypeLogicalTypeBuildingsNotWalls, cUnitStateAlive, -1, cPlayerRelationEnemy, defPlanDefPoint, 35.0, true);
+				int NumEnemyFarms = getNumUnitsByRel(cUnitTypeAbstractFarm, cUnitStateAlive, -1, cPlayerRelationEnemy, defPlanDefPoint, 35.0, true);
+                NumEnemyBuildings = NumEnemyBuildings - NumEnemyFarms; 				
                 int priorityA = 48;
                 if (distToMainBase > 90.0)
                     priorityA = 52;
                 static int countA = 0;
-                static int resourceCountA = 0;
+                static int resourceCountA = 0; // add more
                 if ((enemyMilUnitsInR50 < 4) && (numAttEnemySiegeInR45 < 1) && (numAttEnemyTitansInR50 < 1))
                 {
                     if (countA <= 14)
                     {
                         if (distToMainBase < 85.0)
-                            aiPlanAddUnitType(defendPlanID, cUnitTypeLogicalTypeLandMilitary, 7, 19, 19);
+                            aiPlanAddUnitType(defendPlanID, cUnitTypeLogicalTypeLandMilitary, 8, 10, 12);
                         else
                         {
-                            if (distToMainBase > 100.0)
-                                aiPlanAddUnitType(defendPlanID, cUnitTypeLogicalTypeLandMilitary, 11, 24, 24);
+                            if ((distToMainBase > 100.0) && (NumEnemyBuildings > 6))
+                                aiPlanAddUnitType(defendPlanID, cUnitTypeLogicalTypeLandMilitary, 14, 22, 25);
                             else
-                                aiPlanAddUnitType(defendPlanID, cUnitTypeLogicalTypeLandMilitary, 9, 22, 22);
+                                aiPlanAddUnitType(defendPlanID, cUnitTypeLogicalTypeLandMilitary, 8, 10, 12);
                         }
                         
                         if (countA >= 12)
@@ -663,7 +664,7 @@ rule monitorAttPlans
             {
                 static int countA = 0;
                 float distanceA = 30.0;
-                
+                aiEcho("gEnemySettlementAttPlanID:  "+attackPlanID+"");
                 if (killSettlementAttPlanCount != -1)
                 {
                     if (planState < cPlanStateAttack)
@@ -824,6 +825,7 @@ rule monitorAttPlans
             {
                 static int countB = 0;
                 float distanceB = 25.0;
+				aiEcho("gRandomAttackPlanID:  "+attackPlanID+"");
                 
                 if (killRandomAttPlanCount != -1)
                 {
@@ -2283,7 +2285,8 @@ rule attackEnemySettlement
     
     bool randomAttackPlanActive = false;
     bool landAttackPlanActive = false;
-        
+    int numUnitsInDef = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeLogicalTypeLandMilitary);
+    
     int currentPop = kbGetPop();
     int currentPopCap = kbGetPopCap();
     if (ShowAiEcho == true) aiEcho("currentPop: "+currentPop+", currentPopCap: "+currentPopCap);
@@ -2383,7 +2386,7 @@ rule attackEnemySettlement
                 }
                 continue;
             }
-            else if (attackPlanID == gLandAttackPlanID)
+            else if ((attackPlanID == gLandAttackPlanID) && (numUnitsInDef < 25))
             {
                 landAttackPlanActive = true;
                 continue;
@@ -2973,8 +2976,11 @@ rule defendSettlementPosition
             
             if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
                 aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 1, 1);
+            	
+				if (NumEnemyBuildings > 6)
+				aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 7, 15, 19);
+				else aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 6, 8, 12);
             
-            aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 7, 19, 19);
         }
         else
         {
@@ -2999,7 +3005,7 @@ rule defendSettlementPosition
 				aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeAbstractSiegeWeapon, 1, 2, 2);
 				else aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
 				if (NumEnemyBuildings > 6)
-				aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 15, 25, 35); // add extra
+				aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 15, 25, 35); // add more
 				else aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 8, 10, 12);
 				
             }
@@ -3008,8 +3014,12 @@ rule defendSettlementPosition
                 if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
                     aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 1, 1);
                 
-                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeAbstractSiegeWeapon, 1, 1, 1);
-                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 9, 22, 22);
+			   if (NumEnemyBuildings > 6)
+				aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeAbstractSiegeWeapon, 1, 2, 2);
+				else aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
+				if (NumEnemyBuildings > 6)
+				aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 15, 18, 25); // add more
+				else aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 5, 8, 10);
             }
         }
         aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeAbstractTitan, 0, 1, 1);
@@ -4072,7 +4082,7 @@ rule createLandAttack
         }
     }
     int NumUnitsInDef = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeLogicalTypeLandMilitary);
-    if (enemySettlementAttPlanActive == true)
+    if ((enemySettlementAttPlanActive == true) && (NumUnitsInDef < 30)) //trying this..
     {
         if (ShowAiEcho == true) aiEcho("returning as there is a gEnemySettlementAttPlanID active");
         return;
@@ -4082,7 +4092,7 @@ rule createLandAttack
         if (ShowAiEcho == true) aiEcho("returning as there is a gRandomAttackPlanID active and gathering units");
         return;
     }
-    else if ((randomAttackPlanActive == true) && (aiPlanGetNumberUnits(gRandomAttackPlanID, cUnitTypeLogicalTypeLandMilitary) > 15) && (NumUnitsInDef < 30))
+    else if ((randomAttackPlanActive == true) && (aiPlanGetNumberUnits(gRandomAttackPlanID, cUnitTypeLogicalTypeLandMilitary) > 15) && (NumUnitsInDef < 30)) //trying this..
     {
         if (ShowAiEcho == true) aiEcho("returning as there is a gRandomAttackPlanID active and there are more than 15 units in the plan");
         return;
