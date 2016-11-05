@@ -733,7 +733,7 @@ rule getGreatWall
     
     if (ShowAiEcho == true) aiEcho("getGreatWall:");
 
-    if (kbGetTechStatus(cTechStoneWall) < cTechStatusResearching)
+    if (kbGetTechStatus(cTechStoneWallChinese) < cTechStatusResearching)
     {
         return;
     }

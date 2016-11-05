@@ -516,7 +516,7 @@ rule updateFoodBreakdown
     
 	// Consider any of these below, as Aggressive Animals at the start of the game.
 	
-	if (IsRunHuntingDogs == false && xsGetTime() < 20*1*1000)
+	if ((IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000))
 	{ 
 	int GiraffeNearMB = getNumUnits(cUnitTypeGiraffe, cUnitStateAny, 0, 0, mainBaseLocation, distance);
 	int ZebraNearMB = getNumUnits(cUnitTypeZebra, cUnitStateAny, 0, 0, mainBaseLocation, distance);
@@ -528,7 +528,7 @@ rule updateFoodBreakdown
 	int FakeAggressives = ZebraNearMB+CaribouNearMB+GazelleNearMB+ElkNearMB+DeerNearMB+GiraffeNearMB;
 	}
 	
-	if (numberAggressiveResourceSpots > 0 && IsRunHuntingDogs == false && xsGetTime() < 20*1*1000 || FakeAggressives > 3 && IsRunHuntingDogs == false && xsGetTime() < 20*1*1000)
+	if ((numberAggressiveResourceSpots > 0) && (IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000) || (FakeAggressives > 3) && (IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000))
 	   { 
 	   int TotalAnimalsFound = numberAggressiveResourceSpots+FakeAggressives; 
         if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Animals or Agressive spots found: "+TotalAnimalsFound+", activating HuntingDogsAsap");
@@ -540,7 +540,7 @@ rule updateFoodBreakdown
     }
 	
 	    static bool HippoDone = false;
-		if (HippoDone == false && gHuntingDogsASAP == true && xsGetTime() < 20*1*1000)
+		if ((HippoDone == false) && (gHuntingDogsASAP == true) && (xsGetTime() < 20*1*1000))
 		{ 
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
 	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, distance);
