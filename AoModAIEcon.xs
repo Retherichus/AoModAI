@@ -1288,7 +1288,7 @@ int changeMainBase(int newSettle = -1)
     updateWoodBreakdown();
 
     //increase the gHouseAvailablePopRebuild
-    gHouseAvailablePopRebuild = 50;
+    gHouseAvailablePopRebuild = 16;
    
 
     return(newBaseID);

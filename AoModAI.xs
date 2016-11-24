@@ -4355,9 +4355,9 @@ void age2Handler(int age=1)
     if (cMyCulture == cCultureEgyptian)
         gHouseAvailablePopRebuild=30;
     else if (cMyCulture == cCultureAtlantean)
-        gHouseAvailablePopRebuild=30;
+        gHouseAvailablePopRebuild=12;
     else
-        gHouseAvailablePopRebuild=24;
+        gHouseAvailablePopRebuild=10;
 
     //Switch the EM rule.
     xsDisableRule("updateEMAge1");

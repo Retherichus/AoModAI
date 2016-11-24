@@ -720,7 +720,7 @@ rule monitorAttPlans
                     continue;
                 }
                 
-                if ((kbUnitGetCurrentHitpoints(gEnemySettlementAttPlanTargetUnitID) <= 0) && (gEnemySettlementAttPlanTargetUnitID != -1))
+                if ((kbUnitGetCurrentHitpoints(gEnemySettlementAttPlanTargetUnitID) <= 0) && (gEnemySettlementAttPlanTargetUnitID != -1) && (numMilUnitsInPlan < 10))
                 {
                     if (countA == -1)
                     {
@@ -827,8 +827,8 @@ rule monitorAttPlans
             {
                 static int countB = 0;
                 float distanceB = 25.0;
-				aiEcho("gRandomAttackPlanID:  "+attackPlanID+"");
-				aiEcho("NumInPlan:  "+numMilUnitsInPlan+"");
+				if (ShowAiEcho == true) aiEcho("gRandomAttackPlanID:  "+attackPlanID+"");
+				if (ShowAiEcho == true) aiEcho("NumInPlan:  "+numMilUnitsInPlan+"");
                 
                 if (killRandomAttPlanCount != -1)
                 {
@@ -3027,7 +3027,7 @@ rule defendSettlementPosition
             }
         }
         aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeAbstractTitan, 0, 1, 1);
-        aiEcho("Initial BUILDINGS FOUND "+NumEnemyBuildings+"");
+        if (ShowAiEcho == true) aiEcho("Initial BUILDINGS FOUND "+NumEnemyBuildings+"");
 
         //override
         if (enemyMilUnitsInR50 > 18)
