@@ -883,7 +883,10 @@ rule maintainSiegeUnits
     }
     else if (cMyCulture == cCultureNorse)
     {
-        siegeUnitType1 = cUnitTypeBallista;
+        if (aiRandInt(2) == 0)
+		siegeUnitType1 = cUnitTypeBallista;
+		else siegeUnitType1 = cUnitTypePortableRam;
+		
     }
     else if (cMyCulture == cCultureChinese)
     {
@@ -930,7 +933,11 @@ rule maintainSiegeUnits
     int numSiegeUnitType1ToTrain = 3;
     if (kbGetAge() > cAge3)
         numSiegeUnitType1ToTrain = 5;
-    if ((numSiegeUnitType1 < numSiegeUnitType1ToTrain) && (siegeUnitType1BeingTrained == false))
+	
+	if ((cMyCulture == cCultureNorse) && (siegeUnitType1 == cUnitTypePortableRam)) // train some PortableRams?
+	numSiegeUnitType1ToTrain = 3;
+    
+	if ((numSiegeUnitType1 < numSiegeUnitType1ToTrain) && (siegeUnitType1BeingTrained == false))
     {
         if ((cMyCulture == cCultureAtlantean) && (kbGetAge() < cAge4))
         {

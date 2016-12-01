@@ -680,6 +680,7 @@ rule monitorAttPlans
                         {
                             if (DisallowPullBack == false) 
                             pullBackUnits(attackPlanID, attPlanRetreatPosition);
+							aiEcho("PullBack 1");
                             if ((killSettlementAttPlanCount >= 4) || (attPlanDistance < 25.0))
                             {
                                 aiPlanDestroy(attackPlanID);
@@ -715,18 +716,19 @@ rule monitorAttPlans
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                         if (DisallowPullBack == false) 
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
+						aiEcho("PullBack 2");
                         killSettlementAttPlanCount = 0;
                     }
                     continue;
                 }
                 
-                if ((kbUnitGetCurrentHitpoints(gEnemySettlementAttPlanTargetUnitID) <= 0) && (gEnemySettlementAttPlanTargetUnitID != -1) && (numMilUnitsInPlan < 10))
+                if ((kbUnitGetCurrentHitpoints(gEnemySettlementAttPlanTargetUnitID) <= 0) && (gEnemySettlementAttPlanTargetUnitID != -1))
                 {
                     if (countA == -1)
                     {
                         aiPlanDestroy(attackPlanID);
                         gEnemySettlementAttPlanTargetUnitID = -1;
-                         if (ShowAiEcho == true) aiEcho("destroying gEnemySettlementAttPlanID as the target has been destroyed");
+                          aiEcho("destroying gEnemySettlementAttPlanID as the target has been destroyed");
                         countA = 0;
                         continue;
                     }
@@ -753,7 +755,7 @@ rule monitorAttPlans
                         if ((numEnemyMilUnitsNearMBInR70 > 14) || (numEnemyMilUnitsNearDefBInR40 > 10) && (attPlanPriority < 20))
                         {
                             aiPlanDestroy(attackPlanID);
-                             if (ShowAiEcho == true) aiEcho("destroying gEnemySettlementAttPlanID as there are too many enemies");
+                              aiEcho("destroying gEnemySettlementAttPlanID as there are too many enemies");
                             continue;
                         }
                         else
@@ -801,12 +803,13 @@ rule monitorAttPlans
                     else
                     {
                         float distanceToTarget = xsVectorLength(mainBaseLocation - kbUnitGetPosition(gEnemySettlementAttPlanTargetUnitID));
-                        if ((currentPop <= currentPopCap - 3 - number) && (distanceToTarget > 110.0) && (aiRandInt(5) < 1))
+                        if ((currentPop <= currentPopCap - 3 - number) && (distanceToTarget > 110.0) && (aiRandInt(5) < 1) && (numMilUnitsInPlan < 5) )
                         {
                             aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                             aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
                             if (DisallowPullBack == false) 
                             pullBackUnits(attackPlanID, attPlanRetreatPosition);
+							aiEcho("PullBack 3");
                             killSettlementAttPlanCount = 0;
                         }
                         else if ((numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan) 
@@ -817,6 +820,7 @@ rule monitorAttPlans
                             aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);                            
                             if (DisallowPullBack == false)
                             pullBackUnits(attackPlanID, attPlanRetreatPosition);
+							aiEcho("PullBack 4");
                             killSettlementAttPlanCount = 0; 
                         }
                     }
@@ -881,7 +885,7 @@ rule monitorAttPlans
                         if ((numEnemyMilUnitsNearMBInR70 > 11) || (numEnemyMilUnitsNearDefBInR40 > 9) && (attPlanPriority < 20))
                         {
                             aiPlanDestroy(attackPlanID);
-                            if (ShowAiEcho == true) aiEcho("destroying gRandomAttackPlanID as there are too many enemies");
+                             aiEcho("destroying gRandomAttackPlanID as there are too many enemies");
                             continue;
                         }
                         else
@@ -914,7 +918,7 @@ rule monitorAttPlans
                     countB = 0;
                     if ((numMilUnitsInPlan < 3)
                      || ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.3) && ((numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan) 
-                     || ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 5) && (numSiegeInPlan < 1)))))
+                     || ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numMilUnitsInPlan < 5)))))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
@@ -922,9 +926,9 @@ rule monitorAttPlans
                         pullBackUnits(attackPlanID, attPlanRetreatPosition);
                         killRandomAttPlanCount = 0;
                         if ((numMilUnitsInPlan < 3) && (numSiegeInPlan < 1))
-                            if (ShowAiEcho == true) aiEcho("Destroying gRandomAttackPlanID as less than 3 units in the plan");
+                             aiEcho("Destroying gRandomAttackPlanID as less than 3 units in the plan");
                         else
-                            if (ShowAiEcho == true) aiEcho("Destroying gRandomAttackPlanID as there are too many enemies");
+                             aiEcho("Destroying gRandomAttackPlanID as there are too many enemies");
                     }
                     continue;
                 }
@@ -977,7 +981,7 @@ rule monitorAttPlans
                 }
                 else if (planState == cPlanStateAttack)
                 {
-                    if ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.5) && ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0) && (numSiegeInPlan < 1)
+                    if ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.5) && ((numEnemyBuildingsThatShootNearAttPlanInR25 > 0)
                      || (numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan)))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
@@ -1079,7 +1083,7 @@ rule monitorAttPlans
                             if (((numEnemyMilUnitsNearMBInR70 > 14) || (numEnemyMilUnitsNearDefBInR40 > 10)) && (attPlanPriority < 20))
                             {
                                 aiPlanDestroy(attackPlanID);
-                                if (ShowAiEcho == true) aiEcho("destroying gLandAttackPlanID as there are too many enemies");
+                                 aiEcho("destroying gLandAttackPlanID as there are too many enemies");
                                 continue;
                             }
                             else
@@ -1122,9 +1126,9 @@ rule monitorAttPlans
                         killLandAttPlanCount = 0;
                         
                         if ((kbGetAge() > cAge2) && (numMilUnitsInPlan < 5))
-                             if (ShowAiEcho == true) aiEcho("Destroying gLandAttackPlanID as there less than 5 units in the plan");
+                              aiEcho("Destroying gLandAttackPlanID as there less than 5 units in the plan");
                         else
-                             if (ShowAiEcho == true) aiEcho("Destroying gLandAttackPlanID as there are too many enemies");
+                              aiEcho("Destroying gLandAttackPlanID as there are too many enemies");
                     }
                     continue;
                 }
@@ -2344,7 +2348,7 @@ rule attackEnemySettlement
                     if (numTitansInAttackPlan > 0)
                     {
                         aiPlanSetNoMoreUnits(attackPlanID, false);  // Make sure the gEnemySettlementAttPlan stays open
-                        if (ShowAiEcho == true) aiEcho("Setting gEnemySettlementAttPlanID NoMoreUnits to false");
+                         aiEcho("Setting gEnemySettlementAttPlanID NoMoreUnits to false");
                         aiPlanAddUnitType(attackPlanID, cUnitTypeLogicalTypeLandMilitary, 10, currentPopCap / 5 + 3, currentPopCap / 5 + 3);
                     }
                     else if ((currentPop >= currentPopCap * 0.8) && ((numMythInAttackPlan > 0) || (numSiegeInAttackPlan > 0)) && (kbGetAge() > cAge3)
@@ -2352,14 +2356,14 @@ rule attackEnemySettlement
                     {
                         aiPlanSetNoMoreUnits(attackPlanID, false);  // Make sure the gEnemySettlementAttPlan stays open
                         aiPlanSetDesiredPriority(attackPlanID, 55);
-                        if (ShowAiEcho == true) aiEcho("Setting gEnemySettlementAttPlanID NoMoreUnits to false");
+                         aiEcho("Setting gEnemySettlementAttPlanID NoMoreUnits to false");
                         aiPlanAddUnitType(attackPlanID, cUnitTypeLogicalTypeLandMilitary, 8, currentPopCap / 5, currentPopCap / 5);
                     }
                     else
                     {
                         aiPlanSetNoMoreUnits(attackPlanID, true);  // Make sure the gEnemySettlementAttPlan is closed
                         aiPlanSetDesiredPriority(attackPlanID, 51);
-                        if (ShowAiEcho == true) aiEcho("Setting gEnemySettlementAttPlanID NoMoreUnits to true");
+                         aiEcho("Setting gEnemySettlementAttPlanID NoMoreUnits to true");
                     }
                 }
                 else if (((planState == cPlanStateGather) || (planState == cPlanStateExplore) || (planState == cPlanStateNone))
@@ -2370,12 +2374,12 @@ rule attackEnemySettlement
                     {
                         aiPlanDestroy(attackPlanID);
                         gEnemySettlementAttPlanTargetUnitID = -1;
-                        if (ShowAiEcho == true) aiEcho("destroying gEnemySettlementAttPlanID as it has been active for more than 5 Minutes");
+                         aiEcho("destroying gEnemySettlementAttPlanID as it has been active for more than 5 Minutes");
                     }
                     else
                     {
                         aiPlanSetVariableBool(attackPlanID, cAttackPlanMoveAttack, 0, false);
-                        if (ShowAiEcho == true) aiEcho("setting cAttackPlanMoveAttack to false");
+                         aiEcho("setting cAttackPlanMoveAttack to false");
                     }
                     continue;
                 }
@@ -2417,7 +2421,7 @@ rule attackEnemySettlement
    
     if ((numAttEnemyMilUnitsNearMBInR85 > 10) && (targetSettlementCloseToMB == false))
     {
-        if (ShowAiEcho == true) aiEcho("returning as there are too many enemies near our main base");
+         aiEcho("returning as there are too many enemies near our main base");
         return;
     }
     
@@ -2469,27 +2473,27 @@ rule attackEnemySettlement
         }
         if ((settlementPosDefPlanActive == true) && (myBaseAtDefPlanPosition + alliedBaseAtDefPlanPosition < 1))
         {
-            if (ShowAiEcho == true) aiEcho("returning as there's a settlementPosDefPlan active");
+             aiEcho("returning as there's a settlementPosDefPlan active");
             return;
         }
         else if (randomAttackPlanActive == true)
         {
-            if (ShowAiEcho == true) aiEcho("returning as there is a gRandomAttackPlanID active and gathering units");
+             aiEcho("returning as there is a gRandomAttackPlanID active and gathering units");
             return;
         }
         else if (landAttackPlanActive == true)
         {
-            if (ShowAiEcho == true) aiEcho("returning as there is a landAttackPlan active");
+             aiEcho("returning as there is a landAttackPlan active");
             return;
         }
-        else if ((numSiegeWeapons < 1) && (currentPop <= currentPopCap - 3 - number) && (aiRandInt(5) == 1))
+        else if ((numSiegeWeapons < 1+aiRandInt(2)) && (currentPop <= currentPopCap - 3 - number) && (aiRandInt(10) > 1))
         {
-            if (ShowAiEcho == true) aiEcho("returning as we don't have a Titan, a siege weapon, or a military myth unit");
+             aiEcho("returning as we don't have a Titan, a siege weapon, or a military myth unit");
             return;
         }
         else if (((woodSupply < 300) || (goldSupply < 400) || (foodSupply < 400)) && (currentPop <= currentPopCap - 3 - number))
         {
-            if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
+             aiEcho("returning as we don't have enough resources");
             return;
         }
     }
@@ -2498,7 +2502,7 @@ rule attackEnemySettlement
 
         if (((woodSupply < 150) || (goldSupply <150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 3 - number))
         {
-            if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
+             aiEcho("returning as we don't have enough resources");
             return;
         }
     }
@@ -2590,21 +2594,21 @@ rule attackEnemySettlement
         if (ShowAiEcho == true) aiEcho("Enemy Settlement is his mainbase");
         if ((kbGetAge() < cAge4) && (1 + getNumPlayersByRel(true) - getNumPlayersByRel(false) < 0))
         {
-            if (ShowAiEcho == true) aiEcho("Not yet in Age4 and there are too many enemy players, returning!");
+             aiEcho("Not yet in Age4 and there are too many enemy players, returning!");
             return;
         }
         else
         {
             if ((numTitansIngDefendPlan > 0)
-             || ((numMilUnitsInDefPlans > 14) && ((numSiegeUnitsIngDefendPlan > 1) || (numMilUnitsInDefPlans > 25) && (aiRandInt(4) == 1) || (numMythUnitsIngDefendPlan > 1)
-              || ((numSiegeUnitsIngDefendPlan > 0) && (numMythUnitsIngDefendPlan > 0)))))
+             || ((numMilUnitsInDefPlans >= 16) && ((numSiegeUnitsIngDefendPlan > 1) || (numMilUnitsInDefPlans >= 25) && (aiRandInt(10) == 1) ||
+			 ((numSiegeUnitsIngDefendPlan > 1) && (numMythUnitsIngDefendPlan > 0) && (numMilUnitsInDefPlans >= 12)))))
             {
                 targetIsEnemyMainBase = true;
-                if (ShowAiEcho == true) aiEcho("We have enough troops, attacking enemy main base!");
+                 aiEcho("We have enough troops, attacking enemy main base!");
             }
             else
             {
-                if (ShowAiEcho == true) aiEcho("returning as we don't have enough troops to attack his main base");
+                 aiEcho("returning as we don't have enough troops to attack his main base");
                 return;
             }
         }
@@ -2615,12 +2619,12 @@ rule attackEnemySettlement
         {
             if (numMilUnitsInDefPlans < 8)
             {
-                if (ShowAiEcho == true) aiEcho("returning as we don't have enough troops to attack targetSettlementID:"+targetSettlementID+" in close range");
+                 aiEcho("returning as we don't have enough troops to attack targetSettlementID:"+targetSettlementID+" in close range");
                 return;
             }
             else
             {
-                if (ShowAiEcho == true) aiEcho("We have enough troops to attack targetSettlementID:"+targetSettlementID+" in close range");
+                 aiEcho("We have enough troops to attack targetSettlementID:"+targetSettlementID+" in close range");
             }
         }
         else
@@ -2628,11 +2632,11 @@ rule attackEnemySettlement
             if ((numTitansIngDefendPlan > 0) || ((numMilUnitsInDefPlans > 9) && ((numSiegeUnitsIngDefendPlan > 0)
              || (numMythUnitsIngDefendPlan > 0) || (numMilUnitsInDefPlans > 20))))
             {
-                if (ShowAiEcho == true) aiEcho("We have enough troops to attack targetSettlementID:"+targetSettlementID);
+                 aiEcho("We have enough troops to attack targetSettlementID:"+targetSettlementID);
             }
             else
             {
-                if (ShowAiEcho == true) aiEcho("returning as we don't have enough troops to attack targetSettlementID:"+targetSettlementID);
+                 aiEcho("returning as we don't have enough troops to attack targetSettlementID:"+targetSettlementID);
                 return;
             }
         }
@@ -2655,7 +2659,7 @@ rule attackEnemySettlement
     if ((enemySettlementsBeingBuiltAtTSP > 0) && (kbUnitGetHealth(targetSettlementID) < 0.8))
     {
         aiPlanSetVariableBool(enemySettlementAttPlanID, cAttackPlanMoveAttack, 0, false);
-        if (ShowAiEcho == true) aiEcho("Setting gEnemySettlementAttPlanID MoveAttack to false");
+         aiEcho("Setting gEnemySettlementAttPlanID MoveAttack to false");
     }
     
     // Specify other continent so that armies will transport
@@ -2971,11 +2975,11 @@ rule defendSettlementPosition
         {
             if (cMyCulture == cCultureAtlantean)
             {
-                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 1, 1, 1);
+                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 0, 0, 1);
             }
             else
             {
-                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 1, 1, 1);
+                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 0, 0, 1);
             }
             
             if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
@@ -2983,22 +2987,22 @@ rule defendSettlementPosition
             	
 				if (NumEnemyBuildings > 6)
 				aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 7, 15, 18);
-				else aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 5, 8, 10);
+				else aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary, 3, 5, 6);
             
         }
         else
         {
             if (cMyCulture == cCultureNorse)
             {
-                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 2, 4, 4);
+                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 0, 1, 2);
             }
             else if (cMyCulture == cCultureAtlantean)
             {
-                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 1, 3, 3);
+                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 0, 1, 2);
             }
             else
             {
-                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 1, 2, 2);
+                aiPlanAddUnitType(settlementPosDefPlanID, cUnitTypeHero, 0, 1, 2);
             }
             if (distToMainBase > 100.0)
             {
@@ -4205,7 +4209,7 @@ rule createLandAttack
 
     if (numEnemySettlements < 1)
     {
-        aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.85, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans);
+        aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.90, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
         aiPlanSetVariableInt(landAttackPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeNone);
     }
     else
@@ -4220,7 +4224,7 @@ rule createLandAttack
         if (kbGetAge() == cAge2)
             aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95);
         else
-            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans, numMilUnitsInDefPlans); 
+            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans, numMilUnitsInDefPlans); 
             
         aiPlanSetVariableInt(landAttackPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
     }

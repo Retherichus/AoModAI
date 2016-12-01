@@ -261,9 +261,8 @@ void initRethlAge1(void)  // Am I doing this right??
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
-	    
-	   
-	   if (gHuntEarly == true && cRandomMapName != "Deep Jungle" && cRandomMapName != "erebus")
+
+	    if (gHuntEarly == true && cRandomMapName != "Deep Jungle" && cRandomMapName != "erebus")
 		{
 		if (cMyCulture == cCultureGreek)
 		aiSetMinNumberNeedForGatheringAggressvies(4);      // The number inside of ( ) represents the amount of villagers/units needed.
@@ -1331,7 +1330,8 @@ rule IHateBuildingsHadesSpecial
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
-        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
+        if ((kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true) 
+		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHealingSpringObject) == true))
             continue;
 	   
 	   if (numberFoundTemp > 0)
@@ -1607,7 +1607,8 @@ rule IHateBuildingsBeheAndScarab
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
-        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
+        if ((kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true) 
+		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHealingSpringObject) == true))
             continue;
 	   
 	   if (numberFoundTemp > 0)
@@ -1618,6 +1619,73 @@ rule IHateBuildingsBeheAndScarab
    }
 }
 
+//==============================================================================
+// IHateGates 
+//==============================================================================
+rule IHateGates
+   minInterval 5
+   inactive
+   group HateScripts
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+   if (aiGetWorldDifficulty() == cDifficultyEasy)
+   {
+	xsDisableSelf();
+	return;
+   }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSiegeWeapon);			
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeGate);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+			
+	   if (numberFoundTemp > 0)
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
 
 //==============================================================================
 // IHateBuildingsSiege
@@ -1662,7 +1730,7 @@ rule IHateBuildingsSiege
    if (enemyQueryID != -1)
    {
 		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeLogicalTypeBuildingsNotWalls);
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
@@ -1678,7 +1746,8 @@ rule IHateBuildingsSiege
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
-        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true || kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true)
+        if ((kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true) 
+		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHealingSpringObject) == true))
             continue;
 			
 	   if (numberFoundTemp > 0)

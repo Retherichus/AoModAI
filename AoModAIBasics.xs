@@ -1661,6 +1661,13 @@ int getSoftPopCap(void) //Calculate our pop limit if we had all houses built
     if (cMyCulture == cCultureAtlantean)
         popPerHouse = 20;
 
+		if (maxHouses == -1)
+		{
+		if (cMyCulture == cCultureAtlantean)
+        maxHouses = 15; 
+        else if (cMyCulture != cCultureAtlantean)
+        maxHouses = 30; 
+        }
     houseCount = kbUnitCount(cMyID, houseProtoID, cUnitStateAlive); // Do not count houses being built
 
     int retVal = -1;
