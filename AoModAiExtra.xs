@@ -297,6 +297,13 @@ void initRethlAge1(void)  // Am I doing this right??
 	   }
 	   if ((kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusUnobtainable) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusActive))
        TitanAvailable = true;
+	   
+	    int houseProtoID = cUnitTypeHouse;
+        if (cMyCulture == cCultureAtlantean)
+        houseProtoID = cUnitTypeManor;
+		int maxHouses = kbGetBuildLimit(cMyID, houseProtoID);
+	   	if (maxHouses == -1)
+		aiEcho("Warning:  Modded Protox file detected, results may vary.");
 }
 
 //==============================================================================
@@ -1314,7 +1321,7 @@ rule IHateBuildingsHadesSpecial
    if (enemyQueryID != -1)
    {
 		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeLogicalTypeBuildingsNotWalls);
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAny);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
