@@ -122,7 +122,7 @@ extern int eFBoomWood = 50;             // Wood, The Ai will automatically boost
 
 
 //Timer for gSuperboom & fishing
-extern int eBoomTimer = 6;                // Minutes this plan will remain active. It'll disable itself after X minutes set.(minus delay) 
+extern int eBoomTimer = 7;                // Minutes this plan will remain active. It'll disable itself after X minutes set.(minus delay) 
 extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wood, this supports the Ai in building early fishing ships.
 
 

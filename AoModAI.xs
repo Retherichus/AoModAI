@@ -1582,7 +1582,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 16;
     if (cMyCulture == cCultureAtlantean)
-        minVillagers = 7;
+        minVillagers = 6;
     else if (cMyCulture == cCultureGreek)
         minVillagers = 16;
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);

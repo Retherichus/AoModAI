@@ -70,9 +70,9 @@ rule updateWoodBreakdown
    if ((kbGetAge() < cAge2) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 6)
-			woodGathererCount = 3;
+			woodGathererCount = 4;
 			if ((foodGathererCount > 9) && (goldGathererCount > 2))
-			woodGathererCount = 4;        
+			woodGathererCount = 5;        
    }   
 
       float woodSupply = kbResourceGet(cResourceWood);

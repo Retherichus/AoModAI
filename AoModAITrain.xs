@@ -694,7 +694,7 @@ rule hesperides //Watch for ownership of a hesperides tree, make driads if you o
 
 //==============================================================================
 rule maintainMilitaryTroops
-    minInterval 17 //starts in cAge2
+    minInterval 15 //starts in cAge2
     inactive
 {        
     if (ShowAiEcho == true) aiEcho("maintainMilitaryTroops:");
@@ -732,7 +732,7 @@ rule maintainMilitaryTroops
     {
         unitType1 = cUnitTypeChuKoNu;
         unitType2 = cUnitTypeHalberdier;
-       //unitType3 = cUnitTypeScoutChinese;  // Not for now.
+        unitType3 = cUnitTypeFireLance;  // Not for now.
     }	
     
     bool unitType1BeingTrained = false;
@@ -790,9 +790,7 @@ rule maintainMilitaryTroops
     }
     else if (numUnitType1 >= gNumUnitType1ToTrain)
     {
-        if ((kbGetAge() == cAge2) && (gNumUnitType1ToTrain < 7))
-            gNumUnitType1ToTrain = gNumUnitType1ToTrain + 1;
-        else if ((kbGetAge() >= cAge3) && (gNumUnitType1ToTrain < 12))
+         if ((kbGetAge() >= cAge3) && (gNumUnitType1ToTrain < 12))
             gNumUnitType1ToTrain = gNumUnitType1ToTrain + 1;
     }
     
