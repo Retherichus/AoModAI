@@ -104,7 +104,7 @@ extern bool AllyTcLimit = false; // This enables the modified rule and disables 
 
 extern int eBoomFood = 600;              // Food
 extern int eBoomGold = 200;              // Gold
-extern int eBoomWood = 325;              // Wood, duh.
+extern int eBoomWood = 300;              // Wood, duh.
 
 
 //Egyptians have their own, because they don't like wood as much.
@@ -140,7 +140,7 @@ extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wo
 //Age 2 (Classical Age)
 extern int RethLGFAge2 = 1000;             // Food
 extern int RethLGGAge2 = 550;              // Gold
-extern int RethLGWAge2 = 650;              // Wood
+extern int RethLGWAge2 = 600;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -150,9 +150,9 @@ extern int RethLGWAge3 = 600;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLGFAge4 = 3000;              // Food
-extern int RethLGGAge4 = 2500;              // Gold
-extern int RethLGWAge4 = 1600;              // Wood
+extern int RethLGFAge4 = 4300;              // Food
+extern int RethLGGAge4 = 3600;              // Gold
+extern int RethLGWAge4 = 2300;              // Wood
 
 
 //==============================================================================
@@ -172,9 +172,9 @@ extern int RethLEWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLEFAge4 = 3000;              // Food
-extern int RethLEGAge4 = 2500;              // Gold
-extern int RethLEWAge4 = 800;              // Wood
+extern int RethLEFAge4 = 4300;              // Food
+extern int RethLEGAge4 = 3600;              // Gold
+extern int RethLEWAge4 = 1200;              // Wood
 
 //==============================================================================
 //Norse
@@ -193,9 +193,9 @@ extern int RethLNWAge3 = 750;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLNFAge4 = 3000;              // Food
-extern int RethLNGAge4 = 2500;              // Gold
-extern int RethLNWAge4 = 1600;              // Wood
+extern int RethLNFAge4 = 4300;              // Food
+extern int RethLNGAge4 = 3600;              // Gold
+extern int RethLNWAge4 = 2300;              // Wood
 
 //==============================================================================
 //Atlantean
@@ -214,9 +214,9 @@ extern int RethLAWAge3 = 800;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLAFAge4 = 3000;              // Food
-extern int RethLAGAge4 = 2500;              // Gold
-extern int RethLAWAge4 = 1600;              // Wood
+extern int RethLAFAge4 = 4300;              // Food
+extern int RethLAGAge4 = 3600;              // Gold
+extern int RethLAWAge4 = 2300;              // Wood
 
 
 //==============================================================================
@@ -236,9 +236,9 @@ extern int RethLCWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLCFAge4 = 3000;              // Food
-extern int RethLCGAge4 = 2500;              // Gold
-extern int RethLCWAge4 = 1600;              // Wood
+extern int RethLCFAge4 = 4300;              // Food
+extern int RethLCGAge4 = 3600;              // Gold
+extern int RethLCWAge4 = 2300;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -413,11 +413,10 @@ rule ActivateRethOverridesAge1
 		
 		if (aiGetWorldDifficulty() > cDifficultyHard)
 		xsEnableRuleGroup("MassDonations");
-		aiResourceCheat(cMyID, cResourceFood, 0.1); //Adds 0.1 (not even 1!) food resource to fix a critical "startup-inventory" bug that can potentially block the AI from making vills.
+		
 		xsDisableSelf();
            
     }
-
 	
 rule ActivateRethOverridesAge2
    minInterval 30
@@ -1081,8 +1080,7 @@ rule IHateSiege
 	   int NoArcherPlease = kbUnitQueryGetResult(unitQueryID, i);
         if (kbUnitIsType(NoArcherPlease, cUnitTypeAbstractSiegeWeapon) || 
 		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractArcher) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLance) != true)) ||
-		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLance) == true)) ||
-		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeChieroballista) == true)))
+		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLance) == true)))
             continue;
 		
 	   if (numberFoundTemp > 0)
@@ -2038,9 +2036,6 @@ inactive
 						}
 						aiPlanSetNoMoreUnits(gDefendPlentyVault, false);
 						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.8, numAvailableUnits * 0.85, numAvailableUnits * 0.9);    // Most mil units.
-						if (cMyCulture != cCultureChinese)
-						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeAbstractSiegeWeapon, 0, 0, 0);
-						else aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeSittingTiger, 0, 0, 0);
 						LandNeedReCalculation = false;
 						KOTHStopRefill = true;
 						xsEnableRule("KOTHMonitor");

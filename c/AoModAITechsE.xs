@@ -665,12 +665,6 @@ rule getFuneralBarge
     minInterval 31
     group Osiris
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (kbGetTechStatus(cTechFuneralBarge) == cTechStatusAvailable)
     {
         int x=-1;

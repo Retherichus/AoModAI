@@ -451,12 +451,12 @@ rule getHusbandry
     int numTemples = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
     if ((numTemples < 1) || ((cMyCulture == cCultureAtlantean) && (kbGetAge() < cAge2)))
         return;
-    int numHerdables = kbUnitCount(cMyID, cUnitTypeHerdable);     
+        
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
-    if ((woodSupply < 200) || (goldSupply < 110) || (kbGetTechStatus(cTechPickaxe) < cTechStatusResearching) || (kbGetTechStatus(cTechHandAxe) < cTechStatusResearching) || (cMyCulture == cCultureAtlantean) && (numHerdables < 5))
+    if ((woodSupply < 110) || (goldSupply < 110))
         return;
-       
+        
     if ((gHuntersExist == true) && (kbGetTechStatus(cTechHuntingDogs) < cTechStatusResearching))
         return;
     

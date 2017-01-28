@@ -199,12 +199,6 @@ rule getArcticWinds
     minInterval 60 //starts in cAge2
     group Heimdall
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     float woodSupply = kbResourceGet(cResourceWood);
@@ -330,12 +324,6 @@ rule getLongSerpent
     minInterval 60 //starts in cAge3
     group Njord
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechLongSerpent) == cTechStatusAvailable)
@@ -356,12 +344,6 @@ rule getWrathOfTheDeep
     minInterval 60 //starts in cAge3
     group Njord
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechWrathOfTheDeep) == cTechStatusAvailable)
@@ -509,12 +491,7 @@ rule getArcticGale
     minInterval 60 //starts in cAge4
     group Baldr
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
+
     if (kbGetTechStatus(cTechArcticGale) == cTechStatusAvailable)
     {
         int x=-1;

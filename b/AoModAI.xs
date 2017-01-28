@@ -65,7 +65,7 @@ extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age hand
 
 
 // Trade globals
-extern int gMaxTradeCarts = 23;           // Max trade carts
+extern int gMaxTradeCarts = 24;           // Max trade carts
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -814,9 +814,7 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
             tradeCount = 15;
         if ((aiGetGameMode() == cGameModeLightning) && (tradeCount > 5))
             tradeCount = 5;
-
         vilPop = vilPop - tradeCount;     // Vils = total-trade
-
     }
     
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -854,14 +852,6 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
             vilPop = lightningLimit;
     }
 
-	if (cMyCulture == cCultureAtlantean) // To make sure caravans don't steal all pop slots etc.
-	{	
-		if (vilPop >= 25)
-        vilPop = 25;
-		
-		if (vilPop < 5)
-        vilPop = 6;
-	}	
     //Update the number of vils to maintain.
     aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0, vilPop);
 }
@@ -1593,8 +1583,6 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     int minVillagers = 16;
     if (cMyCulture == cCultureAtlantean)
         minVillagers = 6;
-	if (aiGetWorldDifficulty() > cDifficultyHard)
-	minVillagers = minVillagers / 2;		
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
     {
@@ -3540,8 +3528,7 @@ void init(void)
     if (cvOffenseDefenseSlider < -1.0)
         cvOffenseDefenseSlider = -1.0;
     if (ShowAiEcho == true) aiEcho("Sliders are...RushBoom "+cvRushBoomSlider+", MilitaryEcon "+cvMilitaryEconSlider+", OffenseDefense "+cvOffenseDefenseSlider);
-    
-	
+
 
     //Startup messages.
     if (ShowAiEcho == true) aiEcho("Greetings, my name is "+cMyName+".");
@@ -4058,6 +4045,7 @@ void init(void)
             lateAttackAge = 3;
 
         gLandAttackGoalID = createSimpleAttackGoal("Main Land Attack", -1, gLateUPID, -1, lateAttackAge, -1, kbBaseGetMainID(cMyID), true);
+
         if (gLandAttackGoalID >= 0)
         {
             //If this is easy, this is an idle attack.
@@ -4148,7 +4136,7 @@ void init(void)
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFood, 1.5);
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFavor, 10.0);
         //Set our farm limits.
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 30);  //  Up from 4
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 20);  //  Up from 4
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanMaxFarmLimit, 0, 40);     //  Up from 24
         aiSetFarmLimit(aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0));
         //Do our late econ init.
@@ -5551,7 +5539,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 	
 			// Disable early fishing for Nomad & Highland, to later be enabled.
 		
-		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") ||(cRandomMapName == "vinlandsaga") ||(cRandomMapName == "team migration") ||(NoFishing == true))
+		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") ||(cRandomMapName == "vinlandsaga") ||(cRandomMapName == "team migration") ||(NoFishing == true)) 
 		  {
 		  if (ShowAiEcho == true) aiEcho("FindFish disabled, map forced this.");
 		  xsDisableSelf();

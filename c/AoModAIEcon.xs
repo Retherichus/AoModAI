@@ -85,8 +85,6 @@ rule updateWoodBreakdown
         minVillagers = 5;
     else if (cMyCulture == cCultureGreek)
         minVillagers = 14;
-	if (aiGetWorldDifficulty() > cDifficultyHard)
-	minVillagers = minVillagers / 2;
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
     {
@@ -156,7 +154,10 @@ rule updateWoodBreakdown
 
         if (numberWoodBaseSites > 0)  // We do have remote wood
         {
+            if (gTransportMap == true)
                 aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+            else
+                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
             aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
         }
         else  // No remote wood...bummer.  Kill old breakdown, look for more
@@ -171,7 +172,10 @@ rule updateWoodBreakdown
             if (gWoodBaseID >= 0)
             {
                 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
+                if (gTransportMap == true)
                     aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+                else
+                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
             }
             else
             {
@@ -314,8 +318,6 @@ rule updateGoldBreakdown
         minVillagers = 5;
     else if (cMyCulture == cCultureGreek)
         minVillagers = 14;
-	if (aiGetWorldDifficulty() > cDifficultyHard)
-	minVillagers = minVillagers / 2;		
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
     {
@@ -574,7 +576,7 @@ rule updateFoodBreakdown
 
     float aggressiveAmount = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
     float easyAmount = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, distance);
-    easyAmount = easyAmount + 100 * numHerdables;      // Add in the herdables, overlooked by the kbGetAmount call.
+    easyAmount = easyAmount + 50 * numHerdables;      // Add in the herdables, overlooked by the kbGetAmount call.
 
     float totalAmount = aggressiveAmount + easyAmount;
    
@@ -3205,7 +3207,7 @@ rule sendIdleTradeUnitsToRandomBase
                         if (currentTradeRouteLength > minRequiredDistance)
                         {
                             //33% chance to use the alliedTradeDestinationID
-                            if ((alliedTradeDestinationID != -1) && (aiRandInt(3) > 0))
+                            if ((alliedTradeDestinationID != -1) && (aiRandInt(3) == 0))
                             {
                                 tradeDestinationID = alliedTradeDestinationID;
                                 if (ShowAiEcho == true) aiEcho("setting tradeDestinationID = alliedTradeDestinationID");

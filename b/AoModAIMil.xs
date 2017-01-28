@@ -741,7 +741,7 @@ rule monitorAttPlans
                         aiPlanDestroy(gSettlementPosDefPlanID);
                     }
                     gSettlementPosDefPlanDefPoint = gEnemySettlementAttPlanLastAttPoint;
-                    aiPlanSetDesiredPriority(attackPlanID, 52);
+                    aiPlanSetDesiredPriority(attackPlanID, 51);
 					xsEnableRule("defendSettlementPosition");
                     countA = -1;
                     continue;
@@ -754,7 +754,7 @@ rule monitorAttPlans
                      || ((numAttEnemySiegeNearDefBInR50 > 0) && (numEnemyMilUnitsNearDefBInR40 > 3)))
                     {
                         countA = 0;
-                        if ((numEnemyMilUnitsNearMBInR70 > 14) || (numEnemyMilUnitsNearDefBInR40 > 14) && (attPlanPriority <= 30))
+                        if ((numEnemyMilUnitsNearMBInR70 > 14) || (numEnemyMilUnitsNearDefBInR40 > 10) && (attPlanPriority < 20))
                         {
                             aiPlanDestroy(attackPlanID);
                             if (ShowAiEcho == true) aiEcho ("destroying gEnemySettlementAttPlanID as there are too many enemies");
@@ -2364,7 +2364,7 @@ rule attackEnemySettlement
                     else
                     {
                         aiPlanSetNoMoreUnits(attackPlanID, true);  // Make sure the gEnemySettlementAttPlan is closed
-                        aiPlanSetDesiredPriority(attackPlanID, 52);
+                        aiPlanSetDesiredPriority(attackPlanID, 51);
                        if (ShowAiEcho == true) aiEcho ("Setting gEnemySettlementAttPlanID NoMoreUnits to true");
                     }
                 }
@@ -2720,21 +2720,21 @@ rule attackEnemySettlement
             if (numMilUnitsInDefPlans < 14)
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, 8, 12, 12);
             else
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.5, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.8);
         }
         else
         {
-            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeAbstractSiegeWeapon, 0, 2, 3);
+            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeAbstractSiegeWeapon, 0, 2, 2);
             if (numRagnorokHeroes < 10)
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeHero, 0, 2, 2);
             
             if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 2, 4);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 2, 2);
             
             if (numMilUnitsInDefPlans < 14)
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, 8, 12, 12);
             else
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.90, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.55, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
         }
             
         aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
@@ -2745,11 +2745,9 @@ rule attackEnemySettlement
     {
         aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeAbstractSiegeWeapon, 0, 2, 2);
         if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian))
-            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeHero, 0, 2, 3);
+            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeHero, 0, 2, 2);
         else if (cMyCulture == cCultureAtlantean)
-            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeHero, 0, 3, 4);
-        else if (cMyCulture == cCultureChinese)
-            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeHero, 0, 4, 8);			
+            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeHero, 0, 3, 3);
         else
         {
             if (numRagnorokHeroes < 10)
@@ -2760,13 +2758,13 @@ rule attackEnemySettlement
             aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 2, 2);
         
         if (numTitans > 0)
-            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
+            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.4, numMilUnitsInDefPlans * 0.6, numMilUnitsInDefPlans);
         else
         {
             if (currentPopCap > 160)
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.80, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
             else
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.80, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
         }
         aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
         
@@ -2775,7 +2773,8 @@ rule attackEnemySettlement
     }
     
   
-    if (aiRandInt(2) < 1)
+    if ((aiRandInt(2) < 1) || (numTitans > 0) || (targetSettlementCloseToMB == true)
+      || (distanceToTarget <= veryCloseRange))
         aiPlanSetVariableBool(enemySettlementAttPlanID, cAttackPlanAutoUseGPs, 0, false);
     else
         aiPlanSetVariableBool(enemySettlementAttPlanID, cAttackPlanAutoUseGPs, 0, true);
@@ -4127,7 +4126,7 @@ rule createLandAttack
     int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + IdleMil + numMilUnitsInBaseUnderAttackDefPlan * 0.4 + numMilUnitsInSettlementPosDefPlan * 0.4;
     if ((numMilUnitsInMBDefPlan2 > 3) && (numEnemyMilUnitsNearMBInR85 < 11) && (numEnemyTitansNearMBInR85 < 1))
     {
-        numMilUnitsInDefPlans = numMilUnitsInDefPlans + numMilUnitsInMBDefPlan2 * 0.95;
+        numMilUnitsInDefPlans = numMilUnitsInDefPlans + numMilUnitsInMBDefPlan2 * 0.4;
     }
     if (ShowAiEcho == true) aiEcho("total numMilUnitsInDefPlans: "+numMilUnitsInDefPlans);
     
@@ -4225,7 +4224,7 @@ rule createLandAttack
             aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 1, 1);
     
         if (kbGetAge() == cAge2)
-            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
+            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95);
         else
             aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans, numMilUnitsInDefPlans); 
             

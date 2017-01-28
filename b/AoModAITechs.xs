@@ -451,12 +451,12 @@ rule getHusbandry
     int numTemples = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
     if ((numTemples < 1) || ((cMyCulture == cCultureAtlantean) && (kbGetAge() < cAge2)))
         return;
-    int numHerdables = kbUnitCount(cMyID, cUnitTypeHerdable);     
+        
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
-    if ((woodSupply < 200) || (goldSupply < 110) || (kbGetTechStatus(cTechPickaxe) < cTechStatusResearching) || (kbGetTechStatus(cTechHandAxe) < cTechStatusResearching) || (cMyCulture == cCultureAtlantean) && (numHerdables < 5))
+    if ((woodSupply < 110) || (goldSupply < 110))
         return;
-       
+        
     if ((gHuntersExist == true) && (kbGetTechStatus(cTechHuntingDogs) < cTechStatusResearching))
         return;
     
@@ -527,10 +527,14 @@ rule getPickaxe
     float foodSupply = kbResourceGet(cResourceFood);
     if (kbGetAge() < cAge2)
     {    
-        if (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching)
+        if ((kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) && ((foodSupply < 460) || (woodSupply < 120)))
             return;
     }
-
+    else
+    {
+        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false) && (xsGetTime() < 5*60*1000))
+            return;
+    }
     
     //get Pickaxe.
     int pickAxePlanID=aiPlanCreate("getPickAxe", cPlanProgression);
@@ -600,7 +604,12 @@ rule getHandaxe
     
     if (kbGetAge() < cAge2)
     {
-        if (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching)
+        if ((kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) && ((foodSupply < 530) || (goldSupply < 50)))
+            return;
+    }
+    else
+    {
+        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false) && (xsGetTime() < 5*60*1000))
             return;
     }
     
@@ -820,7 +829,7 @@ rule getHuntingDogs
 
 //==============================================================================
 rule getBowSaw
-    minInterval 15 //gets started in getHandaxe
+    minInterval 31 //gets started in getHandaxe
     inactive
 {
     int techID = cTechBowSaw;
@@ -872,7 +881,7 @@ rule getBowSaw
     
     if (kbGetAge() < cAge3)
     {
-        if ((foodSupply < 300) || (goldSupply < 150))
+        if ((foodSupply < 300) || (goldSupply < 200))
             return;
     }
     
@@ -898,7 +907,7 @@ rule getBowSaw
 
 //==============================================================================
 rule getShaftMine
-    minInterval 15 //gets started in getPickaxe
+    minInterval 29 //gets started in getPickaxe
     inactive
 {
     int techID = cTechShaftMine;
@@ -968,7 +977,7 @@ rule getShaftMine
     
     if (kbGetAge() < cAge3)
     {
-        if ((foodSupply < 200) || (woodSupply < 250))
+        if ((foodSupply < 250) || (woodSupply < 250))
             return;
     }
     
@@ -1061,7 +1070,7 @@ rule getIrrigation
 
 //==============================================================================
 rule getQuarry
-    minInterval 15 //gets started in getShaftMine
+    minInterval 29 //gets started in getShaftMine
     inactive
 {
     int techID = cTechQuarry;
@@ -1127,7 +1136,7 @@ rule getQuarry
     
    if (kbGetAge() < cAge4)
     {
-        if ((foodSupply < 250) || (woodSupply < 300))
+        if ((foodSupply < 300) || (woodSupply < 300))
             return;
     }
     
@@ -1153,7 +1162,7 @@ rule getQuarry
 
 //==============================================================================
 rule getCarpenters
-    minInterval 15 //gets started in getBowSaw
+    minInterval 31 //gets started in getBowSaw
     inactive
 {
     int techID = cTechCarpenters;
@@ -1201,7 +1210,7 @@ rule getCarpenters
     
    if (kbGetAge() < cAge4)
     {
-        if ((foodSupply < 350) || (goldSupply < 200))
+        if ((foodSupply < 400) || (goldSupply < 300))
             return;
     }
     

@@ -1048,7 +1048,7 @@ rule buildSettlementsEarly  //age 1/2 handler
     if (xsGetTime() > 20*60*1000)
         createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);        
     else
-        createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 99);
+        createBuildSettlementGoal("BuildSettlement", kbGetAge(), kbGetAge() + 1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 99);
 }
 
 //==============================================================================
@@ -3736,9 +3736,8 @@ rule buildArmory
         xsDisableSelf();
         return;
     }
-	float woodSupply = kbResourceGet(cResourceWood);
-	int numBuilders = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive); 
-    if ((kbGetAge() < cAge2)|| (kbGetAge() > cAge2) && (woodSupply < 460) || (kbGetAge() == cAge2) && (woodSupply < 220))
+
+    if (kbGetAge() < cAge2)
         return;
     
     xsSetRuleMinIntervalSelf(25);
@@ -4778,7 +4777,7 @@ rule buildExtraFarms
     if (cMyCulture == cCultureEgyptian)
         resourceSupply = kbResourceGet(cResourceGold);
     
-    if (resourceSupply < 350)
+    if (resourceSupply < 200)
     {
         return;
     }

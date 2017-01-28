@@ -279,8 +279,8 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
         aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistanceSelf);
         aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
-        aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 40.0);
-        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 3);
+        aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 20.0);
+        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 2);
         aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMythUnit);
         return (true);  
     }
@@ -1838,7 +1838,6 @@ rule rHesperidesPower
 //==============================================================================
 // rule rCitadel, modified Sentinel plan to be exact.
 //==============================================================================
-extern int BlockedCitadelID=-1;
 rule rCitadel
     minInterval 20 //starts in cAge1
     inactive
@@ -1853,7 +1852,6 @@ rule rCitadel
     int planID=fCitadelPlanID;
     static int unitQueryID=-1;
     static int enemyQueryID=-1;
-
 
     //If we don't have the query yet, create one.
     if (unitQueryID < 0)
@@ -1920,30 +1918,10 @@ rule rCitadel
             aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelNone);
             aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTownCenter);
             xsDisableSelf();
-			BlockedCitadelID = baseID;
-			xsEnableRule("BlockedGPCitadel");
         }
     }
 }
-rule BlockedGPCitadel
-   minInterval 2
-   inactive
-{
-   static vector CitadelLoc = cInvalidVector;
-   if (BlockedCitadelID != -1)
-   {
-   CitadelLoc = kbUnitGetPosition(BlockedCitadelID);
-   
-   int NumAllies = getNumUnitsByRel(cUnitTypeCitadelCenter, cUnitStateAlive, -1, cPlayerRelationAlly, CitadelLoc, 20.0, true);
-   int NumSelf = getNumUnits(cUnitTypeCitadelCenter, cUnitStateAlive, -1, cMyID, CitadelLoc, 20.0, true);
-   int Combined = NumAllies + NumSelf;
-   if (Combined < 1)
-   xsEnableRule("rCitadel");
-   BlockedCitadelID = -1;
-   CitadelLoc = cInvalidVector;
-}
-   xsDisableSelf();
-}
+
 //==============================================================================
 // Shifting Sand Rule & Plan
 //==============================================================================
@@ -2404,12 +2382,10 @@ inactive
         if(aiCastGodPowerAtPosition(aiGetGodPowerTechIDForSlot(3), kbUnitGetPosition(eUnitID)) == true)
    	    {   
    	     CastAttempt = CastAttempt+1;
-	     if (CastAttempt == 3)
-		 xsSetRuleMinIntervalSelf(60);
-		 else xsSetRuleMinIntervalSelf(1);
-		 if (CastAttempt >= 5)
+	     if (CastAttempt >= 2)
 		 xsDisableSelf();
 		 if (ShowAiEcho == true) aiEcho("CASTING A4 GP");
+		 xsSetRuleMinIntervalSelf(1);
    		 return;
    		}
 	}

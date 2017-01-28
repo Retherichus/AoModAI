@@ -92,8 +92,7 @@ void preInitMap()
       (cRandomMapName == "riverland") ||
       (cRandomMapName == "alternate-sea-of-worms") ||
 	  (cRandomMapName == "king of the hill") ||	
-      (cRandomMapName == "sea of worms") ||
-	  (cRandomMapName == "basin"))
+      (cRandomMapName == "sea of worms"))
     {
         // these maps contain water, which we can use to fish for example.
         // but all players are connected by land. This means that we are able
@@ -167,7 +166,7 @@ void preInitMap()
       (cRandomMapName == "rocky mountains") ||
       (cRandomMapName == "cherimoya") ||
       (cRandomMapName == "ghost lake") ||
-      (cRandomMapName == "green desert") || 
+      (cRandomMapName == "green desert") ||
 	  (cRandomMapName == "Deep Jungle") || // Not guaranteed to have a pool generated nearby, and fishing in an enemy pool is a bad idea!
       (cRandomMapName == "sudden death")) // imho: does'nt make much sense to fish here
     {

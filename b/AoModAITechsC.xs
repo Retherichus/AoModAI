@@ -10,10 +10,9 @@
 //==============================================================================
 rule getAcupuncture
     inactive
-    minInterval 30
+    minInterval 23
 {
-    float foodSupply = kbResourceGet(cResourceFood);
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (foodSupply < 1000))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechAcupuncture) == cTechStatusAvailable)
     {
@@ -21,7 +20,6 @@ rule getAcupuncture
         x = aiPlanCreate("Acupuncture", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechAcupuncture);
         aiPlanSetDesiredPriority(x, 15);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Acupuncture");
@@ -34,10 +32,9 @@ rule getAcupuncture
 //==============================================================================
 rule getDomestication
     inactive
-    minInterval 50
+    minInterval 23
 {
-    float woodSupply = kbResourceGet(cResourceWood);
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (woodSupply < 500))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechDomestication) == cTechStatusAvailable)
     {
@@ -45,7 +42,6 @@ rule getDomestication
         x = aiPlanCreate("Domestication", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechDomestication);
         aiPlanSetDesiredPriority(x, 15);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Domestication");
@@ -58,7 +54,7 @@ rule getDomestication
 //==============================================================================
 rule getWheelbarrow
     inactive
-    minInterval 25
+    minInterval 23
 {
     int techID = cTechWheelbarrow;
     int techStatus = kbGetTechStatus(techID);
@@ -69,7 +65,7 @@ rule getWheelbarrow
         x = aiPlanCreate("Wheelbarrow", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
         aiPlanSetDesiredPriority(x, 100);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         if (ShowAiEcho == true) aiEcho("Getting Wheelbarrow");
         xsSetRuleMinIntervalSelf(300);
@@ -99,7 +95,6 @@ rule getElixirofImmortality
         x = aiPlanCreate("ElixirofImmortality", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechElixirofImmortality);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting ElixirofImmortality");
@@ -118,7 +113,7 @@ rule getHouyisBow
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
-    if (kbGetAge() < cAge3 && woodSupply < 500)
+    if (kbGetAge() < cAge3 && woodSupply < 650)
 	return;
     if (kbGetTechStatus(cTechHouyisBow) == cTechStatusAvailable)
     {
@@ -126,7 +121,6 @@ rule getHouyisBow
         x = aiPlanCreate("VolcanicForge", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechHouyisBow);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Houyis Bow");
@@ -153,7 +147,6 @@ rule getJadeRabbit
         x = aiPlanCreate("VolcanicForge", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechJadeRabbit);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Jade Rabbit");
@@ -166,7 +159,7 @@ rule getJadeRabbit
 //==============================================================================
 rule getGoldenBandedStaff
     inactive
-    minInterval 30
+    minInterval 27
     group Sunwukong
 {
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
@@ -181,7 +174,6 @@ rule getGoldenBandedStaff
         x = aiPlanCreate("GoldenBandedStaff", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechGoldenBandedStaff);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting GoldenBandedStaff");
@@ -208,46 +200,13 @@ rule getPaperTalisman
         x = aiPlanCreate("PaperTalisman", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechPaperTalisman);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting PaperTalisman");
     }
 }
 
-//Sunwukong
-//==============================================================================
-// RULE: PillaroftheOcean
-//==============================================================================
-rule PillaroftheOcean
-    inactive
-    minInterval 30
-    group Sunwukong
-{
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float woodSupply = kbResourceGet(cResourceWood);
-	
-    if ((kbGetAge() < cAge3) && (woodSupply < 700))
-	return;
-    if (kbGetTechStatus(cTechPillaroftheOcean) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("PillaroftheOcean", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechPillaroftheOcean);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting PillaroftheOcean");
-    }
-}
+
 
 //Huangdi
 
@@ -272,7 +231,6 @@ rule getStoneArmor
         x = aiPlanCreate("StoneArmor", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechStoneArmor);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting StoneArmor");
@@ -293,7 +251,6 @@ rule getFiveGrains
         x = aiPlanCreate("FiveGrains", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechFiveGrains);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting FiveGrains");
@@ -305,7 +262,7 @@ rule getFiveGrains
 //==============================================================================
 rule getOracleBoneScript
     inactive
-    minInterval 35
+    minInterval 27
     group Huangdi
 {
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
@@ -320,7 +277,6 @@ rule getOracleBoneScript
         x = aiPlanCreate("OracleBoneScript", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechOracleBoneScript);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting OracleBoneScript");
@@ -335,20 +291,16 @@ rule getOracleBoneScript
 //==============================================================================
 rule getLandlordSpirit
     inactive
-    minInterval 45
+    minInterval 27
     group Dabogong
 {
-    float foodSupply = kbResourceGet(cResourceFood);
-	if (foodSupply < 400)
-	return;
-	
+
     if (kbGetTechStatus(cTechLandlordSpirit) == cTechStatusAvailable)
     {
         int x=-1;
         x = aiPlanCreate("LandlordSpirit", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechLandlordSpirit);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting LandlordSpirit");
@@ -372,7 +324,6 @@ rule getBurials
         x = aiPlanCreate("Burials", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechBurials);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Burials");
@@ -395,7 +346,6 @@ rule getHouseAltars
         x = aiPlanCreate("HouseAltars", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechHouseAltars);
         aiPlanSetDesiredPriority(x, 50);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting HouseAltars");
@@ -413,11 +363,10 @@ rule getHouseAltars
 //==============================================================================
 rule getLifeDrain
     inactive
-    minInterval 60
+    minInterval 27
     group Zhongkui
 {
-    float goldSupply = kbResourceGet(cResourceGold);
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (goldSupply < 1000))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechLifeDrain) == cTechStatusAvailable)
     {
@@ -425,7 +374,6 @@ rule getLifeDrain
         x = aiPlanCreate("LifeDrain", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechLifeDrain);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting LifeDrain");
@@ -438,7 +386,7 @@ rule getLifeDrain
 //==============================================================================
 rule getDemonSlayer
     inactive
-    minInterval 40
+    minInterval 27
     group Zhongkui
 {
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
@@ -449,7 +397,6 @@ rule getDemonSlayer
         x = aiPlanCreate("DemonSlayer", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechDemonSlayer);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting DemonSlayer");
@@ -462,7 +409,7 @@ rule getDemonSlayer
 //==============================================================================
 rule getUnbridledAnger
     inactive
-    minInterval 35
+    minInterval 27
     group Zhongkui
  {
      if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
@@ -473,7 +420,6 @@ rule getUnbridledAnger
         x = aiPlanCreate("UnbridledAnger", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechUnbrideledAnger);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Unbridled Anger");
@@ -488,7 +434,7 @@ rule getUnbridledAnger
 //==============================================================================
 rule getSacrifices
     inactive
-    minInterval 30
+    minInterval 27
     group Hebo
 {
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
@@ -499,7 +445,6 @@ rule getSacrifices
         x = aiPlanCreate("Sacrifices", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechSacrifices);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Sacrifices");
@@ -514,12 +459,6 @@ rule getLordoftheRiver
     minInterval 27
     group Hebo
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechLordoftheRiver) == cTechStatusAvailable)
@@ -528,7 +467,6 @@ rule getLordoftheRiver
         x = aiPlanCreate("LordoftheRiver", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechLordoftheRiver);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting LordoftheRiver");
@@ -552,7 +490,6 @@ rule getRammedEarth
         x = aiPlanCreate("RammedEarth", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechRammedEarth);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting RammedEarth");
@@ -575,7 +512,6 @@ rule getTigerSpirit
         x = aiPlanCreate("TigerSpirit", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechTigerSpirit);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting TigerSpirit");
@@ -596,7 +532,6 @@ rule getGoldenPeaches
         x = aiPlanCreate("GoldenPeaches", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechGoldenPeaches);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting GoldenPeaches");
@@ -617,7 +552,6 @@ rule getCelestialPalace
         x = aiPlanCreate("CelestialPalace", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechCelestialPalace);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting CelestialPalace");
@@ -642,7 +576,6 @@ rule getHeavenlyFire
         x = aiPlanCreate("HeavenlyFire", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechHeavenlyFire);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting HeavenlyFire");
@@ -663,7 +596,6 @@ rule getStirrup
         x = aiPlanCreate("Stirrup", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechStirrup);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Stirrup");
@@ -679,19 +611,12 @@ rule getAncientDestroyer
     minInterval 27
     group Chongli
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (kbGetTechStatus(cTechAncientDestroyer) == cTechStatusAvailable)
     {
         int x=-1;
         x = aiPlanCreate("AncientDestroyer", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechAncientDestroyer);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting AncientDestroyer");
@@ -715,7 +640,6 @@ rule getNezhasDefeat
         x = aiPlanCreate("NezhasDefeat", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechNezhasDefeat);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting NezhasDefeat");
@@ -736,7 +660,6 @@ rule getDragonScales
         x = aiPlanCreate("DragonScales", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechDragonScales);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting DragonScales");
@@ -751,19 +674,12 @@ rule getEastSea
     minInterval 27
     group Aokuang
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (kbGetTechStatus(cTechEastSea) == cTechStatusAvailable)
     {
         int x=-1;
         x = aiPlanCreate("EastSea", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechEastSea);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting EastSea");

@@ -85,8 +85,6 @@ rule updateWoodBreakdown
         minVillagers = 5;
     else if (cMyCulture == cCultureGreek)
         minVillagers = 14;
-	if (aiGetWorldDifficulty() > cDifficultyHard)
-	minVillagers = minVillagers / 2;
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
     {
@@ -120,7 +118,7 @@ rule updateWoodBreakdown
 
     int desiredWoodPlans = 1 + (woodGathererCount/12);
     if (cMyCulture == cCultureAtlantean)
-	desiredWoodPlans = 2;
+	desiredWoodPlans = 1 + (woodGathererCount/5);
 	
 	if (desiredWoodPlans > 2)
 	desiredWoodPlans = 2;
@@ -156,7 +154,10 @@ rule updateWoodBreakdown
 
         if (numberWoodBaseSites > 0)  // We do have remote wood
         {
+            if (gTransportMap == true)
                 aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+            else
+                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
             aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
         }
         else  // No remote wood...bummer.  Kill old breakdown, look for more
@@ -171,7 +172,10 @@ rule updateWoodBreakdown
             if (gWoodBaseID >= 0)
             {
                 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
+                if (gTransportMap == true)
                     aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+                else
+                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
             }
             else
             {
@@ -314,8 +318,6 @@ rule updateGoldBreakdown
         minVillagers = 5;
     else if (cMyCulture == cCultureGreek)
         minVillagers = 14;
-	if (aiGetWorldDifficulty() > cDifficultyHard)
-	minVillagers = minVillagers / 2;		
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
     {
@@ -349,7 +351,7 @@ rule updateGoldBreakdown
 
     int desiredGoldPlans = 1 + (goldGathererCount/12);
 	if (cMyCulture == cCultureAtlantean)
-	desiredGoldPlans = 2;
+	desiredGoldPlans = 1 + (goldGathererCount/5);
 	
 	if (desiredGoldPlans > 2)
 	desiredGoldPlans = 2;
@@ -686,7 +688,7 @@ rule updateFoodBreakdown
                 if (distanceToMainBase < 65.0)
                     farmsWanted = 3;
                 else if (distanceToMainBase < 90.0)
-                    farmsWanted = 2;
+                    farmsWanted = 1;
 			    if (cMyCulture == cCultureAtlantean)
 			    farmsWanted = 1; // just one for atlanteans.	
             }
@@ -924,6 +926,8 @@ rule updateFoodBreakdown
     int numPlansUnassigned = numPlansWanted;
     
     int minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() + 0;    // Don't start a new aggressive plan unless we have this many vills...buffer above strict minimum.
+    if (cMyCulture == cCultureAtlantean)
+        minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() + 0;
 
     // Start a new plan if we have enough villies and we have the resource.
     // If we have a plan open, don't kill it as long as we are within 1 of the needed min...the plan will steal from elsewhere.
@@ -3205,7 +3209,7 @@ rule sendIdleTradeUnitsToRandomBase
                         if (currentTradeRouteLength > minRequiredDistance)
                         {
                             //33% chance to use the alliedTradeDestinationID
-                            if ((alliedTradeDestinationID != -1) && (aiRandInt(3) > 0))
+                            if ((alliedTradeDestinationID != -1) && (aiRandInt(3) == 0))
                             {
                                 tradeDestinationID = alliedTradeDestinationID;
                                 if (ShowAiEcho == true) aiEcho("setting tradeDestinationID = alliedTradeDestinationID");

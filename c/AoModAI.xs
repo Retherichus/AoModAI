@@ -1593,8 +1593,6 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     int minVillagers = 16;
     if (cMyCulture == cCultureAtlantean)
         minVillagers = 6;
-	if (aiGetWorldDifficulty() > cDifficultyHard)
-	minVillagers = minVillagers / 2;		
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
     {
@@ -5551,7 +5549,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 	
 			// Disable early fishing for Nomad & Highland, to later be enabled.
 		
-		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") ||(cRandomMapName == "vinlandsaga") ||(cRandomMapName == "team migration") ||(NoFishing == true))
+		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") ||(cRandomMapName == "vinlandsaga") ||(cRandomMapName == "team migration") ||(NoFishing == true)) 
 		  {
 		  if (ShowAiEcho == true) aiEcho("FindFish disabled, map forced this.");
 		  xsDisableSelf();

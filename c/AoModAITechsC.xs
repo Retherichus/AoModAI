@@ -215,39 +215,7 @@ rule getPaperTalisman
     }
 }
 
-//Sunwukong
-//==============================================================================
-// RULE: PillaroftheOcean
-//==============================================================================
-rule PillaroftheOcean
-    inactive
-    minInterval 30
-    group Sunwukong
-{
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float woodSupply = kbResourceGet(cResourceWood);
-	
-    if ((kbGetAge() < cAge3) && (woodSupply < 700))
-	return;
-    if (kbGetTechStatus(cTechPillaroftheOcean) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("PillaroftheOcean", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechPillaroftheOcean);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting PillaroftheOcean");
-    }
-}
+
 
 //Huangdi
 
@@ -514,12 +482,6 @@ rule getLordoftheRiver
     minInterval 27
     group Hebo
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechLordoftheRiver) == cTechStatusAvailable)
@@ -679,12 +641,6 @@ rule getAncientDestroyer
     minInterval 27
     group Chongli
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (kbGetTechStatus(cTechAncientDestroyer) == cTechStatusAvailable)
     {
         int x=-1;
@@ -751,12 +707,6 @@ rule getEastSea
     minInterval 27
     group Aokuang
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
     if (kbGetTechStatus(cTechEastSea) == cTechStatusAvailable)
     {
         int x=-1;

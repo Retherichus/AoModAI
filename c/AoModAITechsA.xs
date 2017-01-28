@@ -12,7 +12,7 @@ rule getChannels
     inactive
     minInterval 23
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge3))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechChannels) == cTechStatusAvailable)
     {

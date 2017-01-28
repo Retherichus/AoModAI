@@ -1048,7 +1048,7 @@ rule buildSettlementsEarly  //age 1/2 handler
     if (xsGetTime() > 20*60*1000)
         createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);        
     else
-        createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 99);
+        createBuildSettlementGoal("BuildSettlement", kbGetAge(), kbGetAge() + 1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 99);
 }
 
 //==============================================================================
@@ -4778,7 +4778,7 @@ rule buildExtraFarms
     if (cMyCulture == cCultureEgyptian)
         resourceSupply = kbResourceGet(cResourceGold);
     
-    if (resourceSupply < 350)
+    if (resourceSupply < 200)
     {
         return;
     }
