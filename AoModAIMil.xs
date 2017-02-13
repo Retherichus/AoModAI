@@ -1047,6 +1047,8 @@ rule monitorAttPlans
                             continue;
                         }
                         killLandAttPlanCount = killLandAttPlanCount + 1;
+					    if (numMilUnitsInPlan < 5)
+						killLandAttPlanCount = killLandAttPlanCount + 1; // kill the plan faster.
                         continue;
                     }
                 }
@@ -1237,7 +1239,9 @@ rule defendPlanRule
 
         aiPlanSetDesiredPriority(defPlanID, 20);    // Way below others
         
-        aiPlanSetBaseID(defPlanID, baseToUse);
+		if (gTransportMap == true)
+        aiPlanSetBaseID(defPlanID, mainBaseID);
+		else aiPlanSetBaseID(defPlanID, baseToUse);
         
         aiPlanSetActive(defPlanID);
         gDefendPlanID = defPlanID;
@@ -1296,6 +1300,7 @@ rule activateObeliskClearingPlan // + vil hunting
 
         aiPlanAddUnitType(gObeliskClearingPlanID, cUnitTypeAbstractInfantry, 1, 1, 1);
         aiPlanSetDesiredPriority(gObeliskClearingPlanID, 16);
+		aiPlanSetBaseID(gObeliskClearingPlanID, mainBaseID);
         aiPlanSetActive(gObeliskClearingPlanID);
     }
 }
@@ -2502,7 +2507,7 @@ rule attackEnemySettlement
     else
     {
 
-        if (((woodSupply < 150) || (goldSupply <150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 3 - number))
+        if (((woodSupply < 100) || (goldSupply < 150) || (foodSupply < 110)) && (currentPop <= currentPopCap - 3 - number))
         {
            if (ShowAiEcho == true) aiEcho ("returning as we don't have enough resources");
             return;
@@ -2792,10 +2797,11 @@ rule attackEnemySettlement
 
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);
 	
-    aiPlanSetNumberVariableValues(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 3, true);
+    aiPlanSetNumberVariableValues(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 4, true);
 	aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
+	aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeAbstractTradeUnit);
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID); // add an extra just in case.
 	
 	
@@ -4021,7 +4027,7 @@ rule createLandAttack
             return;
         }
 
-        else if (((woodSupply < 100) || (foodSupply < 100) || (goldSupply < 100)) && (currentPop < currentPopCap))
+        else if (((woodSupply < 50) || (foodSupply < 100) || (goldSupply < 100)) && (currentPop < currentPopCap))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;
@@ -4225,7 +4231,7 @@ rule createLandAttack
             aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 1, 1);
     
         if (kbGetAge() == cAge2)
-            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.8, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
+            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
         else
             aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans, numMilUnitsInDefPlans); 
             
@@ -4260,10 +4266,11 @@ rule createLandAttack
     aiPlanSetVariableBool(landAttackPlanID, cAttackPlanAutoUseGPs, 0, true);
 
     
-    aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetTypeID, 3, true); 
+    aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetTypeID, 4, true); 
 	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
+	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeAbstractTradeUnit);
 	
 
     aiPlanSetDesiredPriority(landAttackPlanID, 50);

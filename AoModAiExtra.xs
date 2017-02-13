@@ -397,6 +397,10 @@ void initRethlAge2(void)
 	if (bWallCleanup == true)
 	xsEnableRuleGroup("WallCleanup");
 	
+    //Try to transport stranded Units.
+	if (gTransportMap == true)
+	xsEnableRule("TransportBuggedUnits");
+	
 }	
 
 //==============================================================================
@@ -413,7 +417,9 @@ rule ActivateRethOverridesAge1
 		
 		if (aiGetWorldDifficulty() > cDifficultyHard)
 		xsEnableRuleGroup("MassDonations");
-		aiResourceCheat(cMyID, cResourceFood, 0.1); //Adds 0.1 (not even 1!) food resource to fix a critical "startup-inventory" bug that can potentially block the AI from making vills.
+		aiResourceCheat(cMyID, cResourceFood, 0.1); //Adds 0.1 (not even 1!) resources to fix a critical "startup-inventory" bug that can potentially block the AI from making vills.
+		aiResourceCheat(cMyID, cResourceWood, 0.1);
+		aiResourceCheat(cMyID, cResourceGold, 0.1);
 		xsDisableSelf();
            
     }
@@ -2144,6 +2150,9 @@ inactive
 	{
 	 xsSetRuleMinIntervalSelf(5); // give some extra time to fetch units.
 	 aiPlanSetNoMoreUnits(gDefendPlentyVault, true);
+	 if (cMyCulture != cCultureChinese)
+	 aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeAbstractSiegeWeapon, 0, 0, 0);
+	 else aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeSittingTiger, 0, 0, 0);	 
 	 xsDisableSelf();
 	 keepUnitsWithinRange(gDefendPlentyVault, KOTHGlobal);
 	 KOTHStopRefill = false;
@@ -2463,8 +2472,109 @@ rule TEST
 minInterval 1
 inactive
 {
-
-
-
 }
 
+rule TransportBuggedUnits  
+minInterval 5
+inactive
+{
+static int TransportAttPlanID = -1;
+int IdleMil = aiNumberUnassignedUnits(cUnitTypeLogicalTypeLandMilitary);
+static int attackPlanStartTime = -1;
+static int targetSettlementID = -1;
+int AttackPlayer = aiGetMostHatedPlayerID();
+xsSetRuleMinIntervalSelf(20);
+static vector attPlanPosition = cInvalidVector;
+bool Filled = false;
+
+
+    int activeAttPlans = aiPlanGetNumber(cPlanAttack, -1, true );  // Attack plans, any state, active only
+	if (activeAttPlans > 0)
+    {
+        for (i = 0; < activeAttPlans)
+        {
+            int attackPlanID = aiPlanGetIDByIndex(cPlanAttack, -1, true, i);
+            if (ShowAiEcho == true) aiEcho("attackPlanID: "+attackPlanID);
+            if (attackPlanID == -1)
+                continue;
+				
+           int planState = aiPlanGetState(TransportAttPlanID);
+           attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
+		   aiPlanSetVariableInt(gMaintainWaterXPortPlanID, cTrainPlanNumberToMaintain, 0, 3);
+           int numMilUnitsNearAttPlan = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, attPlanPosition, 100);
+           int numInPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeLogicalTypeLandMilitary);
+		   int numTransportPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeTransport);
+           if (numMilUnitsNearAttPlan >= 20)
+           numMilUnitsNearAttPlan = 20;
+           if (numInPlan > 1)
+           Filled = true;
+           
+		   
+           if (Filled == false)
+		   {
+		   aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
+           aiPlanAddUnitType(TransportAttPlanID, cUnitTypeLogicalTypeLandMilitary, 0, 0, numMilUnitsNearAttPlan);
+           }		   
+           if (ShowAiEcho == true) aiEcho("planState: "+planState);
+           
+           if (attackPlanID == TransportAttPlanID)
+           {
+           if ((numInPlan < 1) || (xsGetTime() > attackPlanStartTime + 30*60*1000) || (planState == cPlanStateNone) && (xsGetTime() > attackPlanStartTime + 1.5*60*1000) ||
+           (planState == cPlanStateGather) && (xsGetTime() > attackPlanStartTime + 1.5*60*1000) || (planState == cPlanStateEnter) && (xsGetTime() > attackPlanStartTime + 2*60*1000)
+		   (planState == cPlanStateTransport) && (xsGetTime() > attackPlanStartTime + 1.5*60*1000) && (numTransportPlan < 1))
+           {
+           aiPlanDestroy(TransportAttPlanID);
+           aiEcho("Deleted");
+           xsSetRuleMinIntervalSelf(5);
+           }
+           return;			 
+		}
+	 }
+  }
+    if (IdleMil < 5)
+    return;				
+    TransportAttPlanID = aiPlanCreate("Transport bugged units", cPlanAttack);
+    if (TransportAttPlanID < 0)
+    return; 
+        
+    aiEcho(""+TransportAttPlanID+"");
+	
+    TransportAttPlanID = TransportAttPlanID;
+
+	targetSettlementID = getMainBaseUnitIDForPlayer(AttackPlayer);
+	if (targetSettlementID == -1)
+	targetSettlementID = findUnit(cUnitTypeUnit, cUnitStateAlive, -1, AttackPlayer); 
+	vector targetSettlementPos = kbUnitGetPosition(targetSettlementID); // uses main TC
+	aiPlanSetNumberVariableValues(TransportAttPlanID, cAttackPlanTargetAreaGroups, 1, true);  
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 0, kbAreaGroupGetIDByPosition(targetSettlementPos));
+    
+	
+	aiPlanAddUnitType(TransportAttPlanID, cUnitTypeHumanSoldier, 0, 0, 1);
+	attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);
+    aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
+ 
+    
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanPlayerID, 0, AttackPlayer);
+	aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
+	
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
+    aiPlanSetUnitStance(TransportAttPlanID, cUnitStanceDefensive);
+    aiPlanSetDesiredPriority(TransportAttPlanID, 1);
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanPlayerID, 0, AttackPlayer);
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanRetreatMode, 0, cAttackPlanRetreatModeNone);
+ 
+    aiPlanSetNumberVariableValues(TransportAttPlanID, cAttackPlanTargetTypeID, 4, true); 
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
+	aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeAbstractTradeUnit);
+ 
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanRefreshFrequency, 0, 12);
+	
+    aiPlanSetActive(TransportAttPlanID);
+    attackPlanStartTime = xsGetTime();
+ 
+ xsSetRuleMinIntervalSelf(5);
+}

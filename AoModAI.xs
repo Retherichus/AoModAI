@@ -65,7 +65,7 @@ extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age hand
 
 
 // Trade globals
-extern int gMaxTradeCarts = 23;           // Max trade carts
+extern int gMaxTradeCarts = 22;           // Max trade carts
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -1329,7 +1329,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     float favorSupply = kbResourceGet(cResourceFavor);
 
     float foodMultiplier = 1.2;      // Because food is so much slower to gather, inflate need
-	if (ResInflate == true && foodSupply > 5000)
+	if ((ResInflate == true) && (foodSupply > 5000))
 	foodMultiplier = 1.0;
 	
     gFoodForecast = gFoodForecast * foodMultiplier;
@@ -1498,7 +1498,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     float neededFoodGatherers = desiredFoodUnits - numFishBoats;
     if ((desiredFoodUnits > 0) && (kbGetAge() > cAge1))
     {
-        float minFoodGatherers = 5;
+        float minFoodGatherers = 6;
         if (cMyCulture == cCultureAtlantean)
             minFoodGatherers = 2;
         if ((numFishBoats < 4) && (kbGetAge() > cAge2) || (numGoldSites < 1))
@@ -3960,6 +3960,8 @@ void init(void)
 
     if (ShowAiEcho == true) aiEcho("gRushCount: "+gRushCount+", gRushSize: "+gRushSize+", gFirstRushSize: "+gFirstRushSize);
 
+	if ((aiGetWorldDifficulty() > cDifficultyHard) && (gRushCount < 1))
+	gRushCount = 1;
 	
 	if (gRushCount >= 2)
 	{

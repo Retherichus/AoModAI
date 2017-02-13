@@ -366,9 +366,9 @@ rule updateGoldBreakdown
             reducedGoldGathererCount = true;   //to make sure the number of desiredGoldPlans gets reduced to 1
         }
     }
-    
-	
-   if (xsGetTime() < 12*60*1000)
+
+   
+   if (xsGetTime() < 11*60*1000)
       desiredGoldPlans = 1;
         
     if (goldGathererCount < desiredGoldPlans)
@@ -378,8 +378,6 @@ rule updateGoldBreakdown
         desiredGoldPlans = numGoldPlans;    // Try to preserve existing plans
 
     if (ShowAiEcho == true) aiEcho("desiredGoldPlans: "+desiredGoldPlans);
-
-    
     // Three cases are possible:
     // 1)  We have enough sites at our main base.  All should work in main base.
     // 2)  We have some gold at main, but not enough.  Split the sites
@@ -503,7 +501,7 @@ rule updateFoodBreakdown
     
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
-    float distance = 85;
+    float distance = 80;
     if ((kbGetAge() >= cAge3) || (xsGetTime() > 15*60*1000)) 
 	distance=40.0;
 
@@ -515,16 +513,9 @@ rule updateFoodBreakdown
 	// Consider any of these below, as Aggressive Animals at the start of the game.
 	
 	if ((IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000))
-	{ 
-	int GiraffeNearMB = getNumUnits(cUnitTypeGiraffe, cUnitStateAny, 0, 0, mainBaseLocation, distance);
-	int ZebraNearMB = getNumUnits(cUnitTypeZebra, cUnitStateAny, 0, 0, mainBaseLocation, distance);
-    int CaribouNearMB = getNumUnits(cUnitTypeCaribou, cUnitStateAny, 0, 0, mainBaseLocation, distance);
-    int GazelleNearMB = getNumUnits(cUnitTypeGazelle, cUnitStateAny, 0, 0, mainBaseLocation, distance);
-    int ElkNearMB = getNumUnits(cUnitTypeElk, cUnitStateAny, 0, 0, mainBaseLocation, distance);
-    int DeerNearMB = getNumUnits(cUnitTypeDeer, cUnitStateAny, 0, 0, mainBaseLocation, distance);
-	
-	int FakeAggressives = ZebraNearMB+CaribouNearMB+GazelleNearMB+ElkNearMB+DeerNearMB+GiraffeNearMB;
-	}
+	int FakeAggressives = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+
+
 	
 	if ((numberAggressiveResourceSpots > 0) && (IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000) || (FakeAggressives > 3) && (IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000))
 	   { 
@@ -899,7 +890,7 @@ rule updateFoodBreakdown
         houseProtoID = cUnitTypeManor;
     int numHouses = kbUnitCount(cMyID, houseProtoID, cUnitStateAliveOrBuilding);
     
-    if (((kbGetAge() == cAge1) && ((numTemples < 1) || (numHouses < 1))) || (unassigned < numPlansWanted))
+    if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) && (xsGetTime() < 4.8*60*1000) || (numHouses < 1) || (unassigned < numPlansWanted))
         numPlansWanted = 1;
 
     if (unassigned <= 0)
@@ -981,6 +972,20 @@ rule updateFoodBreakdown
         easy = easy + unassigned;
         unassigned = 0;
     }  
+    
+	if (xsGetTime() < 2.5*60*1000)
+	{
+	int ForceHunt = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAny, 0, 0, mainBaseLocation, 40);
+	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAny, 0, 0, mainBaseLocation, 40);
+	if ((ForceHunt >= 2) && (Chickens <= 0))
+	{
+    numberAggressiveResourceSpots = 0;	
+	aggHunters = 0;
+	numberEasyResourceSpots = 1;
+	aiEcho("PREY: "+ForceHunt+"");
+	}
+	}
+	
   
  
     // Now, the number of farmers we want is the unassigned total, plus reserve (existing farms) and prebuild (plan ahead).
@@ -1564,7 +1569,7 @@ void econAge4Handler(int age=0)
     int numBuilders = 0;
     int bigBuildingType = 0;
     int littleBuildingType = 0;
-    if (aiGetGameMode() == cGameModeDeathmatch || aiGetWorldDifficulty() >= cDifficultyHard)     // Add 3 extra big buildings and 6 little buildings
+    if (aiGetGameMode() == cGameModeDeathmatch || aiGetWorldDifficulty() >= cDifficultyHard)     // Add 2 extra big buildings and 2-3 little buildings
     {
         switch(cMyCulture)
         {
@@ -1572,38 +1577,39 @@ void econAge4Handler(int age=0)
             {
                 bigBuildingType = cUnitTypeFortress;
                 numBuilders = 3;
-                createSimpleBuildPlan(cUnitTypeBarracks, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-                createSimpleBuildPlan(cUnitTypeStable, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-                createSimpleBuildPlan(cUnitTypeArcheryRange, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeBarracks, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeStable, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeArcheryRange, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 break;
             }
             case cCultureEgyptian:
             {
                 numBuilders = 5;
-                createSimpleBuildPlan(cUnitTypeBarracks, 6, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeBarracks, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+				createSimpleBuildPlan(cUnitTypeSiegeCamp, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 bigBuildingType = cUnitTypeMigdolStronghold;
                 break;
             }
             case cCultureNorse:
             {
                 numBuilders = 2;
-                createSimpleBuildPlan(cUnitTypeLonghouse, 6, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeLonghouse, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 bigBuildingType = cUnitTypeHillFort;
                 break;
             }
             case cCultureAtlantean:
             {
                 numBuilders = 1;
-                createSimpleBuildPlan(cUnitTypeBarracksAtlantean, 4, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-				createSimpleBuildPlan(cUnitTypeCounterBuilding, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeBarracksAtlantean, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+				createSimpleBuildPlan(cUnitTypeCounterBuilding, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 bigBuildingType = cUnitTypePalace;
                 break;
             }
             case cCultureChinese:
             {
                 numBuilders = 3;
-                createSimpleBuildPlan(cUnitTypeBarracksChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-				createSimpleBuildPlan(cUnitTypeStableChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeBarracksChinese, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+				createSimpleBuildPlan(cUnitTypeStableChinese, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 bigBuildingType = cUnitTypeCastle;
                 break;
             }			
@@ -2471,7 +2477,7 @@ rule tradeWithCaravans
         buildPlanID=aiPlanCreate(buildPlanName, cPlanBuild);
         if (buildPlanID < 0)
             return;
-
+        buildPlanID = buildPlanID;
         vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);  // my main base location
         vector allyLocation = cInvalidVector;
         vector marketLocation = cInvalidVector;

@@ -24,7 +24,7 @@ rule maintainTradeUnits
 	
 	if (kbGetAge() > cAge2 && cMyCiv == cCivNuwa && IsRunTradeUnits2 == false)
 	{
-	gMaxTradeCarts = 23;
+	gMaxTradeCarts = 22;
 	IsRunTradeUnits2  = true;
     }	
     int tradeCartPUID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0);

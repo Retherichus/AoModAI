@@ -1695,11 +1695,18 @@ rule mainBaseAreaWallTeam2
     inactive
 {
 
-    if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
-	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000))
+    if (cMyCulture == cCultureAtlantean) // 1 vil = 3!
+	{
+	xsDisableSelf();
 	return;
-    if ((cMyCulture == cCultureAtlantean) && (kbGetAge() < cAge3))
-        return;
+	}
+    if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
+	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000) || (kbGetAge() == cAge2) && (xsGetTime() < 10*60*1000))
+	return;
+    
+
+	
+	
     float goldSupply = kbResourceGet(cResourceGold);
 
     //If we already have a build wall plan, don't make another one.
@@ -3738,7 +3745,7 @@ rule buildArmory
     }
 	float woodSupply = kbResourceGet(cResourceWood);
 	int numBuilders = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive); 
-    if ((kbGetAge() < cAge2)|| (kbGetAge() > cAge2) && (woodSupply < 460) || (kbGetAge() == cAge2) && (woodSupply < 220))
+    if ((kbGetAge() < cAge2)|| (kbGetAge() > cAge2) && (woodSupply < 460) || (kbGetAge() == cAge2) && (woodSupply < 220) && (cMyCulture != cCultureEgyptian))
         return;
     
     xsSetRuleMinIntervalSelf(25);
