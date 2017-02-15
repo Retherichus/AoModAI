@@ -816,7 +816,7 @@ rule monitorAttPlans
                         }
                         else if ((numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan * 5) 
                               && (numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.3) && (aiPlanGetNoMoreUnits(attackPlanID) == true)
-                              && (currentPop <= currentPopCap - 3 - number * 0.95))
+                              && (currentPop <= currentPopCap * 0.95))
                         {
                             aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                             aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);                            
@@ -3205,41 +3205,10 @@ rule createRaidingParty
     int militaryUnit1ID = -1;
     int currentPop = kbGetPop();
     int currentPopCap = kbGetPopCap();
-	
-	int number = 0;
-	if (mPopLandAttack == true)
-	{
-	int numTcs=kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
-	if (numTcs > 2)
-	{
-    number = numTcs * 8 - 10;
-    if (currentPopCap >= 300)
-	number = 50;
-	}
-    }
-	
-    // StandardAI Pop
-    int upID = -1;                   // Active unit picker, for getting target military size
-    int targetPop = -1;              // Size needed to launch an attack, in pop slots
-   
-    if (kbGetAge() < cAge3)
-    upID = gRushUPID;
-    else
-    upID = gLateUPID;
-    targetPop = kbUnitPickGetMinimumPop(upID);  
-    //		
     
-    int numMilUnitsIngDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInMBDefPlan2 = aiPlanGetNumberUnits(gMBDefPlan2ID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInBaseUnderAttackDefPlan = aiPlanGetNumberUnits(gBaseUnderAttackDefPlanID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInSettlementPosDefPlan = aiPlanGetNumberUnits(gSettlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary);
-	int IdleMil = aiNumberUnassignedUnits(cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + IdleMil + numMilUnitsInBaseUnderAttackDefPlan * 0.4 + numMilUnitsInSettlementPosDefPlan * 0.4;
-		
     if (dropsiteUnitIDinCloseRange != -1)
     {
-        if ((UseStandardPop == false) && (currentPop <= currentPopCap - 9 - number) || 
-		(UseStandardPop == true) && (numMilUnitsInDefPlans*3 < targetPop)) 
+        if (currentPop <= currentPopCap - 9)
         {
             return;
         }
@@ -3899,12 +3868,11 @@ rule randomAttackGenerator
     aiPlanSetInitialPosition(randomAttackPlanID, baseLocationToUse);
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanRefreshFrequency, 0, 12);
 
-    aiPlanSetNumberVariableValues(randomAttackPlanID, cAttackPlanTargetTypeID, 5, false);
+    aiPlanSetNumberVariableValues(randomAttackPlanID, cAttackPlanTargetTypeID, 4, false);
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);	
     aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
-	aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeMilitaryBuilding);
-	aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeBuilding);
-    aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 4, cUnitTypeAbstractWall);	
+	aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
+    aiPlanSetVariableInt(randomAttackPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeAbstractWall);	
 
    
     if (gTransportMap == true)
@@ -4326,12 +4294,11 @@ rule createLandAttack
     aiPlanSetVariableBool(landAttackPlanID, cAttackPlanAutoUseGPs, 0, true);
 
     
-    aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetTypeID, 5, true); 
+    aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetTypeID, 4, true); 
 	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
-	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeMilitaryBuilding);
-    aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeBuilding);
-	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 4, cUnitTypeAbstractTradeUnit);
+    aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
+	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeAbstractTradeUnit);
 	
 
     aiPlanSetDesiredPriority(landAttackPlanID, 50);

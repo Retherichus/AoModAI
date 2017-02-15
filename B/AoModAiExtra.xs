@@ -85,9 +85,6 @@ extern bool bWallAllyMB = false;          // Walls up the mainbase of a human al
 extern bool bWallCleanup = true;          // Prevents the AI from building small wall pieces inside of gates and/or deletes them if one were to slip through the check.
 extern bool CheatResources = false;        // For those who finds titan (difficulty) to be just 	too easy, enable this and you'll have the AI cheat in some resources as it ages up.
 extern bool mPopLandAttack = true;         //Dynamically scales the min total pop needed before it can attack, 6 pop slots per TC after 4 and beyond.
-extern bool UseStandardPop = false;         //Forces the AI to use the UpID's way of deciding when it is okay to make an attack -
-                                            // - automatically enabled if a modded protox is detected. Unit Range is from 20-100 and changes constantly. 1 unit = 3 pop!
-
 //For gAgeReduceMil when true.
 extern int eMaxMilPop = 15;               // Max military pop cap during Classical Age, the lower it is, the faster it'll advance, but leaving it defenseless can be just as bad!
 extern int eHMaxMilPop = 25;              // Heroic age.
@@ -306,10 +303,7 @@ void initRethlAge1(void)  // Am I doing this right??
         houseProtoID = cUnitTypeManor;
 		int maxHouses = kbGetBuildLimit(cMyID, houseProtoID);
 	   	if (maxHouses == -1)
-		{
-		UseStandardPop = true;
 		aiEcho("Warning:  Modded Protox file detected, results may vary.");
-		}
 }
 
 //==============================================================================
@@ -402,10 +396,6 @@ void initRethlAge2(void)
 	
 	if (bWallCleanup == true)
 	xsEnableRuleGroup("WallCleanup");
-	
-    //Try to transport stranded Units.
-	if (gTransportMap == true)
-	xsEnableRule("TransportBuggedUnits");
 	
 }	
 
@@ -995,7 +985,7 @@ rule myAgeTracker
 
 rule Helpme
    minInterval 23
-   inactive
+   active
 {
    static bool messageSent=false;
    //Set our min interval back to 23 if it has been changed.
@@ -1354,8 +1344,7 @@ rule IHateBuildingsHadesSpecial
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
         if ((kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true) 
-		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHealingSpringObject) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypePlentyVault) == true)
-		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHesperidesTree) == true))
+		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHealingSpringObject) == true))
             continue;
 	   
 	   if (numberFoundTemp > 0)
@@ -1634,8 +1623,7 @@ rule IHateBuildingsBeheAndScarab
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
         if ((kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true) 
-		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHealingSpringObject) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypePlentyVault) == true)
-		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHesperidesTree) == true))
+		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHealingSpringObject) == true))
             continue;
 	   
 	   if (numberFoundTemp > 0)
@@ -1774,8 +1762,7 @@ rule IHateBuildingsSiege
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
 	   
         if ((kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeSettlement) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeAbstractFarm) == true) 
-		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHealingSpringObject) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypePlentyVault) == true)
-		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHesperidesTree) == true))
+		|| (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHealingSpringObject) == true))
             continue;
 			
 	   if (numberFoundTemp > 0)
@@ -1805,14 +1792,12 @@ inactive
 		 {
          xsEnableRuleGroup("Donations");
 		 xsEnableRule("defendAlliedBase");
-		 xsEnableRule("Helpme");
 		 IhaveAllies = true;
 		 return;
 		 }
 		 else 
 		 xsDisableRuleGroup("Donations"); 
 		 xsDisableRule("defendAlliedBase");
-		 xsDisableRule("Helpme");
 		 IhaveAllies = false;
 	}
 }
@@ -1837,6 +1822,15 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	int NumSelf = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, KOTHPlace, 25.0);
     
     int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+	
+	if (cMyCulture == cCultureGreek)
+	transportPUID = cUnitTypeTransportShipGreek;
+	else if (cMyCulture == cCultureNorse)
+	transportPUID = cUnitTypeTransportShipNorse;
+	else if (cMyCulture == cCultureAtlantean)
+	transportPUID = cUnitTypeTransportShipAtlantean;
+	else if (cMyCulture == cCultureChinese)
+	transportPUID = cUnitTypeTransportShipChinese;
 
     int BoatToUse=kbUnitCount(cMyID, transportPUID, cUnitStateAlive);
 	
@@ -2046,6 +2040,9 @@ inactive
 						}
 						aiPlanSetNoMoreUnits(gDefendPlentyVault, false);
 						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeLogicalTypeLandMilitary, numAvailableUnits * 0.8, numAvailableUnits * 0.85, numAvailableUnits * 0.9);    // Most mil units.
+						if (cMyCulture != cCultureChinese)
+						aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeAbstractSiegeWeapon, 0, 0, 0);
+						else aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeSittingTiger, 0, 0, 0);
 						LandNeedReCalculation = false;
 						KOTHStopRefill = true;
 						xsEnableRule("KOTHMonitor");
@@ -2148,7 +2145,10 @@ inactive
     if (KOTHStopRefill == true)
 	{
 	 xsSetRuleMinIntervalSelf(5); // give some extra time to fetch units.
-	 aiPlanSetNoMoreUnits(gDefendPlentyVault, true);	 
+	 aiPlanSetNoMoreUnits(gDefendPlentyVault, true);
+	 if (cMyCulture != cCultureChinese)
+	 aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeAbstractSiegeWeapon, 0, 0, 0);
+	 else aiPlanAddUnitType(gDefendPlentyVault, cUnitTypeSittingTiger, 0, 0, 0);	 
 	 xsDisableSelf();
 	 keepUnitsWithinRange(gDefendPlentyVault, KOTHGlobal);
 	 KOTHStopRefill = false;
@@ -2462,118 +2462,14 @@ inactive
    }
 }
 
-//==============================================================================
-rule TransportBuggedUnits  
-minInterval 10
-inactive
-{
-static int TransportAttPlanID = -1;
-int IdleMil = aiNumberUnassignedUnits(cUnitTypeLogicalTypeLandMilitary);
-static int attackPlanStartTime = -1;
-static int targetSettlementID = -1;
-int AttackPlayer = aiGetMostHatedPlayerID();
-xsSetRuleMinIntervalSelf(30);
-static vector attPlanPosition = cInvalidVector;
-bool Filled = false;
-
-
-    int activeAttPlans = aiPlanGetNumber(cPlanAttack, -1, true );  // Attack plans, any state, active only
-	if (activeAttPlans > 0)
-    {
-        for (i = 0; < activeAttPlans)
-        {
-            int attackPlanID = aiPlanGetIDByIndex(cPlanAttack, -1, true, i);
-            if (ShowAiEcho == true) aiEcho("attackPlanID: "+attackPlanID);
-            if (attackPlanID == -1)
-                continue;
-				
-           int planState = aiPlanGetState(TransportAttPlanID);
-           attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
-		   aiPlanSetVariableInt(gMaintainWaterXPortPlanID, cTrainPlanNumberToMaintain, 0, 3);
-           int numMilUnitsNearAttPlan = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, attPlanPosition, 100);
-           int numInPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeLogicalTypeLandMilitary);
-		   int numTransportPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeTransport);
-           if (numMilUnitsNearAttPlan >= 20)
-           numMilUnitsNearAttPlan = 20;
-           if (numInPlan > 1)
-           Filled = true;
-           
-		   
-           if (Filled == false)
-		   {
-		   aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
-           aiPlanAddUnitType(TransportAttPlanID, cUnitTypeLogicalTypeLandMilitary, 0, 0, numMilUnitsNearAttPlan);
-           }		   
-           if (ShowAiEcho == true) aiEcho("planState: "+planState);
-           
-           if (attackPlanID == TransportAttPlanID)
-           {
-           if ((numInPlan < 1) || (xsGetTime() > attackPlanStartTime + 30*60*1000) || (planState == cPlanStateNone) && (xsGetTime() > attackPlanStartTime + 1.5*60*1000) ||
-           (planState == cPlanStateGather) && (xsGetTime() > attackPlanStartTime + 1.5*60*1000) || (planState == cPlanStateEnter) && (xsGetTime() > attackPlanStartTime + 2*60*1000)
-		   (planState == cPlanStateTransport) && (xsGetTime() > attackPlanStartTime + 1.5*60*1000) && (numTransportPlan < 1))
-           {
-           aiPlanDestroy(TransportAttPlanID);
-           if (ShowAiEcho == true) aiEcho("Deleted");
-           xsSetRuleMinIntervalSelf(5);
-           }
-           return;			 
-		}
-	 }
-  }
-    if (IdleMil < 5)
-    return;				
-    TransportAttPlanID = aiPlanCreate("Transport bugged units", cPlanAttack);
-    if (TransportAttPlanID < 0)
-    return; 
-        
-    if (ShowAiEcho == true) aiEcho(""+TransportAttPlanID+"");
-	
-    TransportAttPlanID = TransportAttPlanID;
-
-	targetSettlementID = getMainBaseUnitIDForPlayer(AttackPlayer);
-	if (targetSettlementID == -1)
-	targetSettlementID = findUnit(cUnitTypeUnit, cUnitStateAlive, -1, AttackPlayer); 
-	vector targetSettlementPos = kbUnitGetPosition(targetSettlementID); // uses main TC
-	aiPlanSetNumberVariableValues(TransportAttPlanID, cAttackPlanTargetAreaGroups, 1, true);  
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 0, kbAreaGroupGetIDByPosition(targetSettlementPos));
-    
-	
-	aiPlanAddUnitType(TransportAttPlanID, cUnitTypeHumanSoldier, 0, 0, 1);
-	attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);
-    aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
- 
-    
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanPlayerID, 0, AttackPlayer);
-	aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
-	
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
-    aiPlanSetUnitStance(TransportAttPlanID, cUnitStanceDefensive);
-    aiPlanSetDesiredPriority(TransportAttPlanID, 1);
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanPlayerID, 0, AttackPlayer);
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanRetreatMode, 0, cAttackPlanRetreatModeNone);
- 
-    aiPlanSetNumberVariableValues(TransportAttPlanID, cAttackPlanTargetTypeID, 4, true); 
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
-	aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeAbstractTradeUnit);
- 
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanRefreshFrequency, 0, 12);
-	
-    aiPlanSetActive(TransportAttPlanID);
-    attackPlanStartTime = xsGetTime();
- 
- xsSetRuleMinIntervalSelf(5);
-}
-
 //Testing ground
 
 rule TEST  
 minInterval 1
 inactive
 {
+
+
 
 }
 

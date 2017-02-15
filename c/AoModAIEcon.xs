@@ -982,7 +982,7 @@ rule updateFoodBreakdown
     numberAggressiveResourceSpots = 0;	
 	aggHunters = 0;
 	numberEasyResourceSpots = 1;
-	if (ShowAiEcoEcho == true) aiEcho("PREY: "+ForceHunt+"");
+	aiEcho("PREY: "+ForceHunt+"");
 	}
 	}
 	

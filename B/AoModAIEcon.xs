@@ -982,7 +982,7 @@ rule updateFoodBreakdown
     numberAggressiveResourceSpots = 0;	
 	aggHunters = 0;
 	numberEasyResourceSpots = 1;
-	if (ShowAiEcoEcho == true) aiEcho("PREY: "+ForceHunt+"");
+	aiEcho("PREY: "+ForceHunt+"");
 	}
 	}
 	
@@ -1569,7 +1569,7 @@ void econAge4Handler(int age=0)
     int numBuilders = 0;
     int bigBuildingType = 0;
     int littleBuildingType = 0;
-    if (aiGetGameMode() == cGameModeDeathmatch || aiGetWorldDifficulty() >= cDifficultyHard)     // Add 2 extra big buildings and 2-3 little buildings
+    if (aiGetGameMode() == cGameModeDeathmatch || aiGetWorldDifficulty() >= cDifficultyHard)     // Add 3 extra big buildings and 6 little buildings
     {
         switch(cMyCulture)
         {
@@ -1577,39 +1577,38 @@ void econAge4Handler(int age=0)
             {
                 bigBuildingType = cUnitTypeFortress;
                 numBuilders = 3;
-                createSimpleBuildPlan(cUnitTypeBarracks, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-                createSimpleBuildPlan(cUnitTypeStable, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-                createSimpleBuildPlan(cUnitTypeArcheryRange, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeBarracks, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeStable, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeArcheryRange, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 break;
             }
             case cCultureEgyptian:
             {
                 numBuilders = 5;
-                createSimpleBuildPlan(cUnitTypeBarracks, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-				createSimpleBuildPlan(cUnitTypeSiegeCamp, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeBarracks, 6, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 bigBuildingType = cUnitTypeMigdolStronghold;
                 break;
             }
             case cCultureNorse:
             {
                 numBuilders = 2;
-                createSimpleBuildPlan(cUnitTypeLonghouse, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeLonghouse, 6, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 bigBuildingType = cUnitTypeHillFort;
                 break;
             }
             case cCultureAtlantean:
             {
                 numBuilders = 1;
-                createSimpleBuildPlan(cUnitTypeBarracksAtlantean, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-				createSimpleBuildPlan(cUnitTypeCounterBuilding, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeBarracksAtlantean, 4, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+				createSimpleBuildPlan(cUnitTypeCounterBuilding, 2, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 bigBuildingType = cUnitTypePalace;
                 break;
             }
             case cCultureChinese:
             {
                 numBuilders = 3;
-                createSimpleBuildPlan(cUnitTypeBarracksChinese, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
-				createSimpleBuildPlan(cUnitTypeStableChinese, 1, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeBarracksChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
+				createSimpleBuildPlan(cUnitTypeStableChinese, 3, 90, true, false, cMilitaryEscrowID, kbBaseGetMainID(cMyID), 1);
                 bigBuildingType = cUnitTypeCastle;
                 break;
             }			
@@ -2477,7 +2476,7 @@ rule tradeWithCaravans
         buildPlanID=aiPlanCreate(buildPlanName, cPlanBuild);
         if (buildPlanID < 0)
             return;
-        buildPlanID = buildPlanID;
+
         vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);  // my main base location
         vector allyLocation = cInvalidVector;
         vector marketLocation = cInvalidVector;

@@ -4990,7 +4990,7 @@ rule buildManyBuildings
    }
   
    int numberOfArcheryRange=kbUnitCount(cMyID, cUnitTypeArcheryRange, cUnitStateAlive);
-   int numberOfBarracks=kbUnitCount(cMyID, cUnitTypeAcademy, cUnitStateAlive);
+   int numberOfBarracks=kbUnitCount(cMyID, cUnitTypeBarracks, cUnitStateAlive);
    int numberOfStables=kbUnitCount(cMyID, cUnitTypeStable, cUnitStateAlive);
    int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAlive);
    int numberSettlements=kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
@@ -5004,7 +5004,7 @@ rule buildManyBuildings
    if (currentWood < 1000)
       return;
 
- if (numberOfArcheryRange+numberOfBarracks+numberOfStables < 34)
+ if (numberOfArcheryRange+numberOfBarracks+numberOfStables <= 40)
  {
    int planID=aiPlanCreate("Build More Buildings", cPlanBuild);
    if (planID >= 0)

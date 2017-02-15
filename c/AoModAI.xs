@@ -3883,7 +3883,7 @@ void init(void)
             rushSize = rushSize/2;
     }
 
-    /*
+
     if ((gTargetNumTowers > 0) && (rushCount > 0))   // Remove 2 pop slots for each tower's cost
     {
         int reduce = 2*gTargetNumTowers;
@@ -3892,7 +3892,7 @@ void init(void)
         else
             rushSize = rushSize - reduce;
     }
-    */
+
     
     int numTypes = 2;
     if (rushSize < 40)
@@ -3941,7 +3941,7 @@ void init(void)
     //set the gRushCount in order to enable the tech rules if we only have an idle attack goal in cAge2
     if (gRushCount > 0)
     {
-        gRushCount = rushCount + 2;    //since our attack plans don't make several attempts, we increase the rush count
+        gRushCount = rushCount + 1;    //since our attack plans don't make several attempts, we increase the rush count
     }  
     else
     {
@@ -3961,9 +3961,9 @@ void init(void)
     if (ShowAiEcho == true) aiEcho("gRushCount: "+gRushCount+", gRushSize: "+gRushSize+", gFirstRushSize: "+gFirstRushSize);
 
 	if ((aiGetWorldDifficulty() > cDifficultyModerate) && (gRushCount < 1))
-	gRushCount = 2;
+	gRushCount = 1;
 	
-	if (gRushCount > 2)
+	if (gRushCount >= 2)
 	{
 	gRushCount = gRushCount + aiRandInt(3);
 	mRusher = true;
@@ -5153,7 +5153,7 @@ void age3Handler(int age=2)
     xsEnableRule("maintainTradeUnits");
     
     //enable the age2 military tech rules to make sure they get researched
-    if (gRushCount > 2)
+    if (gRushCount > 0)
     {
         if (cMyCulture == cCultureGreek)
         {
