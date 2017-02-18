@@ -610,6 +610,13 @@ rule buildHouse
         int otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
     }
     
+	if (cvMapSubType == VINLANDSAGAMAP)
+	{
+	if (aiRandInt(4) > 2)
+    otherBaseID=kbUnitGetBaseID(VinLandBase);
+	else otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
+	}
+	
     vector location = cInvalidVector;
     int planID = aiPlanCreate("BuildHouse", cPlanBuild);
     if (planID >= 0)
@@ -1267,6 +1274,8 @@ rule mainBaseAreaWallTeam1
 
     int mainBaseID=kbBaseGetMainID(cMyID);
 	vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+	if (mainBaseID == gVinlandsagaInitialBaseID)
+	return;
 
     if (wallPlanID >= 0)
     {
@@ -3231,7 +3240,7 @@ rule buildBuildingsAtOtherBase
     else
     {
         int otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
-        if (otherBaseID == mainBaseID)
+        if ((otherBaseID == mainBaseID) || (otherBaseID == gVinlandsagaInitialBaseID))
         {
             if (ShowAiEcho == true) aiEcho("otherBaseID == mainBaseID, returning");
             return;
@@ -3391,7 +3400,7 @@ rule buildBuildingsAtOtherBase2
     else
     {
         int otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
-        if (otherBaseID == mainBaseID)
+        if ((otherBaseID == mainBaseID) || (otherBaseID == gVinlandsagaInitialBaseID))
         {
             if (ShowAiEcho == true) aiEcho("otherBaseID == mainBaseID, returning");
             return;
@@ -3648,7 +3657,7 @@ rule buildInitialTemple //and rebuild it if destroyed
         return;
     }
     
-    if (xsGetTime() < 60*1000)
+    if ((xsGetTime() < 60*1000) || (cMyCulture == cCultureAtlantean) && (kbGetAge() < cAge2) && (kbUnitCount(cMyID, cUnitTypeManor, cUnitStateAliveOrBuilding) < 1))
         return;
 
     int mainBaseID = kbBaseGetMainID(cMyID);

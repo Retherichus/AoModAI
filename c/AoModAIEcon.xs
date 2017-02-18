@@ -39,15 +39,28 @@ rule updateWoodBreakdown
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
     
-    bool reducedWoodGathererCount = false;
+        bool reducedWoodGathererCount = false;
 
     if ((woodGathererCount <= 0 ) && (kbGetAge() >= cAge1)) //always some units on wood, unless there are less than 15 trees
     {
-            if (cMyCulture == cCultureAtlantean)
+            woodGathererCount = 1;
+			if (cMyCulture == cCultureAtlantean)
 			woodGathererCount = 1;
-			else woodGathererCount = 3;
+			if ((cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian))
+			woodGathererCount = woodGathererCount + 1;
             reducedWoodGathererCount = true;
         }
+
+     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+   {
+            if ((foodGathererCount > 2) && (goldGathererCount > 0))
+			woodGathererCount = 1; 
+   }
+   
+
+   
+   
+
     
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -243,26 +256,20 @@ rule updateGoldBreakdown
         {
 		    if (cMyCulture == cCultureAtlantean)
             goldGathererCount = 1;
-			else goldGathererCount = 3;
+			else goldGathererCount = 2;
             reducedGoldGathererCount = true;
         }
     }
 	
-     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv == cCivGaia) && (gHuntingDogsASAP) == true && (ConfirmFish == false))
-   {
-            if ((foodGathererCount > 2) && (woodGathererCount > 0))
-			goldGathererCount = 1;
-			else goldGathererCount = 0;
-   }
    
-      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv != cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 1)
-			goldGathererCount = 1; 
-            else goldGathererCount = 0;			
-   }   
+			goldGathererCount = 1;      
+   } 
    
-
+   
+   
 
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -483,22 +490,7 @@ rule updateFoodBreakdown
 		xsEnableRule("HuntingDogsAsap");
 		if (cMyCulture == cCultureAtlantean)
 		createSimpleBuildPlan(cUnitTypeGuild, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
-    }
-	
-	    static bool HippoDone = false;
-		if ((HippoDone == false) && (gHuntingDogsASAP == true) && (xsGetTime() < 20*1*1000))
-		{ 
-		// Force early aggressive hunting for these, as they are not likely to kill a villager.
-	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, distance);
-		if (HippoNearMB > 1 && cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse) 
-		aiSetMinNumberNeedForGatheringAggressvies(3);
-		else if (HippoNearMB > 1 && cMyCulture == cCultureAtlantean) 
-		aiSetMinNumberNeedForGatheringAggressvies(1);
-		else if (HippoNearMB > 1 && cMyCulture == cCultureNorse) 
-		aiSetMinNumberNeedForGatheringAggressvies(3);
-		if (HippoNearMB > 1)
-		HippoDone = true;
-        }			
+    }		
 	
 	
 	if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.
@@ -1699,7 +1691,7 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
         return;
     }
 
-    if ((gathererCount < 4) && (numberEasyResourceSpots > 0) && (xsGetTime() < 1*60*1000))
+    if ((gathererCount < 5) && (numberEasyResourceSpots > 0))
     return;
    
 
@@ -3496,7 +3488,7 @@ rule norseInfantryCheck
 	if (ulfCount >= 2)     
         return;
 		
-	if ((kbGetAge() < cAge2) && (ulfCount >= 1))   
+	if ((kbGetAge() < cAge2) && (ulfCount >= 2))   
     {	   
 	return;
 	}

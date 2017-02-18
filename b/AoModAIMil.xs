@@ -1418,20 +1418,16 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
         {
             aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractCavalry, 0, 1, 1);
             aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
+			
             if (cMyCulture == cCultureNorse)
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeThrowingAxeman, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeThrowingAxeman, 0, 1, 2);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else if (cMyCulture == cCultureGreek)
             {
-                if (cMyCiv == cCivHades)
-                {  
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypePeltast, 0, 1, 1);
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeToxotes, 0, 1, 2);
-                }
-                else
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 2);
+    
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 2);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else if (cMyCulture == cCultureAtlantean)

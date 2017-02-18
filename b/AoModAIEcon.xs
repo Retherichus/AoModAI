@@ -39,15 +39,32 @@ rule updateWoodBreakdown
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
     
-    bool reducedWoodGathererCount = false;
+        bool reducedWoodGathererCount = false;
 
     if ((woodGathererCount <= 0 ) && (kbGetAge() >= cAge1)) //always some units on wood, unless there are less than 15 trees
     {
-            if (cMyCulture == cCultureAtlantean)
+            woodGathererCount = 2;
+			if (cMyCulture == cCultureAtlantean)
 			woodGathererCount = 1;
-			else woodGathererCount = 3;
             reducedWoodGathererCount = true;
         }
+
+     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+   {
+            if ((foodGathererCount > 2) && (goldGathererCount > 0))
+			woodGathererCount = 1; 
+   }
+   
+
+   
+   
+   if ((kbGetAge() < cAge2) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+   {
+            if (foodGathererCount > 6)
+			woodGathererCount = 4;
+			if ((foodGathererCount > 9) && (goldGathererCount > 2))
+			woodGathererCount = 5;        
+   } 
     
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -243,26 +260,37 @@ rule updateGoldBreakdown
         {
 		    if (cMyCulture == cCultureAtlantean)
             goldGathererCount = 1;
-			else goldGathererCount = 3;
+			else goldGathererCount = 2;
             reducedGoldGathererCount = true;
         }
     }
 	
-     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv == cCivGaia) && (gHuntingDogsASAP) == true && (ConfirmFish == false))
-   {
-            if ((foodGathererCount > 2) && (woodGathererCount > 0))
-			goldGathererCount = 1;
-			else goldGathererCount = 0;
-   }
    
-      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv != cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 1)
-			goldGathererCount = 1; 
-            else goldGathererCount = 0;			
+			goldGathererCount = 1;      
+   } 
+   
+   
+      if ((kbGetAge() < cAge2) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+   {
+            if ((foodGathererCount > 7) && (woodGathererCount > 1))
+			goldGathererCount = 2;
+			if ((foodGathererCount > 10) && (woodGathererCount > 3))
+			goldGathererCount = 4;        
    }   
    
-
+      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+   {
+            if (foodGathererCount > 7)
+			goldGathererCount = 3;
+			if (foodGathererCount > 8)
+			goldGathererCount = 4;
+			if (foodGathererCount > 10)
+			goldGathererCount = 6;        
+   }
+   
 
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -1699,7 +1727,7 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
         return;
     }
 
-    if ((gathererCount < 4) && (numberEasyResourceSpots > 0) && (xsGetTime() < 1*60*1000))
+    if ((gathererCount < 5) && (numberEasyResourceSpots > 0))
     return;
    
 

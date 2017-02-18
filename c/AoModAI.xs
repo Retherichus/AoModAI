@@ -884,12 +884,12 @@ rule updateEMAge1       // i.e. cAge1
       }
       else if (aiGetWorldDifficulty() == cDifficultyModerate)
       {
-         civPopTarget = 40;
+         civPopTarget = 18;
          milPopTarget = 30;
       }
       else if (aiGetWorldDifficulty() == cDifficultyHard)
       {
-         civPopTarget = 25;
+         civPopTarget = 21;
          milPopTarget = 60;
       }
       else
@@ -2475,7 +2475,7 @@ if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCul
             gWoodForecast = gWoodForecast + (200 - woodSupply);
     }
 
-    aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -3693,7 +3693,7 @@ void init(void)
     if (cMyCulture == cCultureEgyptian)
         gHouseAvailablePopRebuild=4;
     else if (cMyCulture == cCultureAtlantean)
-        gHouseAvailablePopRebuild=6;
+        gHouseAvailablePopRebuild=5;
     else if (cMyCulture == cCultureNorse)
         gHouseAvailablePopRebuild=8;		
     else

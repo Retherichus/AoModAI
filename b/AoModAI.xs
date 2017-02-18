@@ -3693,7 +3693,7 @@ void init(void)
     if (cMyCulture == cCultureEgyptian)
         gHouseAvailablePopRebuild=4;
     else if (cMyCulture == cCultureAtlantean)
-        gHouseAvailablePopRebuild=6;
+        gHouseAvailablePopRebuild=5;
     else if (cMyCulture == cCultureNorse)
         gHouseAvailablePopRebuild=8;		
     else
