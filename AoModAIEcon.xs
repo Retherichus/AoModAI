@@ -38,9 +38,6 @@ rule updateWoodBreakdown
     int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
-
- 
-    
     
     bool reducedWoodGathererCount = false;
 
@@ -52,32 +49,6 @@ rule updateWoodBreakdown
             reducedWoodGathererCount = true;
         }
     
-    
-     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv != cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if (foodGathererCount > 2 && goldGathererCount > 0)
-			woodGathererCount = 1;
-			//if (foodGathererCount > 3 && goldGathererCount > 0)
-			//woodGathererCount = 2;        
-   }
-   
-   if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv == cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if (foodGathererCount > 2)
-			woodGathererCount = 1;       
-   }
-   
-   if ((kbGetAge() < cAge2) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if (foodGathererCount > 6)
-			woodGathererCount = 4;
-			if ((foodGathererCount > 9) && (goldGathererCount > 2))
-			woodGathererCount = 5;        
-   }   
-
-      float woodSupply = kbResourceGet(cResourceWood);
-	  float goldSupply = kbResourceGet(cResourceGold);
-  	
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 12;
@@ -268,9 +239,11 @@ rule updateGoldBreakdown
 
     if (goldGathererCount <= 0) //always some units on gold, unless there are no gold sites
     {
-        if ((numGoldSites > 0) && (kbGetAge() > cAge1))
+        if ((numGoldSites > 0) && (kbGetAge() >= cAge1))
         {
+		    if (cMyCulture == cCultureAtlantean)
             goldGathererCount = 1;
+			else goldGathererCount = 2;
             reducedGoldGathererCount = true;
         }
     }
@@ -279,33 +252,17 @@ rule updateGoldBreakdown
    {
             if ((foodGathererCount > 2) && (woodGathererCount > 0))
 			goldGathererCount = 1;
-			//if (foodGathererCount > 4 && woodGathererCount > 2)
-			//goldGathererCount = 2;        
+			else goldGathererCount = 0;
    }
    
       if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv != cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 1)
-			goldGathererCount = 1;      
+			goldGathererCount = 1; 
+            else goldGathererCount = 0;			
    }   
    
-      if ((kbGetAge() < cAge2) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if ((foodGathererCount > 7) && (woodGathererCount > 1))
-			goldGathererCount = 2;
-			if ((foodGathererCount > 10) && (woodGathererCount > 3))
-			goldGathererCount = 4;        
-   }   
-   
-      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if (foodGathererCount > 7)
-			goldGathererCount = 3;
-			if (foodGathererCount > 8)
-			goldGathererCount = 4;
-			if (foodGathererCount > 10)
-			goldGathererCount = 6;        
-   } 	
+
 
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -501,7 +458,7 @@ rule updateFoodBreakdown
     
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
-    float distance = 80;
+    float distance = 85;
     if ((kbGetAge() >= cAge3) || (xsGetTime() > 15*60*1000)) 
 	distance=40.0;
 

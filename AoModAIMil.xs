@@ -1337,7 +1337,7 @@ rule decreaseRaxPref    //Egyptian decrease rax units preference if has at least
 
 //==============================================================================
 rule mainBaseDefPlan1   //Make a defend plan that protects the main base
-    minInterval 71 //starts in cAge1
+    minInterval 8 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("mainBaseDefPlan1:");
@@ -1346,12 +1346,13 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
         return;
         
     static bool alreadyInAge3 = false;
-
+    Vector Temp = cInvalidVector;
     if ((kbGetAge() == cAge3) && (alreadyInAge3 == false))
     {
         alreadyInAge3 = true;
         aiPlanDestroy(gMBDefPlan1ID);
         gMBDefPlan1ID = -1;
+		xsSetRuleMinIntervalSelf(20);
         if (ShowAiEcho == true) aiEcho("destroying gMBDefPlan1ID");
     }
         
@@ -1369,6 +1370,26 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
                 
             if (defendPlanID == gMBDefPlan1ID)
             {
+	    
+		    int activeGatherPlans = aiPlanGetNumber(cPlanGather, -1, true);
+		    for (f = 0; < activeGatherPlans)
+            {
+            int foodGatherPlanID = aiPlanGetIDByIndex(cPlanGather, cPlanStateGather , true, f);
+            int resourceID = aiPlanGetVariableInt(foodGatherPlanID, cGatherPlanResourceID, 0);
+            if (resourceID == cResourceFood)
+            {
+			
+			Temp = aiPlanGetLocation(foodGatherPlanID);
+			if (Temp != cInvalidVector)
+			{
+			aiPlanSetVariableVector(gMBDefPlan1ID, cDefendPlanDefendPoint, 0, Temp);
+			aiPlanSetVariableFloat(gMBDefPlan1ID, cDefendPlanGatherDistance, 0, 10.0);
+			return;
+			}
+			}
+			}
+			    aiPlanSetVariableVector(gMBDefPlan1ID, cDefendPlanDefendPoint, 0, kbBaseGetLocation(cMyID, mainBaseID));
+			    aiPlanSetVariableFloat(gMBDefPlan1ID, cDefendPlanGatherDistance, 0, 25.0);
                 if (ShowAiEcho == true) aiEcho("mainBaseDefPlan1 exists: ID is "+defendPlanID);
                 return;
             }
@@ -1406,20 +1427,20 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
                 if (cMyCiv == cCivHades)
                 {  
                     aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypePeltast, 0, 1, 1);
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeToxotes, 0, 1, 1);
+                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeToxotes, 0, 1, 2);
                 }
                 else
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
+                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 2);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else if (cMyCulture == cCultureAtlantean)
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 2);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 2);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
         }
@@ -1428,29 +1449,26 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
             aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractCavalry, 0, 1, 1);
             if (cMyCulture == cCultureNorse)
             {
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 2);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeThrowingAxeman, 0, 1, 1);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else if (cMyCulture == cCultureGreek)
             {
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
-                if (cMyCiv == cCivHades)
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeToxotes, 0, 1, 1);
-                else
-                    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 2);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else if (cMyCulture == cCultureAtlantean)
             {
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 2);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
             else
             {
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractInfantry, 0, 1, 1);
-                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 1);
+                aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeAbstractArcher, 0, 1, 2);
                 aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeHero, 0, 1, 1);
             }
         }
@@ -2129,7 +2147,7 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
 
 //==============================================================================
 rule attackEnemySettlement
-    minInterval 15 //starts in cAge2
+    minInterval 22 //starts in cAge2
     inactive
 {
 
@@ -3939,7 +3957,7 @@ rule randomAttackGenerator
 
 //==============================================================================
 rule createLandAttack
-    minInterval 26 //starts in cAge2
+    minInterval 31 //starts in cAge2
     inactive
 {
 	
