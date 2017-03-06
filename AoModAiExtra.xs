@@ -42,10 +42,14 @@ extern bool KOTHStopRefill = false;
 extern vector KOTHGlobal = cInvalidVector;
 extern bool IhaveAllies = false;
 extern bool mRusher = false;
+extern bool BeenmRusher = false;
 extern int MoreFarms = 28;
 extern bool TitanAvailable = false;
 extern int KOTHBASE = -1;
 extern bool WaitForDock = false;
+extern int VinLandBase = -1;
+extern int mChineseImmortal = -1;
+
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -105,9 +109,9 @@ extern bool AllyTcLimit = false; // This enables the modified rule and disables 
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 600;              // Food
-extern int eBoomGold = 200;              // Gold
-extern int eBoomWood = 325;              // Wood, duh.
+extern int eBoomFood = 650;              // Food
+extern int eBoomGold = 100;              // Gold
+extern int eBoomWood = 300;              // Wood, duh.
 
 
 //Egyptians have their own, because they don't like wood as much.
@@ -141,21 +145,21 @@ extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wo
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 1000;             // Food
-extern int RethLGGAge2 = 550;              // Gold
-extern int RethLGWAge2 = 650;              // Wood
+extern int RethLGFAge2 = 800;             // Food
+extern int RethLGGAge2 = 450;              // Gold
+extern int RethLGWAge2 = 500;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLGFAge3 = 1300;              // Food
-extern int RethLGGAge3 = 1700;              // Gold
+extern int RethLGFAge3 = 1200;              // Food
+extern int RethLGGAge3 = 1000;              // Gold
 extern int RethLGWAge3 = 600;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLGFAge4 = 3000;              // Food
-extern int RethLGGAge4 = 2500;              // Gold
-extern int RethLGWAge4 = 1600;              // Wood
+extern int RethLGFAge4 = 1500;              // Food
+extern int RethLGGAge4 = 1200;              // Gold
+extern int RethLGWAge4 = 1000;              // Wood
 
 
 //==============================================================================
@@ -163,63 +167,63 @@ extern int RethLGWAge4 = 1600;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLEFAge2 = 1000;              // Food
-extern int RethLEGAge2 = 700;              // Gold
+extern int RethLEFAge2 = 800;              // Food
+extern int RethLEGAge2 = 550;              // Gold
 extern int RethLEWAge2 = 100;              // Wood
 
 //Age 3 (Heroic Age)
 
 extern int RethLEFAge3 = 1300;              // Food
-extern int RethLEGAge3 = 1700;              // Gold
+extern int RethLEGAge3 = 1100;              // Gold
 extern int RethLEWAge3 = 450;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLEFAge4 = 3000;              // Food
-extern int RethLEGAge4 = 2500;              // Gold
-extern int RethLEWAge4 = 800;              // Wood
+extern int RethLEFAge4 = 1500;              // Food
+extern int RethLEGAge4 = 1300;              // Gold
+extern int RethLEWAge4 = 700;              // Wood
 
 //==============================================================================
 //Norse
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 1000;             // Food
-extern int RethLNGAge2 = 600;              // Gold
-extern int RethLNWAge2 = 700;              // Wood
+extern int RethLNFAge2 = 900;             // Food
+extern int RethLNGAge2 = 450;              // Gold
+extern int RethLNWAge2 = 500;              // Wood
 
 //Age 3 (Heroic Age)
 
 extern int RethLNFAge3 = 1200;              // Food
-extern int RethLNGAge3 = 1700;              // Gold
+extern int RethLNGAge3 = 1000;              // Gold
 extern int RethLNWAge3 = 750;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLNFAge4 = 3000;              // Food
-extern int RethLNGAge4 = 2500;              // Gold
-extern int RethLNWAge4 = 1600;              // Wood
+extern int RethLNFAge4 = 1500;              // Food
+extern int RethLNGAge4 = 1200;              // Gold
+extern int RethLNWAge4 = 1000;              // Wood
 
 //==============================================================================
 //Atlantean
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 1000;              // Food
-extern int RethLAGAge2 = 600;              // Gold
-extern int RethLAWAge2 = 650;              // Wood
+extern int RethLAFAge2 = 800;              // Food
+extern int RethLAGAge2 = 450;              // Gold
+extern int RethLAWAge2 = 500;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLAFAge3 = 1700;              // Food
-extern int RethLAGAge3 = 1400;              // Gold
+extern int RethLAFAge3 = 1200;              // Food
+extern int RethLAGAge3 = 1000;              // Gold
 extern int RethLAWAge3 = 800;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLAFAge4 = 3000;              // Food
-extern int RethLAGAge4 = 2500;              // Gold
-extern int RethLAWAge4 = 1600;              // Wood
+extern int RethLAFAge4 = 1500;              // Food
+extern int RethLAGAge4 = 1200;              // Gold
+extern int RethLAWAge4 = 1000;              // Wood
 
 
 //==============================================================================
@@ -227,21 +231,21 @@ extern int RethLAWAge4 = 1600;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLCFAge2 = 1150;              // Food
-extern int RethLCGAge2 = 600;              // Gold
-extern int RethLCWAge2 = 700;              // Wood
+extern int RethLCFAge2 = 800;              // Food
+extern int RethLCGAge2 = 450;              // Gold
+extern int RethLCWAge2 = 500;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLCFAge3 = 1300;              // Food
-extern int RethLCGAge3 = 1700;              // Gold
-extern int RethLCWAge3 = 450;              // Wood
+extern int RethLCFAge3 = 1200;              // Food
+extern int RethLCGAge3 = 1000;              // Gold
+extern int RethLCWAge3 = 500;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLCFAge4 = 3000;              // Food
-extern int RethLCGAge4 = 2500;              // Gold
-extern int RethLCWAge4 = 1600;              // Wood
+extern int RethLCFAge4 = 1500;              // Food
+extern int RethLCGAge4 = 1200;              // Gold
+extern int RethLCWAge4 = 1000;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -265,21 +269,22 @@ void initRethlAge1(void)  // Am I doing this right??
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
 
-	    if (gHuntEarly == true && cRandomMapName != "Deep Jungle" && cRandomMapName != "erebus")
+
+	    if ((gHuntEarly == true) && (cRandomMapName != "Deep Jungle") && (cRandomMapName != "erebus") && (cvMapSubType != VINLANDSAGAMAP))
 		{
-		if (cMyCulture == cCultureGreek)
-		aiSetMinNumberNeedForGatheringAggressvies(4);      // The number inside of ( ) represents the amount of villagers/units needed.
+		//if (cMyCulture == cCultureGreek)
+		//aiSetMinNumberNeedForGatheringAggressvies(6);      // The number inside of ( ) represents the amount of villagers/units needed.
 		if (cMyCulture == cCultureAtlantean)
-		aiSetMinNumberNeedForGatheringAggressvies(1);
-	    if (cMyCulture == cCultureEgyptian)
-		aiSetMinNumberNeedForGatheringAggressvies(4);
-		if (cMyCulture == cCultureNorse)
-		aiSetMinNumberNeedForGatheringAggressvies(4);
-		if (cMyCulture == cCultureChinese)
-		aiSetMinNumberNeedForGatheringAggressvies(4);
+		aiSetMinNumberNeedForGatheringAggressvies(2);
+	    //if (cMyCulture == cCultureEgyptian)
+		//aiSetMinNumberNeedForGatheringAggressvies(6);
+		//if (cMyCulture == cCultureNorse)
+		//aiSetMinNumberNeedForGatheringAggressvies(6);
+		//if (cMyCulture == cCultureChinese)
+		//aiSetMinNumberNeedForGatheringAggressvies(6);
 		
         }
-      
+
 	   // Don't build transport ships on these maps!
 	   if ((cRandomMapName == "highland") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") 
 	   || (cRandomMapName == "Sacred Pond 1-0") || (cRandomMapName == "nomad") || (cRandomMapName == "Deep Jungle") 
@@ -304,8 +309,9 @@ void initRethlAge1(void)  // Am I doing this right??
 	    int houseProtoID = cUnitTypeHouse;
         if (cMyCulture == cCultureAtlantean)
         houseProtoID = cUnitTypeManor;
+		int CheckUnitPop = kbGetPopSlots(cMyID, cUnitTypeHoplite);  // <3 Loggy
 		int maxHouses = kbGetBuildLimit(cMyID, houseProtoID);
-	   	if (maxHouses == -1)
+	   	if ((maxHouses == -1) || (CheckUnitPop != 2))
 		{
 		UseStandardPop = true;
 		aiEcho("Warning:  Modded Protox file detected, results may vary.");
@@ -407,6 +413,14 @@ void initRethlAge2(void)
 	if (gTransportMap == true)
 	xsEnableRule("TransportBuggedUnits");
 	
+	//Lower vills needed for hunt
+	if (cMyCulture == cCultureAtlantean)
+	aiSetMinNumberNeedForGatheringAggressvies(2);
+	else aiSetMinNumberNeedForGatheringAggressvies(5);
+	
+	// Up Immortal count for chinese
+	aiPlanSetVariableInt(mChineseImmortal, cTrainPlanNumberToMaintain, 0, 6);
+	
 }	
 
 //==============================================================================
@@ -422,11 +436,13 @@ rule ActivateRethOverridesAge1
 		xsEnableRule("HuntingDogsAsap");
 		
 		if (aiGetWorldDifficulty() > cDifficultyHard)
-		xsEnableRuleGroup("MassDonations");
 		aiResourceCheat(cMyID, cResourceFood, 0.1); //Adds 0.1 (not even 1!) resources to fix a critical "startup-inventory" bug that can potentially block the AI from making vills.
 		aiResourceCheat(cMyID, cResourceWood, 0.1);
 		aiResourceCheat(cMyID, cResourceGold, 0.1);
 		xsDisableSelf();
+		
+		if ((gBuildWallsAtMainBase == true) && (mRusher == false))
+            xsEnableRule("mainBaseAreaWallTeam1");
            
     }
 
@@ -744,10 +760,10 @@ rule HuntingDogsAsap
 }   
   
 //==============================================================================
-// RULE DONATEFood
+// RULE ALLYCatchUp
 //==============================================================================
-rule DONATEFood
-   minInterval 30
+rule ALLYCatchUp   // a reverse updatePlayerToAttack rule to find allies and boost their eco.
+   minInterval 45
    maxInterval 80
    inactive
    Group Donations
@@ -757,163 +773,118 @@ rule DONATEFood
         xsDisableSelf();
         return;    
     }
-   for (i = aiRandInt(12); <= cNumberPlayers)
-   {
-           if (i == cMyID)
-         continue;
-      
-	       float foodSupply = kbResourceGet(cResourceFood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && foodSupply > 1500)
-		   {
-		             if (ShowAiEcho == true) aiEcho("Tributing 100 food to one of my allies!");
-	  aiTribute(i, cResourceFood, 100);
-	  }  	
- }
- }
- 
- //==============================================================================
-// RULE DONATEWood
-//==============================================================================
-rule DONATEWood
-   minInterval 30
-   maxInterval 80
-   inactive
-   Group Donations
-{
-  if  (aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy)
-  {
-        xsDisableSelf();
-        return;    
+    static int lastTargetPlayerIDSaveTime = -1;
+    static int lastTargetPlayerID = -1;
+    static bool increaseStartIndex = false;
+    int Tcs = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
+   	float foodSupply = kbResourceGet(cResourceFood);
+    float goldSupply = kbResourceGet(cResourceGold);
+	float woodSupply = kbResourceGet(cResourceWood);
+    if ((Tcs < 1) || (kbGetAge() < cAge2) || (xsGetTime() < 8*60*1000))
+    return;
+    
+    static int startIndex = -1;
+    if (increaseStartIndex == true)
+    {
+        if (startIndex >= cNumberPlayers - 1)
+            startIndex = 0;
+        else
+            startIndex = startIndex + 1;
+        increaseStartIndex = false;
     }
-   for (i = aiRandInt(12); <= cNumberPlayers)
-   {
-           if (i == cMyID)
-         continue;
-      
-	       float woodSupply = kbResourceGet(cResourceWood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && woodSupply > 1750)
-		   {
-		             if (ShowAiEcho == true) aiEcho("Tributing 100 wood to one of my allies!");
-	  aiTribute(i, cResourceWood, 100);
-	  return;
-	  }  	
- }
- }
- 
- //==============================================================================
-// RULE DONATEGold
-//==============================================================================
-rule DONATEGold
-   minInterval 30
-   maxInterval 80
-   inactive
-   Group Donations
-{
-  if  (aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy)
-  {
-        xsDisableSelf();
-        return;    
+    
+    if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (1)*1*1000))
+    {
+        startIndex = aiRandInt(cNumberPlayers);
     }
-   for (i = aiRandInt(12); <= cNumberPlayers)
-   {
-           if (i == cMyID)
-         continue;
-      
-	       float goldSupply = kbResourceGet(cResourceGold);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && goldSupply > 2000)
-		   {
-		             if (ShowAiEcho == true) aiEcho("Tributing 100 gold to one of my allies!");
-	  aiTribute(i, cResourceGold, 100);
-	  return;
-	  }  	
- }
- }
 
-//==============================================================================
-// RULE DONATEMassiveFood
-//==============================================================================
-rule DONATEMASSFood
-   minInterval 15
-   maxInterval 40
-   inactive
-   group MassDonations
-{
-if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy) || (aiGetWorldDifficulty() < cDifficultyNightmare))
-  {
-        xsDisableSelf();
-        return;    
+    int comparePlayerID = -1;
+    for (i = 0; < cNumberPlayers)
+    {
+        //If we're past the end of our players, go back to the start.
+        int actualIndex = i + startIndex;
+        if (actualIndex >= cNumberPlayers)
+            actualIndex = actualIndex - cNumberPlayers;
+        if ((actualIndex <= 0) || (actualIndex == cMyID))
+            continue;
+        if ((kbIsPlayerAlly(actualIndex) == true) && 
+		(kbIsPlayerResigned(actualIndex) == false) && 
+		(kbHasPlayerLost(actualIndex) == false))
+        {
+            comparePlayerID = actualIndex;
+            if (actualIndex == lastTargetPlayerID)
+            {
+                increaseStartIndex = true;
+                continue;
+            }
+            break;
+        }
     }
-   for (i = aiRandInt(12); <= cNumberPlayers)
-   {
-           if (i == cMyID)
-         continue;
-      
-	       float foodSupply = kbResourceGet(cResourceFood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && foodSupply > 5000)
-		   {
-		             if (ShowAiEcho == true) aiEcho("Tributing 1000 food to one of my allies!");
-	  aiTribute(i, cResourceFood, 1000);
-	  }  	
- }
- }
- 
- //==============================================================================
-// RULE DONATEMassiveWood
-//==============================================================================
-rule DONATEMASSWood
-   minInterval 15
-   maxInterval 40
-   inactive
-   group MassDonations
-{
-if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy) || (aiGetWorldDifficulty() < cDifficultyNightmare))
-  {
-        xsDisableSelf();
-        return;    
+    int actualPlayerID = comparePlayerID;
+    if (actualPlayerID != lastTargetPlayerID)
+    {
+        lastTargetPlayerID = actualPlayerID;
+        lastTargetPlayerIDSaveTime = xsGetTime();
     }
-   for (i = aiRandInt(12); <= cNumberPlayers)
-   {
-           if (i == cMyID)
-         continue;
-      
-	       float woodSupply = kbResourceGet(cResourceWood);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && woodSupply > 3500)
+
+    if (actualPlayerID != -1)
+    {
+	    int iTcs = kbUnitCount(actualPlayerID, cUnitTypeAbstractSettlement, cUnitStateAlive);
+	   	int houseProtoID = cUnitTypeHouse;
+        if (kbGetCultureForPlayer(actualPlayerID) == cCultureAtlantean)
+        houseProtoID = cUnitTypeManor;
+	    int iHouses = kbUnitCount(actualPlayerID, houseProtoID, cUnitStateAlive);
+		int Combined = iHouses + iTcs;
+		if (Combined < 1)
+		return;
+	   
+	   
+		   if ((kbGetAgeForPlayer(actualPlayerID) < 2) && (iTcs >= 1) && (kbGetAge() > cAge3) && (foodSupply > 1000) && (goldSupply > 1000))
 		   {
-		             if (ShowAiEcho == true) aiEcho("Tributing 750 wood to one of my allies!");
-	  aiTribute(i, cResourceWood, 750);
-	  return;
-	  }  	
- }
- }
- 
- //==============================================================================
-// RULE DONATEMassiveGold
-//==============================================================================
-rule DONATEMASSGold
-   minInterval 15
-   maxInterval 40
-   inactive
-   group MassDonations
-{
-if ((aiGetGameMode() != cGameModeConquest && aiGetGameMode() != cGameModeSupremacy) || (aiGetWorldDifficulty() < cDifficultyNightmare))
-  {
-        xsDisableSelf();
-        return;    
+	       aiTribute(actualPlayerID, cResourceFood, 800);
+		   aiTribute(actualPlayerID, cResourceGold, 600);
+		   if (ShowAiEcho == true) aiEcho("Tributing 800 food and 600 gold to one of my allies!"); // Take a break too.
+		   return;
+		   }
+		   else
+		   {
+           int donateFAmount = 100;
+		   int donateWAmount = 100;
+		   int donateGAmount = 100;
+		   int fAmount = 1600;
+		   int wAmount = 1750;
+		   int gAmount = 2000;
+		   int VillagerScore = kbUnitCount(actualPlayerID, cUnitTypeAbstractVillager, cUnitStateAlive);
+		   
+		   if (kbGetCultureForPlayer(actualPlayerID) == cCultureAtlantean)
+		   VillagerScore = VillagerScore * 3;
+		   
+		   if (aiGetWorldDifficulty() > cDifficultyHard)
+		   {
+		   if (foodSupply > 5000)
+		   donateFAmount = 1000;
+		   if (woodSupply > 3500)
+		   donateWAmount = 750;
+		   if (goldSupply > 5000)
+		   donateGAmount = 1000;	   
+		   }
+		   
+		   if ((VillagerScore < 8) && (aiGetWorldDifficulty() < cDifficultyNightmare))
+		   {
+		   donateFAmount = donateFAmount+50;
+		   donateWAmount = donateWAmount+50;
+		   donateGAmount = donateGAmount+50;
+		   }
+		   if (foodSupply > fAmount)
+		   aiTribute(actualPlayerID, cResourceFood, donateFAmount);
+		   if (woodSupply > wAmount)
+		   aiTribute(actualPlayerID, cResourceWood, donateWAmount);
+		   if (goldSupply > gAmount)
+		   aiTribute(actualPlayerID, cResourceGold, donateGAmount);
+		   if (ShowAiEcho == true) aiEcho("Tributing some spare resources to one of my allies!");
+		   }
     }
-   for (i = aiRandInt(12); <= cNumberPlayers)
-   {
-           if (i == cMyID)
-         continue;
-      
-	       float goldSupply = kbResourceGet(cResourceGold);
-	  	   if(kbIsPlayerAlly(i) == true && kbIsPlayerResigned(i) == false && kbHasPlayerLost(i) == false && goldSupply > 5000)
-		   {
-		             if (ShowAiEcho == true) aiEcho("Tributing 1000 gold to one of my allies!");
-	  aiTribute(i, cResourceGold, 1000);
-	  return;
-	  }  	
- }
- } 
+}
  //==============================================================================
 // RULE introChat
 //==============================================================================
@@ -1034,7 +1005,7 @@ rule Helpme
 // IHateSiege
 //==============================================================================
 rule IHateSiege
-   minInterval 5
+   minInterval 9
    inactive
    group HateScripts
 {
@@ -1093,8 +1064,11 @@ rule IHateSiege
 	   int NoArcherPlease = kbUnitQueryGetResult(unitQueryID, i);
         if (kbUnitIsType(NoArcherPlease, cUnitTypeAbstractSiegeWeapon) || 
 		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractArcher) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLance) != true)) ||
+		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractArcher) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLanceShennong) != true)) ||
 		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLance) == true)) ||
-		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeChieroballista) == true)))
+		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLanceShennong) == true)) ||
+		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeChieroballista) == true)) ||
+		(kbUnitIsType(NoArcherPlease, cUnitTypeHeroChineseMonk)) || (kbUnitIsType(NoArcherPlease, cUnitTypeHeroRagnorok)) || (kbUnitIsType(NoArcherPlease, cUnitTypeMythUnit)))
             continue;
 		
 	   if (numberFoundTemp > 0)
@@ -1162,7 +1136,9 @@ rule tacticalHeroAttackMyth
    if (unitQueryID != -1)
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeHero);
+		if (cMyCulture == cCultureChinese)
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeHeroChineseImmortal);
+		else kbUnitQuerySetUnitType(unitQueryID, cUnitTypeHero);
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
 
@@ -1203,17 +1179,28 @@ rule tacticalHeroAttackMyth
 		if ((kbUnitIsType(NoFlyingPlease, cUnitTypePegasus) || kbUnitIsType(NoFlyingPlease, cUnitTypeRoc) || kbUnitIsType(NoFlyingPlease, cUnitTypeFlyingMedic) || 
 		kbUnitIsType(NoFlyingPlease, cUnitTypeStymphalianBird) || kbUnitIsType(NoFlyingPlease, cUnitTypePhoenix) || kbUnitIsType(NoFlyingPlease, cUnitTypeVermilionBird) || kbUnitIsType(NoFlyingPlease, cUnitTypeRaven)))
 		{
-        if (cMyCulture == cCultureGreek) if (kbUnitIsType(NoMeleeHeroPlease, Hero1ID) || kbUnitIsType(NoMeleeHeroPlease, Hero3ID) || kbUnitIsType(NoMeleeHeroPlease, Hero4ID))    
+            if (cMyCulture == cCultureGreek) 
+		    {
+		    if (kbUnitIsType(NoMeleeHeroPlease, Hero1ID) || kbUnitIsType(NoMeleeHeroPlease, Hero3ID) || kbUnitIsType(NoMeleeHeroPlease, Hero4ID))    
 			continue;
-        if (cMyCulture == cCultureNorse) if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroNorse) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroRagnorok))    
+			}
+            if (cMyCulture == cCultureNorse) 
+		    {
+		    if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroNorse) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroRagnorok))    
 			continue;
-        if (cMyCulture == cCultureAtlantean) if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeSwordsmanHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeTridentSoldierHero) || 
-		kbUnitIsType(NoMeleeHeroPlease, cUnitTypeRoyalGuardHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeMacemanHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeLancerHero))    
+		    }	
+            if (cMyCulture == cCultureAtlantean) 
+		    {
+		    if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeSwordsmanHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeTridentSoldierHero) || 
+		    kbUnitIsType(NoMeleeHeroPlease, cUnitTypeRoyalGuardHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeMacemanHero) || kbUnitIsType(NoMeleeHeroPlease, cUnitTypeLancerHero))    
 			continue;
-        if (cMyCulture == cCultureChinese) if (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroChineseMonk))    
-			continue;			
+		    }
+	
 	   }
+	   if ((kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroChineseMonk)) || (kbUnitIsType(NoMeleeHeroPlease, cUnitTypeHeroRagnorok)))   
+	   continue;	   
 	   }
+
 	   
 	   if (numberFoundTemp > 0)
 	   {
@@ -2490,6 +2477,8 @@ bool Filled = false;
            int planState = aiPlanGetState(TransportAttPlanID);
            attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
 		   aiPlanSetVariableInt(gMaintainWaterXPortPlanID, cTrainPlanNumberToMaintain, 0, 3);
+		   aiPlanSetVariableInt(gMaintainWaterXPortPlanID, cTrainPlanFrequency, 0, 15);
+		   aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 97);
            int numMilUnitsNearAttPlan = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, attPlanPosition, 100);
            int numInPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeLogicalTypeLandMilitary);
 		   int numTransportPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeTransport);
@@ -2571,10 +2560,12 @@ bool Filled = false;
 
 //Testing ground
 
+
 rule TEST  
 minInterval 1
 inactive
 {
 
 }
+
 

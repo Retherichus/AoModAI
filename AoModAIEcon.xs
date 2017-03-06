@@ -38,53 +38,30 @@ rule updateWoodBreakdown
     int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
-
- 
     
-    
-    bool reducedWoodGathererCount = false;
+        bool reducedWoodGathererCount = false;
 
-    if ((woodGathererCount <= 0 ) && (kbGetAge() >= cAge1)) //always some units on wood, unless there are less than 15 trees
+    if ((woodGathererCount <= 0 ) && (kbGetAge() >= cAge1) || (woodGathererCount <= 2 ) && (kbGetAge() == cAge1) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian)) //always some units on wood, unless there are less than 15 trees
     {
-            woodGathererCount = 2;
+            woodGathererCount = 1;
 			if (cMyCulture == cCultureAtlantean)
 			woodGathererCount = 1;
+			if ((cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (kbGetAge() == cAge1))
+			woodGathererCount = 4;
             reducedWoodGathererCount = true;
         }
-    
-    
-     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv != cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if (foodGathererCount > 2 && goldGathererCount > 0)
-			woodGathererCount = 1;
-			//if (foodGathererCount > 3 && goldGathererCount > 0)
-			//woodGathererCount = 2;        
-   }
-   
-   if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv == cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if (foodGathererCount > 2)
-			woodGathererCount = 1;       
-   }
-   
-   if ((kbGetAge() < cAge2) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if (foodGathererCount > 6)
-			woodGathererCount = 4;
-			if ((foodGathererCount > 9) && (goldGathererCount > 2))
-			woodGathererCount = 5;        
-   }   
 
-      float woodSupply = kbResourceGet(cResourceWood);
-	  float goldSupply = kbResourceGet(cResourceGold);
-  	
+     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+   {
+            if ((foodGathererCount > 2) && (goldGathererCount > 0))
+			woodGathererCount = 1; 
+   }
+   
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
-    int minVillagers = 12;
+    int minVillagers = 14;
     if (cMyCulture == cCultureAtlantean)
         minVillagers = 5;
-    else if (cMyCulture == cCultureGreek)
-        minVillagers = 14;
 	if (aiGetWorldDifficulty() > cDifficultyHard)
 	minVillagers = minVillagers / 2;
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
@@ -268,52 +245,30 @@ rule updateGoldBreakdown
 
     if (goldGathererCount <= 0) //always some units on gold, unless there are no gold sites
     {
-        if ((numGoldSites > 0) && (kbGetAge() > cAge1))
+        if ((numGoldSites > 0) && (kbGetAge() >= cAge1))
         {
+		    if (cMyCulture == cCultureAtlantean)
             goldGathererCount = 1;
+			else goldGathererCount = 2;
             reducedGoldGathererCount = true;
         }
     }
 	
-     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv == cCivGaia) && (gHuntingDogsASAP) == true && (ConfirmFish == false))
-   {
-            if ((foodGathererCount > 2) && (woodGathererCount > 0))
-			goldGathererCount = 1;
-			//if (foodGathererCount > 4 && woodGathererCount > 2)
-			//goldGathererCount = 2;        
-   }
    
-      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (cMyCiv != cCivGaia) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 1)
 			goldGathererCount = 1;      
-   }   
+   } 
    
-      if ((kbGetAge() < cAge2) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if ((foodGathererCount > 7) && (woodGathererCount > 1))
-			goldGathererCount = 2;
-			if ((foodGathererCount > 10) && (woodGathererCount > 3))
-			goldGathererCount = 4;        
-   }   
    
-      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureEgyptian) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if (foodGathererCount > 7)
-			goldGathererCount = 3;
-			if (foodGathererCount > 8)
-			goldGathererCount = 4;
-			if (foodGathererCount > 10)
-			goldGathererCount = 6;        
-   } 	
+   
 
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
-    int minVillagers = 12;
+    int minVillagers = 14;
     if (cMyCulture == cCultureAtlantean)
         minVillagers = 5;
-    else if (cMyCulture == cCultureGreek)
-        minVillagers = 14;
 	if (aiGetWorldDifficulty() > cDifficultyHard)
 	minVillagers = minVillagers / 2;		
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
@@ -486,7 +441,7 @@ rule updateFoodBreakdown
 	
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
+    int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 60.0);
     float foodSupply = kbResourceGet(cResourceFood);
     float woodSupply = kbResourceGet(cResourceWood);
     
@@ -501,8 +456,8 @@ rule updateFoodBreakdown
     
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
-    float distance = 80;
-    if ((kbGetAge() >= cAge3) || (xsGetTime() > 15*60*1000)) 
+    float distance = 85;
+    if ((kbGetAge() >= cAge3) || (xsGetTime() > 12*60*1000)) 
 	distance=40.0;
 
 
@@ -526,23 +481,19 @@ rule updateFoodBreakdown
 		xsEnableRule("HuntingDogsAsap");
 		if (cMyCulture == cCultureAtlantean)
 		createSimpleBuildPlan(cUnitTypeGuild, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
-    }
+    }		
 	
-	    static bool HippoDone = false;
+		static bool HippoDone = false;
 		if ((HippoDone == false) && (gHuntingDogsASAP == true) && (xsGetTime() < 20*1*1000))
 		{ 
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
 	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, distance);
-		if (HippoNearMB > 1 && cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse) 
+		if ((HippoNearMB > 1) && (cMyCulture != cCultureAtlantean))
 		aiSetMinNumberNeedForGatheringAggressvies(3);
-		else if (HippoNearMB > 1 && cMyCulture == cCultureAtlantean) 
+		else if ((HippoNearMB > 1) && (cMyCulture == cCultureAtlantean))
 		aiSetMinNumberNeedForGatheringAggressvies(1);
-		else if (HippoNearMB > 1 && cMyCulture == cCultureNorse) 
-		aiSetMinNumberNeedForGatheringAggressvies(3);
-		if (HippoNearMB > 1)
 		HippoDone = true;
-        }			
-	
+        }
 	
 	if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.
         numberAggressiveResourceSpots = 0;  // Never get enough vills to go hunting.
@@ -575,9 +526,7 @@ rule updateFoodBreakdown
 
     totalNumberResourceSpots = numberAggressiveResourceSpots + numberEasyResourceSpots;
 
-    int gathererCount = kbUnitCount(cMyID,kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer, 0),cUnitStateAlive);
-    if (cMyCulture == cCultureNorse)
-        gathererCount = gathererCount + kbUnitCount(cMyID,kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer, 1),cUnitStateAlive);  // dwarves
+    int gathererCount = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
     
     bool modifiedFoodGathererCount = false;
@@ -592,20 +541,21 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 28;
+    int desiredFarmers = 26;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 11;		
+        desiredFarmers = 10;		
 	
     // Up it a little bit as our civ population raises.	
     int NumVillagers = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID);
-	if (xsGetTime() > 45*60*1000 || kbGetAge() > cAge3 && xsGetTime() > 30*60*1000)
+	if ((kbGetAge() > cAge2) && (xsGetTime() > 18*60*1000))
 	{
 	if (cMyCulture != cCultureAtlantean)
 	desiredFarmers = desiredFarmers+NumVillagers*0.24;
 	else desiredFarmers = desiredFarmers+NumVillagers*0.22;
 	// if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Desired farms: "+desiredFarmers+"");	
     }
-		
+	if (desiredFarmers > 32)
+	desiredFarmers = 32;	
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)
     {  
@@ -808,7 +758,7 @@ rule updateFoodBreakdown
     if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)) && (TempleUp > 0))   // can build farms
     {
         if ((totalNumberResourceSpots < 2) || (totalAmount < 1500) || (gFarming == true) || (kbGetAge() == cAge3)
-           || ((numResourceSpotsInR70 < 2) && (xsGetTime() > 9*60*1000)))
+           || (numResourceSpotsInR70 < 2) && (xsGetTime() > 9*60*1000) || (kbGetAge() >= cAge2) && (xsGetTime() > 15*30*1000))
         {
             if (cMyCulture == cCultureAtlantean)
             {
@@ -825,11 +775,11 @@ rule updateFoodBreakdown
             {
                 if ((unassigned > 1) && ((totalNumberResourceSpots < 2) || (farmerReserve < 17)))
                 {
-                    farmerPreBuild = 6;  // Starting prebuild
+                    farmerPreBuild = 4;  // Starting prebuild
                 }
                 else
                 {
-                    farmerPreBuild = 5;
+                    farmerPreBuild = 3;
                 }
             }
 
@@ -890,7 +840,7 @@ rule updateFoodBreakdown
         houseProtoID = cUnitTypeManor;
     int numHouses = kbUnitCount(cMyID, houseProtoID, cUnitStateAliveOrBuilding);
     
-    if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) && (xsGetTime() < 4.8*60*1000) || (numHouses < 1) || (unassigned < numPlansWanted))
+    if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) && (xsGetTime() < 5*60*1000) || (numHouses < 1) || (unassigned < numPlansWanted))
         numPlansWanted = 1;
 
     if (unassigned <= 0)
@@ -996,11 +946,16 @@ rule updateFoodBreakdown
     {  
         // Still unassigned?  Make an extra easy plan, hope they can find food somewhere
         numberEasyResourceSpots = numberEasyResourceSpots + 1;
+		if ((xsGetTime() > 12*60*1000) && (numberEasyResourceSpots > 1))
+	    numberEasyResourceSpots = 1;
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, numberEasyResourceSpots);
         easy = easy + unassigned;
         unassigned = 0;
     }
 
+	if ((xsGetTime() > 12*60*1000) && (numberEasyResourceSpots > 1))
+	numberEasyResourceSpots = 1;
+		
     int numFarmPlansWanted = 0;
     if (farmers > 0)
     {
@@ -1064,7 +1019,7 @@ rule updateFoodBreakdown
                 }
                 else
                 {
-                    numFarmPlansWanted = numFarmPlansWanted + 1;  //1
+                    numFarmPlansWanted = 1 + ( farmers / aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0) );  //1
                 }
             }                
         }
@@ -1128,7 +1083,7 @@ rule updateFoodBreakdown
         else
             aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, 0, otherFarmPriority, 0, gOtherBase4ID);
     }
-
+	
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, numFarmPlansWanted, mainFarmPriority, (100.0*farmersAtMainBase)/(foodGathererCount*100.0), gFarmBaseID);
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeHuntAggressive, numberAggressiveResourceSpots, aggressivePriority, (100.0*aggHunters)/(foodGathererCount*100.0), mainBaseID); 
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeEasy, numberEasyResourceSpots, easyPriority, (100.0*easy)/(foodGathererCount*100.0), mainBaseID);
@@ -1359,7 +1314,7 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
 	return;
 	
     //If no scout, go away.
-    if (gLandScout == -1)
+    if ((gLandScout == -1) || (cvMapSubType == VINLANDSAGAMAP))
     {
         xsDisableSelf();
         return;
@@ -1417,7 +1372,7 @@ rule startLandScoutingSpecialUlfsark  //grabs the first scout in the scout list 
     inactive
 {
     //If no scout, go away.
-    if (gLandScoutSpecialUlfsark == -1)
+    if ((gLandScoutSpecialUlfsark == -1) || (cvMapSubType == VINLANDSAGAMAP))
     {
         xsDisableSelf();
         return;
@@ -1429,6 +1384,7 @@ rule startLandScoutingSpecialUlfsark  //grabs the first scout in the scout list 
     gLandExplorePlanID2=aiPlanCreate("Explore_Land", cPlanExplore);
     if (gLandExplorePlanID2 >= 0)
     {
+	    
         aiPlanAddUnitType(gLandExplorePlanID2, gLandScoutSpecialUlfsark, 1, 1, 1);
         aiPlanSetDesiredPriority(gLandExplorePlanID2, 50);
         aiPlanSetEscrowID(gLandExplorePlanID2, cEconomyEscrowID);
@@ -1697,7 +1653,7 @@ void initEcon() //setup the initial Econ stuff.
 
 //==============================================================================
 rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it to the food-heavy
-                    //"starting" mix after we have 7 villagers (or 3 for Atlantea)
+                    //"starting" mix after we have 7 villagers (or 3 for Atlanteans)
     minInterval 1 //starts in cAge1
     inactive
 {
@@ -1743,7 +1699,7 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
     }
 
     if ((gathererCount < 5) && (numberEasyResourceSpots > 0))
-        return;
+    return;
    
 
     aiSetResourceGathererPercentage(cResourceFood, foodGPct, false, cRGPScript);
@@ -2667,10 +2623,10 @@ rule tradeWithCaravans
         int i = -1;
         vector towardHome = cInvalidVector;
         towardHome = mainBaseLocation - marketLocation;
-        towardHome = towardHome / 10;    // 10% of distance from market to home
+        towardHome = towardHome / 20;    // 5% of distance from market to home
         bool success = false;
 
-        for (i = 0; < 9)    // Keep testing until areaGroups match
+        for (i = 0; < 18)    // Keep testing until areaGroups match
         {
             marketAreaGroup = kbAreaGroupGetIDByPosition(marketLocation);
             if (marketAreaGroup == homeAreaGroup)
@@ -3133,8 +3089,6 @@ rule sendIdleTradeUnitsToRandomBase
     
     int min = 0;
     int max = 16;
-    if (cMyCulture == cCultureAtlantean)
-        max = 9;
         
     //override
     if (override == true)
@@ -3210,8 +3164,8 @@ rule sendIdleTradeUnitsToRandomBase
                         currentTradeRouteLength = xsVectorLength(targetPosition - tradeMarketPosition);
                         if (currentTradeRouteLength > minRequiredDistance)
                         {
-                            //33% chance to use the alliedTradeDestinationID
-                            if ((alliedTradeDestinationID != -1) && (aiRandInt(3) > 0))
+                            //66% chance to use the alliedTradeDestinationID
+                            if ((alliedTradeDestinationID != -1) && (aiRandInt(4) > 0))
                             {
                                 tradeDestinationID = alliedTradeDestinationID;
                                 if (ShowAiEcho == true) aiEcho("setting tradeDestinationID = alliedTradeDestinationID");
@@ -3242,7 +3196,8 @@ rule sendIdleTradeUnitsToRandomBase
                             tradeDestinationID = otherBaseUnitID;
                     }
                 }
-                if ((alliedTradeDestinationID != -1) && (aiRandInt(2) == 0))
+				//66% chance to use the alliedTradeDestinationID
+                if ((alliedTradeDestinationID != -1) && (aiRandInt(4) > 0))
                 {
                     tradeDestinationID = alliedTradeDestinationID;
                     if (ShowAiEcho == true) aiEcho("setting tradeDestinationID = alliedTradeDestinationID");
@@ -3291,8 +3246,8 @@ rule sendIdleTradeUnitsToRandomBase
                         currentTradeRouteLength = xsVectorLength(targetPosition - tradeMarketPosition);
                         if (currentTradeRouteLength > minRequiredDistance)
                         {
-                            //33% chance to use the alliedTradeDestinationID
-                            if ((alliedTradeDestinationID != -1) && (aiRandInt(3) > 0))
+                            //66% chance to use the alliedTradeDestinationID
+                            if ((alliedTradeDestinationID != -1) && (aiRandInt(4) > 0))
                             {
                                 tradeDestinationID = alliedTradeDestinationID;
                                 if (ShowAiEcho == true) aiEcho("setting tradeDestinationID = alliedTradeDestinationID");
@@ -3324,8 +3279,8 @@ rule sendIdleTradeUnitsToRandomBase
                     }
                 }
                 
-
-                if ((alliedTradeDestinationID != -1) && (aiRandInt(3) > 0))
+                //66% chance to use the alliedTradeDestinationID
+                if ((alliedTradeDestinationID != -1) && (aiRandInt(4) > 0))
                 {
                     tradeDestinationID = alliedTradeDestinationID;
                     if (ShowAiEcho == true) aiEcho("setting tradeDestinationID = alliedTradeDestinationID");

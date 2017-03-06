@@ -265,7 +265,10 @@ void initMapSpecific()
         //Turn off auto dropsite building.
         aiSetAllowAutoDropsites(false);
         aiSetAllowBuildings(false);
-
+		if (cMyCulture == cCultureAtlantean)
+        aiSetMinNumberNeedForGatheringAggressvies(1);
+		else aiSetMinNumberNeedForGatheringAggressvies(2);
+		
         // Move the transport toward map center to find continent quickly.
         int transportID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0));
         vector nearCenter = kbGetMapCenter();
@@ -278,6 +281,8 @@ void initMapSpecific()
         xsDisableRule("fishing");
         //Pause the age upgrades.
         aiSetPauseAllAgeUpgrades(true);
+		gHuntingDogsASAP = false;
+		IsRunHuntingDogs = true;
     }
     //Nomad.
     else if (cvMapSubType == NOMADMAP)
@@ -415,6 +420,7 @@ rule findVinlandsagaBase
         int callbackGID=createCallbackGoal("Vinlandsaga Base Callback", "vinlandsagaBaseCallback", 1, 0, -1, false);
         if (callbackGID >= 0)
             aiPlanSetVariableInt(mainlandBaseGID, cGoalPlanDoneGoal, 0, callbackGID);
+			VinLandBase = mainlandBaseGID;
     }
 
     //Done.
@@ -515,6 +521,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
     xsDisableRule("vinlandsagaFailsafe");
     //Kill the land scout explore.
     aiPlanDestroy(gLandExplorePlanID);
+	aiPlanDestroy(gLandExplorePlanID2);
     //Create a new land based explore plan for the mainland.
     gLandExplorePlanID=aiPlanCreate("Explore_Land_VS", cPlanExplore);
     if (gLandExplorePlanID >= 0)

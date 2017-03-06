@@ -1770,7 +1770,7 @@ rule rGaiaForestPower
         return;
 		    int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 30.0);
+    int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 35.0);
 	if (NumTreesMB < 3)
 	JustCastIt = true;
     static int count = 0;
@@ -2408,7 +2408,10 @@ inactive
 		 xsSetRuleMinIntervalSelf(60);
 		 else xsSetRuleMinIntervalSelf(1);
 		 if (CastAttempt >= 5)
+		 {
+		 xsEnableRule("castHeavyGP");
 		 xsDisableSelf();
+		 }
 		 if (ShowAiEcho == true) aiEcho("CASTING A4 GP");
    		 return;
    		}

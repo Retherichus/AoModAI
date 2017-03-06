@@ -571,12 +571,13 @@ rule buildHouse
     int housePlanID = aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, houseProtoID);
     if (housePlanID > -1)
     {
+	    int planState = aiPlanGetState(housePlanID);
         int houseID = findUnit(houseProtoID, cUnitStateBuilding, -1, cMyID);
-        if (houseID != -1)
+        if ((houseID != -1) || (cvMapSubType == VINLANDSAGAMAP) && (planState == cPlanStatePlace))
         {
-            if (kbUnitGetHealth(houseID) < 1.0)
+            if ((kbUnitGetHealth(houseID) < 1.0) || (cvMapSubType == VINLANDSAGAMAP) && (planState == cPlanStatePlace))
             {
-                if (count > 4)
+                if ((count > 4) || (cvMapSubType == VINLANDSAGAMAP) && (planState == cPlanStatePlace) && (count > 2))
                 {
                     aiPlanDestroy(housePlanID);
                     aiTaskUnitDelete(houseID);
@@ -610,6 +611,13 @@ rule buildHouse
         int otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
     }
     
+	if (cvMapSubType == VINLANDSAGAMAP)
+	{
+	if (aiRandInt(4) > 1)
+    otherBaseID=kbUnitGetBaseID(VinLandBase);
+	else otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
+	}
+	
     vector location = cInvalidVector;
     int planID = aiPlanCreate("BuildHouse", cPlanBuild);
     if (planID >= 0)
@@ -783,7 +791,7 @@ rule buildSettlements
         return;
     if (findASettlement() == false)
         return;
-    if (numberSettlements > 1)  // Test for all the normal reasons to not build a settlement, unless we have only one
+    if (numberSettlements > 0)  // Test for all the normal reasons to not build a settlement, unless we have only one
     {
         int popCapBuffer = 50;
 
@@ -1004,7 +1012,7 @@ rule buildSettlementsEarly  //age 1/2 handler
     inactive
 {
     if (ShowAiEcho == true) aiEcho("buildSettlementsEarly:");
-	if ((mRusher == true) && (xsGetTime() < 15*60*1000))
+	if ((mRusher == true) && (xsGetTime() < 9*60*1000))
 	return;
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals = aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
@@ -1048,7 +1056,7 @@ rule buildSettlementsEarly  //age 1/2 handler
     if (xsGetTime() > 20*60*1000)
         createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);        
     else
-        createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 99);
+        createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
 }
 
 //==============================================================================
@@ -1239,24 +1247,18 @@ rule makeWonder
 
 //==============================================================================
 rule mainBaseAreaWallTeam1
-    minInterval 23 //starts in cAge2
+    minInterval 5 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam1:");
-	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000))
+	int Temple = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
+	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000) || (kbGetAge() < cAge2) && (Temple < 1 ) || (kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean))
 	return;
 	
+	if (kbGetAge() > cAge1)
+	xsSetRuleMinIntervalSelf(23);
+	
     static bool alreadyStarted = false;
-    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
-    if ((alreadyStarted == false) && (numHeroes < 1) && (xsGetTime() < 7*60*1000))
-        return;
-    
-	if (IsRunWallSize == false && aiGetWorldDifficulty() < cDifficultyNightmare && kbGetMapXSize() > 400000000)
-	{
-	gMainBaseAreaWallRadius = gMainBaseAreaWallRadius*0.68;
-	IsRunWallSize = true;
-	 aiEcho(""+kbGetMapXSize()+"");
-	}
 	
     float goldSupply = kbResourceGet(cResourceGold);
 
@@ -1266,6 +1268,8 @@ rule mainBaseAreaWallTeam1
 
     int mainBaseID=kbBaseGetMainID(cMyID);
 	vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+	if (mainBaseID == gVinlandsagaInitialBaseID)
+	return;
 
     if (wallPlanID >= 0)
     {
@@ -1322,7 +1326,7 @@ rule mainBaseAreaWallTeam1
     
     if (alreadyStarted == false)
     {
-        if (goldSupply < 100)
+        if ((goldSupply < 25) && (kbGetAge() < cAge2))
             return;
     }
     else
@@ -1691,7 +1695,7 @@ rule mainBaseAreaWallTeam1
 //==============================================================================
 rule mainBaseAreaWallTeam2
 //    minInterval 23 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
-    minInterval 29 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
+    minInterval 5 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
     inactive
 {
 
@@ -1701,10 +1705,11 @@ rule mainBaseAreaWallTeam2
 	return;
 	}
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
-	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000) || (kbGetAge() == cAge2) && (xsGetTime() < 10*60*1000))
+	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000))
 	return;
     
-
+	if (kbGetAge() > cAge1)
+	xsSetRuleMinIntervalSelf(23);
 	
 	
     float goldSupply = kbResourceGet(cResourceGold);
@@ -1768,7 +1773,7 @@ rule mainBaseAreaWallTeam2
         }
     }
 
-    if (goldSupply < 240)
+    if (goldSupply < 50)
         return;
         
 /*
@@ -2979,7 +2984,7 @@ rule buildFortress
         }
         else
         {
-            int numFortressesNearMainBase = getNumUnits(bigBuildingID, cUnitStateAliveOrBuilding, -1, cMyID, location, 60.0);
+            int numFortressesNearMainBase = getNumUnits(bigBuildingID, cUnitStateAliveOrBuilding, -1, cMyID, location, 50.0);
             if (numFortressesNearMainBase > 5)
             {
                 return;
@@ -3229,7 +3234,7 @@ rule buildBuildingsAtOtherBase
     else
     {
         int otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
-        if (otherBaseID == mainBaseID)
+        if ((otherBaseID == mainBaseID) || (otherBaseID == gVinlandsagaInitialBaseID))
         {
             if (ShowAiEcho == true) aiEcho("otherBaseID == mainBaseID, returning");
             return;
@@ -3389,7 +3394,7 @@ rule buildBuildingsAtOtherBase2
     else
     {
         int otherBaseID=kbUnitGetBaseID(otherBaseUnitID);
-        if (otherBaseID == mainBaseID)
+        if ((otherBaseID == mainBaseID) || (otherBaseID == gVinlandsagaInitialBaseID))
         {
             if (ShowAiEcho == true) aiEcho("otherBaseID == mainBaseID, returning");
             return;
@@ -3646,7 +3651,7 @@ rule buildInitialTemple //and rebuild it if destroyed
         return;
     }
     
-    if (xsGetTime() < 60*1000)
+    if (xsGetTime() < 1*60*1000)
         return;
 
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -3744,8 +3749,11 @@ rule buildArmory
         return;
     }
 	float woodSupply = kbResourceGet(cResourceWood);
-	int numBuilders = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive); 
-    if ((kbGetAge() < cAge2)|| (kbGetAge() > cAge2) && (woodSupply < 460) || (kbGetAge() == cAge2) && (woodSupply < 220) && (cMyCulture != cCultureEgyptian))
+	int numBuilders = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
+	int MilBuildings = kbUnitCount(cMyID, cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAliveOrBuilding);
+	
+    if ((kbGetAge() < cAge2)|| (kbGetAge() > cAge2) && (woodSupply < 450) && (cMyCulture != cCultureEgyptian) && (MilBuildings < 3) || (kbGetAge() == cAge2) && (woodSupply < 200) && (cMyCulture != cCultureEgyptian) 
+	|| (kbGetAge() == cAge2) && (cMyCulture != cCultureEgyptian) && (MilBuildings < 2))
         return;
     
     xsSetRuleMinIntervalSelf(25);
@@ -4758,9 +4766,9 @@ rule buildExtraFarms
 	numVillagers = numVillagers * 1.8;
 	
 	
-    int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 70.0);
+    int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 75.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 6) || (numFarmsNearMainBaseInR30 >= 37) || (numVillagers < 20) || (numFarmsNearMainBaseInR30 > 21) && (aiGetWorldDifficulty() > cDifficultyHard))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 6) || (numFarmsNearMainBaseInR30 >= 30) || (numVillagers < 20) || (numFarmsNearMainBaseInR30 > 21) && (aiGetWorldDifficulty() > cDifficultyHard))
     {
         xsSetRuleMinIntervalSelf(50);
         return;
@@ -4786,16 +4794,6 @@ rule buildExtraFarms
         resourceSupply = kbResourceGet(cResourceGold);
     
     if (resourceSupply < 350)
-    {
-        return;
-    }
-    float distance = 85.0;
-	if (kbGetAge() >= cAge3 || (xsGetTime() > 20*60*1000)) distance=40.0;
-    int numAggressiveResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
-    int numEasyResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, distance);
-    int totalNumResourceSpots = numAggressiveResourceSpots + numEasyResourceSpots;
-
-    if ((totalNumResourceSpots > 1) && (numFarmsNearMainBaseInR30 > 5))
     {
         return;
     }

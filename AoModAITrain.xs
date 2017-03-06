@@ -734,7 +734,7 @@ rule maintainMilitaryTroops
 		Dice = aiRandInt(3);
 		if (Dice < 2)
 		unitType2 = cUnitTypeJarl;
-        else unitType3 = cUnitTypeRaidingCavalry;
+        else unitType2 = cUnitTypeRaidingCavalry;
         }
     }
     else if (cMyCulture == cCultureAtlantean)
@@ -879,10 +879,11 @@ rule maintainMilitaryTroops
         
     aiPlanSetMilitary(trainMilitaryUnitPlanID, true);
     aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanUnitType, 0, unitTypeToTrain);
+	aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanFrequency, 0, 15);
     aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanNumberToTrain, 0, 2);
     aiPlanSetVariableBool(trainMilitaryUnitPlanID, cTrainPlanUseMultipleBuildings, 0, true);
     aiPlanSetBaseID(trainMilitaryUnitPlanID, mainBaseID);
-    aiPlanSetDesiredPriority(trainMilitaryUnitPlanID, 100);
+    aiPlanSetDesiredPriority(trainMilitaryUnitPlanID, 70);
     aiPlanSetActive(trainMilitaryUnitPlanID);
 }
 

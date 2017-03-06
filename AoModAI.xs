@@ -83,7 +83,7 @@ extern bool gBuildTowers = false;
 extern int gRushUPID=-1;            // Unit picker ID for age 2 (cAge2) armies.
 extern int gLateUPID=-1;            // Unit picker for age 3/4 (cAge3 and cAge4).
 extern int gNavalUPID=-1;
-extern int gNumberBuildings=4;      // Number of buildings requested for late unit picker
+extern int gNumberBuildings=3;      // Number of buildings requested for late unit picker
 extern int gNavalAttackGoalID=-1;
 extern int gRushGoalID=-1;
 extern int gLandAttackGoalID=-1;
@@ -179,7 +179,7 @@ extern int gBackAreaID = -1;
 extern int gHouseAreaID = -1;
 extern bool gResetWallPlans = false;
 
-extern float gMainBaseAreaWallRadius = 34;
+extern float gMainBaseAreaWallRadius = 32;
 extern float gSecondaryMainBaseAreaWallRadius = 42;
 
 extern int gMainBaseAreaWallTeam1PlanID = -1;
@@ -456,7 +456,7 @@ rule updatePlayerToAttack   //Updates the player we should be attacking.
 
 //==============================================================================
 rule checkEscrow    //Verify that escrow totals and real inventory are in sync
-    minInterval 7 //starts in cAge1
+    minInterval 6 //starts in cAge1
     active
 {
     if (ShowAiEcho == true) aiEcho("checkEscrow:");
@@ -884,17 +884,17 @@ rule updateEMAge1       // i.e. cAge1
       }
       else if (aiGetWorldDifficulty() == cDifficultyModerate)
       {
-         civPopTarget = 40;
+         civPopTarget = 18;
          milPopTarget = 30;
       }
       else if (aiGetWorldDifficulty() == cDifficultyHard)
       {
-         civPopTarget = 25;
+		 civPopTarget = 21;
          milPopTarget = 60;
       }
       else
       {
-         civPopTarget = 25;
+		 civPopTarget = 21;
          milPopTarget = 80;
       }
    }
@@ -1071,12 +1071,10 @@ rule updateEMAge4
          civPopTarget = 35;
       milPopTarget = getSoftPopCap() - civPopTarget;  // Whatever's left (i.e. 60 + 80% over 115)
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.95);   
+      kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);   
 	  }
       else
       {
-      //int num1 =aiRandInt(3);
-      //int num2 =aiRandInt(9);
       civPopTarget = 45; 
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
@@ -1088,7 +1086,7 @@ rule updateEMAge4
         milPopTarget = getSoftPopCap() - civPopTarget;
         kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
         kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.95);
-        //kbUnitPickSetCostWeight(gLateUPID, num1+2.+num2);
+       
 
    }
 
@@ -1130,7 +1128,7 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
     float goldStatus = 0.0;
     float woodStatus = 0.0;
     float foodStatus = 0.0;
-    float minForecast = 100.0 * (1 + kbGetAge());	// 100, 200, 300, 400, 500 in ages 1-5, prevents small amount from looking large if forecast is very low
+    float minForecast = 200.0 * (1 + kbGetAge());	// 200, 400, 600, 800 in ages 1-5, prevents small amount from looking large if forecast is very low
     if (gGoldForecast > minForecast)
         goldStatus = scaleFactor * kbResourceGet(cResourceGold)/gGoldForecast;
     else
@@ -1174,7 +1172,7 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     float favorSupply = kbResourceGet(cResourceFavor);
-    if (xsGetTime() > 20*60*1000)
+    if ((xsGetTime() > 20*60*1000) && (TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
         favorCost = 21.0 - (18.0*(kbResourceGet(cResourceFavor)/100.0));
     if ((kbGetTechStatus(gAge4MinorGod) >= cTechStatusResearching) && (cMyCulture == cCultureGreek))
     {
@@ -1182,7 +1180,7 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
             favorCost = 40.0;
         else
         {
-            if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (foodSupply > 500) && (goldSupply > 500) && (woodSupply > 500) && (favorSupply <= 70))
+            if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (foodSupply > 500) && (goldSupply > 500) && (woodSupply > 500) && (favorSupply <= 70))
             {
                 favorCost = 25.0;
             }
@@ -1498,15 +1496,15 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     float neededFoodGatherers = desiredFoodUnits - numFishBoats;
     if ((desiredFoodUnits > 0) && (kbGetAge() > cAge1))
     {
-        float minFoodGatherers = 6;
+        float minFoodGatherers = 7;
         if (cMyCulture == cCultureAtlantean)
-            minFoodGatherers = 2;
+            minFoodGatherers = 3;
         if ((numFishBoats < 4) && (kbGetAge() > cAge2) || (numGoldSites < 1))
         {
             foodOverride = true;
             minFoodGatherers = 21;
             if (cMyCulture == cCultureAtlantean)
-                minFoodGatherers = 7;
+                minFoodGatherers = 8;
         }
         if (neededFoodGatherers < minFoodGatherers)
             neededFoodGatherers = minFoodGatherers;
@@ -1586,13 +1584,23 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
             foodAssignment = lastFoodAssignment - 0.03;
             if (foodAssignment < 0.25)
                 foodAssignment = 0.25;
+			if ((foodAssignment < 0.30) && (kbGetAge() > 3))
+                foodAssignment = 0.30;
         }
     }
+	        // Some overrides
+            if ((woodAssignment < 0.15) && (kbGetAge() < 3) && (cMyCulture != cCultureEgyptian) && (cMyCulture != cCultureAtlantean) && (xsGetTime() < 15*60*1000))
+                woodAssignment = 0.15;	
+		    if ((goldAssignment < 0.25) && (cMyCulture == cCultureEgyptian) && (kbGetAge() < 2))
+                goldAssignment = 0.25;
+		    
+			if ((foodAssignment < 0.30) && (kbGetAge() > 3))
+                foodAssignment = 0.30;
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
-    int minVillagers = 16;
+    int minVillagers = 14;
     if (cMyCulture == cCultureAtlantean)
-        minVillagers = 6;
+        minVillagers = 5;
 	if (aiGetWorldDifficulty() > cDifficultyHard)
 	minVillagers = minVillagers / 2;		
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
@@ -1658,8 +1666,6 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
 }
 
-
-// MIL Forecast
 //==============================================================================
 // setMilitaryUnitCostForecast
 // Checks the current age, looks into the appropriate unit picker,
@@ -1704,8 +1710,8 @@ void setMilitaryUnitCostForecast(void)
 	  weight = 0.67; // 2/3 and 1/3
    if (numUnits >= 3)
 	  weight = 0.50; // 1/2, 1/3, 1/6
-   if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Military Unit Cost Forecast:");
-   if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho(" Main unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+   if (ShowAiEcho == true) aiEcho("Military Unit Cost Forecast:");
+   if (ShowAiEcho == true) aiEcho(" Main unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
    
    goldCost = kbUnitCostPerResource(unitID, cResourceGold);
    woodCost = kbUnitCostPerResource(unitID, cResourceWood);
@@ -1720,7 +1726,7 @@ void setMilitaryUnitCostForecast(void)
    {  // Do second unit
 	  unitID = kbUnitPickGetResult(upID, 1);
 	  weight = 0.33;	// Second is 1/3 regardless 
-	  if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("   Secondary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+	  if (ShowAiEcho == true) aiEcho("   Secondary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
 	  goldCost = kbUnitCostPerResource(unitID, cResourceGold);
 	  woodCost = kbUnitCostPerResource(unitID, cResourceWood);
 	  foodCost = kbUnitCostPerResource(unitID, cResourceFood);
@@ -1735,7 +1741,7 @@ void setMilitaryUnitCostForecast(void)
    {  // Do third unit
 	  unitID = kbUnitPickGetResult(upID, 2);
 	  weight = 0.167;   // Third unit, if used, is 1/6
-	  if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("   Tertiary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
+	  if (ShowAiEcho == true) aiEcho("   Tertiary unit is "+unitID+" "+ kbGetProtoUnitName(unitID)+", weight "+weight);
 	  goldCost = kbUnitCostPerResource(unitID, cResourceGold);
 	  woodCost = kbUnitCostPerResource(unitID, cResourceWood);
 	  foodCost = kbUnitCostPerResource(unitID, cResourceFood);
@@ -1745,32 +1751,12 @@ void setMilitaryUnitCostForecast(void)
 	   gWoodForecast = gWoodForecast + woodCost * (totalAmount*weight/totalCost);
 	   gFoodForecast = gFoodForecast + foodCost * (totalAmount*weight/totalCost);
    }
-   if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho(" Mil forecast gold: "+(gGoldForecast-origGold)+", wood: "+(gWoodForecast-origWood)+", food: "+(gFoodForecast-origFood));
+   if (ShowAiEcho == true) aiEcho(" Mil forecast gold: "+(gGoldForecast-origGold)+", wood: "+(gWoodForecast-origWood)+", food: "+(gFoodForecast-origFood));
 }
-
-void addUnitForecast(int unitTypeID=-1, int qty=1)
-{
-   if (unitTypeID < 0)
-	  return;
-   gGoldForecast = gGoldForecast + kbUnitCostPerResource(unitTypeID, cResourceGold)*qty;
-   gWoodForecast = gWoodForecast + kbUnitCostPerResource(unitTypeID, cResourceWood)*qty;
-   gFoodForecast = gFoodForecast + kbUnitCostPerResource(unitTypeID, cResourceFood)*qty;
-}
-
-
-void addTechForecast(int techID=-1)
-{
-   if (techID < 0)
-	  return;
-   gGoldForecast = gGoldForecast + kbTechCostPerResource(techID, cResourceGold);
-   gWoodForecast = gWoodForecast + kbTechCostPerResource(techID, cResourceWood);
-   gFoodForecast = gFoodForecast + kbTechCostPerResource(techID, cResourceFood);
-}
-
 
 //==============================================================================
 rule econForecastAge4		// Rule activates when age 4 research begins
-    minInterval 23
+    minInterval 18
     inactive
 {	
     static int ageStartTime = -1;
@@ -1903,7 +1889,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
             gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
 
-    setMilitaryUnitCostForecast(); 
+	setMilitaryUnitCostForecast(); // add units before scaling down
 	
     if (woodSupply > 2000)
         gWoodForecast = gWoodForecast * 0.6;
@@ -1916,13 +1902,13 @@ rule econForecastAge4		// Rule activates when age 4 research begins
     
 
     
-    if (ShowAiEcho == true || ShowAiEcoEcho == true)  aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
 //==============================================================================
 rule econForecastAge3		// Rule activates when age3 research begins, turns off when age 4 research begins
-    minInterval 15
+    minInterval 12
     inactive
 {
     static int ageStartTime = -1;
@@ -2001,7 +1987,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     float foodSupply = kbResourceGet(cResourceFood);
     float favorSupply = kbResourceGet(cResourceFavor);
     
-    if (((ageStartTime != -1) && (xsGetTime() - ageStartTime > 8*60*1000)) || (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) > 0))
+    if (((ageStartTime != -1) && (xsGetTime() - ageStartTime > 7*60*1000)) || (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) > 0))
     {
         if (goldSupply < 1500)
             gGoldForecast = gGoldForecast + (1500 - goldSupply);
@@ -2088,7 +2074,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
             gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
     
-	setMilitaryUnitCostForecast();  // add units before scaling down
+	//setMilitaryUnitCostForecast();  // add units before scaling down
 
     if (woodSupply > 1100)
         gWoodForecast = gWoodForecast * 0.5;
@@ -2123,13 +2109,13 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     else if (foodSupply > 1600)
         gFoodForecast = gFoodForecast * 0.9;
 	
-    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
 //==============================================================================
 rule econForecastAge2		// Rule activates when age 2 research begins, turns off when age 3 research begins
-    minInterval 15
+    minInterval 11
     inactive
 {
     static int ageStartTime = -1;
@@ -2221,7 +2207,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
             gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
     
-    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 7*60*1000) && (numArmories > 0))
+    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 5*60*1000) && (numArmories > 0))
     {
         if (goldSupply < 800)
             gGoldForecast = gGoldForecast + (800 - goldSupply);
@@ -2346,17 +2332,19 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
         if (woodSupply < 300)
             gWoodForecast = gWoodForecast + (300 - woodSupply);
     }    
+    if ((gWoodForecast > 800) && ((xsGetTime() > (15*60*1000))))
+	gWoodForecast = 800;
+	
 
-
-    if (woodSupply > 1000)
+    if (woodSupply > 700)
         gWoodForecast = gWoodForecast * 0.5;
-    else if (woodSupply > 900)
-        gWoodForecast = gWoodForecast * 0.6;
-    else if (woodSupply > 800)
-        gWoodForecast = gWoodForecast * 0.7;
-    else if (woodSupply > 700)
-        gWoodForecast = gWoodForecast * 0.8;
     else if (woodSupply > 600)
+        gWoodForecast = gWoodForecast * 0.6;
+    else if (woodSupply > 500)
+        gWoodForecast = gWoodForecast * 0.7;
+    else if (woodSupply > 400)
+        gWoodForecast = gWoodForecast * 0.8;
+    else if (woodSupply > 300)
         gWoodForecast = gWoodForecast * 0.9;
         
     if (goldSupply > 900)
@@ -2381,7 +2369,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     else if (foodSupply > 700)
         gFoodForecast = gFoodForecast * 0.9;
 
-    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -2475,7 +2463,7 @@ if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCul
             gWoodForecast = gWoodForecast + (200 - woodSupply);
     }
 
-    if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+    if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
 
@@ -2891,15 +2879,15 @@ void initChinese(void)
 }
 
 rule DelayImmortalHero
-minInterval 25
+minInterval 10
 inactive
 {
 
-    if (kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAlive) < 1)
+    if (kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding) < 1)
 	return;
 
-	if(cMyCulture == cCultureChinese)
-    createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 6, false, kbBaseGetMainID(cMyID));
+	int EcoHero = createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 1, true, kbBaseGetMainID(cMyID));  // Eco
+    mChineseImmortal = createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 0, false, kbBaseGetMainID(cMyID)); // Mil
 	
 	
 	xsDisableSelf();
@@ -3209,7 +3197,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.6);
                 }
                 else if (upRand == 1)
                 {
@@ -3220,7 +3208,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.5);
                 }
                 else
                 {
@@ -3231,7 +3219,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.4);
                 }
                 break;
             }
@@ -3247,7 +3235,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeJarl, 0.9);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.6);
 
                 }
                 else if (upRand == 1)
@@ -3260,7 +3248,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeJarl, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.5);
                 }
                 else
                 {
@@ -3272,7 +3260,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeJarl, 0.4);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
+                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.4);
                 }
                 break;
             }
@@ -3287,7 +3275,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.6);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.6);
                 }
                 else if (upRand == 1)
                 {
@@ -3298,7 +3286,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.5);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.5);
                 }
                 else
                 {
@@ -3309,7 +3297,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeBogsveigir, 0.4);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.4);
                 }
                 break;
             }
@@ -3410,7 +3398,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else if (upRand == 1)
                 {
@@ -3419,7 +3407,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else
                 {
@@ -3428,7 +3416,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 break;			
         }
@@ -3442,7 +3430,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else if (upRand == 1)
                 {
@@ -3451,7 +3439,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else
                 {
@@ -3460,7 +3448,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 break;			
         }
@@ -3474,7 +3462,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else if (upRand == 1)
                 {
@@ -3483,7 +3471,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else
                 {
@@ -3492,7 +3480,7 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.1);
+					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 break;			
         }
@@ -3693,7 +3681,7 @@ void init(void)
     if (cMyCulture == cCultureEgyptian)
         gHouseAvailablePopRebuild=4;
     else if (cMyCulture == cCultureAtlantean)
-        gHouseAvailablePopRebuild=6;
+        gHouseAvailablePopRebuild=5;
     else if (cMyCulture == cCultureNorse)
         gHouseAvailablePopRebuild=8;		
     else
@@ -3894,9 +3882,9 @@ void init(void)
     }
     */
     
-    int numTypes = 2;
-    if (rushSize < 40)
-        numTypes = 1;     // Were doing a few or no rushes of small size, just make 1 unit type
+    int numTypes = 3;
+   // if (rushSize < 40)
+      //  numTypes = 1;     // Were doing a few or no rushes of small size, just make 1 unit type
 
     // Finally, adjust rushSize to the per-wave number we need
     if (rushCount > 0)
@@ -3967,6 +3955,7 @@ void init(void)
 	{
 	gRushCount = gRushCount + aiRandInt(3);
 	mRusher = true;
+	BeenmRusher = true;
 	//aiEcho("Rush count: "+gRushCount+"");
     }
 	
@@ -3974,10 +3963,47 @@ void init(void)
     if (gRushUPID >= 0)
     {
         //Reset a few of the UP parms.
-        kbUnitPickSetPreferenceWeight(gRushUPID, 2.0);
-        kbUnitPickSetCombatEfficiencyWeight(gRushUPID, 4.0);
-        kbUnitPickSetCostWeight(gRushUPID, 7.0);
+	    kbUnitPickSetPreferenceWeight(gRushUPID, 1.0);
+	    kbUnitPickSetCostWeight(gRushUPID, 1.2);
+	    kbUnitPickSetCombatEfficiencyWeight(gRushUPID, 1.0);
+		kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMythUnit, 0.0);
         
+		if (cMyCulture == cCultureGreek)
+        {
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 0.4);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHoplite, 0.3);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.2);
+		 if (cMyCiv == cCivPoseidon)
+		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.3);
+		 if (cMyCiv == cCivHades)
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 0.6);		 
+        }
+        if (cMyCulture == cCultureEgyptian)
+        {
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSlinger, 0.2);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSpearman, 0.4);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeAxeman, 0.3); 
+        }
+        if (cMyCulture == cCultureNorse)
+        {
+		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeAbstractArcher, 0.0);
+	     kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHero, 0.0);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeRaidingCavalry, 0.3);
+		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeAbstractInfantry, 0.5);
+        }
+        if (cMyCulture == cCultureAtlantean)
+        {
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeJavelinCavalry, 0.5);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSwordsman, 0.3);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMaceman, 0.2);
+        }
+        if (cMyCulture == cCultureChinese)
+        {
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeChuKoNu, 0.6);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.3);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHalberdier, 0.4);
+        }		
+		
         //Create the rush goal if we're rushing.
         if (rushCount > 0)  // Deleted conditions that suppress rushing if we're walling or towering...OK to do some of each.
         {
@@ -3998,8 +4024,8 @@ void init(void)
                 aiPlanSetVariableBool(gIdleAttackGID, cGoalPlanIdleAttack, 0, true);
                 //Go for hitpoint upgrades.
                 aiPlanSetVariableInt(gIdleAttackGID, cGoalPlanUpgradeFilterType, 0, cUpgradeTypeHitpoints);
-                //Reset the rushUPID down to 1 unit type and 1 building.
-                kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 2, 1, true);
+                //Reset the rushUPID down to 3 unit type and 1 building.
+                kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 3, 1, true);
             }
         }
     }
@@ -4044,12 +4070,12 @@ void init(void)
         if ( aiGetGameMode() != cGameModeDeathmatch )
         {
             if ((gBuildWallsAtMainBase == false) || (gTransportMap == true))
-                gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
+                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
             else
-                gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
+                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
         }
         else  // Double buildings in DM
-            gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, 2*gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
+            gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, 2*gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
     }
     
     int lateAttackAge = 2;
@@ -4150,7 +4176,7 @@ void init(void)
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFood, 1.5);
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFavor, 10.0);
         //Set our farm limits.
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 30);  //  Up from 4
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 20);  //  Up from 4
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanMaxFarmLimit, 0, 40);     //  Up from 24
         aiSetFarmLimit(aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0));
         //Do our late econ init.
@@ -4665,8 +4691,8 @@ void age2Handler(int age=1)
     else if (cMyCulture == cCultureNorse)
     {
         // add an extra ulfsark builder
-        aiPlanSetVariableInt(gUlfsarkMaintainPlanID, cTrainPlanNumberToMaintain, 0, aiPlanGetVariableInt(gUlfsarkMaintainPlanID, cTrainPlanNumberToMaintain, 0)+1);
-        aiPlanSetVariableInt(gUlfsarkMaintainMilPlanID, cTrainPlanNumberToMaintain, 0, aiPlanGetVariableInt(gUlfsarkMaintainMilPlanID, cTrainPlanNumberToMaintain, 0)+1);
+        //aiPlanSetVariableInt(gUlfsarkMaintainPlanID, cTrainPlanNumberToMaintain, 0, aiPlanGetVariableInt(gUlfsarkMaintainPlanID, cTrainPlanNumberToMaintain, 0)+1);
+        //aiPlanSetVariableInt(gUlfsarkMaintainMilPlanID, cTrainPlanNumberToMaintain, 0, aiPlanGetVariableInt(gUlfsarkMaintainMilPlanID, cTrainPlanNumberToMaintain, 0)+1);
 
         //We always want 3 Norse heroes.
         gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypeHeroNorse, 3, false, kbBaseGetMainID(cMyID));
@@ -5076,7 +5102,7 @@ void age3Handler(int age=2)
         case cCultureNorse:
         {
             buildingType = cUnitTypeHillFort;
-            numBuilders = 2;
+            numBuilders = 3;
             break;
         }
         case cCultureAtlantean:
