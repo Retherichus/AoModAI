@@ -105,9 +105,9 @@ extern bool AllyTcLimit = false; // This enables the modified rule and disables 
 // This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
-extern int eBoomFood = 650;              // Food
-extern int eBoomGold = 150;              // Gold
-extern int eBoomWood = 250;              // Wood, duh.
+extern int eBoomFood = 600;              // Food
+extern int eBoomGold = 200;              // Gold
+extern int eBoomWood = 325;              // Wood, duh.
 
 
 //Egyptians have their own, because they don't like wood as much.
@@ -427,9 +427,6 @@ rule ActivateRethOverridesAge1
 		aiResourceCheat(cMyID, cResourceWood, 0.1);
 		aiResourceCheat(cMyID, cResourceGold, 0.1);
 		xsDisableSelf();
-		
-		if ((gBuildWallsAtMainBase == true) && (mRusher == false))
-            xsEnableRule("mainBaseAreaWallTeam1");
            
     }
 

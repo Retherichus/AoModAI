@@ -1239,18 +1239,17 @@ rule makeWonder
 
 //==============================================================================
 rule mainBaseAreaWallTeam1
-    minInterval 5 //starts in cAge2
+    minInterval 23 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam1:");
-	int Temple = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
-	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000) || (kbGetAge() < cAge2) && (Temple < 1 ) || (kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean))
+	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000))
 	return;
 	
-	if (kbGetAge() > cAge1)
-	xsSetRuleMinIntervalSelf(23);
-	
     static bool alreadyStarted = false;
+    int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
+    if ((alreadyStarted == false) && (numHeroes < 1) && (xsGetTime() < 7*60*1000))
+        return;
     
 	if (IsRunWallSize == false && aiGetWorldDifficulty() < cDifficultyNightmare && kbGetMapXSize() > 400000000)
 	{
@@ -1323,7 +1322,7 @@ rule mainBaseAreaWallTeam1
     
     if (alreadyStarted == false)
     {
-        if ((goldSupply < 25) && (kbGetAge() < cAge2))
+        if (goldSupply < 100)
             return;
     }
     else
@@ -1692,7 +1691,7 @@ rule mainBaseAreaWallTeam1
 //==============================================================================
 rule mainBaseAreaWallTeam2
 //    minInterval 23 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
-    minInterval 5 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
+    minInterval 29 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
     inactive
 {
 
@@ -1702,11 +1701,10 @@ rule mainBaseAreaWallTeam2
 	return;
 	}
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
-	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000))
+	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000) || (kbGetAge() == cAge2) && (xsGetTime() < 10*60*1000))
 	return;
     
-	if (kbGetAge() > cAge1)
-	xsSetRuleMinIntervalSelf(23);
+
 	
 	
     float goldSupply = kbResourceGet(cResourceGold);
@@ -1770,7 +1768,7 @@ rule mainBaseAreaWallTeam2
         }
     }
 
-    if (goldSupply < 50)
+    if (goldSupply < 240)
         return;
         
 /*
@@ -2981,7 +2979,7 @@ rule buildFortress
         }
         else
         {
-            int numFortressesNearMainBase = getNumUnits(bigBuildingID, cUnitStateAliveOrBuilding, -1, cMyID, location, 50.0);
+            int numFortressesNearMainBase = getNumUnits(bigBuildingID, cUnitStateAliveOrBuilding, -1, cMyID, location, 60.0);
             if (numFortressesNearMainBase > 5)
             {
                 return;
