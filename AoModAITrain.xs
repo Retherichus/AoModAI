@@ -277,7 +277,7 @@ rule trainDwarves
     if (numTemplesAtMainBase < 1)
         return;
     
-    gDwarfMaintainPlanID = createSimpleMaintainPlan(cUnitTypeDwarf, 2, true, -1);
+    gDwarfMaintainPlanID = createSimpleMaintainPlan(cUnitTypeDwarf, 2, false, -1);
     xsDisableSelf();
 }
 

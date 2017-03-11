@@ -1027,11 +1027,11 @@ rule buildSettlementsEarly  //age 1/2 handler
 
     if (kbGetAge() > cAge1)
     {
-        if ((gEarlySettlementTarget < 2) && (xsGetTime() > 14*60*1000))
+        if ((gEarlySettlementTarget < 2) && (xsGetTime() > 10*60*1000))
         {
             gEarlySettlementTarget = 2;
         }
-        else if ((gEarlySettlementTarget < 3) && (xsGetTime() > 20*60*1000))
+        else if ((gEarlySettlementTarget < 3) && (xsGetTime() > 14*60*1000) || ((kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching)))
         {
             gEarlySettlementTarget = 3;
         }
@@ -4360,7 +4360,7 @@ rule buildGoldMineTower
     if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop))
         return;
     float goldSupply = kbResourceGet(cResourceGold);
-	if ((kbGetAge() < cAge3) && (goldSupply < 750))
+	if ((kbGetAge() < cAge3) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
 	return; // We need the gold to advance quicker.
 	
 	if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
@@ -4768,13 +4768,13 @@ rule buildExtraFarms
 	
     int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 75.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 6) || (numFarmsNearMainBaseInR30 >= 30) || (numVillagers < 20) || (numFarmsNearMainBaseInR30 > 21) && (aiGetWorldDifficulty() > cDifficultyHard))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 4) || (numFarmsNearMainBaseInR30 >= 30) || (numVillagers < 20) || (numFarmsNearMainBaseInR30 > 18) && (aiGetWorldDifficulty() > cDifficultyHard))
     {
         xsSetRuleMinIntervalSelf(50);
         return;
     }
     else
-        xsSetRuleMinIntervalSelf(18);
+        xsSetRuleMinIntervalSelf(25);
 
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
     if (activeBuildPlans > 0)

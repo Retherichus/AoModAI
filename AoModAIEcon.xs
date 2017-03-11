@@ -41,13 +41,9 @@ rule updateWoodBreakdown
     
         bool reducedWoodGathererCount = false;
 
-    if ((woodGathererCount <= 0 ) && (kbGetAge() >= cAge1) || (woodGathererCount <= 2 ) && (kbGetAge() == cAge1) && (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian)) //always some units on wood, unless there are less than 15 trees
-    {
-            woodGathererCount = 1;
-			if (cMyCulture == cCultureAtlantean)
+    if ((woodGathererCount <= 0 ) && (kbGetAge() >= cAge1))
+        {
 			woodGathererCount = 1;
-			if ((cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian) && (kbGetAge() == cAge1))
-			woodGathererCount = 4;
             reducedWoodGathererCount = true;
         }
 
@@ -102,7 +98,7 @@ rule updateWoodBreakdown
 	if (desiredWoodPlans > 2)
 	desiredWoodPlans = 2;
 	
-	if (xsGetTime() < 10*60*1000)
+	if (xsGetTime() < 12*60*1000)
         desiredWoodPlans = 1;
     
     if (woodGathererCount < desiredWoodPlans)
@@ -148,7 +144,10 @@ rule updateWoodBreakdown
             if (gWoodBaseID >= 0)
             {
                 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
+                if (gTransportMap == true)
                     aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+                else
+                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
             }
             else
             {
@@ -247,9 +246,8 @@ rule updateGoldBreakdown
     {
         if ((numGoldSites > 0) && (kbGetAge() >= cAge1))
         {
-		    if (cMyCulture == cCultureAtlantean)
-            goldGathererCount = 1;
-			else goldGathererCount = 2;
+
+			goldGathererCount = 1;
             reducedGoldGathererCount = true;
         }
     }
@@ -489,7 +487,7 @@ rule updateFoodBreakdown
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
 	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, distance);
 		if ((HippoNearMB > 1) && (cMyCulture != cCultureAtlantean))
-		aiSetMinNumberNeedForGatheringAggressvies(3);
+		aiSetMinNumberNeedForGatheringAggressvies(4);
 		else if ((HippoNearMB > 1) && (cMyCulture == cCultureAtlantean))
 		aiSetMinNumberNeedForGatheringAggressvies(1);
 		HippoDone = true;
@@ -551,7 +549,6 @@ rule updateFoodBreakdown
 	{
 	if (cMyCulture != cCultureAtlantean)
 	desiredFarmers = desiredFarmers+NumVillagers*0.24;
-	else desiredFarmers = desiredFarmers+NumVillagers*0.22;
 	// if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Desired farms: "+desiredFarmers+"");	
     }
 	if (desiredFarmers > 32)
@@ -758,7 +755,7 @@ rule updateFoodBreakdown
     if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)) && (TempleUp > 0))   // can build farms
     {
         if ((totalNumberResourceSpots < 2) || (totalAmount < 1500) || (gFarming == true) || (kbGetAge() == cAge3)
-           || (numResourceSpotsInR70 < 2) && (xsGetTime() > 9*60*1000) || (kbGetAge() >= cAge2) && (xsGetTime() > 15*30*1000))
+           || (numResourceSpotsInR70 < 2) && (xsGetTime() > 9*60*1000) || (kbGetAge() >= cAge2) && (xsGetTime() > 5*60*1000))
         {
             if (cMyCulture == cCultureAtlantean)
             {
@@ -768,7 +765,7 @@ rule updateFoodBreakdown
                 }
                 else
                 {
-                    farmerPreBuild = 1;
+                    farmerPreBuild = 2;
                 }
             }
             else
@@ -779,7 +776,7 @@ rule updateFoodBreakdown
                 }
                 else
                 {
-                    farmerPreBuild = 3;
+                    farmerPreBuild = 4;
                 }
             }
 
@@ -840,14 +837,14 @@ rule updateFoodBreakdown
         houseProtoID = cUnitTypeManor;
     int numHouses = kbUnitCount(cMyID, houseProtoID, cUnitStateAliveOrBuilding);
     
-    if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) && (xsGetTime() < 5*60*1000) || (numHouses < 1) || (unassigned < numPlansWanted))
+    if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) && (xsGetTime() < 4*60*1000) || (numHouses < 1) || (unassigned < numPlansWanted))
         numPlansWanted = 1;
 
     if (unassigned <= 0)
     {
         if (kbGetAge() < cAge3)
         {
-            unassigned = 1;
+		   unassigned = 1;
         }
         else
             numPlansWanted = 0;
@@ -923,7 +920,7 @@ rule updateFoodBreakdown
         unassigned = 0;
     }  
     
-	if (xsGetTime() < 2.5*60*1000)
+	if (xsGetTime() < 5*30*1000)
 	{
 	int ForceHunt = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAny, 0, 0, mainBaseLocation, 40);
 	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAny, 0, 0, mainBaseLocation, 40);
@@ -937,7 +934,6 @@ rule updateFoodBreakdown
 	}
 	
   
- 
     // Now, the number of farmers we want is the unassigned total, plus reserve (existing farms) and prebuild (plan ahead).
     farmers = farmerReserve + farmerPreBuild;
     unassigned = unassigned - farmers;
@@ -946,17 +942,12 @@ rule updateFoodBreakdown
     {  
         // Still unassigned?  Make an extra easy plan, hope they can find food somewhere
         numberEasyResourceSpots = numberEasyResourceSpots + 1;
-		if ((xsGetTime() > 12*60*1000) && (numberEasyResourceSpots > 1))
-	    numberEasyResourceSpots = 1;
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, numberEasyResourceSpots);
         easy = easy + unassigned;
         unassigned = 0;
     }
-
-	if ((xsGetTime() > 12*60*1000) && (numberEasyResourceSpots > 1))
-	numberEasyResourceSpots = 1;
-		
-    int numFarmPlansWanted = 0;
+    
+	int numFarmPlansWanted = 0;
     if (farmers > 0)
     {
         int farmersAtMainBase = 0;
@@ -1015,11 +1006,11 @@ rule updateFoodBreakdown
             {
                 if ((mapRequires2FarmPlans() == true) && (farmersAtMainBase > 10))
                 {
-                    numFarmPlansWanted = numFarmPlansWanted + 2;  //2
+                    numFarmPlansWanted = 2;
                 }
                 else
                 {
-                    numFarmPlansWanted = 1 + ( farmers / aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0) );  //1
+                    numFarmPlansWanted = 2;
                 }
             }                
         }

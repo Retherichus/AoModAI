@@ -179,7 +179,7 @@ extern int gBackAreaID = -1;
 extern int gHouseAreaID = -1;
 extern bool gResetWallPlans = false;
 
-extern float gMainBaseAreaWallRadius = 32;
+extern float gMainBaseAreaWallRadius = 30;
 extern float gSecondaryMainBaseAreaWallRadius = 42;
 
 extern int gMainBaseAreaWallTeam1PlanID = -1;
@@ -1479,9 +1479,9 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
             minGoldGatherers = 1;
         if (numMainBaseGoldSites > 0)
         {
-            minGoldGatherers = 5;
+            minGoldGatherers = 3;
             if (cMyCulture == cCultureAtlantean)
-                minGoldGatherers = 2;
+                minGoldGatherers = 1;
         }
         if (neededGoldGatherers < minGoldGatherers)
             neededGoldGatherers = minGoldGatherers;
@@ -1582,20 +1582,18 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         else if (foodAssignment < lastFoodAssignment)
         {
             foodAssignment = lastFoodAssignment - 0.03;
-            if (foodAssignment < 0.25)
+            if ((foodAssignment < 0.25) && (kbGetAge() < 4))
                 foodAssignment = 0.25;
 			if ((foodAssignment < 0.30) && (kbGetAge() > 3))
                 foodAssignment = 0.30;
         }
     }
 	        // Some overrides
-            if ((woodAssignment < 0.15) && (kbGetAge() < 3) && (cMyCulture != cCultureEgyptian) && (cMyCulture != cCultureAtlantean) && (xsGetTime() < 15*60*1000))
-                woodAssignment = 0.15;	
-		    if ((goldAssignment < 0.25) && (cMyCulture == cCultureEgyptian) && (kbGetAge() < 2))
-                goldAssignment = 0.25;
+            if ((woodAssignment < 0.20) && (kbGetAge() < 3) && (cMyCulture != cCultureEgyptian) && (cMyCulture != cCultureAtlantean) && (xsGetTime() < 15*60*1000))
+                woodAssignment = 0.20;	
+		    if ((goldAssignment < 0.20) && (cMyCulture == cCultureEgyptian) && (kbGetAge() < 2))
+                goldAssignment = 0.20;
 		    
-			if ((foodAssignment < 0.30) && (kbGetAge() > 3))
-                foodAssignment = 0.30;
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 14;
@@ -2273,8 +2271,13 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
                 if (goldSupply < 300)
                     gGoldForecast = gGoldForecast + (300 - goldSupply);
             }
-            else
+            else if (cMyCulture == cCultureAtlantean)
             {
+                if (woodSupply < 500)
+                    gWoodForecast = gWoodForecast + (500 - woodSupply);
+            }
+			else
+			{
                 if (woodSupply < 400)
                     gWoodForecast = gWoodForecast + (400 - woodSupply);
             }
@@ -2714,7 +2717,7 @@ void initNorse(void)
     //Enable our no-infantry check.
     xsEnableRule("norseInfantryCheck");
 	xsEnableRule("startLandScoutingSpecialUlfsark");
-	xsEnableRule("trainDwarves");
+	//xsEnableRule("trainDwarves");  // not now.
 	
 }
 
@@ -3963,14 +3966,15 @@ void init(void)
     if (gRushUPID >= 0)
     {
         //Reset a few of the UP parms.
-	    kbUnitPickSetPreferenceWeight(gRushUPID, 1.0);
-	    kbUnitPickSetCostWeight(gRushUPID, 1.2);
-	    kbUnitPickSetCombatEfficiencyWeight(gRushUPID, 1.0);
+	    kbUnitPickSetPreferenceWeight(gRushUPID, 2.0);
+	    kbUnitPickSetCostWeight(gRushUPID, 7.0);
+	    kbUnitPickSetCombatEfficiencyWeight(gRushUPID, 4.0);
 		kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMythUnit, 0.0);
-        
+        kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 3, 2, true);
+		
 		if (cMyCulture == cCultureGreek)
         {
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 0.4);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 0.5);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHoplite, 0.3);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.2);
 		 if (cMyCiv == cCivPoseidon)
@@ -3980,9 +3984,10 @@ void init(void)
         }
         if (cMyCulture == cCultureEgyptian)
         {
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSlinger, 0.2);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSlinger, 0.3);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSpearman, 0.4);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeAxeman, 0.3); 
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeAxeman, 0.3);
+		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypePriest, 0.1);
         }
         if (cMyCulture == cCultureNorse)
         {
@@ -3990,6 +3995,7 @@ void init(void)
 	     kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHero, 0.0);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeRaidingCavalry, 0.3);
 		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeAbstractInfantry, 0.5);
+		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeThrowingAxeman, 0.6);
         }
         if (cMyCulture == cCultureAtlantean)
         {
@@ -4000,7 +4006,7 @@ void init(void)
         if (cMyCulture == cCultureChinese)
         {
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeChuKoNu, 0.6);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.3);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.4);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHalberdier, 0.4);
         }		
 		
@@ -4176,7 +4182,7 @@ void init(void)
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFood, 1.5);
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFavor, 10.0);
         //Set our farm limits.
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 20);  //  Up from 4
+		aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 14);  //  Up from 4
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanMaxFarmLimit, 0, 40);     //  Up from 24
         aiSetFarmLimit(aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0));
         //Do our late econ init.
@@ -4675,7 +4681,7 @@ void age2Handler(int age=1)
             if (EPlanID >= 0)
             {
                 aiPlanSetEconomy(EPlanID, true);
-                aiPlanAddUnitType(EPlanID, cUnitTypePriest, 1, 1, 1);
+                aiPlanAddUnitType(EPlanID, cUnitTypePriest, 0, 0, 1);
                 aiPlanSetVariableInt(EPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeCitadelCenter);
 				aiPlanSetDesiredPriority(EPlanID, 5);
                 aiPlanSetActive(EPlanID);
@@ -4756,7 +4762,7 @@ void age2Handler(int age=1)
 
         //Up our Thor dwarf count.
         if (gDwarfMaintainPlanID > -1)
-            aiPlanSetVariableInt(gDwarfMaintainPlanID, cTrainPlanNumberToMaintain, 0, 4);
+            aiPlanSetVariableInt(gDwarfMaintainPlanID, cTrainPlanNumberToMaintain, 0, 2);
 
         //Odin has ravens -> destroy unnecessary scout plans
         if (cMyCiv == cCivOdin)
@@ -5075,7 +5081,7 @@ void age3Handler(int age=2)
     {
         //Up our Thor dwarf count.
         if (gDwarfMaintainPlanID > -1)
-            aiPlanSetVariableInt(gDwarfMaintainPlanID, cTrainPlanNumberToMaintain, 0, 6);
+            aiPlanSetVariableInt(gDwarfMaintainPlanID, cTrainPlanNumberToMaintain, 0, 4);
             
         //research axe of muspell
         xsEnableRule("getAxeOfMuspell");

@@ -4404,7 +4404,7 @@ rule setUnitPicker
         {
             // reset myth and siege preference to 1.0
             //kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMythUnit, 1.0);
-            kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractSiegeWeapon, 1.0);
+            //kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractSiegeWeapon, 1.0);
             if (landUPupdate == false)
             {
                 kbUnitPickSetDesiredNumberUnitTypes(gLateUPID, 3, 3, true);  // 3 unit types and 3 buildings.

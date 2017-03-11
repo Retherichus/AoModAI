@@ -762,7 +762,7 @@ rule HuntingDogsAsap
 //==============================================================================
 // RULE ALLYCatchUp
 //==============================================================================
-rule ALLYCatchUp   // a reverse updatePlayerToAttack rule to find allies and boost their eco.
+rule ALLYCatchUp   // a reverse-tweaked updatePlayerToAttack rule to find allies and boost their eco.
    minInterval 45
    maxInterval 80
    inactive
@@ -773,13 +773,11 @@ rule ALLYCatchUp   // a reverse updatePlayerToAttack rule to find allies and boo
         xsDisableSelf();
         return;    
     }
+	xsSetRuleMinIntervalSelf(40+aiRandInt(18));
     static int lastTargetPlayerIDSaveTime = -1;
     static int lastTargetPlayerID = -1;
     static bool increaseStartIndex = false;
     int Tcs = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
-   	float foodSupply = kbResourceGet(cResourceFood);
-    float goldSupply = kbResourceGet(cResourceGold);
-	float woodSupply = kbResourceGet(cResourceWood);
     if ((Tcs < 1) || (kbGetAge() < cAge2) || (xsGetTime() < 8*60*1000))
     return;
     
@@ -830,6 +828,7 @@ rule ALLYCatchUp   // a reverse updatePlayerToAttack rule to find allies and boo
     if (actualPlayerID != -1)
     {
 	    int iTcs = kbUnitCount(actualPlayerID, cUnitTypeAbstractSettlement, cUnitStateAlive);
+		int iMarkets = kbUnitCount(actualPlayerID, cUnitTypeMarket, cUnitStateAlive);
 	   	int houseProtoID = cUnitTypeHouse;
         if (kbGetCultureForPlayer(actualPlayerID) == cCultureAtlantean)
         houseProtoID = cUnitTypeManor;
@@ -838,12 +837,24 @@ rule ALLYCatchUp   // a reverse updatePlayerToAttack rule to find allies and boo
 		if (Combined < 1)
 		return;
 	   
+	    float foodSupply = kbResourceGet(cResourceFood);
+        float goldSupply = kbResourceGet(cResourceGold);
+	    float woodSupply = kbResourceGet(cResourceWood);
 	   
-		   if ((kbGetAgeForPlayer(actualPlayerID) < 2) && (iTcs >= 1) && (kbGetAge() > cAge3) && (foodSupply > 1000) && (goldSupply > 1000))
+		   if ((kbGetAgeForPlayer(actualPlayerID) < 2) && (iTcs >= 1) && (kbGetAge() > cAge3) && (foodSupply > 1000) && (goldSupply > 800))
 		   {
 	       aiTribute(actualPlayerID, cResourceFood, 800);
 		   aiTribute(actualPlayerID, cResourceGold, 600);
+		   xsSetRuleMinIntervalSelf(60);
 		   if (ShowAiEcho == true) aiEcho("Tributing 800 food and 600 gold to one of my allies!"); // Take a break too.
+		   return;
+		   }
+		   if ((kbGetAgeForPlayer(actualPlayerID) < 3) && (kbGetAgeForPlayer(actualPlayerID) == 2) && (iTcs >= 1) && (iMarkets >= 1) && (kbGetAge() > cAge3) && (foodSupply > 1500) && (goldSupply > 1500))
+		   {
+	       aiTribute(actualPlayerID, cResourceFood, 1000);
+		   aiTribute(actualPlayerID, cResourceGold, 1000);
+		   if (ShowAiEcho == true) aiEcho("Tributing 1000 food and 1000 gold to one of my allies!"); // Take a longer break too.
+		   xsSetRuleMinIntervalSelf(75);
 		   return;
 		   }
 		   else
@@ -871,9 +882,9 @@ rule ALLYCatchUp   // a reverse updatePlayerToAttack rule to find allies and boo
 		   
 		   if ((VillagerScore < 8) && (aiGetWorldDifficulty() < cDifficultyNightmare))
 		   {
-		   donateFAmount = donateFAmount+50;
-		   donateWAmount = donateWAmount+50;
-		   donateGAmount = donateGAmount+50;
+		   donateFAmount = donateFAmount+100;
+		   donateWAmount = donateWAmount+100;
+		   donateGAmount = donateGAmount+100;
 		   }
 		   if (foodSupply > fAmount)
 		   aiTribute(actualPlayerID, cResourceFood, donateFAmount);
@@ -1005,7 +1016,7 @@ rule Helpme
 // IHateSiege
 //==============================================================================
 rule IHateSiege
-   minInterval 9
+   minInterval 5
    inactive
    group HateScripts
 {
@@ -1049,7 +1060,7 @@ rule IHateSiege
 	    kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
-		kbUnitQuerySetMaximumDistance(enemyQueryID, 30);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 32);
    }
 
    int numberFoundTemp = 0;
@@ -1060,6 +1071,7 @@ rule IHateSiege
 	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
 	   kbUnitQueryResetResults(enemyQueryID);
 	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   vector Location = cInvalidVector;
 	   
 	   int NoArcherPlease = kbUnitQueryGetResult(unitQueryID, i);
         if (kbUnitIsType(NoArcherPlease, cUnitTypeAbstractSiegeWeapon) || 
@@ -1074,6 +1086,12 @@ rule IHateSiege
 	   if (numberFoundTemp > 0)
 	   {
 		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		Location =  kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i));
+		int NumBSelf = getNumUnits(cUnitTypeBuilding, cUnitStateAlive, -1, cMyID, Location, 36.0);
+		int NumBAllies = getNumUnitsByRel(cUnitTypeBuilding, cUnitStateAlive, -1, cPlayerRelationAlly, Location, 36.0, true);
+		int Combined = NumBSelf + NumBAllies;
+
+		if ((Combined > 0 && (Location != cInvalidVector)))
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
 	   }
    }
@@ -2567,5 +2585,3 @@ inactive
 {
 
 }
-
-
