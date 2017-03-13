@@ -93,7 +93,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     {
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
-        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 16);
+        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 12);
         aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceGold);
         aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
         return (true);
@@ -1016,7 +1016,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	{
 		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
 		aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
-		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 14);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 12);
 		aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceWood);
 		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
 		return (true);

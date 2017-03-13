@@ -2340,7 +2340,7 @@ rule attackEnemySettlement
 				{
 				attackPlanStartTime = xsGetTime();
 				aiPlanSetVariableVector(attackPlanID, cAttackPlanGatherPoint, 0, gEnemySettlementAttPlanLastAttPoint);
-				aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+				aiPlanSetUnitStance(attackPlanID, cUnitStanceAggressive);
 				ResetOk = false;
 				}
 				

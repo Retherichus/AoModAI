@@ -641,30 +641,6 @@ rule DockDefenseMonitor
 	   return;
 	   }
    
-   // Add some defense for the dock
-   
-         if (gWaterMap == true && kbGetAge() > cAge1 && cRandomMapName != "sudden death" && cRandomMapName != "anatolia" && cRandomMapName != "basin")
-      {
-        int planID=aiPlanCreate("Train Triremes", cPlanTrain);
-         if (planID >= 0)
-         {
-            aiPlanSetMilitary(planID, true);
-			if (cMyCulture == cCultureGreek)
-            aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeTrireme);
-			if (cMyCulture == cCultureEgyptian)
-			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeKebenit);
-			if (cMyCulture == cCultureNorse)
-			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeLongboat);
-			if (cMyCulture == cCultureAtlantean)
-			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeBireme);
-			if (cMyCulture == cCultureChinese)
-			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeJunk);
-            
-			aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 1); 
-            aiPlanSetActive(planID);
-            aiPlanSetDesiredPriority(planID, 1);
-         }
-      }
 
 	  xsDisableSelf();
 }	  
@@ -738,9 +714,10 @@ rule HuntingDogsAsap
    if (cMyCulture == cCultureAtlantean)
    HuntingDogsUpgBuilding = cUnitTypeGuild;
    
-   if ((WaitForDock == true) && (kbUnitCount(cMyID, cUnitTypeDock, cUnitStateAliveOrBuilding) <= 0))
-   return;
    
+   if ((WaitForDock == true) && (kbGetAge() < cAge2))
+   return;
+
       if (cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse && kbUnitCount(cMyID, HuntingDogsUpgBuilding, cUnitStateAlive) < 1)
 	  return;
    
@@ -2496,7 +2473,7 @@ bool Filled = false;
            attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
 		   aiPlanSetVariableInt(gMaintainWaterXPortPlanID, cTrainPlanNumberToMaintain, 0, 3);
 		   aiPlanSetVariableInt(gMaintainWaterXPortPlanID, cTrainPlanFrequency, 0, 15);
-		   aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 97);
+		   //aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 97);
            int numMilUnitsNearAttPlan = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, attPlanPosition, 100);
            int numInPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeLogicalTypeLandMilitary);
 		   int numTransportPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeTransport);

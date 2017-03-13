@@ -447,7 +447,7 @@ rule updateFoodBreakdown
     int aggressivePriority = 45;
     int mainFarmPriority = 90;
     int otherFarmPriority = 89;
-    if ((cMyCulture == cCultureNorse) && (kbGetAge() < 2))
+    if ((cMyCulture == cCultureNorse) && (kbGetAge() < cAge2))
 	aggressivePriority = 65; // above wood/gold so it doesn't steal the oxcart
 	
     int numFarms = kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive);
@@ -541,7 +541,7 @@ rule updateFoodBreakdown
 
     int desiredFarmers = 26;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 10;		
+        desiredFarmers = 9;		
 	
     // Up it a little bit as our civ population raises.	
     int NumVillagers = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID);
@@ -549,17 +549,23 @@ rule updateFoodBreakdown
 	{
 	if (cMyCulture != cCultureAtlantean)
 	desiredFarmers = desiredFarmers+NumVillagers*0.24;
-	// if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Desired farms: "+desiredFarmers+"");	
+	if ((ShowAiEcho == true) || (ShowAiEcoEcho == true)) aiEcho("Desired farms: "+desiredFarmers+"");	
     }
-	if (desiredFarmers > 32)
-	desiredFarmers = 32;	
+	
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)
     {  
     desiredFarmers = 20;
 	 if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 9;
+        desiredFarmers = 7;
 	}
+	
+		if ((cMyCulture != cCultureAtlantean) && (desiredFarmers > 32))
+	    desiredFarmers = 32;
+	    if ((cMyCulture == cCultureAtlantean) && (desiredFarmers > 11)) //override for Atlantean
+        desiredFarmers = 11;	
+	
+	
     if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
     {
         foodGathererCount = desiredFarmers + (numSettlements - 1);
@@ -920,16 +926,16 @@ rule updateFoodBreakdown
         unassigned = 0;
     }  
     
-	if (xsGetTime() < 5*30*1000)
+	if ((xsGetTime() < 4*60*1000) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching))
 	{
-	int ForceHunt = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAny, 0, 0, mainBaseLocation, 40);
-	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAny, 0, 0, mainBaseLocation, 40);
-	if ((ForceHunt >= 2) && (Chickens <= 0))
+	int ForceHunt = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAlive, -1, 0, mainBaseLocation, 40);
+	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, mainBaseLocation, 40);
+	if ((ForceHunt >= 1) && (Chickens <= 0))
 	{
     numberAggressiveResourceSpots = 0;	
 	aggHunters = 0;
 	numberEasyResourceSpots = 1;
-	if (ShowAiEcoEcho == true) aiEcho("PREY: "+ForceHunt+"");
+	if ((ShowAiEcho == true) || (ShowAiEcoEcho == true)) aiEcho("PREY: "+ForceHunt+"");
 	}
 	}
 	
@@ -1004,20 +1010,14 @@ rule updateFoodBreakdown
             }
             else
             {
-                if ((mapRequires2FarmPlans() == true) && (farmersAtMainBase > 10))
-                {
-                    numFarmPlansWanted = 2;
-                }
-                else
-                {
-                    numFarmPlansWanted = 2;
-                }
+                numFarmPlansWanted = 2;
             }                
         }
         gFarming = true;
     }
     else
         gFarming = false;
+		
 
     //Egyptians can farm in the first age.
     if (((kbGetAge() > 0) || (cMyCulture == cCultureEgyptian)) && (gFarmBaseID != -1) && (xsGetTime() > 3*60*1000))
@@ -1074,7 +1074,7 @@ rule updateFoodBreakdown
         else
             aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, 0, otherFarmPriority, 0, gOtherBase4ID);
     }
-	
+
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, numFarmPlansWanted, mainFarmPriority, (100.0*farmersAtMainBase)/(foodGathererCount*100.0), gFarmBaseID);
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeHuntAggressive, numberAggressiveResourceSpots, aggressivePriority, (100.0*aggHunters)/(foodGathererCount*100.0), mainBaseID); 
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeEasy, numberEasyResourceSpots, easyPriority, (100.0*easy)/(foodGathererCount*100.0), mainBaseID);
@@ -1083,25 +1083,23 @@ rule updateFoodBreakdown
 //==============================================================================
 void updateResourceHandler(int parm=0)
 {
-    if (ShowAiEcho == true) aiEcho("updateResourceHandler:");    
-    
-    //Handle food.
-    if (parm == cResourceFood)
-    {
-        updateFoodBreakdown();
-    }
-    //Handle Gold.
-    if (parm == cResourceGold)
-    {
-        updateGoldBreakdown();
-//        xsEnableRule("updateGoldBreakdown");
-    }
-    //Handle Wood.
-    if (parm == cResourceWood)
-    {
-        updateWoodBreakdown();
-//        xsEnableRule("updateWoodBreakdown");
-    }
+   //Handle food.
+   if (parm == cResourceFood)
+   {
+	  updateFoodBreakdown();
+   }
+   //Handle Gold.
+   if (parm == cResourceGold)
+   {
+	  updateGoldBreakdown();
+	  xsEnableRule("updateGoldBreakdown");
+   }
+   //Handle Wood.
+   if (parm == cResourceWood)
+   {
+	  updateWoodBreakdown();
+	  xsEnableRule("updateWoodBreakdown");
+   }
 }
 
 //==============================================================================
@@ -1763,9 +1761,10 @@ void postInitEcon()
 
 //==============================================================================
 rule fishing
-    minInterval 10 //starts in cAge1
+    minInterval 1 //starts in cAge1
     inactive
 {
+    xsSetRuleMinIntervalSelf(11);
     if ((cRandomMapName == "river styx"))
     {
         xsDisableSelf();

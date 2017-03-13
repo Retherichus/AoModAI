@@ -191,6 +191,7 @@ rule NavalGoalMonitor
 			tempNumberEnemyWarships = tempNumberEnemyWarships + kbUnitCount(i, cUnitTypeFishingShipNorse, cUnitStateAlive)/2;
 			tempNumberEnemyWarships = tempNumberEnemyWarships + kbUnitCount(i, cUnitTypeFishingShipAtlantean, cUnitStateAlive)/2;
 			tempNumberEnemyWarships = tempNumberEnemyWarships + kbUnitCount(i, cUnitTypeFishingShipEgyptian, cUnitStateAlive)/2;
+			tempNumberEnemyWarships = tempNumberEnemyWarships + kbUnitCount(i, cUnitTypeFishingShipChinese, cUnitStateAlive)/2;
 		 }
 		 //int tempNumberEnemyDocks=kbUnitCount(i, cUnitTypeDock, cUnitStateAlive);
 		 if (tempNumberEnemyWarships > numberEnemyWarships)
@@ -200,7 +201,7 @@ rule NavalGoalMonitor
    //Figure out the min/max number of warships we want.
    int minShips=0;
    int maxShips=0;
-   if (numberEnemyWarships > 0)
+   if (numberEnemyWarships >= 0)
    {
 	  //Build at most 2 ships on easy.
 	  if (aiGetWorldDifficulty() == cDifficultyEasy)
@@ -227,11 +228,7 @@ rule NavalGoalMonitor
 	  {
 		 minShips=numberEnemyWarships*3/4;
 		 maxShips=numberEnemyWarships;
-		 if (minShips < 1)
-			minShips=1;
-		 if (maxShips < 1)
-			maxShips=1;
-		 if (minShips > 5)
+		 if (minShips < 5)
 			minShips=5;
 		 if (maxShips > 8)
 			maxShips=8;
@@ -253,7 +250,7 @@ rule NavalGoalMonitor
    if ( minShips > maxShips)
 	  minShips = maxShips;
 
-   // gTargetNavySize = maxShips;   // Set the global var for forecasting
+   gTargetNavySize = maxShips;   // Set the global var for forecasting
 
    //If we already have a Naval UP, just set the numbers and be done.  If we don't
    //want anything, just set 1 since we've already done it before.
@@ -306,7 +303,7 @@ rule NavalGoalMonitor
    }
    aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanAutoUpdateBase, 0, false);
    aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanSetAreaGroups, 0, false);
-   aiPlanSetDesiredPriority(gNavalAttackGoalID, 53);
+   //aiPlanSetDesiredPriority(gNavalAttackGoalID, 53);
 }
 
 //==============================================================================

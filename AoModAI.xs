@@ -92,7 +92,7 @@ extern int gDefendPlanID = -1;      // Uses military units to defend main base w
 extern int gWonderDefendPlan = -1;     // Uber-plan to defend my wonder
 extern int gEnemyWonderDefendPlan = -1;   // Uber-uber-plan to attack or defend other wonder
 extern int gObeliskClearingPlanID = -1;   // Small attack plan used to remove enemy obelisks
-//extern int gTargetNavySize = 0;     // Set periodically based on difficulty, enemy navy/fish boat count. Units, not pop slots.
+extern int gTargetNavySize = 0;     // Set periodically based on difficulty, enemy navy/fish boat count. Units, not pop slots.
 
 //==============================================================================
 //Minor Gods.
@@ -864,6 +864,7 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
 	}	
     //Update the number of vils to maintain.
     aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0, vilPop);
+	aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanBuildFromType, 0, cUnitTypeAbstractSettlement);   // Abstract fixes Citadel problem
 }
 
 //==============================================================================
@@ -1582,17 +1583,15 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         else if (foodAssignment < lastFoodAssignment)
         {
             foodAssignment = lastFoodAssignment - 0.03;
-            if ((foodAssignment < 0.25) && (kbGetAge() < 4))
-                foodAssignment = 0.25;
-			if ((foodAssignment < 0.30) && (kbGetAge() > 3))
+			if (foodAssignment < 0.30)
                 foodAssignment = 0.30;
         }
     }
 	        // Some overrides
-            if ((woodAssignment < 0.20) && (kbGetAge() < 3) && (cMyCulture != cCultureEgyptian) && (cMyCulture != cCultureAtlantean) && (xsGetTime() < 15*60*1000))
-                woodAssignment = 0.20;	
-		    if ((goldAssignment < 0.20) && (cMyCulture == cCultureEgyptian) && (kbGetAge() < 2))
-                goldAssignment = 0.20;
+            if ((woodAssignment < 0.25) && (kbGetAge() < 3) && (cMyCulture != cCultureEgyptian) && (cMyCulture != cCultureAtlantean) && (xsGetTime() < 15*60*1000))
+                woodAssignment = 0.25;	
+		    if ((goldAssignment < 0.25) && (cMyCulture == cCultureEgyptian) && (kbGetAge() < 3) && (xsGetTime() < 15*60*1000))
+                goldAssignment = 0.25;
 		    
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -2070,9 +2069,21 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     {
         if (woodSupply < 300)
             gWoodForecast = gWoodForecast + (300 - woodSupply);
+	   // Ships
+      int temps = 0;   
+      int myShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+      temps = gTargetNavySize - myShips;   // How many yet to train
+      if (temps < 0)
+         temps = 0;
+      if (temps > 0)
+      {
+      gWoodForecast = gWoodForecast + 100*temps;
+      gGoldForecast = gGoldForecast + 50*temps;
+      }		
     }
     
 	//setMilitaryUnitCostForecast();  // add units before scaling down
+	
 
     if (woodSupply > 1100)
         gWoodForecast = gWoodForecast * 0.5;
@@ -2334,7 +2345,19 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     {
         if (woodSupply < 300)
             gWoodForecast = gWoodForecast + (300 - woodSupply);
-    }    
+	   // Ships
+      int temps = 0;   
+      int myShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+      temps = gTargetNavySize - myShips;   // How many yet to train
+      if (temps < 0)
+         temps = 0;
+      if (temps > 0)
+      {
+      gWoodForecast = gWoodForecast + 100*temps;
+      gGoldForecast = gGoldForecast + 50*temps;
+      }		
+    }
+	
     if ((gWoodForecast > 800) && ((xsGetTime() > (15*60*1000))))
 	gWoodForecast = 800;
 	
@@ -4149,7 +4172,9 @@ void init(void)
         //Standard RB setup.
         aiPlanSetNumberVariableValues(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, 5, true);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHunt, 0);
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 1);
+		if (cMyCulture == cCultureAtlantean)
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 0);
+		else aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 1);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHuntAggressive, 0);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeFarm, 0);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeFish, 0);
@@ -4418,7 +4443,7 @@ void age2Handler(int age=1)
     if ((gTransportMap == true) && (gMaintainWaterXPortPlanID < 0) || (cvRandomMapName == "king of the hill"))
     {
         gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 2, false, -1);
-        aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 95);
+        //aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 50);
     }
 
     //Init our myth unit rule.
@@ -5627,7 +5652,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
         if (gMaintainWaterXPortPlanID < 0 && gTransportMap == true) 
 	    {
         gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 1, false, -1);
-        aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 55);
+        //aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 55);
         }
 
 

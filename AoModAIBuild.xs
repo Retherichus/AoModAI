@@ -4768,7 +4768,7 @@ rule buildExtraFarms
 	
     int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 75.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 4) || (numFarmsNearMainBaseInR30 >= 30) || (numVillagers < 20) || (numFarmsNearMainBaseInR30 > 18) && (aiGetWorldDifficulty() > cDifficultyHard))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 > MoreFarms - 3) || (numFarmsNearMainBaseInR30 >= 30) || (numVillagers < 20) || (numFarmsNearMainBaseInR30 > 18) && (aiGetWorldDifficulty() > cDifficultyHard))
     {
         xsSetRuleMinIntervalSelf(50);
         return;
