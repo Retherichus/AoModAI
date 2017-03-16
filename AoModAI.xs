@@ -854,17 +854,17 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
             vilPop = lightningLimit;
     }
 
-	if (cMyCulture == cCultureAtlantean) // To make sure caravans don't steal all pop slots etc.
+	if ((cMyCulture == cCultureAtlantean) && (aiGetWorldDifficulty() > cDifficultyEasy)) // To make sure caravans don't steal all pop slots etc.
 	{	
 		if (vilPop >= 25)
         vilPop = 25;
 		
-		if (vilPop < 5)
-        vilPop = 6;
+		if (vilPop < 12)
+        vilPop = 12;
 	}	
     //Update the number of vils to maintain.
     aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0, vilPop);
-	aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanBuildFromType, 0, cUnitTypeAbstractSettlement);   // Abstract fixes Citadel problem
+	//aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanBuildFromType, 0, cUnitTypeAbstractSettlement);   // Abstract fixes Citadel problem
 }
 
 //==============================================================================
@@ -878,14 +878,14 @@ rule updateEMAge1       // i.e. cAge1
    {
       if (aiGetWorldDifficulty() == cDifficultyEasy)
       {
-         civPopTarget = 25;
+         civPopTarget = 21;
          milPopTarget = 10;
          if (cMyCulture == cCultureAtlantean)
             civPopTarget = 27;   // Make up for oracles
       }
       else if (aiGetWorldDifficulty() == cDifficultyModerate)
       {
-         civPopTarget = 18;
+         civPopTarget = 21;
          milPopTarget = 30;
       }
       else if (aiGetWorldDifficulty() == cDifficultyHard)
@@ -935,7 +935,7 @@ rule updateEMAge2
             civPopTarget = 35;                                                // reserve pop slots for mil use.
         milPopTarget = getSoftPopCap() - civPopTarget;
 		
-		if (gAgeFaster == true && aiGetWorldDifficulty() == cDifficultyHard)
+		if ((gAgeFaster == true) && (gAgeReduceMil == true) && (aiGetWorldDifficulty() ==  cDifficultyHard))
 		      {
 			  if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
 			 milPopTarget = eMaxMilPop;
@@ -947,7 +947,7 @@ rule updateEMAge2
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
             civPopTarget = 35;  
         milPopTarget = getSoftPopCap() - civPopTarget;
-        if (gAgeFaster == true && gAgeReduceMil == true && aiGetWorldDifficulty() == cDifficultyNightmare)
+        if ((gAgeFaster == true) && (gAgeReduceMil == true) && (aiGetWorldDifficulty() == cDifficultyNightmare))
 		{
 	    if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
 	    milPopTarget = eMaxMilPop;
@@ -1005,7 +1005,7 @@ rule updateEMAge3
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
       
-	  if (gAgeFaster == true && gAgeReduceMil == true && aiGetWorldDifficulty() == cDifficultyNightmare)
+	  if ((gAgeFaster == true) && (gAgeReduceMil == true) && (aiGetWorldDifficulty() == cDifficultyNightmare))
 	  {
 	  if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
 	  milPopTarget = eHMaxMilPop;
@@ -1086,7 +1086,7 @@ rule updateEMAge4
          civPopTarget = 35;
         milPopTarget = getSoftPopCap() - civPopTarget;
         kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-        kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.95);
+        kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);
        
 
    }
@@ -3997,7 +3997,7 @@ void init(void)
 		
 		if (cMyCulture == cCultureGreek)
         {
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 0.5);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 0.6);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHoplite, 0.3);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.2);
 		 if (cMyCiv == cCivPoseidon)
@@ -4022,14 +4022,14 @@ void init(void)
         }
         if (cMyCulture == cCultureAtlantean)
         {
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeJavelinCavalry, 0.5);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeJavelinCavalry, 0.6);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSwordsman, 0.3);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMaceman, 0.2);
         }
         if (cMyCulture == cCultureChinese)
         {
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeChuKoNu, 0.6);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.4);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.5);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHalberdier, 0.4);
         }		
 		

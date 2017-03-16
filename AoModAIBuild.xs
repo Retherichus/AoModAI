@@ -634,8 +634,8 @@ rule buildHouse
 	   // Added a little override as this rule didn't seem to work properly. // Reth.
 	   
 	     if ((findNumUnitsInBase(cMyID, kbBaseGetMain(cMyID), cUnitTypeTower) > 0)
-              && (mapPreventsHousesAtTowers() == false) && (gBuildWallsAtMainBase == false)
-              && (otherBaseID == mainBaseID) || (bHouseBunkering == true) && (mapPreventsHousesAtTowers() == false))
+              && (mapPreventsHousesAtTowers() == false)
+              && (otherBaseID == mainBaseID))
 			  
         {
             //If we don't have the query yet, create one.

@@ -430,6 +430,7 @@ rule updateGoldBreakdown
 //==============================================================================
 rule updateFoodBreakdown
     minInterval 1
+	//runImmediately
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateFoodBreakdown: ");
@@ -472,16 +473,18 @@ rule updateFoodBreakdown
 	
 	if ((numberAggressiveResourceSpots > 0) && (IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000) || (FakeAggressives > 3) && (IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000))
 	   { 
-	   int TotalAnimalsFound = numberAggressiveResourceSpots+FakeAggressives; 
+	    int TotalAnimalsFound = numberAggressiveResourceSpots+FakeAggressives; 
         if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Animals or Agressive spots found: "+TotalAnimalsFound+", activating HuntingDogsAsap");
 		IsRunHuntingDogs = true;
 		gHuntingDogsASAP = true;
 		xsEnableRule("HuntingDogsAsap");
-		if (cMyCulture == cCultureAtlantean)
+		if ((cMyCulture == cCultureAtlantean) && (gTransportMap == false) && (gWaterMap == false))
 		createSimpleBuildPlan(cUnitTypeGuild, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
-    }		
-	
+    }
+	    
+		static bool aSpecialReset = false;
 		static bool HippoDone = false;
+		static bool HippoFound = false;
 		if ((HippoDone == false) && (gHuntingDogsASAP == true) && (xsGetTime() < 20*1*1000))
 		{ 
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
@@ -489,9 +492,23 @@ rule updateFoodBreakdown
 		if ((HippoNearMB > 1) && (cMyCulture != cCultureAtlantean))
 		aiSetMinNumberNeedForGatheringAggressvies(4);
 		else if ((HippoNearMB > 1) && (cMyCulture == cCultureAtlantean))
+		{
 		aiSetMinNumberNeedForGatheringAggressvies(1);
+		aSpecialReset = true;
+		}
+		if (HippoNearMB > 1)
+		HippoFound = true;
+		if ((HippoFound == true) && (cMyCulture == cCultureGreek) || (HippoFound == true) && (cMyCulture == cCultureChinese))
+        aiSetAllowAutoDropsites(false);
 		HippoDone = true;
         }
+		
+       static bool Done = false;
+       if ((Done == false) && (HippoFound == true) && (xsGetTime() > 28*1*1000) && (cMyCulture == cCultureGreek) || (Done == false) && (HippoFound == true) && (xsGetTime() > 14*1*1000) && (cMyCulture == cCultureChinese))
+       {
+	   aiSetAllowAutoDropsites(true);
+	   Done = true;
+       }		
 	
 	if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.
         numberAggressiveResourceSpots = 0;  // Never get enough vills to go hunting.
@@ -926,7 +943,7 @@ rule updateFoodBreakdown
         unassigned = 0;
     }  
     
-	if ((xsGetTime() < 4*60*1000) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching))
+	if ((xsGetTime() < 7*30*1000) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching))
 	{
 	int ForceHunt = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAlive, -1, 0, mainBaseLocation, 40);
 	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, mainBaseLocation, 40);
@@ -939,7 +956,11 @@ rule updateFoodBreakdown
 	}
 	}
 	
-  
+	// Try not to kill the animal before the guild is up.
+	if ((xsGetTime() < 1*5*1000) && (aSpecialReset == true) && (numberAggressiveResourceSpots >= 1) && (cMyCulture == cCultureAtlantean))
+	numberEasyResourceSpots = 0;
+   
+
     // Now, the number of farmers we want is the unassigned total, plus reserve (existing farms) and prebuild (plan ahead).
     farmers = farmerReserve + farmerPreBuild;
     unassigned = unassigned - farmers;
