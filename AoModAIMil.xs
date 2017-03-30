@@ -2154,7 +2154,7 @@ rule attackEnemySettlement
 	if (cMyCulture == cCultureChinese)
 	{
 	SiegeMU = cUnitTypeVermilionBird;
-	SiegeMU2 = cUnitTypeAzureDragon;  // No bonus, but the breath still hurts?
+	SiegeMU2 = cUnitTypeWarSalamander;  // No bonus, but the breath still hurts?
 	}
 	
 	int sMUCombined = ((kbUnitCount(cMyID, SiegeMU, cUnitStateAlive)) + (kbUnitCount(cMyID, SiegeMU2, cUnitStateAlive)));

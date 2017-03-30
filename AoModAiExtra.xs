@@ -85,7 +85,7 @@ extern bool CanIChat = true;              // This will allow the Ai to send chat
 extern bool gEarlyMonuments = false;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
 extern bool bWonderDefense = true;         // Builds towers/fortresses around friendly wonders.
-extern bool bWallAllyMB = false;          // Walls up the mainbase of a human ally (don't use this if you plan on having more than 1 AoModAI ally!)
+extern bool bWallAllyMB = false;          // Walls up TC for human allies, only the team captain can do this and Mainbases are skipped.
 extern bool bWallCleanup = true;          // Prevents the AI from building small wall pieces inside of gates and/or deletes them if one were to slip through the check.
 extern bool CheatResources = false;        // For those who finds titan (difficulty) to be just 	too easy, enable this and you'll have the AI cheat in some resources as it ages up.
 extern bool mPopLandAttack = true;         //Dynamically scales the min total pop needed before it can attack, 6 pop slots per TC after 4 and beyond.
@@ -2650,5 +2650,4 @@ rule TEST
 minInterval 1
 inactive
 {
-
 }

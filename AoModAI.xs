@@ -556,16 +556,6 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
     
     if (kbGetAge() == cAge2)
     {
-        if ((kbGetTechStatus(cTechHuntingDogs) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechHuntingDogs, true) >= 0))
-        {
-            if ((woodSupply > 100) && (goldSupply > 100))
-            {
-                kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
-                kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                if (ShowAiEcho == true) aiEcho("Flushing military wood and gold escrow");
-            }
-        }
-        
         if ((kbGetTechStatus(cTechPlow) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechPlow, true) >= 0))
         {
             if ((woodSupply > 50) && (goldSupply > 100))
@@ -594,7 +584,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         
         if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < gEarlySettlementTarget))
         {
-            if ((woodSupply > 350) && (goldSupply > 350) && (foodSupply < 560))
+            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) && (foodSupply < 560) || (cMyCulture == cCultureEgyptian) && (goldSupply > 350) && (foodSupply < 560))
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
@@ -643,9 +633,9 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             }
         }
         
-        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 3))
+        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 4))
         {
-            if ((woodSupply > 350) && (goldSupply > 350) && (foodSupply < 700) && (goldSupply < 700))
+            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) && (foodSupply > 200) || (cMyCulture == cCultureEgyptian) && (goldSupply > 360) && (foodSupply > 250))
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
@@ -694,7 +684,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         
         if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0))
         {
-            if ((woodSupply > 350) && (goldSupply > 350))
+            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) || (cMyCulture == cCultureEgyptian) && (goldSupply > 360) && (foodSupply > 250))
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
@@ -703,7 +693,30 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
         }
-    }
+   /*
+   // No idea what it really does.. but I am assuming anything in Root escrow is free for all.
+   if (foodSupply > 1200)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceFood, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceFood, true);
+   }
+   if (woodSupply > 1000)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
+   }
+   if (goldSupply > 1200)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
+   }
+   if (favorSupply > 80)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceFavor, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceFavor, true);
+   }
+	*/	
+  }
 }
 
 //==============================================================================
@@ -943,7 +956,7 @@ rule updateEMAge2
     }
     else
     {
-        civPopTarget = 60 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush;
+        civPopTarget = 45 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush;
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
             civPopTarget = 35;  
         milPopTarget = getSoftPopCap() - civPopTarget;
@@ -1001,7 +1014,7 @@ rule updateEMAge3
     }
     else
     {
-      civPopTarget = 60 - (cvRushBoomSlider*5.99);    // +/- 5
+      civPopTarget = 45 - (cvRushBoomSlider*5.99);    // +/- 5
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
       
@@ -1062,7 +1075,7 @@ rule updateEMAge4
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-      civPopTarget = 60;      // 55 of first 115
+      civPopTarget = 58;      // 55 of first 115
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -3930,17 +3943,15 @@ void init(void)
     if (rushSize > 50)
         rushSize = 50;
 
-    if ((rushCount > 0) && (rushSize < 20))
-        rushSize = 20;    // anything less isn't worth sending
+    if ((rushCount > 0) && (rushSize < 24))
+        rushSize = 24;    // anything less isn't worth sending
 
     if (rushSize < 10)
         rushSize = 10;  // Give unitpicker something to do...
 
 
-	    if (gTransportMap == true)
-            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2+aiRandInt(2), true); // Rush with rushSize pop slots of two types, 3 buildings, do guess enemy unit type
-	    else
-            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2, true); // Rush with rushSize pop slots of two types, 2 buildings, do guess enemy unit type
+    gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2+aiRandInt(2), true); // Rush with rushSize pop slots of two types, 2+rand buildings, do guess enemy unit type
+
 
     if (ShowAiEcho == true) aiEcho("Setting rush unit picker for "+rushCount+" rushes with "+rushSize+" pop slots used.");
 
@@ -4018,7 +4029,7 @@ void init(void)
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSlinger, 0.3);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSpearman, 0.4);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeAxeman, 0.3);
-		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypePriest, 0.1);
+		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypePriest, 0.0); // no, the maintain plan should be plenty.
         }
         if (cMyCulture == cCultureNorse)
         {
@@ -4106,10 +4117,10 @@ void init(void)
         
         if ( aiGetGameMode() != cGameModeDeathmatch )
         {
-            if ((gBuildWallsAtMainBase == false) || (gTransportMap == true))
+            if (gTransportMap == true)
                 gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
             else
-                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
+                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings+1, true);    // Min: 40-59, max 70 pop slots
         }
         else  // Double buildings in DM
             gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, 2*gNumberBuildings, true);    // Min: 40-59, max 70 pop slots

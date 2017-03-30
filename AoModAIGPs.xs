@@ -1616,7 +1616,7 @@ rule castHeavyGP
     if (targetID < 0)
     targetID = getMainBaseUnitIDForPlayer(targetPlayerID);
     
-    if (kbUnitIsType(targetID, cUnitTypeAbstractSettlement) == false)
+    if ((kbUnitIsType(targetID, cUnitTypeAbstractSettlement) == false) ||(targetID < 0))
     {
         if (ShowAiEcho == true) aiEcho("target is no cUnitTypeAbstractSettlement, returning");
         return;
@@ -1659,7 +1659,7 @@ rule castHeavyGP
     
     if (distanceToMainBase > 110.0)
     {
-        if (numMilBuildingsInR50 <= 3)
+        if (numMilBuildingsInR50 <= 2)
         {
             if (ShowAiEcho == true) aiEcho("there are just a few military buildings, returning");
             return;
@@ -1673,7 +1673,7 @@ rule castHeavyGP
         if (ShowAiEcho == true) aiEcho("myMilUnitsInR40: "+myMilUnitsInR40);
         if (ShowAiEcho == true) aiEcho("enemyMilUnitsInR30: "+enemyMilUnitsInR50);
   
-        if ((Combined < 10) && (myMilUnitsInR40 < 3))
+        if  (Combined < 10)
         {
             if (ShowAiEcho == true) aiEcho("there are too few enemies, returning");
             return;
@@ -1688,7 +1688,7 @@ rule castHeavyGP
         if (ShowAiEcho == true) aiEcho("Casting heavyGP: "+gHeavyGPTechID+" at position: "+targetPosition);
         aiPlanDestroy(gHeavyGPPlanID);
 	    CastAttempt = CastAttempt+1;
-	    if (CastAttempt > 2)		
+	    if (CastAttempt > 3)		
         xsDisableSelf();
     }
     else

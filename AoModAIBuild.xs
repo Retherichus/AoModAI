@@ -3759,7 +3759,7 @@ rule buildArmory
 	int numBuilders = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
 	int MilBuildings = kbUnitCount(cMyID, cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAliveOrBuilding);
 	
-    if ((kbGetAge() < cAge2)|| (kbGetAge() > cAge2) && (woodSupply < 450) && (cMyCulture != cCultureEgyptian) && (MilBuildings < 3) || (kbGetAge() == cAge2) && (woodSupply < 200) && (cMyCulture != cCultureEgyptian) 
+    if ((kbGetAge() < cAge2)|| (kbGetAge() > cAge2) && (woodSupply < 450) && (cMyCulture != cCultureEgyptian) || (kbGetAge() == cAge2) && (woodSupply < 200) && (cMyCulture != cCultureEgyptian) 
 	|| (kbGetAge() == cAge2) && (cMyCulture != cCultureEgyptian) && (MilBuildings < 2))
         return;
     
@@ -3932,7 +3932,7 @@ rule buildResearchGranary   //or a guild for Atlanteans or a house for Norse
     inactive
     minInterval 45 //starts in cAge1
 {
-    if ((gTransportMap == true) && (cMyCulture != cCultureAtlantean))
+    if (gTransportMap == true)
     {
         xsDisableSelf();
         return;
@@ -3943,6 +3943,10 @@ rule buildResearchGranary   //or a guild for Atlanteans or a house for Norse
         return;
     }
 	
+    if ((cMyCulture == cCultureAtlantean) && (kbUnitCount(cMyID, cUnitTypeGuild, cUnitStateAlive) > 0))
+    {
+        return;
+    }	
 
     int buildingType = cUnitTypeGranary;
     if (cMyCulture == cCultureAtlantean)
@@ -3950,12 +3954,7 @@ rule buildResearchGranary   //or a guild for Atlanteans or a house for Norse
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeHouse;
     else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;	
-
-    if (kbUnitCount(cMyID, buildingType, cUnitStateAliveOrBuilding) > 0)
-    {
-        return;
-    }			
+        buildingType = cUnitTypeStoragePit;		
         
     int mainBaseID = kbBaseGetMainID(cMyID);
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
@@ -3994,7 +3993,7 @@ rule buildResearchGranary   //or a guild for Atlanteans or a house for Norse
     location = location + backVector;
     
     float woodSupply = kbResourceGet(cResourceWood);
-    if (woodSupply < 100)
+    if ((woodSupply < 150) && (cMyCulture != cCultureAtlantean) || (woodSupply < 250) && (cMyCulture == cCultureAtlantean))
         return;
     
     float radius = 25.0;
@@ -4399,7 +4398,7 @@ rule buildGoldMineTower
     if (numTowers >= towerLimit)
         return;
 
-    if ((numTowers > 15) && (kbGetAge() == 2))
+    if ((numTowers > 15) && (kbGetAge() == cAge2))
         return;
 
     if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
@@ -5228,7 +5227,7 @@ else if (FoodSupply > 600 && WoodSupply > 300 && GoldSupply > 400 && MyFavor > 6
 
 //==============================================================================	
 rule WallAllyMB  // wall MB for ally
-minInterval 30
+minInterval 25
 inactive
 { 
 
@@ -5237,51 +5236,87 @@ inactive
 	xsDisableSelf();
 	return;
 	}
-	
-    int startIndex = aiRandInt(cNumberPlayers);
+	if (aiGetCaptainPlayerID(cMyID) != cMyID)
+    return;
     int alliedBaseUnitID = -1;
+	int MBalliedBaseUnitID = -1;
+	
+	int Villagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
+    if ((Villagers < 10) || (kbGetAge() < cAge2) || (xsGetTime() < 10*60*1000))
+    return;
+	
+	static int lastTargetPlayerIDSaveTime = -1;
+    static int lastTargetPlayerID = -1;
+    static bool increaseStartIndex = false;
+
+    static int startIndex = -1;
+    if (increaseStartIndex == true)
+    {
+        if (startIndex >= cNumberPlayers - 1)
+            startIndex = 0;
+        else
+            startIndex = startIndex + 1;
+        increaseStartIndex = false;
+    }
+    
+    if ((startIndex < 0) || (xsGetTime() > lastTargetPlayerIDSaveTime + (1)*1*1000))
+    {
+        startIndex = aiRandInt(cNumberPlayers);
+    }
+
+    int comparePlayerID = -1;
     for (i = 0; < cNumberPlayers)
     {
         //If we're past the end of our players, go back to the start.
         int actualIndex = i + startIndex;
         if (actualIndex >= cNumberPlayers)
             actualIndex = actualIndex - cNumberPlayers;
-        if (actualIndex <= 0)
+        if ((actualIndex <= 0) || (actualIndex == cMyID))
             continue;
-        if (actualIndex == cMyID)
-            continue;
-        if (kbIsPlayerAlly(actualIndex) == true && kbIsPlayerHuman(actualIndex) == true)
+        if ((kbIsPlayerAlly(actualIndex) == true) && 
+		(kbIsPlayerResigned(actualIndex) == false) && 
+		(kbIsPlayerHuman(actualIndex) == true) && 
+		(kbHasPlayerLost(actualIndex) == false))
         {
-            if (kbIsPlayerResigned(actualIndex) == true)
+            comparePlayerID = actualIndex;
+            if (actualIndex == lastTargetPlayerID)
+            {
+                increaseStartIndex = true;
                 continue;
+            }
+            break;
+        }
+    }
+    int actualPlayerID = comparePlayerID;
+    if (actualPlayerID != lastTargetPlayerID)
+    {
+        lastTargetPlayerID = actualPlayerID;
+        lastTargetPlayerIDSaveTime = xsGetTime();
+    }
+
+    if (actualPlayerID != -1)
+    {
+
+    
+
+
             
-            alliedBaseUnitID = getMainBaseUnitIDForPlayer(actualIndex);
+            alliedBaseUnitID = findUnit(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, actualPlayerID);
+			MBalliedBaseUnitID = getMainBaseUnitIDForPlayer(actualPlayerID);
             
              vector otherBaseLocation = kbUnitGetPosition(alliedBaseUnitID);
 			}
-			}
 			
-			if (kbIsPlayerHuman(actualIndex) == false)
+			if ((kbIsPlayerHuman(actualIndex) == false) || (alliedBaseUnitID == MBalliedBaseUnitID))
 			{
 			return;
-			xsDisableSelf();
 			}
 
   
-    float goldSupply = kbResourceGet(cResourceGold);
+           float goldSupply = kbResourceGet(cResourceGold);
     
            if (goldSupply < 250)
             return;
-    int otherBaseUnitID = getMainBaseUnitIDForPlayer(actualIndex);
-    if (otherBaseUnitID < 0)
-	{
-        return;
-		}
-    else
-    {
-        int otherBaseID=getMainBaseUnitIDForPlayer(actualIndex);
-       
-    }
 
 
 	
@@ -5307,8 +5342,7 @@ inactive
                 {
                     aiPlanDestroy(wallPlanIndexID);
                     WallAllyStartTime = -1;
-                    xsSetRuleMinIntervalSelf(19);
-					aiEcho("I was here 4");
+                    xsSetRuleMinIntervalSelf(20);
                     return;
                 }
                 //destroy the plan if it has been active for more than 12 minutes
@@ -5316,30 +5350,11 @@ inactive
                 {
                     aiPlanDestroy(wallPlanIndexID);
                     WallAllyStartTime = -1;
-                    xsSetRuleMinIntervalSelf(59);
-					aiEcho("I was here 5");
+                    xsSetRuleMinIntervalSelf(30);
                     return;
                 }
+				
 
-                //Get the enemies near my base
-			    int numEnemyUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, otherBaseLocation, 35);
-				int myUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationSelf, otherBaseLocation, 35);  
-                int alliedUnitsNearBase = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, cMyID, cPlayerRelationAlly, otherBaseLocation, 35); 				
-
-                //Get the time under attack.
-                int secondsUnderAttack = kbBaseGetTimeUnderAttack(cMyID, otherBaseID);
-                if (secondsUnderAttack > 20)
-                {
-                    //Destroy the plan if there are twice as many enemies as my units 
-                    if ((numEnemyUnitsNearBase > 2 * (myUnitsNearBase + alliedUnitsNearBase)) && (numEnemyUnitsNearBase > 4))
-                    {
-                        aiPlanDestroy(wallPlanIndexID);
-                        WallAllyStartTime = -1;
-                        xsSetRuleMinIntervalSelf(59);
-						aiEcho("I was here 6");
-                        return;
-                    }
-                }
 
                 return;
             }
@@ -5348,13 +5363,13 @@ inactive
     
 
 
-    float otherBaseWallRadius = 40;
+    int radius = 18;
     
     int builderType = cUnitTypeAbstractVillager;
     if (cMyCulture == cCultureNorse)
         builderType = cUnitTypeAbstractInfantry;
-    
-    int OtherWallAllyPlanID = aiPlanCreate("OtherWallAllyPlanID", cPlanBuildWall);
+    static int count = 1;
+    int OtherWallAllyPlanID = aiPlanCreate("OtherWallAllyPlanID #"+count, cPlanBuildWall);
     if (OtherWallAllyPlanID != -1)
     {
         aiPlanSetNumberVariableValues(OtherWallAllyPlanID, cBuildWallPlanAreaIDs, 20, true);
@@ -5367,8 +5382,6 @@ inactive
         float mainX = xsVectorGetX(mainCenter);
         float mainZ = xsVectorGetZ(mainCenter);
         mainArea = kbAreaGetIDByPosition(mainCenter);
-        if (ShowAiEcho == true) aiEcho("otherBaseRingWallTeam1:");
-        if (ShowAiEcho == true) aiEcho("My main area is "+mainArea+", at "+mainCenter);
         aiPlanSetVariableInt(OtherWallAllyPlanID, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
         numAreasAdded = numAreasAdded + 1;
       
@@ -5396,8 +5409,8 @@ inactive
             dx = mainX - areaX;
             dz = mainZ - areaZ;
             
-            if ((dx > otherBaseWallRadius) || (dx < -1.0 * otherBaseWallRadius)
-             || (dz > otherBaseWallRadius) || (dz < -1.0 * otherBaseWallRadius))
+            if ((dx > 18) || (dx < -1.0 * 18)
+             || (dz > 18) || (dz < -1.0 * 18))
             {
                 needToSave = false;
             }
@@ -5444,15 +5457,16 @@ inactive
         aiPlanSetNumberVariableValues(OtherWallAllyPlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
 
         aiPlanSetVariableInt(OtherWallAllyPlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-        aiPlanAddUnitType(OtherWallAllyPlanID, builderType, 1, 2, 3);
+        aiPlanAddUnitType(OtherWallAllyPlanID, builderType, 1, 1, 1);
         aiPlanSetVariableInt(OtherWallAllyPlanID, cBuildWallPlanNumberOfGates, 0, 40);
         aiPlanSetVariableFloat(OtherWallAllyPlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 15.0);
-        aiPlanSetBaseID(OtherWallAllyPlanID, otherBaseID);
+        aiPlanSetBaseID(OtherWallAllyPlanID, alliedBaseUnitID);
         aiPlanSetEscrowID(OtherWallAllyPlanID, cEconomyEscrowID);
-        aiPlanSetDesiredPriority(OtherWallAllyPlanID, 71);
+        aiPlanSetDesiredPriority(OtherWallAllyPlanID, 100);
         aiPlanSetActive(OtherWallAllyPlanID, true);
         WallAllyPlanID = OtherWallAllyPlanID;
-        xsSetRuleMinIntervalSelf(37);
+        xsSetRuleMinIntervalSelf(25);
+		count = count + 1;
     }
 }
 

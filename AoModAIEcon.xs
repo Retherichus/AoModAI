@@ -556,7 +556,7 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 20;
+    int desiredFarmers = 24;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
         desiredFarmers = 9;		
 	
@@ -572,13 +572,13 @@ rule updateFoodBreakdown
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)
     {  
-    desiredFarmers = 20;
+    desiredFarmers = 26;
 	 if (cMyCulture == cCultureAtlantean) //override for Atlantean
         desiredFarmers = 7;
 	}	
 	
-		if ((cMyCulture != cCultureAtlantean) && (desiredFarmers >= 26))
-	    desiredFarmers = 26;
+		if ((cMyCulture != cCultureAtlantean) && (desiredFarmers >= 30))
+	    desiredFarmers = 30;
 	    if ((cMyCulture == cCultureAtlantean) && (desiredFarmers >= 10)) //override for Atlantean
         desiredFarmers = 10;
 	
@@ -587,7 +587,8 @@ rule updateFoodBreakdown
         foodGathererCount = desiredFarmers + (numSettlements - 1);
         modifiedFoodGathererCount = true;
     }
-	
+	if (foodGathererCount >= 32)
+		foodGathererCount = 32;
 
     MoreFarms = desiredFarmers; // Update build more farms
     // Preference order is existing farms (except in age 1), new farms if low on food sites, aggressive hunt (size permitting), easy, then age 1 farms.  
@@ -1031,17 +1032,20 @@ rule updateFoodBreakdown
             }
             else
             {
-			   int numFarmsNearMainBaseInR70 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 70.0);
-			   if (numFarmsNearMainBaseInR70 >= 20)
-               numFarmPlansWanted = numFarmPlansWanted + 2;
-			   else numFarmPlansWanted = numFarmPlansWanted + 1;
+			    //static bool IncreasePlans = false;
+				//if (farmers >= 20) // this is so shit.. but we really need it, activates once first plan is filled... : /
+				//IncreasePlans = true;
+				
+				//if (IncreasePlans == true)
+			    numFarmPlansWanted = numFarmPlansWanted + 2;
+				//else numFarmPlansWanted = numFarmPlansWanted + 1;
             }                
         }
         gFarming = true;
     }
     else
         gFarming = false;
-		
+
 
     //Egyptians can farm in the first age.
     if (((kbGetAge() > 0) || (cMyCulture == cCultureEgyptian)) && (gFarmBaseID != -1) && (xsGetTime() > 3*60*1000))
@@ -1099,6 +1103,7 @@ rule updateFoodBreakdown
             aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, 0, otherFarmPriority, 0, gOtherBase4ID);
     }
 
+	
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, numFarmPlansWanted, mainFarmPriority, (100.0*farmersAtMainBase)/(foodGathererCount*100.0), gFarmBaseID);
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeHuntAggressive, numberAggressiveResourceSpots, aggressivePriority, (100.0*aggHunters)/(foodGathererCount*100.0), mainBaseID); 
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeEasy, numberEasyResourceSpots, easyPriority, (100.0*easy)/(foodGathererCount*100.0), mainBaseID);
