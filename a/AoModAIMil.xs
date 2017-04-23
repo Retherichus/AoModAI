@@ -1952,7 +1952,7 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
         }
     }
     
-    numFavorPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFavorPlans, 0);
+    
     
     if (newBaseID < 0)
     {
@@ -1964,15 +1964,8 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
         gOtherBase1ID = newBaseID;
         gOtherBase1UnitID = newBaseUnitID;
         
-        if (cMyCulture == cCultureGreek)
-        {
-            //enable favor plan
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFavorPlans, 0, numFavorPlans + 1);
-            aiSetResourceBreakdown(cResourceFavor, cAIResourceSubTypeEasy, 1, favorPriority, 1.0, gOtherBase1ID);
-            if (ShowAiEcho == true) aiEcho("adding favor breakdown for gOtherBase1");
-        }
             
-        if (gBuildWalls == true)
+        if ((gBuildWalls == true) && (cMyCulture != cCultureAtlantean))
         {
             //enable the wall plan for gOtherBase1UnitID
             xsEnableRule("otherBase1RingWallTeam");
@@ -1984,15 +1977,9 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
         gOtherBase2ID = newBaseID;
         gOtherBase2UnitID = newBaseUnitID;
         
-        if (cMyCulture == cCultureGreek)
-        {
-            //enable favor plan
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFavorPlans, 0, numFavorPlans + 1);
-            aiSetResourceBreakdown(cResourceFavor, cAIResourceSubTypeEasy, 1, favorPriority, 1.0, gOtherBase2ID);
-            if (ShowAiEcho == true) aiEcho("adding favor breakdown for gOtherBase2");
-        }
+
         
-        if (gBuildWalls == true)
+        if ((gBuildWalls == true) && (cMyCulture != cCultureAtlantean))
         {
             //enable the wall plan for gOtherBase2UnitID
             xsEnableRule("otherBase2RingWallTeam");
@@ -2004,15 +1991,8 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
         gOtherBase3ID = newBaseID;
         gOtherBase3UnitID = newBaseUnitID;
         
-        if (cMyCulture == cCultureGreek)
-        {
-            //enable favor plan
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFavorPlans, 0, numFavorPlans + 1);
-            aiSetResourceBreakdown(cResourceFavor, cAIResourceSubTypeEasy, 1, favorPriority, 1.0, gOtherBase3ID);
-            if (ShowAiEcho == true) aiEcho("adding favor breakdown for gOtherBase3");
-        }
         
-        if (gBuildWalls == true)
+        if ((gBuildWalls == true) && (cMyCulture != cCultureAtlantean))
         {
             //enable the wall plan for gOtherBase3UnitID
             xsEnableRule("otherBase3RingWallTeam");
@@ -2024,15 +2004,9 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
         gOtherBase4ID = newBaseID;
         gOtherBase4UnitID = newBaseUnitID;
         
-        if (cMyCulture == cCultureGreek)
-        {
-            //enable favor plan
-            aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFavorPlans, 0, numFavorPlans + 1);
-            aiSetResourceBreakdown(cResourceFavor, cAIResourceSubTypeEasy, 1, favorPriority, 1.0, gOtherBase4ID);
-            if (ShowAiEcho == true) aiEcho("adding favor breakdown for gOtherBase4");
-        }
+
         
-        if (gBuildWalls == true)
+        if ((gBuildWalls == true) && (cMyCulture != cCultureAtlantean))
         {
             //enable the wall plan for gOtherBase4UnitID
             xsEnableRule("otherBase4RingWallTeam");
@@ -2159,6 +2133,35 @@ rule attackEnemySettlement
     int numRagnorokHeroes = kbUnitCount(cMyID, cUnitTypeHeroRagnorok, cUnitStateAlive);
     int numTitans = kbUnitCount(cMyID, cUnitTypeAbstractTitan, cUnitStateAlive);
     static bool ResetOk = false;
+	
+	int SiegeMU = 0;
+	int SiegeMU2 = 0;
+	if (cMyCulture == cCultureGreek)
+	SiegeMU = cUnitTypeColossus;
+	
+	if (cMyCulture == cCultureEgyptian)
+	{
+	SiegeMU = cUnitTypeScarab;
+	SiegeMU2 = cUnitTypeSphinx;
+	}
+	
+	if (cMyCulture == cCultureNorse)
+	SiegeMU = cUnitTypeMountainGiant;
+	
+	if (cMyCulture == cCultureAtlantean)
+	SiegeMU = cUnitTypeBehemoth;
+	
+	if (cMyCulture == cCultureChinese)
+	{
+	SiegeMU = cUnitTypeVermilionBird;
+	SiegeMU2 = cUnitTypeWarSalamander;  // No bonus, but the breath still hurts?
+	}
+	
+	int sMUCombined = ((kbUnitCount(cMyID, SiegeMU, cUnitStateAlive)) + (kbUnitCount(cMyID, SiegeMU2, cUnitStateAlive)));
+	if (sMUCombined < 0)
+	sMUCombined = 0;
+	
+	numSiegeWeapons = numSiegeWeapons + (sMUCombined);
 	
     int numMythUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeMythUnitNotTitan, cUnitStateAlive);
     int numNonMilitaryMythUnits = kbUnitCount(cMyID, cUnitTypePegasus, cUnitStateAlive);
@@ -2366,7 +2369,7 @@ rule attackEnemySettlement
 				{
 				attackPlanStartTime = xsGetTime();
 				aiPlanSetVariableVector(attackPlanID, cAttackPlanGatherPoint, 0, gEnemySettlementAttPlanLastAttPoint);
-				aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+				aiPlanSetUnitStance(attackPlanID, cUnitStanceAggressive);
 				ResetOk = false;
 				}
 				
@@ -4406,9 +4409,9 @@ rule setUnitPicker
     {
         // increase the number of buildings of the rushUPID
         if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureNorse))
-            kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 2, 3, true);  // 2 unit types and 3 buildings
+            kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 3, 3, true);  // 2 unit types and 3 buildings
         else
-            kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 2, 2, true);  // 2 unit types and 2 buildings
+            kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 3, 2, true);  // 2 unit types and 2 buildings
         rushUPupdate = true;
         return;
     }
@@ -4426,11 +4429,11 @@ rule setUnitPicker
             }
         }
         
-        if (kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusResearching)
+        if ((kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusResearching) || (kbGetAge() > cAge3) && (TitanAvailable == false))
         {
             // reset myth and siege preference to 1.0
-            kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMythUnit, 1.0);
-            kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractSiegeWeapon, 1.0);
+            //kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMythUnit, 1.0);
+            //kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractSiegeWeapon, 1.0);
             if (landUPupdate == false)
             {
                 kbUnitPickSetDesiredNumberUnitTypes(gLateUPID, 3, 3, true);  // 3 unit types and 3 buildings.

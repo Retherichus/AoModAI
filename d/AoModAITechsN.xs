@@ -24,10 +24,6 @@ rule getPigSticker
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;
     
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-    float woodSupply = kbResourceGet(cResourceWood);
-    float favorSupply = kbResourceGet(cResourceFavor);
     
     if (techStatus == cTechStatusAvailable)
     {
@@ -84,32 +80,6 @@ rule getEyesInTheForest
 
 //age2
 //Freyja
-// TODO: Do we really need this rule? If not remove it!
-//==============================================================================
-rule getThunderingHooves
-    inactive
-    minInterval 60 //starts in cAge2
-    group Freyja
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float foodSupply = kbResourceGet(cResourceFood);
-
-    if (kbGetAge() < cAge3 && foodSupply < 1000)
-	return;
-	
-    if (kbGetTechStatus(cTechThunderingHooves) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("ThunderingHooves", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechThunderingHooves);
-        aiPlanSetDesiredPriority(x, 15);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting ThunderingHooves");
-    }
-}
-
 //==============================================================================
 rule getAuroraBorealis
     inactive
@@ -120,7 +90,7 @@ rule getAuroraBorealis
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if (kbGetAge() < cAge3 && goldSupply < 650)
+    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeValkyrie, cUnitStateAlive) < 1))
 	return;
     if (kbGetTechStatus(cTechAuroraBorealis) == cTechStatusAvailable)
     {
@@ -179,7 +149,7 @@ rule getElhrimnirKettle
         return;
     float foodSupply = kbResourceGet(cResourceFood);
 
-    if (kbGetAge() < cAge3 && foodSupply < 1000)
+    if ((kbGetAge() < cAge3 && foodSupply < 1000) || (kbUnitCount(cMyID, cUnitTypeEinheriar, cUnitStateAlive) < 1))
 	return;
     if (kbGetTechStatus(cTechEldhrimnirKettle) == cTechStatusAvailable)
     {
@@ -193,35 +163,6 @@ rule getElhrimnirKettle
     }
 }
 
-//==============================================================================
-rule getArcticWinds
-    inactive
-    minInterval 60 //starts in cAge2
-    group Heimdall
-{
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float woodSupply = kbResourceGet(cResourceWood);
-
-    if (kbGetAge() < cAge3 && woodSupply < 450)
-	return;
-    if (kbGetTechStatus(cTechArcticWinds) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("ArcticWinds", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechArcticWinds);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting ArcticWinds");
-    }
-}
 
 
 //Forseti
@@ -261,7 +202,7 @@ rule getHamarrtroll
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
-    if (kbGetAge() < cAge3 && woodSupply < 650)
+    if ((kbGetAge() < cAge3 && woodSupply < 650) || (kbUnitCount(cMyID, cUnitTypeTroll, cUnitStateAlive) < 1))
 	return;
     if (kbGetTechStatus(cTechHamarrtroll) == cTechStatusAvailable)
     {
@@ -275,81 +216,8 @@ rule getHamarrtroll
     }
 }
 
-// TODO: Do we really need this rule? If not remove it!
-//==============================================================================
-rule getMithrilBreastplate
-    inactive
-    minInterval 60 //starts in cAge2
-    group Forseti
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float goldSupply = kbResourceGet(cResourceGold);
-	
-    if (kbGetAge() < cAge3 && goldSupply < 650)
-	return;
-    if (kbGetTechStatus(cTechMithrilBreastplate) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("MithrilBreastplate", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechMithrilBreastplate);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting MithrilBreastplate");
-    }
-}
-
-
 //age3
 //Njord
-// TODO: Do we really need this rule? If not remove it!
-//==============================================================================
-rule getRingGiver
-    inactive
-    minInterval 60 //starts in cAge3
-    group Njord
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechRingGiver) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("RingGiver", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechRingGiver);
-        aiPlanSetDesiredPriority(x, 15);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting RingGiver");
-    }
-}
-
-//==============================================================================
-rule getLongSerpent
-    inactive
-    minInterval 60 //starts in cAge3
-    group Njord
-{
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechLongSerpent) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("LongSerpent", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechLongSerpent);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting LongSerpent");
-    }
-}
-
 //==============================================================================
 rule getWrathOfTheDeep
     inactive
@@ -362,7 +230,7 @@ rule getWrathOfTheDeep
         return;
     }
 	
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeKraken, cUnitStateAlive) < 1))
         return;
     if (kbGetTechStatus(cTechWrathOfTheDeep) == cTechStatusAvailable)
     {
@@ -384,7 +252,7 @@ rule getRime
     minInterval 60 //starts in cAge3
     group Skadi
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeFrostGiant, cUnitStateAlive) < 1))
         return;
     if (kbGetTechStatus(cTechRime) == cTechStatusAvailable)
     {
@@ -416,26 +284,6 @@ rule getWinterHarvest
     }
 }
 
-// TODO: Do we really need this rule? If not remove it!
-//==============================================================================
-rule getHuntressAxe
-    inactive
-    minInterval 60 //starts in cAge3
-    group Skadi
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechHuntressAxe) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("HuntressAxe", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechHuntressAxe);
-        aiPlanSetDesiredPriority(x, 15);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting HuntressAxe");
-    }
-}
 
 //Bragi
 // TODO: Do we really need this rule? If not remove it!
@@ -459,27 +307,6 @@ rule getSwineArray
     }
 }
 
-// TODO: Do we really need this rule? If not remove it!
-//==============================================================================
-rule getCallOfValhalla
-    inactive
-    minInterval 60 //starts in cAge3
-    group Bragi
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechCallOfValhalla) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("CallOfValhalla", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechCallOfValhalla);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting CallOfValhalla");
-    }
-}
-
 //==============================================================================
 rule getThurisazRune
     inactive
@@ -500,34 +327,25 @@ rule getThurisazRune
     }
 }
 
-
 //age4
 //Baldr
 //==============================================================================
-rule getArcticGale
+rule getDwarvenAuger
     inactive
     minInterval 60 //starts in cAge4
     group Baldr
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
-    if (kbGetTechStatus(cTechArcticGale) == cTechStatusAvailable)
+    if (kbGetTechStatus(cTechDwarvenAuger) == cTechStatusAvailable)
     {
         int x=-1;
-        x = aiPlanCreate("ArcticGale", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechArcticGale);
+        x = aiPlanCreate("DwarvenAuger", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechDwarvenAuger);
         aiPlanSetDesiredPriority(x, 10);
         aiPlanSetActive(x);
         xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting ArcticGale");
+        if (ShowAiEcho == true) aiEcho("Getting DwarvenAuger");
     }
 }
-
-// TODO: Do we really need this rule? If not remove it!
 //==============================================================================
 rule getSonsOfSleipnir
     inactive
@@ -546,63 +364,7 @@ rule getSonsOfSleipnir
     }
 }
 
-//==============================================================================
-rule getDwarvenAuger
-    inactive
-    minInterval 60 //starts in cAge4
-    group Baldr
-{
-    if (kbGetTechStatus(cTechDwarvenAuger) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("DwarvenAuger", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechDwarvenAuger);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting DwarvenAuger");
-    }
-}
-
 //Tyr
-// TODO: Do we really need this rule? If not remove it!
-//==============================================================================
-rule getBerserkergang
-    inactive
-    minInterval 60 //starts in cAge4
-    group Tyr
-{
-    if (kbGetTechStatus(cTechBerserkergang) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("Berserkergang", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechBerserkergang);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting Berserkergang");
-    }
-}
-
-// TODO: Do we really need this rule? If not remove it!
-//==============================================================================
-rule getBravery
-    inactive
-    minInterval 60 //starts in cAge4
-    group Tyr
-{
-    if (kbGetTechStatus(cTechBravery) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("Bravery", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechBravery);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting Bravery");
-    }
-}
-
 //Hel
 //==============================================================================
 rule getRampage

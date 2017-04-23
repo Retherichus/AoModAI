@@ -41,7 +41,7 @@ rule updateWoodBreakdown
     
         bool reducedWoodGathererCount = false;
 
-    if ((woodGathererCount <= 0 ) && (kbGetAge() >= cAge1))
+    if ((woodGathererCount <= 0) && (kbGetAge() <= cAge2))
         {
 			woodGathererCount = 1;
             reducedWoodGathererCount = true;
@@ -430,6 +430,7 @@ rule updateGoldBreakdown
 //==============================================================================
 rule updateFoodBreakdown
     minInterval 1
+	//runImmediately
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateFoodBreakdown: ");
@@ -447,7 +448,7 @@ rule updateFoodBreakdown
     int aggressivePriority = 45;
     int mainFarmPriority = 90;
     int otherFarmPriority = 89;
-    if ((cMyCulture == cCultureNorse) && (kbGetAge() < 2))
+    if ((cMyCulture == cCultureNorse) && (kbGetAge() < cAge2))
 	aggressivePriority = 65; // above wood/gold so it doesn't steal the oxcart
 	
     int numFarms = kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive);
@@ -472,16 +473,18 @@ rule updateFoodBreakdown
 	
 	if ((numberAggressiveResourceSpots > 0) && (IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000) || (FakeAggressives > 3) && (IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000))
 	   { 
-	   int TotalAnimalsFound = numberAggressiveResourceSpots+FakeAggressives; 
+	    int TotalAnimalsFound = numberAggressiveResourceSpots+FakeAggressives; 
         if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Animals or Agressive spots found: "+TotalAnimalsFound+", activating HuntingDogsAsap");
 		IsRunHuntingDogs = true;
 		gHuntingDogsASAP = true;
 		xsEnableRule("HuntingDogsAsap");
-		if (cMyCulture == cCultureAtlantean)
+		if ((cMyCulture == cCultureAtlantean) && (gTransportMap == false) && (gWaterMap == false))
 		createSimpleBuildPlan(cUnitTypeGuild, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
-    }		
-	
+    }
+	    
+		static bool aSpecialReset = false;
 		static bool HippoDone = false;
+		static bool HippoFound = false;
 		if ((HippoDone == false) && (gHuntingDogsASAP == true) && (xsGetTime() < 20*1*1000))
 		{ 
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
@@ -489,9 +492,23 @@ rule updateFoodBreakdown
 		if ((HippoNearMB > 1) && (cMyCulture != cCultureAtlantean))
 		aiSetMinNumberNeedForGatheringAggressvies(4);
 		else if ((HippoNearMB > 1) && (cMyCulture == cCultureAtlantean))
+		{
 		aiSetMinNumberNeedForGatheringAggressvies(1);
+		aSpecialReset = true;
+		}
+		if (HippoNearMB > 1)
+		HippoFound = true;
+		//if ((HippoFound == true) && (cMyCulture == cCultureGreek) || (HippoFound == true) && (cMyCulture == cCultureChinese))
+        //aiSetAllowAutoDropsites(false);
 		HippoDone = true;
         }
+		
+       //static bool Done = false;
+       //if ((Done == false) && (HippoFound == true) && (xsGetTime() > 28*1*1000) && (cMyCulture == cCultureGreek) || (Done == false) && (HippoFound == true) && (xsGetTime() > 14*1*1000) && (cMyCulture == cCultureChinese))
+      // {
+	  // aiSetAllowAutoDropsites(true);
+	  // Done = true;
+      // }		
 	
 	if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.
         numberAggressiveResourceSpots = 0;  // Never get enough vills to go hunting.
@@ -539,38 +556,39 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 26;
+    int desiredFarmers = 24;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
         desiredFarmers = 9;		
 	
     // Up it a little bit as our civ population raises.	
     int NumVillagers = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID);
-	if ((kbGetAge() > cAge2) && (xsGetTime() > 18*60*1000))
+	if ((kbGetAge() > cAge2) || (xsGetTime() > 14*60*1000))
 	{
 	if (cMyCulture != cCultureAtlantean)
-	desiredFarmers = desiredFarmers+NumVillagers*0.24;
-	// if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Desired farms: "+desiredFarmers+"");	
+	desiredFarmers = desiredFarmers+NumVillagers*0.10;
+	if ((ShowAiEcho == true) || (ShowAiEcoEcho == true)) aiEcho("Desired farms: "+desiredFarmers+"");	
     }
 	
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)
     {  
-    desiredFarmers = 20;
+    desiredFarmers = 26;
 	 if (cMyCulture == cCultureAtlantean) //override for Atlantean
         desiredFarmers = 7;
-	}
+	}	
 	
-		if ((cMyCulture != cCultureAtlantean) && (desiredFarmers > 32))
-	    desiredFarmers = 32;
-	    if ((cMyCulture == cCultureAtlantean) && (desiredFarmers > 11)) //override for Atlantean
-        desiredFarmers = 11;	
-	
+		if ((cMyCulture != cCultureAtlantean) && (desiredFarmers >= 30))
+	    desiredFarmers = 30;
+	    if ((cMyCulture == cCultureAtlantean) && (desiredFarmers >= 10)) //override for Atlantean
+        desiredFarmers = 10;
 	
     if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
     {
         foodGathererCount = desiredFarmers + (numSettlements - 1);
         modifiedFoodGathererCount = true;
     }
+	if (foodGathererCount >= 32)
+		foodGathererCount = 32;
 
     MoreFarms = desiredFarmers; // Update build more farms
     // Preference order is existing farms (except in age 1), new farms if low on food sites, aggressive hunt (size permitting), easy, then age 1 farms.  
@@ -782,7 +800,7 @@ rule updateFoodBreakdown
                 }
                 else
                 {
-                    farmerPreBuild = 4;
+                    farmerPreBuild = 2;
                 }
             }
 
@@ -797,7 +815,7 @@ rule updateFoodBreakdown
                     static bool extraFarms = false;
                     if (extraFarms == false)
                     {
-                        xsEnableRule("buildExtraFarms");
+                        //xsEnableRule("buildExtraFarms");
                         extraFarms = true;
                     }
                 }
@@ -926,20 +944,24 @@ rule updateFoodBreakdown
         unassigned = 0;
     }  
     
-	if (xsGetTime() < 5*30*1000)
+	if ((xsGetTime() < 7*30*1000) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching))
 	{
-	int ForceHunt = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAny, 0, 0, mainBaseLocation, 40);
-	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAny, 0, 0, mainBaseLocation, 40);
-	if ((ForceHunt >= 2) && (Chickens <= 0))
+	int ForceHunt = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAlive, -1, 0, mainBaseLocation, 40);
+	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, mainBaseLocation, 40);
+	if ((ForceHunt >= 1) && (Chickens <= 0))
 	{
     numberAggressiveResourceSpots = 0;	
 	aggHunters = 0;
 	numberEasyResourceSpots = 1;
-	if (ShowAiEcoEcho == true) aiEcho("PREY: "+ForceHunt+"");
+	if ((ShowAiEcho == true) || (ShowAiEcoEcho == true)) aiEcho("PREY: "+ForceHunt+"");
 	}
 	}
 	
-  
+	// Try not to kill the animal before the guild is up.
+	if ((xsGetTime() < 1*5*1000) && (aSpecialReset == true) && (numberAggressiveResourceSpots >= 1) && (cMyCulture == cCultureAtlantean))
+	numberEasyResourceSpots = 0;
+   
+
     // Now, the number of farmers we want is the unassigned total, plus reserve (existing farms) and prebuild (plan ahead).
     farmers = farmerReserve + farmerPreBuild;
     unassigned = unassigned - farmers;
@@ -1010,14 +1032,24 @@ rule updateFoodBreakdown
             }
             else
             {
-                numFarmPlansWanted = 2; 
+			    static bool IncreasePlans = false;
+				if (farmers >= 20) // this is so shit.. but we really need it, activates once first plan is filled... : /
+				IncreasePlans = true;
+				if (farmersAtMainBase >= 30)
+				farmersAtMainBase = 30;
+				
+				if (aiGetWorldDifficulty() == cDifficultyNightmare)
+			    numFarmPlansWanted = numFarmPlansWanted + 1;
+				else if ((aiGetWorldDifficulty() == cDifficultyHard) && (IncreasePlans == true))
+			    numFarmPlansWanted = numFarmPlansWanted + 2;
+				else numFarmPlansWanted = numFarmPlansWanted + 1;
             }                
         }
         gFarming = true;
     }
     else
         gFarming = false;
-		aiEcho("numFarmPlansWanted  "+numFarmPlansWanted+"");
+
 
     //Egyptians can farm in the first age.
     if (((kbGetAge() > 0) || (cMyCulture == cCultureEgyptian)) && (gFarmBaseID != -1) && (xsGetTime() > 3*60*1000))
@@ -1074,6 +1106,7 @@ rule updateFoodBreakdown
         else
             aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, 0, otherFarmPriority, 0, gOtherBase4ID);
     }
+
 	
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, numFarmPlansWanted, mainFarmPriority, (100.0*farmersAtMainBase)/(foodGathererCount*100.0), gFarmBaseID);
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeHuntAggressive, numberAggressiveResourceSpots, aggressivePriority, (100.0*aggHunters)/(foodGathererCount*100.0), mainBaseID); 
@@ -1763,9 +1796,10 @@ void postInitEcon()
 
 //==============================================================================
 rule fishing
-    minInterval 10 //starts in cAge1
+    minInterval 1 //starts in cAge1
     inactive
 {
+    xsSetRuleMinIntervalSelf(11);
     if ((cRandomMapName == "river styx"))
     {
         xsDisableSelf();
@@ -2048,6 +2082,7 @@ rule randomUpgrader
     minInterval 61 //starts in cAge5
     inactive
 {
+
     if (ShowAiEcho == true) aiEcho("randomUpgrader:");
 
     if (kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusObtainable && kbGetTechStatus(cTechSecretsoftheTitans) <= cTechStatusResearching)

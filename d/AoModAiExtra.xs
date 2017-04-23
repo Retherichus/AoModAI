@@ -43,7 +43,7 @@ extern vector KOTHGlobal = cInvalidVector;
 extern bool IhaveAllies = false;
 extern bool mRusher = false;
 extern bool BeenmRusher = false;
-extern int MoreFarms = 28;
+extern int MoreFarms = 26;
 extern bool TitanAvailable = false;
 extern int KOTHBASE = -1;
 extern bool WaitForDock = false;
@@ -85,7 +85,7 @@ extern bool CanIChat = true;              // This will allow the Ai to send chat
 extern bool gEarlyMonuments = false;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
 extern bool bWonderDefense = true;         // Builds towers/fortresses around friendly wonders.
-extern bool bWallAllyMB = false;          // Walls up the mainbase of a human ally (don't use this if you plan on having more than 1 AoModAI ally!)
+extern bool bWallAllyMB = false;          // Walls up TC for human allies, only the team captain can do this and Mainbases are skipped.
 extern bool bWallCleanup = true;          // Prevents the AI from building small wall pieces inside of gates and/or deletes them if one were to slip through the check.
 extern bool CheatResources = false;        // For those who finds titan (difficulty) to be just 	too easy, enable this and you'll have the AI cheat in some resources as it ages up.
 extern bool mPopLandAttack = true;         //Dynamically scales the min total pop needed before it can attack, 6 pop slots per TC after 4 and beyond.
@@ -284,6 +284,9 @@ void initRethlAge1(void)  // Am I doing this right??
 		//aiSetMinNumberNeedForGatheringAggressvies(6);
 		
         }
+	  
+	  // Check with allies and enable donations
+       xsEnableRule("MonitorAllies");
 
 	   // Don't build transport ships on these maps!
 	   if ((cRandomMapName == "highland") || ((cRandomMapName == "Sacred Pond") || (cRandomMapName == "Sacred Pond 1.0") 
@@ -400,9 +403,6 @@ void initRethlAge2(void)
     //HateScripts
     xsEnableRuleGroup("HateScripts");
 	
-	// Check with allies and enable donations
-    xsEnableRule("MonitorAllies");
-	
 	if (bWallAllyMB == true)
 	xsEnableRule("WallAllyMB");
 	
@@ -435,8 +435,8 @@ rule ActivateRethOverridesAge1
 		if (gHuntingDogsASAP == true)
 		xsEnableRule("HuntingDogsAsap");
 		
-		if (aiGetWorldDifficulty() > cDifficultyHard)
-		aiResourceCheat(cMyID, cResourceFood, 0.1); //Adds 0.1 (not even 1!) resources to fix a critical "startup-inventory" bug that can potentially block the AI from making vills.
+		//Adds 0.1 (not even 1!) of all resources to fix a critical "startup-inventory" bug that can potentially block the AI from making vills until the first villager have returned any resource.
+		aiResourceCheat(cMyID, cResourceFood, 0.1); 
 		aiResourceCheat(cMyID, cResourceWood, 0.1);
 		aiResourceCheat(cMyID, cResourceGold, 0.1);
 		xsDisableSelf();
@@ -568,7 +568,7 @@ rule ActivateRethOverridesAge3
 }
 
 rule ActivateRethOverridesAge4
-   minInterval 30
+   minInterval 15
    active
 {
     if (kbGetAge() > cAge3)
@@ -619,56 +619,21 @@ rule ActivateRethOverridesAge4
 	    aiResourceCheat(cMyID, cResourceWood, 800);
 	    aiResourceCheat(cMyID, cResourceGold, 900);
 	    }		
-
+        if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge2Bast) == cTechStatusActive) // Sphinx maintain, because they're just that good.
+		createSimpleMaintainPlan(cUnitTypeSphinx, 2, false, kbBaseGetMainID(cMyID));
+		
+		if (cMyCulture == cCultureChinese)
+		{
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeScoutChinese, 0.1);
+		if (cMyCiv == cCivShennong)
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLanceShennong, 0.6);
+		else kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLance, 0.5);
+		}
 		
 		xsDisableSelf();
            
     }
-}	
-
-
-//==============================================================================
-// rule DockDefenseMonitor // I'll make this more dynamic later and base it on enemy ships.
-//==============================================================================
-rule DockDefenseMonitor
-   minInterval 45
-   inactive
-{  
-
-   	   if (gWaterMap == false)
-	   {
-	   xsDisableSelf();
-	   return;
-	   }
-   
-   // Add some defense for the dock
-   
-         if (gWaterMap == true && kbGetAge() > cAge1 && cRandomMapName != "sudden death" && cRandomMapName != "anatolia" && cRandomMapName != "basin")
-      {
-        int planID=aiPlanCreate("Train Triremes", cPlanTrain);
-         if (planID >= 0)
-         {
-            aiPlanSetMilitary(planID, true);
-			if (cMyCulture == cCultureGreek)
-            aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeTrireme);
-			if (cMyCulture == cCultureEgyptian)
-			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeKebenit);
-			if (cMyCulture == cCultureNorse)
-			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeLongboat);
-			if (cMyCulture == cCultureAtlantean)
-			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeBireme);
-			if (cMyCulture == cCultureChinese)
-			aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, cUnitTypeJunk);
-            
-			aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 1); 
-            aiPlanSetActive(planID);
-            aiPlanSetDesiredPriority(planID, 1);
-         }
-      }
-
-	  xsDisableSelf();
 }	  
-
 //==============================================================================
 // wonder death handler
 //==============================================================================
@@ -738,9 +703,10 @@ rule HuntingDogsAsap
    if (cMyCulture == cCultureAtlantean)
    HuntingDogsUpgBuilding = cUnitTypeGuild;
    
-   if ((WaitForDock == true) && (kbUnitCount(cMyID, cUnitTypeDock, cUnitStateAliveOrBuilding) <= 0))
-   return;
    
+   if ((WaitForDock == true) && (kbGetAge() < cAge2))
+   return;
+
       if (cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse && kbUnitCount(cMyID, HuntingDogsUpgBuilding, cUnitStateAlive) < 1)
 	  return;
    
@@ -974,7 +940,6 @@ rule myAgeTracker
 //==============================================================================
 // RULE Helpme
 //==============================================================================
-
 rule Helpme
    minInterval 23
    inactive
@@ -1080,7 +1045,8 @@ rule IHateSiege
 		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLance) == true)) ||
 		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeFireLanceShennong) == true)) ||
 		(kbUnitIsType(NoArcherPlease, cUnitTypeAbstractInfantry) && (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0),cUnitTypeChieroballista) == true)) ||
-		(kbUnitIsType(NoArcherPlease, cUnitTypeHeroChineseMonk)) || (kbUnitIsType(NoArcherPlease, cUnitTypeHeroRagnorok)) || (kbUnitIsType(NoArcherPlease, cUnitTypeMythUnit)))
+		(kbUnitIsType(NoArcherPlease, cUnitTypeHeroChineseMonk)) || (kbUnitIsType(NoArcherPlease, cUnitTypeHeroRagnorok)) || (kbUnitIsType(NoArcherPlease, cUnitTypePriest))
+		|| (kbUnitIsType(NoArcherPlease, cUnitTypeAbstractPharaoh)) || (kbUnitIsType(NoArcherPlease, cUnitTypeMythUnit)))
             continue;
 		
 	   if (numberFoundTemp > 0)
@@ -1114,6 +1080,9 @@ rule tacticalHeroAttackMyth
 	xsDisableSelf();
 	return;
    }
+   
+   if (kbUnitCount(cMyID, cUnitTypeHero) < 1)
+   return;
    
    		if (cMyCulture == cCultureGreek && RunOnlyOnce == false)
 		{
@@ -1315,7 +1284,10 @@ rule IHateBuildingsHadesSpecial
 	xsDisableSelf();
 	return;
    }
-
+   
+   if (kbUnitCount(cMyID, cUnitTypeCrossbowman) < 1)
+   return;
+   
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
    unitQueryID=kbUnitQueryCreate("My Siege Query");
@@ -1564,12 +1536,11 @@ rule IHateUnderworldPassages
    }
 }
 
-
 //==============================================================================
 // IHateBuildingsBeheAndScarab
 //==============================================================================
 rule IHateBuildingsBeheAndScarab
-   minInterval 6
+   minInterval 5
    inactive
    group Sekhmet
    group Rheia
@@ -1579,7 +1550,7 @@ rule IHateBuildingsBeheAndScarab
    static int MythUnit=-1;
    
 
-   if ((aiGetWorldDifficulty() == cDifficultyEasy) || (cMyCulture != cCultureAtlantean && cMyCulture != cCultureEgyptian))
+   if ((aiGetWorldDifficulty() == cDifficultyEasy) || (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureEgyptian))
    {
 	xsDisableSelf();
 	return;
@@ -1589,8 +1560,11 @@ rule IHateBuildingsBeheAndScarab
    else MythUnit = cUnitTypeScarab;
    
    if (kbUnitCount(cMyID, MythUnit) < 1)
-   xsSetRuleMinIntervalSelf(65);
-   else xsSetRuleMinIntervalSelf(6);
+   {
+	xsSetRuleMinIntervalSelf(65);
+	return;
+   }   
+    xsSetRuleMinIntervalSelf(6);
    
 
    //If we don't have the query yet, create one.
@@ -1667,6 +1641,9 @@ rule IHateGates
 	xsDisableSelf();
 	return;
    }
+   
+   if (kbUnitCount(cMyID, cUnitTypeAbstractSiegeWeapon) < 1)
+   return;
 
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
@@ -1735,7 +1712,10 @@ rule IHateBuildingsSiege
 	xsDisableSelf();
 	return;
    }
-
+  
+   if (kbUnitCount(cMyID, cUnitTypeAbstractSiegeWeapon) < 1)
+   return;
+   
    //If we don't have the query yet, create one.
    if (unitQueryID < 0)
    unitQueryID=kbUnitQueryCreate("My Siege Query");
@@ -1744,7 +1724,7 @@ rule IHateBuildingsSiege
    if (unitQueryID != -1)
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSiegeWeapon);			
+        kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSiegeWeapon);
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }
 
@@ -1790,6 +1770,79 @@ rule IHateBuildingsSiege
 	   }
    }
 }
+//==============================================================================
+// IHateGatesMeleeSiege // for Ram and Siphon 
+//==============================================================================
+rule IHateGatesMeleeSiege
+   minInterval 5
+   inactive
+   group HateScripts
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+   if ((aiGetWorldDifficulty() == cDifficultyEasy) || (cMyCulture != cCultureAtlantean) && (cMyCulture != cCultureNorse))
+   {
+	xsDisableSelf();
+	return;
+   }
+   
+   if (kbUnitCount(cMyID, cUnitTypeAbstractSiegeWeapon) < 1)
+   return;
+   
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+		if (cMyCulture == cCultureNorse)
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypePortableRam);	
+		else if (cMyCulture == cCultureAtlantean)
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeFireSiphon);				
+	   kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeGate);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 10);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+			
+	   if (numberFoundTemp > 0)
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
 
 //==============================================================================
 // MonitorAllies
@@ -1814,11 +1867,13 @@ inactive
 		 IhaveAllies = true;
 		 return;
 		 }
-		 else 
-		 xsDisableRuleGroup("Donations"); 
-		 xsDisableRule("defendAlliedBase");
-		 xsDisableRule("Helpme");
-		 IhaveAllies = false;
+		 else
+		 {
+		  xsDisableRuleGroup("Donations"); 
+		  xsDisableRule("defendAlliedBase");
+		  xsDisableRule("Helpme");
+		  IhaveAllies = false;
+		 }
 	}
 }
 }
@@ -2070,7 +2125,7 @@ inactive
 				}
 				
 				if (WaterVersion == false)
-				return;  // will this skip the code below?
+				return;  // will this skip the code below? duh ofc, what was I thinking?
 				 
 				 if (NumSelf > NumEnemy + 14 && WaterVersion == true)
 				 SendBackCount = SendBackCount+1;
@@ -2113,9 +2168,7 @@ rule GatherAroundKOTH  // launches a defend plan on the island.
 		{
 		if (ShowAiEcho == true) aiEcho("I was here!");
 		gDefendPlentyVaultWater = aiPlanCreate("KOTH WATER VAULT DEFEND", cPlanDefend);
-                
-        
-
+		
         aiPlanSetDesiredPriority(gDefendPlentyVaultWater, 90);                       // prio
         aiPlanSetVariableVector(gDefendPlentyVaultWater, cDefendPlanDefendPoint, 0, KOTHPlace);
         aiPlanSetVariableFloat(gDefendPlentyVaultWater, cDefendPlanEngageRange, 0, 25.0);
@@ -2496,7 +2549,7 @@ bool Filled = false;
            attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
 		   aiPlanSetVariableInt(gMaintainWaterXPortPlanID, cTrainPlanNumberToMaintain, 0, 3);
 		   aiPlanSetVariableInt(gMaintainWaterXPortPlanID, cTrainPlanFrequency, 0, 15);
-		   aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 97);
+		   //aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 97);
            int numMilUnitsNearAttPlan = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, attPlanPosition, 100);
            int numInPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeLogicalTypeLandMilitary);
 		   int numTransportPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeTransport);
@@ -2583,5 +2636,4 @@ rule TEST
 minInterval 1
 inactive
 {
-
 }

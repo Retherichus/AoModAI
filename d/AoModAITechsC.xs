@@ -106,60 +106,6 @@ rule getElixirofImmortality
     }
 }
 
-//==============================================================================
-// RULE: getHouyisBow
-//==============================================================================
-rule getHouyisBow
-    inactive
-    minInterval 29
-    group Change
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float woodSupply = kbResourceGet(cResourceWood);
-	
-    if (kbGetAge() < cAge3 && woodSupply < 500)
-	return;
-    if (kbGetTechStatus(cTechHouyisBow) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("VolcanicForge", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechHouyisBow);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting Houyis Bow");
-    }
-}
-
-//==============================================================================
-// RULE: getJadeRabbit
-//==============================================================================
-rule getJadeRabbit
-    inactive
-    minInterval 29
-    group Change
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float foodSupply = kbResourceGet(cResourceFood);
-	
-    if (kbGetAge() < cAge3 && foodSupply < 1000)
-	return;
-    if (kbGetTechStatus(cTechJadeRabbit) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("VolcanicForge", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechJadeRabbit);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting Jade Rabbit");
-    }
-}
-
 //Sunwukong
 //==============================================================================
 // RULE: getGoldenBandedStaff
@@ -173,7 +119,7 @@ rule getGoldenBandedStaff
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
-    if (kbGetAge() < cAge3 && woodSupply < 650)
+    if ((kbGetAge() < cAge3 && woodSupply < 650) || (kbUnitCount(cMyID, cUnitTypeMonkeyKing, cUnitStateAlive) < 1))
 	return;
     if (kbGetTechStatus(cTechGoldenBandedStaff) == cTechStatusAvailable)
     {
@@ -188,66 +134,6 @@ rule getGoldenBandedStaff
     }
 }
 
-//==============================================================================
-// RULE: getPaperTalisman
-//==============================================================================
-rule getPaperTalisman
-    inactive
-    minInterval 27
-    group Sunwukong
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float woodSupply = kbResourceGet(cResourceWood);
-	
-    if (kbGetAge() < cAge3 && woodSupply < 500)
-	return;
-    if (kbGetTechStatus(cTechPaperTalisman) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("PaperTalisman", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechPaperTalisman);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting PaperTalisman");
-    }
-}
-
-//Sunwukong
-//==============================================================================
-// RULE: PillaroftheOcean
-//==============================================================================
-rule PillaroftheOcean
-    inactive
-    minInterval 30
-    group Sunwukong
-{
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float woodSupply = kbResourceGet(cResourceWood);
-	
-    if ((kbGetAge() < cAge3) && (woodSupply < 700))
-	return;
-    if (kbGetTechStatus(cTechPillaroftheOcean) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("PillaroftheOcean", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechPillaroftheOcean);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting PillaroftheOcean");
-    }
-}
 
 //Huangdi
 
@@ -264,7 +150,7 @@ rule getStoneArmor
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
-    if (kbGetAge() < cAge3 && woodSupply < 650)
+    if ((kbGetAge() < cAge3 && woodSupply < 650) || (kbUnitCount(cMyID, cUnitTypeTerracottaSoldier, cUnitStateAlive) < 1))
 	return;
     if (kbGetTechStatus(cTechStoneArmor) == cTechStatusAvailable)
     {
@@ -292,41 +178,13 @@ rule getFiveGrains
         int x=-1;
         x = aiPlanCreate("FiveGrains", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechFiveGrains);
-        aiPlanSetDesiredPriority(x, 10);
+        aiPlanSetDesiredPriority(x, 75);
         aiPlanSetEscrowID(x, cEconomyEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting FiveGrains");
     }
 }
-
-//==============================================================================
-// RULE: getOracleBoneScript
-//==============================================================================
-rule getOracleBoneScript
-    inactive
-    minInterval 35
-    group Huangdi
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float foodSupply = kbResourceGet(cResourceFood);
-	
-    if (kbGetAge() < cAge3 && foodSupply < 1000)
-	return;
-    if (kbGetTechStatus(cTechOracleBoneScript) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("OracleBoneScript", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechOracleBoneScript);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting OracleBoneScript");
-    }
-}
-
 
 //Dabogong
 
@@ -417,7 +275,7 @@ rule getLifeDrain
     group Zhongkui
 {
     float goldSupply = kbResourceGet(cResourceGold);
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (goldSupply < 1000))
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (goldSupply < 1000) || (kbUnitCount(cMyID, cUnitTypeJiangshi, cUnitStateAlive) < 1))
         return;
     if (kbGetTechStatus(cTechLifeDrain) == cTechStatusAvailable)
     {
@@ -456,31 +314,6 @@ rule getDemonSlayer
     }
 }
 
-
-//==============================================================================
-// RULE: getUnbridledAnger
-//==============================================================================
-rule getUnbridledAnger
-    inactive
-    minInterval 35
-    group Zhongkui
- {
-     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechUnbrideledAnger) == cTechStatusAvailable)
-      {
-          int x=-1;
-        x = aiPlanCreate("UnbridledAnger", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechUnbrideledAnger);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting Unbridled Anger");
-      }
-  }
-
-
 // Hebo
 
 //==============================================================================
@@ -505,36 +338,6 @@ rule getSacrifices
         if (ShowAiEcho == true) aiEcho("Getting Sacrifices");
     }
 }
-
-//==============================================================================
-// RULE: getLordoftheRiver
-//==============================================================================
-rule getLordoftheRiver
-    inactive
-    minInterval 27
-    group Hebo
-{
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechLordoftheRiver) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("LordoftheRiver", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechLordoftheRiver);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting LordoftheRiver");
-    }
-}
-
 
 //==============================================================================
 // RULE: getRammedEarth
@@ -583,27 +386,6 @@ rule getTigerSpirit
 }
 
 //==============================================================================
-// RULE: getGoldenPeaches
-//==============================================================================
-rule getGoldenPeaches
-    inactive
-    minInterval 27
-    group Xiwangmu
-{
-    if (kbGetTechStatus(cTechGoldenPeaches) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("GoldenPeaches", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechGoldenPeaches);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting GoldenPeaches");
-    }
-}
-
-//==============================================================================
 // RULE: getCelestialPalace
 //==============================================================================
 rule getCelestialPalace
@@ -633,74 +415,45 @@ rule getCelestialPalace
 //==============================================================================
 rule getHeavenlyFire
     inactive
-    minInterval 27
+    minInterval 10
     group Chongli
 {
-    if (kbGetTechStatus(cTechHeavenlyFire) == cTechStatusAvailable)
+    int techID = cTechHeavenlyFire;
+    int techStatus = kbGetTechStatus(techID);
+    if ((techStatus > cTechStatusResearching) || (techStatus < cTechStatusAvailable))
     {
-        int x=-1;
-        x = aiPlanCreate("HeavenlyFire", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechHeavenlyFire);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);		
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting HeavenlyFire");
-    }
-}
-
-//==============================================================================
-// RULE: getStirrup
-//==============================================================================
-rule getStirrup
-    inactive
-    minInterval 27
-    group Chongli
-{
-    if (kbGetTechStatus(cTechStirrup) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("Stirrup", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechStirrup);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);		
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting Stirrup");
-    }
-}
-
-
-//==============================================================================
-// RULE: getAncientDestroyer
-//==============================================================================
-rule getAncientDestroyer
-    inactive
-    minInterval 27
-    group Chongli
-{
-    if (gTransportMap == false)
-    {
+        //cTechHeavenlyFire is researched, reactivate the attack goal
+        aiPlanSetVariableBool(gLandAttackGoalID, cGoalPlanIdleAttack, 0, false);
+        if (ShowAiEcho == true) aiEcho("reactivating attack goal");
         xsDisableSelf();
         return;
     }
-	
-    if (kbGetTechStatus(cTechAncientDestroyer) == cTechStatusAvailable)
+    
+    if (aiPlanGetVariableBool(gLandAttackGoalID, cGoalPlanIdleAttack, 0) == false)
+    {
+        //set the gLandAttackGoalID to idle so that no armory techs get researched
+        aiPlanSetVariableBool(gLandAttackGoalID, cGoalPlanIdleAttack, 0, true);
+        if (ShowAiEcho == true) aiEcho("setting gLandAttackGoalID to idle");
+        xsSetRuleMinIntervalSelf(10);
+    }
+    
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+        return;
+    
+    if (techStatus == cTechStatusAvailable)
     {
         int x=-1;
-        x = aiPlanCreate("AncientDestroyer", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechAncientDestroyer);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
+        x = aiPlanCreate("cTechHeavenlyFire", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, techID);
+        aiPlanSetDesiredPriority(x, 100);
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting AncientDestroyer");
+        if (ShowAiEcho == true) aiEcho("Getting cTechHeavenlyFire");
+        xsSetRuleMinIntervalSelf(11);
     }
 }
 
-
 // Aokuang
-
 //==============================================================================
 // RULE: getNezhasDefeat
 //==============================================================================
@@ -719,27 +472,6 @@ rule getNezhasDefeat
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting NezhasDefeat");
-    }
-}
-
-//==============================================================================
-// RULE: getDragonScales
-//==============================================================================
-rule getDragonScales
-    inactive
-    minInterval 27
-    group Aokuang
-{
-    if (kbGetTechStatus(cTechDragonScales) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("DragonScales", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechDragonScales);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);	
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting DragonScales");
     }
 }
 

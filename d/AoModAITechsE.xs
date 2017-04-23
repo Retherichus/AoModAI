@@ -82,7 +82,7 @@ rule getFeetOfTheJackal
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if (kbGetAge() < cAge3 && goldSupply < 650)
+    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeAnubite, cUnitStateAlive) < 1))
 	return;
     if (kbGetTechStatus(cTechFeetoftheJackal) == cTechStatusAvailable)
     {
@@ -93,32 +93,6 @@ rule getFeetOfTheJackal
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting FeetOfTheJackal");
-    }
-}
-
-//==============================================================================
-// RULE: getSerpentSpear
-//==============================================================================
-rule getSerpentSpear
-    inactive
-    minInterval 29
-    group Anubis
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float foodSupply = kbResourceGet(cResourceFood);
-
-    if (kbGetAge() < cAge3 && foodSupply < 1000)
-	return;
-    if (kbGetTechStatus(cTechSerpentSpear) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("SerpentSpear", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechSerpentSpear);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting SerpentSpear");
     }
 }
 
@@ -199,7 +173,7 @@ rule getCriosphinx
     minInterval 31
     group Bast
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 1))
         return;
     if (kbGetTechStatus(cTechCriosphinx) == cTechStatusAvailable)
     {
@@ -221,7 +195,7 @@ rule getHieracosphinx
     minInterval 33
     group Bast
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 1))
         return;
     if (kbGetTechStatus(cTechHieracosphinx) == cTechStatusAvailable)
     {
@@ -249,84 +223,10 @@ rule getShaduf
         int x=-1;
         x = aiPlanCreate("Shaduf", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechShaduf);
-        aiPlanSetDesiredPriority(x, 25);
+        aiPlanSetDesiredPriority(x, 75);
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Shaduf");
-    }
-}
-
-//==============================================================================
-// RULE: getScallopedAxe
-//==============================================================================
-rule getScallopedAxe
-    inactive
-    minInterval 29
-    group Ptah
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float foodSupply = kbResourceGet(cResourceFood);
-
-    if (kbGetAge() < cAge3 && foodSupply < 1000)
-	return;
-    if (kbGetTechStatus(cTechScallopedAxe) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("ScallopedAxe", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechScallopedAxe);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting ScallopedAxe");
-    }
-}
-
-//==============================================================================
-// RULE: getLeatherFrameShield
-//==============================================================================
-rule getLeatherFrameShield
-    inactive
-    minInterval 31
-    group Ptah
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechLeatherFrameShield) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("LeatherFrameShield", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechLeatherFrameShield);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting LeatherFrameShield");
-    }
-}
-
-//==============================================================================
-// RULE: getElectrumBullets
-//==============================================================================
-rule getElectrumBullets
-    inactive
-    minInterval 33
-    group Ptah
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float goldSupply = kbResourceGet(cResourceGold);
-
-    if (kbGetAge() < cAge3 && goldSupply < 650)
-	return;
-    if (kbGetTechStatus(cTechElectrumBullets) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("ElectrumBullets", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechElectrumBullets);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting ElectrumBullets");
     }
 }
 
@@ -384,7 +284,7 @@ rule getCrocodopolis
     minInterval 31
     group Hathor
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypePetsuchos, cUnitStateAlive) < 1))
         return;
     if (kbGetTechStatus(cTechCrocodopolis) == cTechStatusAvailable)
     {
@@ -451,7 +351,7 @@ rule getStonesOfRedLinen
     minInterval 31
     group Sekhmet
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge4))
         return;
     if (kbGetTechStatus(cTechStonesofRedLinen) == cTechStatusAvailable)
     {
@@ -556,65 +456,6 @@ rule getCityOfTheDead
 
 //age4
 //Horus
-//==============================================================================
-// RULE: getAxeOfVengeance
-//==============================================================================
-rule getAxeOfVengeance
-    inactive
-    minInterval 27
-    group Horus
-{
-    if (kbGetTechStatus(cTechAxeofVengeance) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("AxeOfVengeance", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechAxeofVengeance);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting AxeOfVengeance");
-    }
-}
-
-//==============================================================================
-// RULE: getGreatestOfFifty
-//==============================================================================
-rule getGreatestOfFifty
-    inactive
-    minInterval 29
-    group Horus
-{
-    if (kbGetTechStatus(cTechGreatestofFifty) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("GreatestOfFifty", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechGreatestofFifty);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting GreatestOfFifty");
-    }
-}
-
-//==============================================================================
-// RULE: getSpearOnTheHorizon
-//==============================================================================
-rule getSpearOnTheHorizon
-    inactive
-    minInterval 31
-    group Horus
-{
-    if (kbGetTechStatus(cTechSpearontheHorizon) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("SpearOnTheHorizon", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechSpearontheHorizon);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting SpearOnTheHorizon");
-    }
-}
 
 //Osiris
 //==============================================================================
@@ -637,89 +478,25 @@ rule getAtefCrown
     }
 }
 
-//==============================================================================
-// RULE: getDesertWind
-//==============================================================================
-rule getDesertWind
-    inactive
-    minInterval 29
-    group Osiris
-{
-    if (kbGetTechStatus(cTechDesertWind) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("DesertWind", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechDesertWind);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting DesertWind");
-    }
-}
-
-//==============================================================================
-// RULE: getFuneralBarge
-//==============================================================================
-rule getFuneralBarge
-    inactive
-    minInterval 31
-    group Osiris
-{
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-    }
-	
-    if (kbGetTechStatus(cTechFuneralBarge) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("FuneralBarge", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechFuneralBarge);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting FuneralBarge");
-    }
-}
-
 //Thoth
 //==============================================================================
-// RULE: getValleyOfTheKings
+// RULE: getBookofThoth
 //==============================================================================
-rule getValleyOfTheKings
+rule getBookofThoth
     inactive
     minInterval 27
     group Thoth
 {
-    if (kbGetTechStatus(cTechValleyoftheKings) == cTechStatusAvailable)
+    if (kbGetTechStatus(cTechBookofThoth) == cTechStatusAvailable)
     {
         int x=-1;
-        x = aiPlanCreate("ValleyOfTheKings", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechValleyoftheKings);
+        x = aiPlanCreate("BookofThoth", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechBookofThoth);
         aiPlanSetDesiredPriority(x, 15);
         aiPlanSetActive(x);
         xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting ValleyOfTheKings");
+        if (ShowAiEcho == true) aiEcho("Getting BookofThoth");
     }
 }
 
-//==============================================================================
-// RULE: getTusksOfApedemak
-//==============================================================================
-rule getTusksOfApedemak
-    inactive
-    minInterval 29
-    group Thoth
-{
-    if (kbGetTechStatus(cTechTusksofApedemak) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("TusksOfApedemak", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechTusksofApedemak);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting TusksOfApedemak");
-    }
-}
+

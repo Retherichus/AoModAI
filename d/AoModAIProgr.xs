@@ -128,6 +128,25 @@ rule unPauseAge2
 }
 
 //==============================================================================
+rule unPauseAge3
+    minInterval 90 //starts in cAge2
+    inactive
+{
+    if (ShowAiEcho == true) aiEcho("unPauseAge3:");
+
+    if (gAge2ProgressionPlanID == -1)
+    {
+        xsDisableSelf();
+        return;
+    }
+
+    aiPlanSetVariableBool(gAge3ProgressionPlanID, cProgressionPlanPaused, false);
+    aiPlanSetVariableBool(gAge3ProgressionPlanID, cProgressionPlanPaused, 0, false);
+    aiPlanSetVariableBool(gAge3ProgressionPlanID, cProgressionPlanAdvanceOneStep, 0, false);
+    xsDisableSelf();
+}
+
+//==============================================================================
 rule age1Progress
     minInterval 10 //starts in cAge1
     inactive
@@ -175,7 +194,15 @@ rule age2Progress
         aiPlanSetDesiredPriority(gAge3ProgressionPlanID, 100);
         aiPlanSetEscrowID(gAge3ProgressionPlanID, cEconomyEscrowID);
         aiPlanSetBaseID(gAge3ProgressionPlanID, kbBaseGetMainID(cMyID));
+        aiPlanSetActive(gAge3ProgressionPlanID);		
+		if (cMyCulture != cCultureEgyptian)
+		{
+		//Start paused!!
+        aiPlanSetVariableBool(gAge3ProgressionPlanID, cProgressionPlanPaused, 0, true);
+        aiPlanSetVariableBool(gAge3ProgressionPlanID, cProgressionPlanAdvanceOneStep, 0, true);
         aiPlanSetActive(gAge3ProgressionPlanID);
+		xsEnableRule("unPauseAge3"); // we want to delay the armory a bit!
+		}
     }
    
     xsDisableSelf();

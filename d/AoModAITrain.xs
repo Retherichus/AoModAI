@@ -344,7 +344,7 @@ rule trainMercs
 
 //==============================================================================
 rule trainMythUnit
-    minInterval 35 //starts in cAge2
+    minInterval 30 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("trainMythUnit:");
@@ -377,7 +377,7 @@ rule trainMythUnit
 
     if ((numMilitaryMythUnits > 0) || (favorSupply < 40))
     {
-        if ((kbGetTechStatus(cTechSecretsoftheTitans) >= cTechStatusResearching) && (favorSupply < 35))
+        if ((kbGetTechStatus(cTechSecretsoftheTitans) >= cTechStatusResearching) && (favorSupply < 35) || (TitanAvailable == false) && (favorSupply < 35))
         {
             //if (ShowAiEcho == true) aiEcho("trainMythUnit: returning as favor is below 35");
             return;
@@ -387,16 +387,16 @@ rule trainMythUnit
             //if (ShowAiEcho == true) aiEcho("trainMythUnit: returning as favor is below 55");
             return;
         }
-        else if (favorSupply < 75)
+        else if ((favorSupply < 75) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (TitanAvailable == true))
         {
             //if (ShowAiEcho == true) aiEcho("trainMythUnit: returning as favor is below 75");
             return;
         }
     }
 
-    if (numMilitaryMythUnits > 15)
+    if (numMilitaryMythUnits > 6)
     {
-        //if (ShowAiEcho == true) aiEcho("trainMythUnit: returning as numMilitaryMythUnits > 15");
+        //if (ShowAiEcho == true) aiEcho("trainMythUnit: returning as numMilitaryMythUnits > 6");
         return;
     }
 
@@ -821,7 +821,7 @@ rule maintainMilitaryTroops
     {
 			if ((kbGetAge() < cAge3) && (gNumUnitType1ToTrain < 7))
 			gNumUnitType1ToTrain = gNumUnitType1ToTrain + 1;	
-         if ((kbGetAge() > cAge2) && (gNumUnitType1ToTrain < 11))
+         if ((kbGetAge() > cAge2) && (gNumUnitType1ToTrain < 8))
             gNumUnitType1ToTrain = gNumUnitType1ToTrain + 1;
 
     }
@@ -842,7 +842,7 @@ rule maintainMilitaryTroops
     {
         if ((kbGetAge() == cAge2) && (gNumUnitType2ToTrain < 5))
             gNumUnitType2ToTrain = gNumUnitType2ToTrain + 1;
-        else if ((kbGetAge() >= cAge3) && (gNumUnitType2ToTrain < 10))
+        else if ((kbGetAge() >= cAge3) && (gNumUnitType2ToTrain < 8))
             gNumUnitType2ToTrain = gNumUnitType2ToTrain + 1;
     }
     
@@ -862,7 +862,7 @@ rule maintainMilitaryTroops
     {
         if ((kbGetAge() == cAge2) && (gNumUnitType3ToTrain < 5))
             gNumUnitType3ToTrain = gNumUnitType3ToTrain + 1;
-        else if ((kbGetAge() >= cAge3) && (gNumUnitType3ToTrain < 10))
+        else if ((kbGetAge() >= cAge3) && (gNumUnitType3ToTrain < 8))
             gNumUnitType3ToTrain = gNumUnitType3ToTrain + 1;
     }
     

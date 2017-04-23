@@ -2648,6 +2648,12 @@ bool Filled = false;
 
 rule TEST  
 minInterval 1
-inactive
+active
 {
+    int mainBaseID = kbBaseGetMainID(cMyID);
+	int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy);
+    int numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
+	int WoodCombined = numberMainBaseSites + numberWoodBaseSites;
+	
+	aiEcho("NumWoodBases: "+WoodCombined);
 }

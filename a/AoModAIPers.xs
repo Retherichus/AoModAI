@@ -20,7 +20,7 @@ void persDecidePersonality(void)
     
 //Test start TODO: disable this part once the AI works as espected
 // choice = 1;
-//    choice = 0;
+//  choice = 5;
 //Test end
 
     switch(choice)

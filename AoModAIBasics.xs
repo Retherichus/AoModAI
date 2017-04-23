@@ -204,8 +204,6 @@ extern bool KoTHOkNow = false;
 extern bool DestroyTransportPlan = false;  
 extern bool DestroyHTransportPlan = false;
 extern bool DestroyKOTHLandPlan = false;
-extern int gTowerEscrowID=cMilitaryEscrowID;
-mutable void towerInBase( string planName="BUG", bool los = true, int numTowers = 6, int escrowID=-1 ) { }
 //==============================================================================
 int getAreaGroupByArea(int areaID=-1)   //this is such shit, but there is no other possibility
                                         //as far as I can see :-(

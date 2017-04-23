@@ -90,7 +90,7 @@ rule getAuroraBorealis
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeValkyrie, cUnitStateAlive) < 1))
+    if (kbGetAge() < cAge3 && goldSupply < 650)
 	return;
     if (kbGetTechStatus(cTechAuroraBorealis) == cTechStatusAvailable)
     {
@@ -149,7 +149,7 @@ rule getElhrimnirKettle
         return;
     float foodSupply = kbResourceGet(cResourceFood);
 
-    if ((kbGetAge() < cAge3 && foodSupply < 1000) || (kbUnitCount(cMyID, cUnitTypeEinheriar, cUnitStateAlive) < 1))
+    if (kbGetAge() < cAge3 && foodSupply < 1000)
 	return;
     if (kbGetTechStatus(cTechEldhrimnirKettle) == cTechStatusAvailable)
     {
@@ -202,7 +202,7 @@ rule getHamarrtroll
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
-    if ((kbGetAge() < cAge3 && woodSupply < 650) || (kbUnitCount(cMyID, cUnitTypeTroll, cUnitStateAlive) < 1))
+    if (kbGetAge() < cAge3 && woodSupply < 650)
 	return;
     if (kbGetTechStatus(cTechHamarrtroll) == cTechStatusAvailable)
     {
@@ -230,7 +230,7 @@ rule getWrathOfTheDeep
         return;
     }
 	
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeKraken, cUnitStateAlive) < 1))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechWrathOfTheDeep) == cTechStatusAvailable)
     {
@@ -252,7 +252,7 @@ rule getRime
     minInterval 60 //starts in cAge3
     group Skadi
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeFrostGiant, cUnitStateAlive) < 1))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechRime) == cTechStatusAvailable)
     {
@@ -344,23 +344,6 @@ rule getDwarvenAuger
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting DwarvenAuger");
-    }
-}
-//==============================================================================
-rule getSonsOfSleipnir
-    inactive
-    minInterval 60 //starts in cAge4
-    group Baldr
-{
-    if (kbGetTechStatus(cTechSonsofSleipnir) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("SonsOfSleipnir", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechSonsofSleipnir);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting SonsOfSleipnir");
     }
 }
 

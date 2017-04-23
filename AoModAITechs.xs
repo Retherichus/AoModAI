@@ -133,7 +133,7 @@ rule getArchitects
     if (ruleStartTime == -1)
         ruleStartTime = xsGetTime();
         
-    if ((gBuildTowers == true) && ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) || (xsGetTime() - ruleStartTime < 15*60*1000)))
+    if ((gBuildTowers == true) && ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) || (xsGetTime() - ruleStartTime < 2*60*1000)))
         return;
     
     if (kbGetAge() == cAge3)
@@ -1398,14 +1398,7 @@ rule getHeroicFleet
     }
     
     if (ShowAiEcho == true) aiEcho("getHeroicFleet:");
-    
-//test    
-    if (cMyCulture == cCultureAtlantean)
-    {
-        xsDisableSelf();
-        return;
-    }
-//test end      
+        
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
         return;

@@ -92,7 +92,7 @@ extern int gDefendPlanID = -1;      // Uses military units to defend main base w
 extern int gWonderDefendPlan = -1;     // Uber-plan to defend my wonder
 extern int gEnemyWonderDefendPlan = -1;   // Uber-uber-plan to attack or defend other wonder
 extern int gObeliskClearingPlanID = -1;   // Small attack plan used to remove enemy obelisks
-//extern int gTargetNavySize = 0;     // Set periodically based on difficulty, enemy navy/fish boat count. Units, not pop slots.
+extern int gTargetNavySize = 0;     // Set periodically based on difficulty, enemy navy/fish boat count. Units, not pop slots.
 
 //==============================================================================
 //Minor Gods.
@@ -556,16 +556,6 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
     
     if (kbGetAge() == cAge2)
     {
-        if ((kbGetTechStatus(cTechHuntingDogs) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechHuntingDogs, true) >= 0))
-        {
-            if ((woodSupply > 100) && (goldSupply > 100))
-            {
-                kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
-                kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                if (ShowAiEcho == true) aiEcho("Flushing military wood and gold escrow");
-            }
-        }
-        
         if ((kbGetTechStatus(cTechPlow) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechPlow, true) >= 0))
         {
             if ((woodSupply > 50) && (goldSupply > 100))
@@ -594,7 +584,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         
         if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < gEarlySettlementTarget))
         {
-            if ((woodSupply > 350) && (goldSupply > 350) && (foodSupply < 560))
+            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) && (foodSupply < 560) || (cMyCulture == cCultureEgyptian) && (goldSupply > 350) && (foodSupply < 560))
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
@@ -643,9 +633,9 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             }
         }
         
-        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 3))
+        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 4))
         {
-            if ((woodSupply > 350) && (goldSupply > 350) && (foodSupply < 700) && (goldSupply < 700))
+            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) && (foodSupply > 200) || (cMyCulture == cCultureEgyptian) && (goldSupply > 360) && (foodSupply > 250))
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
@@ -694,7 +684,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         
         if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0))
         {
-            if ((woodSupply > 350) && (goldSupply > 350))
+            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) || (cMyCulture == cCultureEgyptian) && (goldSupply > 360) && (foodSupply > 250))
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
@@ -703,7 +693,30 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
         }
-    }
+   /*
+   // No idea what it really does.. but I am assuming anything in Root escrow is free for all.
+   if (foodSupply > 1200)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceFood, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceFood, true);
+   }
+   if (woodSupply > 1000)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
+   }
+   if (goldSupply > 1200)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
+   }
+   if (favorSupply > 80)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceFavor, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceFavor, true);
+   }
+	*/	
+  }
 }
 
 //==============================================================================
@@ -854,16 +867,17 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
             vilPop = lightningLimit;
     }
 
-	if (cMyCulture == cCultureAtlantean) // To make sure caravans don't steal all pop slots etc.
+	if ((cMyCulture == cCultureAtlantean) && (aiGetWorldDifficulty() > cDifficultyEasy)) // To make sure caravans don't steal all pop slots etc.
 	{	
 		if (vilPop >= 25)
         vilPop = 25;
 		
-		if (vilPop < 5)
-        vilPop = 6;
+		if (vilPop < 12)
+        vilPop = 12;
 	}	
     //Update the number of vils to maintain.
     aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0, vilPop);
+	//aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanBuildFromType, 0, cUnitTypeAbstractSettlement);   // Abstract fixes Citadel problem
 }
 
 //==============================================================================
@@ -877,14 +891,14 @@ rule updateEMAge1       // i.e. cAge1
    {
       if (aiGetWorldDifficulty() == cDifficultyEasy)
       {
-         civPopTarget = 25;
+         civPopTarget = 21;
          milPopTarget = 10;
          if (cMyCulture == cCultureAtlantean)
             civPopTarget = 27;   // Make up for oracles
       }
       else if (aiGetWorldDifficulty() == cDifficultyModerate)
       {
-         civPopTarget = 18;
+         civPopTarget = 21;
          milPopTarget = 30;
       }
       else if (aiGetWorldDifficulty() == cDifficultyHard)
@@ -934,7 +948,7 @@ rule updateEMAge2
             civPopTarget = 35;                                                // reserve pop slots for mil use.
         milPopTarget = getSoftPopCap() - civPopTarget;
 		
-		if (gAgeFaster == true && aiGetWorldDifficulty() == cDifficultyHard)
+		if ((gAgeFaster == true) && (gAgeReduceMil == true) && (aiGetWorldDifficulty() ==  cDifficultyHard))
 		      {
 			  if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
 			 milPopTarget = eMaxMilPop;
@@ -942,11 +956,11 @@ rule updateEMAge2
     }
     else
     {
-        civPopTarget = 60 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush;
+        civPopTarget = 45 - (cvRushBoomSlider*5.99); // +/- 5, smaller in rush;
         if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
             civPopTarget = 35;  
         milPopTarget = getSoftPopCap() - civPopTarget;
-        if (gAgeFaster == true && gAgeReduceMil == true && aiGetWorldDifficulty() == cDifficultyNightmare)
+        if ((gAgeFaster == true) && (gAgeReduceMil == true) && (aiGetWorldDifficulty() == cDifficultyNightmare))
 		{
 	    if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
 	    milPopTarget = eMaxMilPop;
@@ -1000,11 +1014,11 @@ rule updateEMAge3
     }
     else
     {
-      civPopTarget = 60 - (cvRushBoomSlider*5.99);    // +/- 5
+      civPopTarget = 45 - (cvRushBoomSlider*5.99);    // +/- 5
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
          civPopTarget = 35;        milPopTarget = getSoftPopCap() - civPopTarget;
       
-	  if (gAgeFaster == true && gAgeReduceMil == true && aiGetWorldDifficulty() == cDifficultyNightmare)
+	  if ((gAgeFaster == true) && (gAgeReduceMil == true) && (aiGetWorldDifficulty() == cDifficultyNightmare))
 	  {
 	  if (ShowAiEcho == true) aiEcho("I'll try to advance a little faster, at the cost of lower a military count.");
 	  milPopTarget = eHMaxMilPop;
@@ -1061,7 +1075,7 @@ rule updateEMAge4
     }
     else if (aiGetWorldDifficulty() == cDifficultyHard)
     {
-      civPopTarget = 60;      // 55 of first 115
+      civPopTarget = 58;      // 55 of first 115
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
@@ -1085,7 +1099,7 @@ rule updateEMAge4
          civPopTarget = 35;
         milPopTarget = getSoftPopCap() - civPopTarget;
         kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
-        kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.95);
+        kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);
        
 
    }
@@ -1492,13 +1506,20 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     if (woodSupply > goldSupply+3500)
         neededWoodGatherers = neededWoodGatherers / 2;
     
+	int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy);
+    int numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
+	int WoodCombined = numberMainBaseSites + numberWoodBaseSites;
+	
+	if (WoodCombined < 1)
+	neededWoodGatherers = 0;
+    
     bool foodOverride = false;
     float neededFoodGatherers = desiredFoodUnits - numFishBoats;
     if ((desiredFoodUnits > 0) && (kbGetAge() > cAge1))
     {
-        float minFoodGatherers = 7;
+        float minFoodGatherers = 12;
         if (cMyCulture == cCultureAtlantean)
-            minFoodGatherers = 3;
+            minFoodGatherers = 4;
         if ((numFishBoats < 4) && (kbGetAge() > cAge2) || (numGoldSites < 1))
         {
             foodOverride = true;
@@ -1582,18 +1603,15 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         else if (foodAssignment < lastFoodAssignment)
         {
             foodAssignment = lastFoodAssignment - 0.03;
-            if ((foodAssignment < 0.25) && (kbGetAge() < 4))
+			if (foodAssignment < 0.25)
                 foodAssignment = 0.25;
-			if ((foodAssignment < 0.30) && (kbGetAge() > 3))
-                foodAssignment = 0.30;
         }
     }
 	        // Some overrides
-            if ((woodAssignment < 0.20) && (kbGetAge() < 3) && (cMyCulture != cCultureEgyptian) && (cMyCulture != cCultureAtlantean) && (xsGetTime() < 15*60*1000))
-                woodAssignment = 0.20;	
-		    if ((goldAssignment < 0.20) && (cMyCulture == cCultureEgyptian) && (kbGetAge() < 2))
-                goldAssignment = 0.20;
-		    
+            if ((woodAssignment < 0.25) && (kbGetAge() < cAge3) && (cMyCulture != cCultureEgyptian) && (cMyCulture != cCultureAtlantean) && (xsGetTime() < 15*60*1000))
+                woodAssignment = 0.25;	
+		    if ((goldAssignment < 0.25) && (cMyCulture == cCultureEgyptian) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000))
+                goldAssignment = 0.25;
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 14;
@@ -1661,7 +1679,9 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood, aiGetResourceGathererPercentage(cResourceFood, cRGPScript));
     aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFavor, aiGetResourceGathererPercentage(cResourceFavor, cRGPScript));
 
-if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
+     if (ShowAiEcoEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
+     if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+
 }
 
 //==============================================================================
@@ -2070,9 +2090,21 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     {
         if (woodSupply < 300)
             gWoodForecast = gWoodForecast + (300 - woodSupply);
+	   // Ships
+      int temps = 0;   
+      int myShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+      temps = gTargetNavySize - myShips;   // How many yet to train
+      if (temps < 0)
+         temps = 0;
+      if (temps > 0)
+      {
+      gWoodForecast = gWoodForecast + 100*temps;
+      gGoldForecast = gGoldForecast + 50*temps;
+      }		
     }
     
 	//setMilitaryUnitCostForecast();  // add units before scaling down
+	
 
     if (woodSupply > 1100)
         gWoodForecast = gWoodForecast * 0.5;
@@ -2334,7 +2366,19 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     {
         if (woodSupply < 300)
             gWoodForecast = gWoodForecast + (300 - woodSupply);
-    }    
+	   // Ships
+      int temps = 0;   
+      int myShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
+      temps = gTargetNavySize - myShips;   // How many yet to train
+      if (temps < 0)
+         temps = 0;
+      if (temps > 0)
+      {
+      gWoodForecast = gWoodForecast + 100*temps;
+      gGoldForecast = gGoldForecast + 50*temps;
+      }		
+    }
+	
     if ((gWoodForecast > 800) && ((xsGetTime() > (15*60*1000))))
 	gWoodForecast = 800;
 	
@@ -3899,17 +3943,15 @@ void init(void)
     if (rushSize > 50)
         rushSize = 50;
 
-    if ((rushCount > 0) && (rushSize < 20))
-        rushSize = 20;    // anything less isn't worth sending
+    if ((rushCount > 0) && (rushSize < 24))
+        rushSize = 24;    // anything less isn't worth sending
 
     if (rushSize < 10)
         rushSize = 10;  // Give unitpicker something to do...
 
 
-	    if (gTransportMap == true)
-            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2+aiRandInt(2), true); // Rush with rushSize pop slots of two types, 3 buildings, do guess enemy unit type
-	    else
-            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2, true); // Rush with rushSize pop slots of two types, 2 buildings, do guess enemy unit type
+    gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2+aiRandInt(2), true); // Rush with rushSize pop slots of two types, 2+rand buildings, do guess enemy unit type
+
 
     if (ShowAiEcho == true) aiEcho("Setting rush unit picker for "+rushCount+" rushes with "+rushSize+" pop slots used.");
 
@@ -3974,7 +4016,7 @@ void init(void)
 		
 		if (cMyCulture == cCultureGreek)
         {
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 0.5);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 0.6);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHoplite, 0.3);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.2);
 		 if (cMyCiv == cCivPoseidon)
@@ -3987,7 +4029,7 @@ void init(void)
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSlinger, 0.3);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSpearman, 0.4);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeAxeman, 0.3);
-		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypePriest, 0.1);
+		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypePriest, 0.0); // no, the maintain plan should be plenty.
         }
         if (cMyCulture == cCultureNorse)
         {
@@ -3999,14 +4041,14 @@ void init(void)
         }
         if (cMyCulture == cCultureAtlantean)
         {
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeJavelinCavalry, 0.5);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeJavelinCavalry, 0.6);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSwordsman, 0.3);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMaceman, 0.2);
         }
         if (cMyCulture == cCultureChinese)
         {
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeChuKoNu, 0.6);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.3);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.5);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHalberdier, 0.4);
         }		
 		
@@ -4075,10 +4117,10 @@ void init(void)
         
         if ( aiGetGameMode() != cGameModeDeathmatch )
         {
-            if ((gBuildWallsAtMainBase == false) || (gTransportMap == true))
+            if (gTransportMap == true)
                 gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
             else
-                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
+                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings+1, true);    // Min: 40-59, max 70 pop slots
         }
         else  // Double buildings in DM
             gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, 2*gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
@@ -4149,7 +4191,9 @@ void init(void)
         //Standard RB setup.
         aiPlanSetNumberVariableValues(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, 5, true);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHunt, 0);
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 1);
+		if (cMyCulture == cCultureAtlantean)
+        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 0);
+		else aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 1);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHuntAggressive, 0);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeFarm, 0);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeFish, 0);
@@ -4182,7 +4226,9 @@ void init(void)
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFood, 1.5);
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFavor, 10.0);
         //Set our farm limits.
-		aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 14);  //  Up from 4
+		if (cMyCulture == cCultureAtlantean)
+		aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 12);  //  Up from 4
+		else aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 20);  //  Up from 4
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanMaxFarmLimit, 0, 40);     //  Up from 24
         aiSetFarmLimit(aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0));
         //Do our late econ init.
@@ -4418,7 +4464,7 @@ void age2Handler(int age=1)
     if ((gTransportMap == true) && (gMaintainWaterXPortPlanID < 0) || (cvRandomMapName == "king of the hill"))
     {
         gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 2, false, -1);
-        aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 95);
+        //aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 50);
     }
 
     //Init our myth unit rule.
@@ -5627,7 +5673,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
         if (gMaintainWaterXPortPlanID < 0 && gTransportMap == true) 
 	    {
         gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 1, false, -1);
-        aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 55);
+        //aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 55);
         }
 
 

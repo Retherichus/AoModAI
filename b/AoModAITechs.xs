@@ -3740,6 +3740,11 @@ rule getSecretsOfTheTitan
 {
 
     if (ShowAiEcho == true) aiEcho("getSecretsOfTheTitan:");
+    if (TitanAvailable == false)
+    {
+        xsDisableSelf();
+        return;
+    }	
     
     if ((gAge4MinorGod == cTechAge4Hephaestus) && (kbGetTechStatus(cTechForgeofOlympus) < cTechStatusResearching))
         return;

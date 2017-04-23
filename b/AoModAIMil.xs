@@ -1216,7 +1216,7 @@ rule defendPlanRule
     {
         defendCount = defendCount + 1;
    
-        aiPlanSetVariableInt(defPlanID, cDefendPlanRefreshFrequency, 0, 15);
+        aiPlanSetVariableInt(defPlanID, cDefendPlanRefreshFrequency, 0, 10);
 				if (gTransportMap == true)
         baseToUse = mainBaseID;
         aiPlanSetVariableVector(defPlanID, cDefendPlanDefendPoint, 0, kbBaseGetLocation(cMyID, baseToUse));
@@ -2121,18 +2121,47 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
 
 //==============================================================================
 rule attackEnemySettlement
-    minInterval 22 //starts in cAge2
+    minInterval 18 //starts in cAge2
     inactive
 {
 
     if (ShowAiEcho == true) aiEcho("attackEnemySettlement:");
-    
+    xsSetRuleMinIntervalSelf(18+aiRandInt(12));
     int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
     int numMilUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive);
     int numSiegeWeapons = kbUnitCount(cMyID, cUnitTypeAbstractSiegeWeapon, cUnitStateAlive);
     int numRagnorokHeroes = kbUnitCount(cMyID, cUnitTypeHeroRagnorok, cUnitStateAlive);
     int numTitans = kbUnitCount(cMyID, cUnitTypeAbstractTitan, cUnitStateAlive);
     static bool ResetOk = false;
+	
+	int SiegeMU = 0;
+	int SiegeMU2 = 0;
+	if (cMyCulture == cCultureGreek)
+	SiegeMU = cUnitTypeColossus;
+	
+	if (cMyCulture == cCultureEgyptian)
+	{
+	SiegeMU = cUnitTypeScarab;
+	SiegeMU2 = cUnitTypeSphinx;
+	}
+	
+	if (cMyCulture == cCultureNorse)
+	SiegeMU = cUnitTypeMountainGiant;
+	
+	if (cMyCulture == cCultureAtlantean)
+	SiegeMU = cUnitTypeBehemoth;
+	
+	if (cMyCulture == cCultureChinese)
+	{
+	SiegeMU = cUnitTypeVermilionBird;
+	SiegeMU2 = cUnitTypeWarSalamander;  // No bonus, but the breath still hurts?
+	}
+	
+	int sMUCombined = ((kbUnitCount(cMyID, SiegeMU, cUnitStateAlive)) + (kbUnitCount(cMyID, SiegeMU2, cUnitStateAlive)));
+	if (sMUCombined < 0)
+	sMUCombined = 0;
+	
+	numSiegeWeapons = numSiegeWeapons + (sMUCombined);
 	
     int numMythUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeMythUnitNotTitan, cUnitStateAlive);
     int numNonMilitaryMythUnits = kbUnitCount(cMyID, cUnitTypePegasus, cUnitStateAlive);
@@ -2340,7 +2369,7 @@ rule attackEnemySettlement
 				{
 				attackPlanStartTime = xsGetTime();
 				aiPlanSetVariableVector(attackPlanID, cAttackPlanGatherPoint, 0, gEnemySettlementAttPlanLastAttPoint);
-				aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
+				aiPlanSetUnitStance(attackPlanID, cUnitStanceAggressive);
 				ResetOk = false;
 				}
 				
@@ -2847,6 +2876,24 @@ rule attackEnemySettlement
     attackPlanStartTime = xsGetTime();
 	ResetOk = true;
     if (ShowAiEcho == true) aiEcho("attackPlanStartTime: "+attackPlanStartTime);
+	bool Announce = false;
+	
+	if ((aiRandInt(3) == 0) && (IhaveAllies == true) && (aiGetCaptainPlayerID(cMyID) == cMyID) && (targetSettlementID > 0))
+	Announce = true;
+	
+	if (Announce == true)
+	{
+	int RandMessage = 1+aiRandInt(4);
+	if (RandMessage == 3)
+	RandMessage = 2;
+	for (i=1; < cNumberPlayers)
+   {
+      if (i == cMyID)
+         continue;
+    if ((kbIsPlayerAlly(i) == true) && (kbIsPlayerHuman(i) == true) && (kbHasPlayerLost(i) == false))
+	aiCommsSendStatementWithVector(i, cAICommPromptAIAttackHere, RandMessage, targetSettlementPos);
+	}
+	}
 }
 
 //==============================================================================
@@ -3952,14 +3999,14 @@ rule randomAttackGenerator
 
 //==============================================================================
 rule createLandAttack
-    minInterval 31 //starts in cAge2
+    minInterval 29 //starts in cAge2
     inactive
 {
 	
-	xsSetRuleMinIntervalSelf(37);
+	xsSetRuleMinIntervalSelf(29+aiRandInt(12));
     if (ShowAiEcho == true) aiEcho("createLandAttack:");
     if ((mRusher == true) && (kbGetAge() < cAge3))
-	xsSetRuleMinIntervalSelf(15);
+	xsSetRuleMinIntervalSelf(12);
 	
     int numTitans = kbUnitCount(cMyID, cUnitTypeAbstractTitan, cUnitStateAlive);
     int numRagnorokHeroes = kbUnitCount(cMyID, cUnitTypeHeroRagnorok, cUnitStateAlive);

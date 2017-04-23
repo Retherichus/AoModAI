@@ -498,17 +498,17 @@ rule updateFoodBreakdown
 		}
 		if (HippoNearMB > 1)
 		HippoFound = true;
-		if ((HippoFound == true) && (cMyCulture == cCultureGreek) || (HippoFound == true) && (cMyCulture == cCultureChinese))
-        aiSetAllowAutoDropsites(false);
+		//if ((HippoFound == true) && (cMyCulture == cCultureGreek) || (HippoFound == true) && (cMyCulture == cCultureChinese))
+        //aiSetAllowAutoDropsites(false);
 		HippoDone = true;
         }
 		
-       static bool Done = false;
-       if ((Done == false) && (HippoFound == true) && (xsGetTime() > 28*1*1000) && (cMyCulture == cCultureGreek) || (Done == false) && (HippoFound == true) && (xsGetTime() > 14*1*1000) && (cMyCulture == cCultureChinese))
-       {
-	   aiSetAllowAutoDropsites(true);
-	   Done = true;
-       }		
+       //static bool Done = false;
+       //if ((Done == false) && (HippoFound == true) && (xsGetTime() > 28*1*1000) && (cMyCulture == cCultureGreek) || (Done == false) && (HippoFound == true) && (xsGetTime() > 14*1*1000) && (cMyCulture == cCultureChinese))
+      // {
+	  // aiSetAllowAutoDropsites(true);
+	  // Done = true;
+      // }		
 	
 	if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.
         numberAggressiveResourceSpots = 0;  // Never get enough vills to go hunting.
@@ -800,7 +800,7 @@ rule updateFoodBreakdown
                 }
                 else
                 {
-                    farmerPreBuild = 4;
+                    farmerPreBuild = 2;
                 }
             }
 
@@ -815,7 +815,7 @@ rule updateFoodBreakdown
                     static bool extraFarms = false;
                     if (extraFarms == false)
                     {
-                        xsEnableRule("buildExtraFarms");
+                        //xsEnableRule("buildExtraFarms");
                         extraFarms = true;
                     }
                 }
@@ -1037,7 +1037,11 @@ rule updateFoodBreakdown
 				//IncreasePlans = true;
 				
 				//if (IncreasePlans == true)
+				if (aiGetWorldDifficulty() == cDifficultyNightmare)
+			    numFarmPlansWanted = numFarmPlansWanted + 1;
+				else if (aiGetWorldDifficulty() == cDifficultyHard)
 			    numFarmPlansWanted = numFarmPlansWanted + 2;
+				else numFarmPlansWanted = numFarmPlansWanted + 1;
 				//else numFarmPlansWanted = numFarmPlansWanted + 1;
             }                
         }
@@ -2078,6 +2082,7 @@ rule randomUpgrader
     minInterval 61 //starts in cAge5
     inactive
 {
+
     if (ShowAiEcho == true) aiEcho("randomUpgrader:");
 
     if (kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusObtainable && kbGetTechStatus(cTechSecretsoftheTitans) <= cTechStatusResearching)

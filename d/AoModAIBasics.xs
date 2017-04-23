@@ -204,8 +204,6 @@ extern bool KoTHOkNow = false;
 extern bool DestroyTransportPlan = false;  
 extern bool DestroyHTransportPlan = false;
 extern bool DestroyKOTHLandPlan = false;
-extern int gTowerEscrowID=cMilitaryEscrowID;
-mutable void towerInBase( string planName="BUG", bool los = true, int numTowers = 6, int escrowID=-1 ) { }
 //==============================================================================
 int getAreaGroupByArea(int areaID=-1)   //this is such shit, but there is no other possibility
                                         //as far as I can see :-(
@@ -964,8 +962,9 @@ int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
     else
         aiPlanSetVariableBool(goalID, cGoalPlanAutoUpdateBase, 0, true);
     //Attack.
-    aiPlanSetAttack(goalID, true);
-    aiPlanSetVariableInt(goalID, cGoalPlanGoalType, 0, cGoalPlanGoalTypeAttack);
+	aiPlanSetAttack(goalID, true);
+	aiPlanSetVariableInt(goalID, cGoalPlanGoalType, 0, cGoalPlanGoalTypeAttack);
+	aiPlanSetVariableInt(goalID, cGoalPlanAttackStartFrequency, 0, 5);
     //Military.
     aiPlanSetMilitary(goalID, true);
     aiPlanSetEscrowID(goalID, cMilitaryEscrowID);
@@ -1641,6 +1640,7 @@ bool createSimpleBuildPlan(int puid=-1, int number=1, int pri=100,
         aiPlanAddUnitType(planID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), numberBuilders, numberBuilders, numberBuilders);
         //Base ID.
         aiPlanSetBaseID(planID, baseID);
+		aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 4.0);
         //Go.
         aiPlanSetActive(planID);
     }

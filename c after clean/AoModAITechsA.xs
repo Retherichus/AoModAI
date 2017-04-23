@@ -109,7 +109,7 @@ rule getHephaestusRevenge
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeAutomaton, cUnitStateAlive) < 1))
+    if (kbGetAge() < cAge3 && goldSupply < 650)
 	return;
     if (kbGetTechStatus(cTechHephaestusRevenge) == cTechStatusAvailable)
     {
@@ -193,7 +193,7 @@ rule getAlluvialClay
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if ((kbGetAge() < cAge3 && goldSupply < 750) || (kbUnitCount(cMyID, cUnitTypePromethean, cUnitStateAlive) < 1))
+    if (kbGetAge() < cAge3 && goldSupply < 750)
 	return;
     if (kbGetTechStatus(cTechAlluvialClay) == cTechStatusAvailable)
     {
@@ -330,7 +330,7 @@ rule getGemino
     minInterval 29
     group Hyperion
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSatyr, cUnitStateAlive) < 1))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechGemino) == cTechStatusAvailable)
     {

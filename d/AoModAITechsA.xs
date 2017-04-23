@@ -109,7 +109,7 @@ rule getHephaestusRevenge
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if (kbGetAge() < cAge3 && goldSupply < 650)
+    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeAutomaton, cUnitStateAlive) < 1))
 	return;
     if (kbGetTechStatus(cTechHephaestusRevenge) == cTechStatusAvailable)
     {
@@ -136,7 +136,7 @@ rule getVolcanicForge
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
 
-    if (kbGetAge() < cAge3 && goldSupply < 650 && foodSupply < 900)
+    if (kbGetAge() < cAge2 && goldSupply < 650 && foodSupply < 900)
 	return;
 	
     if (kbGetTechStatus(cTechVolcanicForge) == cTechStatusAvailable)
@@ -152,56 +152,7 @@ rule getVolcanicForge
 }
 
 //Oceanus
-//==============================================================================
-// RULE: getBiteOfTheShark
-//==============================================================================
-rule getBiteOfTheShark
-    inactive
-    minInterval 27
-    group Oceanus
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float foodSupply = kbResourceGet(cResourceFood);
 
-    if (kbGetAge() < cAge3 && foodSupply < 1000)
-	return;
-    if (kbGetTechStatus(cTechBiteoftheShark) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("BiteOfTheShark", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechBiteoftheShark);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting BiteOfTheShark");
-    }
-}
-
-//==============================================================================
-// RULE: getWeightlessMace
-//==============================================================================
-rule getWeightlessMace
-    inactive
-    minInterval 29
-    group Oceanus
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float foodSupply = kbResourceGet(cResourceFood);
-    if (kbGetAge() < cAge3 && foodSupply < 1000)
-	return;
-    if (kbGetTechStatus(cTechWeightlessMace) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("WeightlessMace", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechWeightlessMace);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting WeightlessMace");
-    }
-}
 
 //Prometheus
 //==============================================================================
@@ -242,7 +193,7 @@ rule getAlluvialClay
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if (kbGetAge() < cAge3 && goldSupply < 750)
+    if ((kbGetAge() < cAge3 && goldSupply < 750) || (kbUnitCount(cMyID, cUnitTypePromethean, cUnitStateAlive) < 1))
 	return;
     if (kbGetTechStatus(cTechAlluvialClay) == cTechStatusAvailable)
     {
@@ -259,28 +210,6 @@ rule getAlluvialClay
 
 //age3
 //Rheia
-//==============================================================================
-// RULE: getMailOfOrichalkos
-//==============================================================================
-rule getMailOfOrichalkos
-    inactive
-    minInterval 27
-    group Rheia
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechMailofOrichalkos) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("MailOfOrichalkos", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechMailofOrichalkos);
-        aiPlanSetDesiredPriority(x, 25);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting MailOfOrichalkos");
-    }
-}
-
 //==============================================================================
 // RULE: getHornsOfConsecration
 //==============================================================================
@@ -348,29 +277,6 @@ rule getLemurianDescendants
         if (ShowAiEcho == true) aiEcho("Getting LemurianDescendants");
     }
 }
-
-//==============================================================================
-// RULE: getPoseidonsSecret
-//==============================================================================
-rule getPoseidonsSecret
-    inactive
-    minInterval 29
-    group Theia
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechPoseidonsSecret) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("PoseidonsSecret", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechPoseidonsSecret);
-        aiPlanSetDesiredPriority(x, 15);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting PoseidonsSecret");
-    }
-}
-
 //==============================================================================
 // RULE: getLanceOfStone
 //==============================================================================
@@ -424,7 +330,7 @@ rule getGemino
     minInterval 29
     group Hyperion
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSatyr, cUnitStateAlive) < 1))
         return;
     if (kbGetTechStatus(cTechGemino) == cTechStatusAvailable)
     {
@@ -565,26 +471,6 @@ rule getAsperBlood
 
 
 //Helios
-//==============================================================================
-// RULE: getHaloOfTheSun
-//==============================================================================
-rule getHaloOfTheSun
-    inactive
-    minInterval 27
-    group Helios
-{
-    if (kbGetTechStatus(cTechHalooftheSun) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("HaloOfTheSun", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechHalooftheSun);
-        aiPlanSetDesiredPriority(x, 15);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting HaloOfTheSun");
-    }
-}
-
 //==============================================================================
 // RULE: getPetrified
 //==============================================================================

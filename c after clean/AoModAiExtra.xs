@@ -568,7 +568,7 @@ rule ActivateRethOverridesAge3
 }
 
 rule ActivateRethOverridesAge4
-   minInterval 30
+   minInterval 15
    active
 {
     if (kbGetAge() > cAge3)
@@ -621,6 +621,14 @@ rule ActivateRethOverridesAge4
 	    }		
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge2Bast) == cTechStatusActive) // Sphinx maintain, because they're just that good.
 		createSimpleMaintainPlan(cUnitTypeSphinx, 2, false, kbBaseGetMainID(cMyID));
+		
+		if (cMyCulture == cCultureChinese)
+		{
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeScoutChinese, 0.1);
+		if (cMyCiv == cCivShennong)
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLanceShennong, 0.6);
+		else kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLance, 0.5);
+		}
 		
 		xsDisableSelf();
            

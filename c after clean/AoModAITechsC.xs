@@ -119,7 +119,7 @@ rule getGoldenBandedStaff
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
-    if ((kbGetAge() < cAge3 && woodSupply < 650) || (kbUnitCount(cMyID, cUnitTypeMonkeyKing, cUnitStateAlive) < 1))
+    if (kbGetAge() < cAge3 && woodSupply < 650)
 	return;
     if (kbGetTechStatus(cTechGoldenBandedStaff) == cTechStatusAvailable)
     {
@@ -150,7 +150,7 @@ rule getStoneArmor
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
-    if ((kbGetAge() < cAge3 && woodSupply < 650) || (kbUnitCount(cMyID, cUnitTypeTerracottaSoldier, cUnitStateAlive) < 1))
+    if (kbGetAge() < cAge3 && woodSupply < 650)
 	return;
     if (kbGetTechStatus(cTechStoneArmor) == cTechStatusAvailable)
     {
@@ -275,7 +275,7 @@ rule getLifeDrain
     group Zhongkui
 {
     float goldSupply = kbResourceGet(cResourceGold);
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (goldSupply < 1000) || (kbUnitCount(cMyID, cUnitTypeJiangshi, cUnitStateAlive) < 1))
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (goldSupply < 1000))
         return;
     if (kbGetTechStatus(cTechLifeDrain) == cTechStatusAvailable)
     {

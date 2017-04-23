@@ -377,7 +377,7 @@ rule trainMythUnit
 
     if ((numMilitaryMythUnits > 0) || (favorSupply < 40))
     {
-        if ((kbGetTechStatus(cTechSecretsoftheTitans) >= cTechStatusResearching) && (favorSupply < 35))
+        if ((kbGetTechStatus(cTechSecretsoftheTitans) >= cTechStatusResearching) && (favorSupply < 35) || (TitanAvailable == false) && (favorSupply < 35))
         {
             //if (ShowAiEcho == true) aiEcho("trainMythUnit: returning as favor is below 35");
             return;
@@ -394,7 +394,7 @@ rule trainMythUnit
         }
     }
 
-    if (numMilitaryMythUnits > 15)
+    if (numMilitaryMythUnits > 6)
     {
         //if (ShowAiEcho == true) aiEcho("trainMythUnit: returning as numMilitaryMythUnits > 15");
         return;

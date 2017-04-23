@@ -82,7 +82,7 @@ rule getFeetOfTheJackal
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeAnubite, cUnitStateAlive) < 1))
+    if (kbGetAge() < cAge3 && goldSupply < 650)
 	return;
     if (kbGetTechStatus(cTechFeetoftheJackal) == cTechStatusAvailable)
     {
@@ -173,7 +173,7 @@ rule getCriosphinx
     minInterval 31
     group Bast
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 1))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechCriosphinx) == cTechStatusAvailable)
     {
@@ -195,7 +195,7 @@ rule getHieracosphinx
     minInterval 33
     group Bast
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 1))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechHieracosphinx) == cTechStatusAvailable)
     {
@@ -284,7 +284,7 @@ rule getCrocodopolis
     minInterval 31
     group Hathor
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypePetsuchos, cUnitStateAlive) < 1))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechCrocodopolis) == cTechStatusAvailable)
     {
@@ -300,50 +300,6 @@ rule getCrocodopolis
 
 //Sekhmet
 //==============================================================================
-// RULE: getBoneBow
-//==============================================================================
-rule getBoneBow
-    inactive
-    minInterval 27
-    group Sekhmet
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechBoneBow) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("BoneBow", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechBoneBow);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting BoneBow");
-    }
-}
-
-//==============================================================================
-// RULE: getSlingsOfTheSun
-//==============================================================================
-rule getSlingsOfTheSun
-    inactive
-    minInterval 29
-    group Sekhmet
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    if (kbGetTechStatus(cTechSlingsoftheSun) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("SlingsOfTheSun", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechSlingsoftheSun);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting SlingsOfTheSun");
-    }
-}
-
-//==============================================================================
 // RULE: getStonesOfRedLinen
 //==============================================================================
 rule getStonesOfRedLinen
@@ -351,7 +307,7 @@ rule getStonesOfRedLinen
     minInterval 31
     group Sekhmet
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge4))
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     if (kbGetTechStatus(cTechStonesofRedLinen) == cTechStatusAvailable)
     {

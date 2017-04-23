@@ -93,7 +93,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     {
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
-        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 16);
+        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 12);
         aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceGold);
         aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
         return (true);
@@ -1016,7 +1016,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	{
 		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
 		aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
-		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 14);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 12);
 		aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceWood);
 		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
 		return (true);
@@ -1597,7 +1597,7 @@ rule rRagnorokPower
 
 //==============================================================================
 rule castHeavyGP
-    minInterval 13  //starts in cAge4
+    minInterval 12  //starts in cAge4
     inactive
 {
     if (ShowAiEcho == true) aiEcho("castHeavyGP:");
@@ -1607,19 +1607,16 @@ rule castHeavyGP
         if (ShowAiEcho == true) aiEcho("gEnemySettlementAttPlanID < 0, returning");
         return;
     }
-    
+    static int CastAttempt=0; 
     //get the targetPlayerID, the targetID, its unitType, its health and its position
     int targetPlayerID = aiPlanGetVariableInt(gEnemySettlementAttPlanID, cAttackPlanPlayerID, 0);
     if (ShowAiEcho == true) aiEcho("targetPlayerID: "+targetPlayerID);
     int targetID = aiPlanGetVariableInt(gEnemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0);
     if (ShowAiEcho == true) aiEcho("targetID: "+targetID);
     if (targetID < 0)
-    {
-        if (ShowAiEcho == true) aiEcho("targetID < 0, returning");
-        return;
-    }
+    targetID = getMainBaseUnitIDForPlayer(targetPlayerID);
     
-    if (kbUnitIsType(targetID, cUnitTypeAbstractSettlement) == false)
+    if ((kbUnitIsType(targetID, cUnitTypeAbstractSettlement) == false) ||(targetID < 0))
     {
         if (ShowAiEcho == true) aiEcho("target is no cUnitTypeAbstractSettlement, returning");
         return;
@@ -1652,8 +1649,8 @@ rule castHeavyGP
     }
     
     //count the number of enemy buildings in range
-    int numMilBuildingsInR30 = getNumUnitsByRel(cUnitTypeMilitaryBuilding, cUnitStateAlive, -1, cPlayerRelationEnemy, targetPosition, 30.0);
-    if (ShowAiEcho == true) aiEcho("numMilBuildingsInR30: "+numMilBuildingsInR30);
+    int numMilBuildingsInR50 = getNumUnitsByRel(cUnitTypeMilitaryBuilding, cUnitStateAlive, -1, cPlayerRelationEnemy, targetPosition, 50.0);
+    if (ShowAiEcho == true) aiEcho("numMilBuildingsInR50: "+numMilBuildingsInR50);
    
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
@@ -1662,23 +1659,23 @@ rule castHeavyGP
     
     if (distanceToMainBase > 110.0)
     {
-        if (numMilBuildingsInR30 <= 2)
+        if (numMilBuildingsInR50 <= 2)
         {
             if (ShowAiEcho == true) aiEcho("there are just a few military buildings, returning");
             return;
         }
    
         //count the units in range
-        int myMilUnitsInR40 = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, targetPosition, 40.0);
-        int alliedMilUnitsInR40 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, targetPosition, 40.0, true);
-        int enemyMilUnitsInR30 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, targetPosition, 30.0, true);
+		int myMilUnitsInR40 = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, targetPosition, 30.0);
+		int enemyVilUnitsInR50 = getNumUnitsByRel(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cPlayerRelationEnemy, targetPosition, 50.0, true);
+        int enemyMilUnitsInR50 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, targetPosition, 50.0, true);
+		int Combined = enemyVilUnitsInR50 + enemyMilUnitsInR50;
         if (ShowAiEcho == true) aiEcho("myMilUnitsInR40: "+myMilUnitsInR40);
-        if (ShowAiEcho == true) aiEcho("alliedMilUnitsInR40: "+alliedMilUnitsInR40);
-        if (ShowAiEcho == true) aiEcho("enemyMilUnitsInR30: "+enemyMilUnitsInR30);
+        if (ShowAiEcho == true) aiEcho("enemyMilUnitsInR30: "+enemyMilUnitsInR50);
   
-        if (myMilUnitsInR40 + alliedMilUnitsInR40 + 5 <= enemyMilUnitsInR30)
+        if  (Combined < 10)
         {
-            if (ShowAiEcho == true) aiEcho("there are too many enemies, returning");
+            if (ShowAiEcho == true) aiEcho("there are too few enemies, returning");
             return;
         }
         
@@ -1690,6 +1687,8 @@ rule castHeavyGP
     {
         if (ShowAiEcho == true) aiEcho("Casting heavyGP: "+gHeavyGPTechID+" at position: "+targetPosition);
         aiPlanDestroy(gHeavyGPPlanID);
+	    CastAttempt = CastAttempt+1;
+	    if (CastAttempt > 3)		
         xsDisableSelf();
     }
     else
@@ -2330,9 +2329,9 @@ rule rCastHeavyGP
 			{
       		if(aiCastGodPowerAtPosition(gHeavyGPTech,loc) == true)
    			{
-   				kbUnitQueryDestroy(settleQuery);
-   				kbUnitQueryDestroy(fortressQuery);
-   				kbUnitQueryDestroy(farmQuery);
+   			  kbUnitQueryDestroy(settleQuery);
+   			  kbUnitQueryDestroy(fortressQuery);
+   			  kbUnitQueryDestroy(farmQuery);
    		      aiPlanDestroy(gHeavyGPPlan);
    			  CastAttempt = CastAttempt+1;
 			  if (CastAttempt > 5)
