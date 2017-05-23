@@ -3110,9 +3110,9 @@ rule buildTowerAtOtherBase
 
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
     if (numSettlements < 2)
-        xsSetRuleMinIntervalSelf(61);
+        xsSetRuleMinIntervalSelf(58);
     else
-        xsSetRuleMinIntervalSelf(31);
+        xsSetRuleMinIntervalSelf(28);
 
     int mainBaseID = kbBaseGetMainID(cMyID);
     int otherBaseUnitID = findUnit(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, cMyID);
@@ -4550,7 +4550,7 @@ rule buildMBTower
     
    int attempt = 0;
    vector testVec = cInvalidVector;
-   float spacingDistance = 22.0; // Mid- and corner-spots on a square with 'radius' spacingDistance, i.e. each side is 2 * spacingDistance.
+   float spacingDistance = 24.0; // Mid- and corner-spots on a square with 'radius' spacingDistance, i.e. each side is 2 * spacingDistance.
    float exclusionRadius = spacingDistance / 2.0;
    float dx = spacingDistance;
    float dz = spacingDistance;
@@ -4802,7 +4802,7 @@ rule buildExtraFarms
 	
     int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 75.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 >= MoreFarms - 1) || (numFarmsNearMainBaseInR30 >= 28) || (numFarmsNearMainBaseInR30 < 20) || (numVillagers < 10) || (numFarmsNearMainBaseInR30 > 24) && (aiGetWorldDifficulty() > cDifficultyHard))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 >= MoreFarms - 1) || (numFarmsNearMainBaseInR30 >= 30) || (numFarmsNearMainBaseInR30 < 15) || (numVillagers < 10) || (numFarmsNearMainBaseInR30 > 24) && (aiGetWorldDifficulty() > cDifficultyHard))
     {
         xsSetRuleMinIntervalSelf(50);
         return;

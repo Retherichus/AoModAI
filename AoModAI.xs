@@ -3244,7 +3244,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.6);
                 }
                 else if (upRand == 1)
                 {
@@ -3255,7 +3254,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.5);
                 }
                 else
                 {
@@ -3266,7 +3264,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.1);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.4);
                 }
                 break;
             }
@@ -3282,7 +3279,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeJarl, 0.9);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.6);
 
                 }
                 else if (upRand == 1)
@@ -3295,7 +3291,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeJarl, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.5);
                 }
                 else
                 {
@@ -3307,7 +3302,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 					kbUnitPickSetPreferenceFactor(upID, cUnitTypeJarl, 0.4);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-                    kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.4);
                 }
                 break;
             }
@@ -3322,7 +3316,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.6);
                 }
                 else if (upRand == 1)
                 {
@@ -3333,7 +3326,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.5);
                 }
                 else
                 {
@@ -3344,7 +3336,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.4);
                 }
                 break;
             }

@@ -4525,11 +4525,13 @@ rule buildMBTower
             return;
     }
     
+	int mainBaseID = kbBaseGetMainID(cMyID);
+	vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+    int NumTowersInMB = getNumUnits(cUnitTypeTower, cUnitStateAlive, -1, cMyID, mainBaseLocation, 85.0);
     int towerLimit = kbGetBuildLimit(cMyID, cUnitTypeTower);
-    if (numTowers >= towerLimit)
+    if ((numTowers >= towerLimit) ||(NumTowersInMB >= 12))
         return;
 
-    int mainBaseID = kbBaseGetMainID(cMyID);
     
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
     if (activeBuildPlans > 0)
@@ -4544,116 +4546,141 @@ rule buildMBTower
         }
     }
     
-        
-    //variables for our tower placing
-    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    vector frontVector = kbBaseGetFrontVector(cMyID, mainBaseID);
-    float fx = xsVectorGetX(frontVector);
-    float fz = xsVectorGetZ(frontVector);
-    float fxOrig = fx;
-    float fzOrig = fz;
+   
     
-    if (ShowAiEcho == true) aiEcho("mainBaseLocation: "+mainBaseLocation);
-    if (ShowAiEcho == true) aiEcho("frontVector: "+frontVector);
-    if (ShowAiEcho == true) aiEcho("fx: "+fx);
-    if (ShowAiEcho == true) aiEcho("fz: "+fz);
-    
-    //Towers should be placed in a radius of 20m around a point 15m in front of our main base
-    fx = fxOrig * 15;
-    fz = fzOrig * 15;
-    frontVector = xsVectorSetX(frontVector, fx);
-    frontVector = xsVectorSetZ(frontVector, fz);
-    frontVector = xsVectorSetY(frontVector, 0.0);
-    vector location = mainBaseLocation + frontVector;
-    vector centerLocation = location;
-    if (ShowAiEcho == true) aiEcho("centerLocation: "+centerLocation);
-    
-    for (i = 0; < 3)
-    {
-        switch(i)
-        {
-            case 0: //front
-            {
-                fx = fxOrig * 20;
-                fz = fzOrig * 20;
-            }
-            case 1: //left
-            {
-                fx = fzOrig * (-20);
-                fz = fxOrig * 20;
-            }
-            case 2: //right
-            {
-                fx = fzOrig * 20;
-                fz = fxOrig * (-20);
-            }
-        }
-        frontVector = xsVectorSetX(frontVector, fx);
-        frontVector = xsVectorSetZ(frontVector, fz);
-        frontVector = xsVectorSetY(frontVector, 0.0);
-        if (i == 0)
-            vector frontLocation = centerLocation + frontVector;
-        else if (i == 1)
-            vector leftLocation = centerLocation + frontVector;
-        else if (i == 2)
-            vector rightLocation = centerLocation + frontVector;
-    }
-    
-    int numTowersNearFront = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, frontLocation, 18.0);
-    int numTowersNearLeft = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, leftLocation, 18.0);
-    int numTowersNearRight = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, rightLocation, 18.0);
-    if ((numTowersNearFront < 3) && (numTowersNearFront <= numTowersNearLeft) && (numTowersNearFront <= numTowersNearRight))
-    {
-        location = frontLocation;
-        if (ShowAiEcho == true) aiEcho("using frontLocation");
-    }
-    else
-    {
-        if ((numTowersNearLeft < 3) && (numTowersNearLeft <= numTowersNearRight))
-        {
-            location = leftLocation;
-            if (ShowAiEcho == true) aiEcho("using leftLocation");
-        }
-        else
-        {
-            if (numTowersNearLeft < 3)
-            {
-                location = rightLocation;
-                if (ShowAiEcho == true) aiEcho("using rightLocation");
-            }
-            else
-            {
-                if (ShowAiEcho == true) aiEcho("returning, as there are 3 towers near the front, left and right location");
-                return;
-            }
-        }
-    }
+   int attempt = 0;
+   vector testVec = cInvalidVector;
+   float spacingDistance = 22.0; // Mid- and corner-spots on a square with 'radius' spacingDistance, i.e. each side is 2 * spacingDistance.
+   float exclusionRadius = spacingDistance / 2.0;
+   float dx = spacingDistance;
+   float dz = spacingDistance;
+   static int towerSearch = -1;
+   bool success = false;
+	
+   for (attempt = 0; < 10) // Take ten tries to place it
+   {
+      testVec = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)); // Start with base location
+      
+      switch(aiRandInt(8)) // 0..7
+      {  // Use 0.9 * on corners to "round them" a bit
+         case 0:
+         {  // W
+            dx = -0.9 * dx;
+            dz = 0.9 * dz;
+            if (ShowAiEcho == true) aiEcho("West...");
+            break;
+         }
+         case 1:
+         {  // NW
+            dx = 0.0;
+            if (ShowAiEcho == true) aiEcho("Northwest...");
+            break;
+         }
+         case 2:
+         {  // N
+            dx = 0.9 * dx;
+            dz = 0.9 * dz;
+            if (ShowAiEcho == true) aiEcho("North...");
+            break;
+         }
+         case 3:
+         {  // NE
+            dz = 0.0;
+            if (ShowAiEcho == true) aiEcho("NorthEast...");
+            break;
+         }
+         case 4:
+         {  // E
+            dx = 0.9 * dx;
+            dz = -0.9 * dz;
+            if (ShowAiEcho == true) aiEcho("East...");
+            break;
+         }
+         case 5:
+         {  // SE
+            dx = 0.0;
+            dz = -1.0 * dz;
+            if (ShowAiEcho == true) aiEcho("SouthEast...");
+            break;
+         }
+         case 6:
+         {  // S
+            dx = -0.9 * dx;
+            dz = -0.9 * dz;
+            if (ShowAiEcho == true) aiEcho("South...");
+            break;
+         }
+         case 7:
+         {  // SW
+            dx = -1.0 * dx;
+            dz = 0;
+            if (ShowAiEcho == true) aiEcho("SouthWest...");
+            break;
+         }
+      }
+      testVec = xsVectorSetX(testVec, xsVectorGetX(testVec) + dx);
+      testVec = xsVectorSetZ(testVec, xsVectorGetZ(testVec) + dz);
+      if (ShowAiEcho == true) aiEcho("Testing tower location "+testVec);
+      if (towerSearch < 0)
+      {  // init
+         towerSearch = kbUnitQueryCreate("Tower placement search");
+         kbUnitQuerySetPlayerRelation(towerSearch, cPlayerRelationAny);
+         kbUnitQuerySetUnitType(towerSearch, cUnitTypeTower);
+         kbUnitQuerySetState(towerSearch, cUnitStateAliveOrBuilding);
+      }
+      kbUnitQuerySetPosition(towerSearch, testVec);
+      kbUnitQuerySetMaximumDistance(towerSearch, exclusionRadius);
+      kbUnitQueryResetResults(towerSearch);
+      if (kbUnitQueryExecute(towerSearch) < 1)
+      {  // Site is clear, use it
+         if ( kbAreaGroupGetIDByPosition(testVec) == kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) )
+         {  // Make sure it's in same areagroup.
+            success = true;
+            break;
+         }
+      }
+   }
+   
+   // We have found a location (success == true) or we need to just do a brute force placement around the TC.
+   if (success == false)
+      testVec = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
 
     int builderType = cUnitTypeAbstractVillager;
     if (cMyCulture == cCultureNorse)
         builderType = cUnitTypeAbstractInfantry;
     
-    if (ShowAiEcho == true) aiEcho("using location: "+location);
+    if (ShowAiEcho == true) aiEcho("using location: "+testVec);
 
     //Build a tower near our main base
     static int count = 1;
     int buildMBTowerPlanID = aiPlanCreate("Build main base tower #"+count, cPlanBuild);
     if (buildMBTowerPlanID >= 0)
     {
-        aiPlanSetInitialPosition(buildMBTowerPlanID, location);
+        if (success == true)
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, exclusionRadius);
+        else
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 50.0);	
+        aiPlanSetInitialPosition(buildMBTowerPlanID, mainBaseLocation);
         aiPlanSetVariableInt(buildMBTowerPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeTower);
         aiPlanSetDesiredPriority(buildMBTowerPlanID, 100);
         aiPlanSetVariableBool(buildMBTowerPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
         aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanRandomBPValue, 0, 0.99);
         
-        aiPlanSetVariableVector(buildMBTowerPlanID, cBuildPlanCenterPosition, 0, location);
-        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 10.0);
+        aiPlanSetVariableVector(buildMBTowerPlanID, cBuildPlanCenterPosition, 0, testVec);
         aiPlanAddUnitType(buildMBTowerPlanID, builderType, 1, 1, 1);
         aiPlanSetEscrowID(buildMBTowerPlanID, cMilitaryEscrowID);
+        // Add position influence for nearby towers
+        aiPlanSetVariableInt(buildMBTowerPlanID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeTower); 
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanInfluenceUnitDistance, 0, spacingDistance);    
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanInfluenceUnitValue, 0, -20.0);        // -20 points per tower
+        // Weight it to stay very close to center point.
+        aiPlanSetVariableVector(buildMBTowerPlanID, cBuildPlanInfluencePosition, 0, testVec);    // Position influence for landing position
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanInfluencePositionDistance, 0, exclusionRadius);     // 100m range.
+         aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanInfluencePositionValue, 0, 10.0);        // 10 points for center		
         aiPlanSetBaseID(buildMBTowerPlanID, mainBaseID);
         aiPlanSetActive(buildMBTowerPlanID);
         count = count + 1;
-        if (ShowAiEcho == true) aiEcho("building tower at our main base: "+mainBaseID+" near location: "+location);
+        if (ShowAiEcho == true) aiEcho("building tower at our main base: "+mainBaseID+" near location: "+testVec);
     }
 }
 
@@ -4775,7 +4802,7 @@ rule buildExtraFarms
 	
     int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 75.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 >= MoreFarms - 1) || (numFarmsNearMainBaseInR30 >= 28) || (numFarmsNearMainBaseInR30 < 20) || (numVillagers < 10) || (numFarmsNearMainBaseInR30 > 24) && (aiGetWorldDifficulty() > cDifficultyHard))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 >= MoreFarms - 1) || (numFarmsNearMainBaseInR30 >= 30) || (numFarmsNearMainBaseInR30 < 15) || (numVillagers < 10) || (numFarmsNearMainBaseInR30 > 24) && (aiGetWorldDifficulty() > cDifficultyHard))
     {
         xsSetRuleMinIntervalSelf(50);
         return;

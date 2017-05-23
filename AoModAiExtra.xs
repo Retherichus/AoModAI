@@ -629,6 +629,8 @@ rule ActivateRethOverridesAge4
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLanceShennong, 0.6);
 		else kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLance, 0.5);
 		}
+		if (cMyCulture == cCultureNorse)
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractArcher, 0.2+aiRandInt(3)); // Ok to Bogsveigir now
 		
 		xsDisableSelf();
            

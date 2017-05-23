@@ -815,7 +815,7 @@ rule updateFoodBreakdown
                     static bool extraFarms = false;
                     if (extraFarms == false)
                     {
-                        //xsEnableRule("buildExtraFarms");
+                        xsEnableRule("buildExtraFarms");
                         extraFarms = true;
                     }
                 }
@@ -2884,7 +2884,10 @@ rule tradeWithCaravans
     }
     if (equal(gTradeMarketLocation, mainBaseLocation) == false)
     {
-        //Build a tower near our trade market
+	    int numTowersNearMarket = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, gTradeMarketLocation, 30.0);
+        if (numTowersNearMarket < 1+aiRandInt(2))  
+	    {
+	    //Build a tower near our trade market
         int buildTowerPlanID = aiPlanCreate("Build trade market tower", cPlanBuild);
         if (buildTowerPlanID >= 0)
         {
@@ -2895,6 +2898,7 @@ rule tradeWithCaravans
             aiPlanSetEscrowID(buildTowerPlanID, cMilitaryEscrowID);
             aiPlanSetActive(buildTowerPlanID);
         }
+	    }	
     }
 
     // We have a market for trade, activate the rule to rebuild if lost

@@ -435,8 +435,8 @@ rule ActivateRethOverridesAge1
 		if (gHuntingDogsASAP == true)
 		xsEnableRule("HuntingDogsAsap");
 		
-		if (aiGetWorldDifficulty() > cDifficultyHard)
-		aiResourceCheat(cMyID, cResourceFood, 0.1); //Adds 0.1 (not even 1!) resources to fix a critical "startup-inventory" bug that can potentially block the AI from making vills.
+		//Adds 0.1 (not even 1!) of all resources to fix a critical "startup-inventory" bug that can potentially block the AI from making vills until the first villager have returned any resource.
+		aiResourceCheat(cMyID, cResourceFood, 0.1); 
 		aiResourceCheat(cMyID, cResourceWood, 0.1);
 		aiResourceCheat(cMyID, cResourceGold, 0.1);
 		xsDisableSelf();
@@ -629,31 +629,13 @@ rule ActivateRethOverridesAge4
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLanceShennong, 0.6);
 		else kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLance, 0.5);
 		}
+		if (cMyCulture == cCultureNorse)
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractArcher, 0.3+aiRandInt(4)); // Ok to Bogsveigir now
 		
 		xsDisableSelf();
            
     }
-}	
-
-
-//==============================================================================
-// rule DockDefenseMonitor // I'll make this more dynamic later and base it on enemy ships.
-//==============================================================================
-rule DockDefenseMonitor
-   minInterval 45
-   inactive
-{  
-
-   	   if (gWaterMap == false)
-	   {
-	   xsDisableSelf();
-	   return;
-	   }
-   
-
-	  xsDisableSelf();
 }	  
-
 //==============================================================================
 // wonder death handler
 //==============================================================================
@@ -960,7 +942,6 @@ rule myAgeTracker
 //==============================================================================
 // RULE Helpme
 //==============================================================================
-
 rule Helpme
    minInterval 23
    inactive
@@ -1557,7 +1538,6 @@ rule IHateUnderworldPassages
    }
 }
 
-
 //==============================================================================
 // IHateBuildingsBeheAndScarab
 //==============================================================================
@@ -1889,11 +1869,13 @@ inactive
 		 IhaveAllies = true;
 		 return;
 		 }
-		 else 
-		 xsDisableRuleGroup("Donations"); 
-		 xsDisableRule("defendAlliedBase");
-		 xsDisableRule("Helpme");
-		 IhaveAllies = false;
+		 else
+		 {
+		  xsDisableRuleGroup("Donations"); 
+		  xsDisableRule("defendAlliedBase");
+		  xsDisableRule("Helpme");
+		  IhaveAllies = false;
+		 }
 	}
 }
 }
@@ -2145,7 +2127,7 @@ inactive
 				}
 				
 				if (WaterVersion == false)
-				return;  // will this skip the code below?
+				return;  // will this skip the code below? duh ofc, what was I thinking?
 				 
 				 if (NumSelf > NumEnemy + 14 && WaterVersion == true)
 				 SendBackCount = SendBackCount+1;
@@ -2188,9 +2170,7 @@ rule GatherAroundKOTH  // launches a defend plan on the island.
 		{
 		if (ShowAiEcho == true) aiEcho("I was here!");
 		gDefendPlentyVaultWater = aiPlanCreate("KOTH WATER VAULT DEFEND", cPlanDefend);
-                
-        
-
+		
         aiPlanSetDesiredPriority(gDefendPlentyVaultWater, 90);                       // prio
         aiPlanSetVariableVector(gDefendPlentyVaultWater, cDefendPlanDefendPoint, 0, KOTHPlace);
         aiPlanSetVariableFloat(gDefendPlentyVaultWater, cDefendPlanEngageRange, 0, 25.0);
