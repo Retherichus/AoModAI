@@ -91,16 +91,21 @@ rule updateWoodBreakdown
     //Get the count of plans we currently have going.
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
-    int desiredWoodPlans = 1 + (woodGathererCount/12);
-    if (cMyCulture == cCultureAtlantean)
-	desiredWoodPlans = 2;
+    int desiredWoodPlans = 2;
+	if ((kbGetAge() > cAge3) || (xsGetTime() > 25*60*1000))
+	{
+	if (cMyCulture == cCultureAtlantean)
+	desiredWoodPlans = 1 + (woodGathererCount/4);
+	else
+	desiredWoodPlans = 1 + (woodGathererCount/12);
+	}
 	
+	if (xsGetTime() < 6*60*1000)
+    desiredWoodPlans = 1;
+    
 	if (desiredWoodPlans > 2)
 	desiredWoodPlans = 2;
 	
-	if (xsGetTime() < 12*60*1000)
-        desiredWoodPlans = 1;
-    
     if (woodGathererCount < desiredWoodPlans)
         desiredWoodPlans = woodGathererCount;
 
@@ -144,10 +149,7 @@ rule updateWoodBreakdown
             if (gWoodBaseID >= 0)
             {
                 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
-                if (gTransportMap == true)
-                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
-                else
-                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
+                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
             }
             else
             {
@@ -300,9 +302,11 @@ rule updateGoldBreakdown
     //Get the count of plans we currently have going.
     int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 
-    int desiredGoldPlans = 1 + (goldGathererCount/12);
+    int desiredGoldPlans = 2;
 	if (cMyCulture == cCultureAtlantean)
-	desiredGoldPlans = 2;
+	desiredGoldPlans = 1 + (goldGathererCount/4);
+	else
+	desiredGoldPlans = 1 + (goldGathererCount/12);
 	
 	if (desiredGoldPlans > 2)
 	desiredGoldPlans = 2;
@@ -353,10 +357,8 @@ rule updateGoldBreakdown
 
         if (numberGoldBaseSites > 0)  // We do have remote gold
         {
-            if (gTransportMap == true)
-                aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
-            else
-                aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 0.2, gGoldBaseID);
+
+            aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
             aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);
         }
         else  // No remote gold...bummer.  Kill old breakdown, look for more
@@ -370,10 +372,7 @@ rule updateGoldBreakdown
             if (gGoldBaseID >= 0)
             {
                 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);      // We can have the full amount
-                if (gTransportMap == true)
-                    aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
-                else
-                    aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 0.2, gGoldBaseID);
+                aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
             }
             else
             {
@@ -484,7 +483,6 @@ rule updateFoodBreakdown
 	    
 		static bool aSpecialReset = false;
 		static bool HippoDone = false;
-		static bool HippoFound = false;
 		if ((HippoDone == false) && (gHuntingDogsASAP == true) && (xsGetTime() < 20*1*1000))
 		{ 
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
@@ -497,18 +495,9 @@ rule updateFoodBreakdown
 		aSpecialReset = true;
 		}
 		if (HippoNearMB > 1)
-		HippoFound = true;
-		//if ((HippoFound == true) && (cMyCulture == cCultureGreek) || (HippoFound == true) && (cMyCulture == cCultureChinese))
-        //aiSetAllowAutoDropsites(false);
 		HippoDone = true;
         }
 		
-       //static bool Done = false;
-       //if ((Done == false) && (HippoFound == true) && (xsGetTime() > 28*1*1000) && (cMyCulture == cCultureGreek) || (Done == false) && (HippoFound == true) && (xsGetTime() > 14*1*1000) && (cMyCulture == cCultureChinese))
-      // {
-	  // aiSetAllowAutoDropsites(true);
-	  // Done = true;
-      // }		
 	
 	if ((aiGetWorldDifficulty() == cDifficultyEasy) && (cvRandomMapName != "erebus")) // Changed 8/18/03 to force Easy hunting on Erebus.
         numberAggressiveResourceSpots = 0;  // Never get enough vills to go hunting.
@@ -617,14 +606,11 @@ rule updateFoodBreakdown
         if (cMyCulture == cCultureEgyptian)
             building1ID = cUnitTypeBarracks;
         else if (cMyCulture == cCultureGreek)
-        {
-            if (gTransportMap == false)
-                building1ID = cUnitTypeTemple;
-            else
                 building1ID = cUnitTypeStable;
-        }
         else if (cMyCulture == cCultureNorse)
             building1ID = cUnitTypeLonghouse;
+        else if (cMyCulture == cCultureChinese)
+            building1ID = cUnitTypeBarracksChinese;			
         else if (cMyCulture == cCultureAtlantean)
         {
             if ((cMyCiv == cCivOuranos) && (gTransportMap == false))
@@ -779,7 +765,7 @@ rule updateFoodBreakdown
     if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)) && (TempleUp > 0))   // can build farms
     {
         if ((totalNumberResourceSpots < 2) || (totalAmount < 1500) || (gFarming == true) || (kbGetAge() == cAge3)
-           || (numResourceSpotsInR70 < 2) && (xsGetTime() > 9*60*1000) || (kbGetAge() >= cAge2) && (xsGetTime() > 5*60*1000))
+           || (numResourceSpotsInR70 < 2) && (xsGetTime() > 9*60*1000) || (kbGetAge() >= cAge2) && (xsGetTime() > 6*60*1000))
         {
             if (cMyCulture == cCultureAtlantean)
             {
@@ -789,7 +775,7 @@ rule updateFoodBreakdown
                 }
                 else
                 {
-                    farmerPreBuild = 2;
+                    farmerPreBuild = 1;
                 }
             }
             else
@@ -1033,10 +1019,8 @@ rule updateFoodBreakdown
             else
             {
 			    static bool IncreasePlans = false;
-				if (farmers >= 20) // this is so shit.. but we really need it, activates once first plan is filled... : /
+				if (farmers >= 16) // this is so poop.. but we really need it, activates once first plan is filled... : /
 				IncreasePlans = true;
-				if (farmersAtMainBase >= 30)
-				farmersAtMainBase = 30;
 				
 				if (aiGetWorldDifficulty() == cDifficultyNightmare)
 			    numFarmPlansWanted = numFarmPlansWanted + 1;
@@ -1127,13 +1111,12 @@ void updateResourceHandler(int parm=0)
     if (parm == cResourceGold)
     {
         updateGoldBreakdown();
-//        xsEnableRule("updateGoldBreakdown");
+
     }
     //Handle Wood.
     if (parm == cResourceWood)
     {
         updateWoodBreakdown();
-//        xsEnableRule("updateWoodBreakdown");
     }
 }
 
@@ -1276,7 +1259,6 @@ int changeMainBase(int newSettle = -1)
 
 //==============================================================================
 rule relocateFarming
-//    minInterval 30 //starts in cAge2 (or cAge3 on transport maps)
     minInterval 101 //starts in cAge2 (or cAge3 on transport maps)
     inactive
 {
@@ -1390,7 +1372,6 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
     xsDisableSelf();
 }
 //==============================================================================
-//==============================================================================
 rule startLandScoutingSpecialUlfsark  //grabs the first scout in the scout list and starts scouting with it.
     minInterval 1 //starts in cAge1
     inactive
@@ -1427,6 +1408,7 @@ rule startLandScoutingSpecialUlfsark  //grabs the first scout in the scout list 
 
 //==============================================================================
 // RULE: autoBuildOutpost
+//==============================================================================
 rule autoBuildOutpost   //Restrict Egyptians from building outposts until they have a temple.
     minInterval 10 //starts in cAge1, activated in startLandScouting
     inactive  
@@ -1800,7 +1782,7 @@ rule fishing
     inactive
 {
     xsSetRuleMinIntervalSelf(11);
-    if ((cRandomMapName == "river styx"))
+    if ((cRandomMapName == "river styx") || (gFishPlanID > 0))
     {
         xsDisableSelf();
         return;
@@ -2060,9 +2042,10 @@ rule collectIdleVills
         }
         else
         {
-            configQuery(randomResourceQueryID, resourceType, -1, unitState, playerID, villiePos, true, radius);
-			if ((cRandomMapName == "vinlandsaga") || (cRandomMapName == "team migration"))
+            if ((cRandomMapName == "vinlandsaga") || (cRandomMapName == "team migration"))
 			configQuery(randomResourceQueryID, resourceType, -1, unitState, playerID, villiePos, true);
+			else
+			configQuery(randomResourceQueryID, resourceType, -1, unitState, playerID, villiePos, true, radius);
             kbUnitQuerySetAreaGroupID(randomResourceQueryID, villieAGID);
             kbUnitQueryResetResults(randomResourceQueryID);
             int numberRandomResource = kbUnitQueryExecute(randomResourceQueryID);
@@ -2078,7 +2061,6 @@ rule collectIdleVills
 
 //==============================================================================
 rule randomUpgrader
-//    minInterval 30 //starts in cAge4
     minInterval 61 //starts in cAge5
     inactive
 {
@@ -2193,10 +2175,9 @@ rule createHerdplan
 //==============================================================================
 rule monitorTrade
     inactive
-//    minInterval 27 //starts in cAge3, activated in tradeWithCaravans
     minInterval 23 //starts in cAge3, activated in tradeWithCaravans
 {
-    if (ShowAiEcho == true) aiEcho("!++!++!monitorTrade:");
+    if (ShowAiEcho == true) aiEcho("monitorTrade:");
     
     if (ShowAiEcho == true) aiEcho("gTradeMarketUnitID: "+gTradeMarketUnitID);
     if (((gTradeMarketUnitID != -1) && (kbUnitGetCurrentHitpoints(gTradeMarketUnitID) <= 0))
@@ -2413,7 +2394,6 @@ rule monitorTrade
 
 //==============================================================================
 rule tradeWithCaravans
-//    minInterval 11 //starts in cAge3
     minInterval 31 //starts in cAge3
     inactive
 {
@@ -2435,8 +2415,8 @@ rule tradeWithCaravans
 
     if (failedBase == mainBaseID)  // We've failed at this spot before
     {
-        xsSetRuleMinIntervalSelf(227);
-        failedBase = -1;    //Try again in 4 minutes
+        xsSetRuleMinIntervalSelf(210);
+        failedBase = -1;    //Try again in 3.5 minutes
         return;
     }
 
@@ -2593,7 +2573,6 @@ rule tradeWithCaravans
         // second closest corner.
 
         int chosenCorner = -1;
-
 
         if ((mapRestrictsMarketAttack() == false) || (cRandomMapName == "watering hole"))
         {
@@ -2791,9 +2770,10 @@ rule tradeWithCaravans
         aiPlanSetDesiredPriority(buildPlanID, 100);
         aiPlanSetEscrowID(buildPlanID, cEconomyEscrowID);
         aiPlanSetActive(buildPlanID);
-
+		
         builtMarket = true;
         marketTime = xsGetTime();
+		
         
         if (extraRuleEnabled == false)
         {
@@ -2884,8 +2864,8 @@ rule tradeWithCaravans
     }
     if (equal(gTradeMarketLocation, mainBaseLocation) == false)
     {
-	    int numTowersNearMarket = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, gTradeMarketLocation, 30.0);
-        if (numTowersNearMarket < 1+aiRandInt(2))  
+	    int numTowersNearMarket = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, gTradeMarketLocation, 45.0);
+        if (numTowersNearMarket < 1)  
 	    {
 	    //Build a tower near our trade market
         int buildTowerPlanID = aiPlanCreate("Build trade market tower", cPlanBuild);
@@ -2937,7 +2917,6 @@ rule tradeWithCaravans
 
 //==============================================================================
 rule sendIdleTradeUnitsToRandomBase
-//    minInterval 15 //starts in cAge3
     minInterval 17 //starts in cAge3
     inactive
 {
@@ -3102,7 +3081,6 @@ rule sendIdleTradeUnitsToRandomBase
     float minRequiredDistance = 37.0;
 	if (numTcs <= 1)
     minRequiredDistance = 30.0;
-	else minRequiredDistance = 37.0;
 	
 	
 	
@@ -3327,7 +3305,6 @@ rule sendIdleTradeUnitsToRandomBase
 
 //==============================================================================
 rule airScout1  //air scout plan that avoids attacked areas
-//    minInterval 73 //starts in cAge1
     minInterval 83 //starts in cAge1
     inactive
 {
@@ -3437,7 +3414,6 @@ rule airScout1  //air scout plan that avoids attacked areas
 
 //==============================================================================
 rule airScout2  //air scout plan that doesn't avoid attacked areas
-//    minInterval 71 //starts in cAge1
     minInterval 79 //starts in cAge1
     inactive
 {
@@ -3521,16 +3497,9 @@ rule norseInfantryCheck
 	int AllBuilders=kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive); // just do it!
 	ulfCount = ulfCount + ulfCountS + AllBuilders;
     
-	if (ulfCount >= 2)     
-        return;
-		
-	if ((kbGetAge() < cAge2) && (ulfCount >= 1))   
-    {	   
-	return;
-	}
+	if ((kbGetAge() < cAge2) && (ulfCount >= 1) || (xsGetTime() < 90*1000) || (ulfCount >= 2))   
+    return;
 	
-    if (xsGetTime() < 90*1000)
-        return;     // Don't do it in first 90 seconds
 
     //If we're low on infantry, make sure we have at least X pop slots free.
     int availablePopSlots=kbGetPopCap()-kbGetPop();
