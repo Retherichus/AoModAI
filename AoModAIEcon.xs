@@ -1315,10 +1315,7 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
 {
 
     xsSetRuleMinIntervalSelf(40);
-	
-    if (cMyCulture == cCultureNorse && kbUnitCount(cMyID, cUnitTypeUlfsarkStarting, cUnitStateAlive) > 0)
-	return;
-	
+		
     //If no scout, go away.
     if ((gLandScout == -1) || (cvMapSubType == VINLANDSAGAMAP))
     {
@@ -1367,40 +1364,6 @@ rule startLandScouting  //grabs the first scout in the scout list and starts sco
         }
         aiPlanSetActive(gLandExplorePlanID);
     }
-
-    //Go away now.
-    xsDisableSelf();
-}
-//==============================================================================
-rule startLandScoutingSpecialUlfsark  //grabs the first scout in the scout list and starts scouting with it.
-    minInterval 1 //starts in cAge1
-    inactive
-{
-    //If no scout, go away.
-    if ((gLandScoutSpecialUlfsark == -1) || (cvMapSubType == VINLANDSAGAMAP))
-    {
-        xsDisableSelf();
-        return;
-    }
-
-    if (ShowAiEcho == true) aiEcho("startLandScouting2:");
-
-    //Land based Scouting.
-    gLandExplorePlanID2=aiPlanCreate("Explore_Land", cPlanExplore);
-    if (gLandExplorePlanID2 >= 0)
-    {
-	    
-        aiPlanAddUnitType(gLandExplorePlanID2, gLandScoutSpecialUlfsark, 1, 1, 1);
-        aiPlanSetDesiredPriority(gLandExplorePlanID2, 50);
-        aiPlanSetEscrowID(gLandExplorePlanID2, cEconomyEscrowID);
-        aiPlanSetInitialPosition(gLandExplorePlanID2, kbBaseGetLocation(cMyID,kbBaseGetMainID(cMyID)));
-        aiPlanSetVariableFloat(gLandExplorePlanID2, cExplorePlanLOSMultiplier, 0, 1.7);
-        aiPlanSetVariableBool(gLandExplorePlanID2, cExplorePlanDoLoops, 0, true);
-        aiPlanSetVariableInt(gLandExplorePlanID2, cExplorePlanNumberOfLoops, 0, 2);
-        
-        aiPlanSetActive(gLandExplorePlanID2);
-    }
-	
 
     //Go away now.
     xsDisableSelf();

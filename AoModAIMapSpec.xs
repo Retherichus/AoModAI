@@ -519,7 +519,6 @@ void vinlandsagaBaseCallback(int parm1=-1)
     xsDisableRule("vinlandsagaFailsafe");
     //Kill the land scout explore.
     aiPlanDestroy(gLandExplorePlanID);
-	aiPlanDestroy(gLandExplorePlanID2);
     //Create a new land based explore plan for the mainland.
     gLandExplorePlanID=aiPlanCreate("Explore_Land_VS", cPlanExplore);
     if (gLandExplorePlanID >= 0)

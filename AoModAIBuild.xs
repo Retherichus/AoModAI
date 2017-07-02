@@ -628,6 +628,8 @@ rule buildHouse
             builderTypeID = cUnitTypeAbstractInfantry;   // Exact match for land scout, so build plan can steal scout
 
         aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
+		if ((cMyCulture == cCultureNorse) && (kbUnitCount(cMyID, builderTypeID, cUnitStateAlive) < 3))
+		aiPlanAddUnitType(planID, cUnitTypeHeroNorse, 0, 0, 1);
 
 
 	   // Added a little override as this rule didn't seem to work properly. // Reth.

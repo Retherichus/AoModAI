@@ -2695,8 +2695,7 @@ void initNorse(void)
         }
     }
     //Norse scout types.
-    gLandScout=cUnitTypeUlfsark;
-	gLandScoutSpecialUlfsark=cUnitTypeUlfsarkStarting;
+    gLandScout=cUnitTypeAbstractScout;
     gAirScout=-1;
     gWaterScout=cUnitTypeFishingShipNorse;
     //Norse gather with their heros.
@@ -2725,7 +2724,6 @@ void initNorse(void)
 
     //Enable our no-infantry check.
     xsEnableRule("norseInfantryCheck");
-	xsEnableRule("startLandScoutingSpecialUlfsark");
 	//xsEnableRule("trainDwarves");  // not now.
 	
 }

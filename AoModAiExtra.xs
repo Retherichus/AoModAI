@@ -23,7 +23,6 @@ extern bool ConfirmFish = false;          // Don't change this, It's for extra s
 extern bool gHuntingDogsASAP = false;     // Will automatically be called upon if there is huntable nearby the MB.
 extern int gGardenBuildLimit = 0;
 extern int HateChoice = -1;
-extern int gLandExplorePlanID2=-1;
 extern int gLandScoutSpecialUlfsark = -1;
 extern bool IsRunTradeUnits1 = false;
 extern bool IsRunTradeUnits2 = false;
@@ -332,7 +331,6 @@ void initRethlAge2(void)
 	{	
 	xsEnableRule("getLoneWanderer");
 	aiPlanDestroy(gLandExplorePlanID);
-	aiPlanDestroy(gLandExplorePlanID2);
     }
 	if (cMyCiv == cCivLoki)
     {
@@ -471,11 +469,6 @@ rule ActivateRethOverridesAge2
         xsEnableRuleGroup("Prometheus");
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge2Okeanus) == cTechStatusActive)
         xsEnableRuleGroup("Oceanus");
-		
-		if (cMyCulture == cCultureNorse)
-		{
-		aiPlanDestroy(gLandExplorePlanID2);
-		}
 		
 	    if (CheatResources == true)
 	    {
