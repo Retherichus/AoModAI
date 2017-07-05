@@ -829,7 +829,6 @@ rule updateFoodBreakdown
         }
     }
     
-
     int numPlansWanted = 2;
     if (cMyCulture == cCultureAtlantean)
         numPlansWanted = 1 + unassigned/4;

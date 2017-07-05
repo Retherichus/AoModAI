@@ -3569,9 +3569,6 @@ void init(void)
     
     //God Powers
     initGodPowers();
-
-    //Map Specific
-    initMapSpecific();
     
     //Naval
     initNaval();
@@ -3655,6 +3652,10 @@ void init(void)
             break;
         }		
     }
+    
+	//Map Specific
+    initMapSpecific();
+	
     //Setup the progression to follow these minor gods.
     kbTechTreeAddMinorGodPref(gAge2MinorGod);
     kbTechTreeAddMinorGodPref(gAge3MinorGod);

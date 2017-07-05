@@ -261,7 +261,7 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetRelicEventHandler("relicHandler");
 	aiSetRetreatEventHandler("retreatHandler");
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
-	
+
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
 	  

@@ -252,7 +252,7 @@ void initMapSpecific()
     }
     else if ((cvRandomMapName == "erebus") || (cvRandomMapName == "river styx"))
     {
-        aiSetMinNumberNeedForGatheringAggressvies(2);
+        aiSetMinNumberNeedForGatheringAggressvies(1);
         kbBaseSetMaximumResourceDistance(cMyID, kbBaseGetMainID(cMyID), 85.0);
     }
     //Vinlandsaga.
