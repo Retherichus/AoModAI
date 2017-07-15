@@ -1423,11 +1423,8 @@ void econAge2Handler(int age=1)
 
     // Set escrow caps
     kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 800.0);    // Age 3
-	if (cMyCulture == cCultureAtlantean)
-    kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 400.0);  // Testing.. Farms are more expensive and crucial in this age
-    else 
-	kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 200.0);
-	kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 500.0);    // Age 3
+    kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 200.0);
+    kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 500.0);    // Age 3
     kbEscrowSetCap( cEconomyEscrowID, cResourceFavor, 30.0);
     kbEscrowSetCap( cMilitaryEscrowID, cResourceFood, 100.0);
     kbEscrowSetCap( cMilitaryEscrowID, cResourceWood, 200.0);   // Towers
@@ -1548,21 +1545,10 @@ void econAge4Handler(int age=0)
 
 
     // Set escrow caps tighter
-	if (TitanAvailable == true)
-	{
-	kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 800.0);
-    kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 800.0);     
-    kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 800.0);    
-	kbEscrowSetCap( cEconomyEscrowID, cResourceFavor, 60.0);
-	}
-	else 
-	{
-	kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 300.0);    
+    kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 300.0);    
     kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 300.0);    
     kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 300.0);    
     kbEscrowSetCap( cEconomyEscrowID, cResourceFavor, 30.0);
-	}
-
     kbEscrowSetCap( cMilitaryEscrowID, cResourceFood, 300.0);
     kbEscrowSetCap( cMilitaryEscrowID, cResourceWood, 300.0);   
     kbEscrowSetCap( cMilitaryEscrowID, cResourceGold, 300.0);   

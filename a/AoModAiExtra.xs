@@ -47,7 +47,6 @@ extern bool WaitForDock = false;
 extern int VinLandBase = -1;
 extern int mChineseImmortal = -1;
 extern int eChineseHero = -1;
-extern int cMonkMaintain = -1;
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -494,10 +493,7 @@ rule ActivateRethOverridesAge3
     {
         //CHINESE MINOR GOD SPECIFIC
 		if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Dabogong) == cTechStatusActive)
-		{
         xsEnableRuleGroup("Dabogong");
-		aiPlanSetVariableInt(cMonkMaintain, cTrainPlanNumberToMaintain, 0, 5);
-		}
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Hebo) == cTechStatusActive)
         xsEnableRuleGroup("Hebo");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Zhongkui) == cTechStatusActive)

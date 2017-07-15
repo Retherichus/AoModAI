@@ -3709,7 +3709,7 @@ rule getSecretsOfTheTitan
     {
         aiPlanSetVariableInt(titanPID, cProgressionPlanGoalTechID, 0, techID);
         aiPlanSetDesiredPriority(titanPID, 100);
-        aiPlanSetEscrowID(titanPID, cEconomyEscrowID);
+        aiPlanSetEscrowID(titanPID, cMilitaryEscrowID);
         aiPlanSetActive(titanPID);
         if (ShowAiEcho == true) aiEcho("getting secrets of the titans");
         xsDisableSelf();

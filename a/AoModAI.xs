@@ -441,12 +441,13 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
 
     static int failCount = 0;
     static bool initialResetDone = false;
+
     if (initialResetDone == false)
     {
         initialResetDone = true;
         kbEscrowAllocateCurrentResources();
         return;
-    }	
+    }
 
     bool fishingReset = false;    // Special reset in first 5 minutes for wood imbalance while fishing
                                  // (Every fishing boat trained gets double-billed.)
@@ -670,6 +671,29 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
         }
+   /*
+   // No idea what this really does.. but I am assuming anything in the Root escrow is free for all.
+   if (foodSupply > 1200)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceFood, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceFood, true);
+   }
+   if (woodSupply > 1000)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
+   }
+   if (goldSupply > 1200)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
+   }
+   if (favorSupply > 80)
+   {
+       kbEscrowFlush(cEconomyEscrowID, cResourceFavor, true);
+       kbEscrowFlush(cMilitaryEscrowID, cResourceFavor, true);
+   }
+	*/	
   }
 }
 
@@ -916,12 +940,6 @@ rule updateEMAge2
                                                    // For hawk, vice versa 
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
-	
-	if ((xsGetTime() > 14*60*1000) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge2))
-	{
-	if (econEscrow < 0.85)
-	econEscrow = 0.85;
-	}
 
     //More military in second age
     updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, econEscrow, econEscrow, econEscrow);
@@ -994,12 +1012,6 @@ rule updateEMAge3
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
 
-	if ((xsGetTime() > 25*60*1000) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge3))
-	{
-	if (econEscrow < 0.70)
-	econEscrow = 0.70;
-	}	
-	
     //More military in second age
     updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, econEscrow, econEscrow, econEscrow);
 }
@@ -1060,7 +1072,6 @@ rule updateEMAge4
 
     float econPercent = 0.15;     // Econ priority rating, range 0..1
     float econEscrow = 0.15;      // Economy's share of non-root escrow, range 0..1
-	
 
     float econAdjust = -.5 * cvMilitaryEconSlider;  // For econ purist, do lesser of 50% econ boost or 50% mil cut
                                                    // For hawk, vice versa 
@@ -1078,11 +1089,6 @@ rule updateEMAge4
 
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
-	if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
-	{
-	if (econEscrow < 0.64)
-	econEscrow = 0.64;
-    }
 
     //More military in second age
     updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, econEscrow, econEscrow, econEscrow);
@@ -2823,8 +2829,8 @@ void initChinese(void)
 		if(cMyCulture == cCultureChinese)
 	{ 
         xsEnableRule("DelayImmortalHero"); 	
-		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 2, false, kbBaseGetMainID(cMyID));
-		cMonkMaintain = createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(2)+3, false, kbBaseGetMainID(cMyID));
+		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 3, false, kbBaseGetMainID(cMyID));
+		createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(3)+2, false, kbBaseGetMainID(cMyID));
 	}
         if (aiGetWorldDifficulty() != cDifficultyEasy && cMyCulture == cCultureChinese)
             createSimpleMaintainPlan(cUnitTypeSittingTiger, 4, false, kbBaseGetMainID(cMyID));
@@ -5199,13 +5205,6 @@ void age5Handler(int age=4)
 
     //enable the titanplacement rule
     xsEnableRule("rPlaceTitanGate");
-    
-	// Set Escrow back to normal.
-	kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 300.0);    
-    kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 300.0);    
-    kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 300.0);    
-    kbEscrowSetCap( cEconomyEscrowID, cResourceFavor, 30.0);
-	//
     
     //enable the randomUpgrader rule
     xsEnableRule("randomUpgrader");
