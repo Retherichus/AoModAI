@@ -224,7 +224,24 @@ void preInitMap()
     {
         cvMapSubType = WATERNOMADMAP;
     }
+	
+	if (cvRandomMapName == "Transport Scenario")
+    {
+        gTransportMap = true;
+        gWaterMap = true;
+        xsEnableRule("fishing"); // force builds the dock.
+    }	
+	
+	if (cvRandomMapName == "Migration Scenario")
+    {
+        gTransportMap = true;
+        gWaterMap = true;
+		cvMapSubType = VINLANDSAGAMAP;
+        xsEnableRule("fishing"); // force builds the dock.
+    }		
+	
 
+	
     //Tell the AI what kind of map we are on.
     aiSetWaterMap(gTransportMap == true);
 }

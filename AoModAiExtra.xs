@@ -48,6 +48,7 @@ extern int VinLandBase = -1;
 extern int mChineseImmortal = -1;
 extern int eChineseHero = -1;
 extern int cMonkMaintain = -1;
+extern const int cGaiaID = 0;
 
 //////////////// aiEchoDEBUG ////////////////
 

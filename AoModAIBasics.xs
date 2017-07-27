@@ -169,7 +169,8 @@ extern int     cvNumberMilitaryUnitTypes = -1;
 // Random map name.  Can be set in setParameters to make scenario AI's adopt map-specific behaviors.  Must be set in setParameters() to be
 // used, there is no way to activate it later.
 
-extern string cvRandomMapName="None";    
+extern string cvRandomMapName="None"; 
+// if your scenario needs a special treatment, consider to change "None" to one of these: "Transport Scenario" or "Migration Scenario"
 
 
 extern bool    cvTransportMap = false;    // Set this to true in setParameters() to tell AI to make transports.  Note: if left

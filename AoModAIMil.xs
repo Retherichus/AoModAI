@@ -2484,13 +2484,13 @@ rule attackEnemySettlement
             aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 2, 2);
         
         if (numTitans > 0)
-            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
+            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans, numMilUnitsInDefPlans, numMilUnitsInDefPlans);
         else
         {
             if (currentPopCap > 160)
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans, numMilUnitsInDefPlans, numMilUnitsInDefPlans);
             else
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
         }
         aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
         
@@ -2687,7 +2687,7 @@ rule defendSettlementPosition
     }
     
     static int count = 0;
-    if (numMilUnits < 20)
+    if (numMilUnits < 14)
     {
         xsSetRuleMinIntervalSelf(11);
         if (count > 2)

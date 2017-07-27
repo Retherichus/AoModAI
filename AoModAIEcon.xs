@@ -1776,6 +1776,9 @@ rule fishing
 		if (cRandomMapName == "Basin")
 		gNumBoatsToMaintain = 5;
 
+    if (kbUnitCount(cGaiaID, cUnitTypeFish) < 1)
+        gNumBoatsToMaintain = 1;
+
     //Create the fish plan.
     int fishPlanID = aiPlanCreate("FishPlan", cPlanFish);
     if (fishPlanID >= 0)

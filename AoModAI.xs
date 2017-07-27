@@ -706,6 +706,8 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
             milPop = milPop + (milPop * milPopDelta);
             if (milPop < 23) 
                 milPop = 23;
+            if ((gAgeFaster == true) && (gAgeReduceMil == true))
+	        milPop = eMaxMilPop;				
         }
     }
 
@@ -3575,8 +3577,7 @@ void init(void)
     //God Powers
     initGodPowers();
     
-    //Naval
-    initNaval();
+
 
     //Create bases for all of our settlements.  Ignore any that already have
     //bases set.  If we have an invalid main base, the first base we create
@@ -3660,6 +3661,8 @@ void init(void)
     
 	//Map Specific
     initMapSpecific();
+	    //Naval
+    initNaval();
 	
     //Setup the progression to follow these minor gods.
     kbTechTreeAddMinorGodPref(gAge2MinorGod);
