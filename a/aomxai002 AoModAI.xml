@@ -38,6 +38,7 @@
       <name>Ipuwer<culture>Egyptian</culture></name>
       <name>Seqenenre<culture>Egyptian</culture></name>
       <name>Pasebakhaenniut<culture>Egyptian</culture></name>
+	  <name>Poppy<culture>Egyptian</culture></name>	
       <name>Bias<culture>Greek</culture></name>
       <name>Kasos<culture>Greek</culture></name>
       <name>Kittos<culture>Greek</culture></name>
@@ -75,6 +76,7 @@
       <name>Cteatus<culture>Greek</culture></name>
       <name>Autolycus<culture>Greek</culture></name>
       <name>Cratippus<culture>Greek</culture></name>
+	  <name>Ash Ketchum<culture>Greek</culture></name>
       <name>Gudberd<culture>Norse</culture></name>
       <name>Aric<culture>Norse</culture></name>
       <name>Wodin<culture>Norse</culture></name>
@@ -105,7 +107,7 @@
       <name>Hemingr<culture>Norse</culture></name>
       <name>Magni<culture>Norse</culture></name>
       <name>Broddr<culture>Norse</culture></name>
-      <name>Stenkil<culture>Norse</culture></name>
+      <name>Stenkil<culture>Norse</culture></name> 
       <name>Opir<culture>Norse</culture></name>
       <name>Havvar<culture>Norse</culture></name>
       <name>Arva<culture>Norse</culture></name>
@@ -144,8 +146,7 @@
       <name>Suennon<culture>Atlantean</culture></name>
       <name>Thildo<culture>Atlantean</culture></name>
       <name>Thoun<culture>Atlantean</culture></name>
-	  <name>Kaceytron<culture>Atlantean</culture></name>
-	  <name>Ash Ketchum<culture>Greek</culture></name>
+	  <name>Kaceytron<culture>Atlantean</culture></name>  
 		<nameID>62000<culture>Chinese</culture></nameID>
 		<nameID>62001<culture>Chinese</culture></nameID>
 		<nameID>62002<culture>Chinese</culture></nameID>

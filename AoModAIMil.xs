@@ -1201,7 +1201,7 @@ rule activateObeliskClearingPlan // + vil hunting
     int mainBaseID = kbBaseGetMainID(cMyID);
     static int obeliskPlanCount = 0;
     // We found targets, make a plan if we don't have one.
-
+    aiPlanSetBaseID(gObeliskClearingPlanID, mainBaseID);
     if ( (gObeliskClearingPlanID < 0) )
     {
         gObeliskClearingPlanID = aiPlanCreate("Obelisk plan #"+obeliskPlanCount, cPlanDefend);
@@ -1212,7 +1212,7 @@ rule activateObeliskClearingPlan // + vil hunting
    
         aiPlanSetVariableVector(gObeliskClearingPlanID, cDefendPlanDefendPoint, 0, kbBaseGetLocation(cMyID, mainBaseID));
         aiPlanSetVariableFloat(gObeliskClearingPlanID, cDefendPlanEngageRange, 0, 110.0);   //only in close range
-        aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanRefreshFrequency, 0, 30);
+        aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanRefreshFrequency, 0, 15);
         aiPlanSetVariableFloat(gObeliskClearingPlanID, cDefendPlanGatherDistance, 0, 40.0);
 
         aiPlanSetUnitStance(gObeliskClearingPlanID, cUnitStanceDefensive);
@@ -1828,7 +1828,7 @@ rule attackEnemySettlement
 	if (cMyCulture == cCultureChinese)
 	{
 	SiegeMU = cUnitTypeVermilionBird;
-	SiegeMU2 = cUnitTypeWarSalamander;  // No bonus.. but why not?
+	SiegeMU2 = cUnitTypePixiu;  // No bonus.. but why not?
 	}
 	
 	int sMUCombined = ((kbUnitCount(cMyID, SiegeMU, cUnitStateAlive)) + (kbUnitCount(cMyID, SiegeMU2, cUnitStateAlive)));

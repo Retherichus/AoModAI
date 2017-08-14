@@ -47,6 +47,9 @@ extern bool WaitForDock = false;
 extern int VinLandBase = -1;
 extern int mChineseImmortal = -1;
 extern int eChineseHero = -1;
+extern int cMonkMaintain = -1;
+extern const int cGaiaID = 0;
+extern int StuckTransformID = 0;
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -130,21 +133,16 @@ extern int eBoomTimer = 7;                // Minutes this plan will remain activ
 extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wood, this supports the Ai in building early fishing ships.
 
 
-
-
-
-
-
 // For RethEcoGoals, AoModAi do normally calculate the resources it needs, though.. we want it to keep some extra resources at all times, 
 // so, let's make it a little bit more ''static'' by setting resource goals a little closer to what Admiral Ai use.
-// Do note that anything you put in here will get added on top of the default goals, some values may appear to be very low but it really isn't.
+// Do note that anything you put in here will be added on top of the default goals, some values may appear to be very low but it really isn't.
 //==============================================================================
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
 extern int RethLGFAge2 = 800;             // Food
 extern int RethLGGAge2 = 450;              // Gold
-extern int RethLGWAge2 = 500;              // Wood
+extern int RethLGWAge2 = 550;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -187,7 +185,7 @@ extern int RethLEWAge4 = 700;              // Wood
 //Age 2 (Classical Age)
 extern int RethLNFAge2 = 900;             // Food
 extern int RethLNGAge2 = 450;              // Gold
-extern int RethLNWAge2 = 500;              // Wood
+extern int RethLNWAge2 = 550;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -208,7 +206,7 @@ extern int RethLNWAge4 = 1000;              // Wood
 //Age 2 (Classical Age)
 extern int RethLAFAge2 = 800;              // Food
 extern int RethLAGAge2 = 450;              // Gold
-extern int RethLAWAge2 = 500;              // Wood
+extern int RethLAWAge2 = 650;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -230,7 +228,7 @@ extern int RethLAWAge4 = 1000;              // Wood
 //Age 2 (Classical Age)
 extern int RethLCFAge2 = 800;              // Food
 extern int RethLCGAge2 = 450;              // Gold
-extern int RethLCWAge2 = 500;              // Wood
+extern int RethLCWAge2 = 550;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -264,7 +262,11 @@ void initRethlAge1(void)  // Am I doing this right??
 
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
-	  
+	if ((bWallUp == true) && (cvMapSubType == VINLANDSAGAMAP) && (cvOkToBuildWalls == true))  // enable in Heroic Age.
+    {
+	    gBuildWalls = false;
+        gBuildWallsAtMainBase = false;
+	}
 	  // Check with allies and enable donations
        xsEnableRule("MonitorAllies");
 
@@ -403,7 +405,6 @@ void initRethlAge2(void)
 	// Up Immortal count for chinese
 	if (cMyCulture == cCultureChinese)
 	aiPlanSetVariableInt(mChineseImmortal, cTrainPlanNumberToMaintain, 0, 6);
-
 }	
 
 //==============================================================================
@@ -468,8 +469,8 @@ rule ActivateRethOverridesAge2
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge2Prometheus) == cTechStatusActive)
         xsEnableRuleGroup("Prometheus");
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge2Okeanus) == cTechStatusActive)
-        xsEnableRuleGroup("Oceanus");
-		
+	    xsEnableRuleGroup("Oceanus");
+
 	    if (CheatResources == true)
 	    {
         aiResourceCheat(cMyID, cResourceFood, 300);
@@ -479,8 +480,7 @@ rule ActivateRethOverridesAge2
 		
 		xsEnableRule("activateObeliskClearingPlan"); // this also looks for villagers, don't get confused by the name.
 		
-		xsDisableSelf();
-		
+		xsDisableSelf();    
            
     }
 }
@@ -493,7 +493,10 @@ rule ActivateRethOverridesAge3
     {
         //CHINESE MINOR GOD SPECIFIC
 		if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Dabogong) == cTechStatusActive)
+		{
         xsEnableRuleGroup("Dabogong");
+		aiPlanSetVariableInt(cMonkMaintain, cTrainPlanNumberToMaintain, 0, 5);
+		}
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Hebo) == cTechStatusActive)
         xsEnableRuleGroup("Hebo");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Zhongkui) == cTechStatusActive)
@@ -505,7 +508,8 @@ rule ActivateRethOverridesAge3
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge3Sekhmet) == cTechStatusActive)
         xsEnableRuleGroup("Sekhmet");
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge3Hathor) == cTechStatusActive)
-        xsEnableRuleGroup("Hathor");		
+		xsEnableRuleGroup("Hathor");
+
 		
 		//Norse MINOR GOD SPECIFIC
         if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge3Skadi) == cTechStatusActive)
@@ -519,7 +523,9 @@ rule ActivateRethOverridesAge3
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge3Rheia) == cTechStatusActive)
         xsEnableRuleGroup("Rheia");
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge3Theia) == cTechStatusActive)
-        xsEnableRuleGroup("Theia");
+		xsEnableRuleGroup("Theia");
+
+        
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge3Hyperion) == cTechStatusActive)
         xsEnableRuleGroup("Hyperion");		
 		
@@ -556,7 +562,13 @@ rule ActivateRethOverridesAge3
 				aiPlanSetDesiredPriority(CPlanID, 69);							
 				aiPlanSetActive(CPlanID);
             }
-        }			
+        }		
+	    
+		if ((bWallUp == true) && (cvMapSubType == VINLANDSAGAMAP) && (cvOkToBuildWalls == true)) // it's okay now.
+        {
+	    gBuildWalls = true;
+        gBuildWallsAtMainBase = true;
+	    }		
 		xsDisableSelf();
            
     }
@@ -575,7 +587,9 @@ rule ActivateRethOverridesAge4
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Xiwangmu) == cTechStatusActive)
         xsEnableRuleGroup("Xiwangmu");
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Chongli) == cTechStatusActive)
-        xsEnableRuleGroup("Chongli");
+		xsEnableRuleGroup("Chongli");
+		
+
 		
         //Egyptian MINOR GOD SPECIFIC	
 	    if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Horus) == cTechStatusActive)
@@ -583,8 +597,8 @@ rule ActivateRethOverridesAge4
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Osiris) == cTechStatusActive)
         xsEnableRuleGroup("Osiris");
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Thoth) == cTechStatusActive)
-        xsEnableRuleGroup("Thoth");	
-		
+		xsEnableRuleGroup("Thoth");
+	
 		
 		//Norse MINOR GOD SPECIFIC
         if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge4Tyr) == cTechStatusActive)
@@ -2614,11 +2628,32 @@ bool Filled = false;
     aiPlanSetActive(TransportAttPlanID);
     attackPlanStartTime = xsGetTime();
  
- xsSetRuleMinIntervalSelf(5);
+    xsSetRuleMinIntervalSelf(5);
+}
+
+//==============================================================================
+rule StuckNorseTransform  
+minInterval 4
+inactive
+{
+	  if (StuckTransformID == 0)
+	  {
+	  return;
+	  xsDisableSelf();
+      }
+	  
+     
+      if (kbUnitIsType(StuckTransformID, cUnitTypeUlfsark))
+      {
+	  vector currentPosition = kbUnitGetPosition(StuckTransformID);	  
+	  aiUnitCreateCheat(cMyID, cUnitTypeUlfsark, currentPosition, "Replacing Stuck Ulfsark", 1);
+	  aiTaskUnitDelete(StuckTransformID);
+      }
+	  StuckTransformID = 0;	  
+      xsDisableSelf();	  
 }
 
 //Testing ground
-
 
 rule TEST  
 minInterval 1

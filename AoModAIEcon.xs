@@ -14,7 +14,8 @@ rule updateWoodBreakdown
     inactive
 {   
     if (ShowAiEcho == true) aiEcho("updateWoodBreakdown: ");
- 
+    if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
+	return;
     int mainBaseID = kbBaseGetMainID(cMyID);
   
     int randomBase = findUnit(cUnitTypeAbstractSettlement);
@@ -91,16 +92,11 @@ rule updateWoodBreakdown
     //Get the count of plans we currently have going.
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
-    int desiredWoodPlans = 2;
-	if ((kbGetAge() > cAge3) || (xsGetTime() > 25*60*1000))
-	{
+    int desiredWoodPlans = 1 + (woodGathererCount/12);
 	if (cMyCulture == cCultureAtlantean)
 	desiredWoodPlans = 1 + (woodGathererCount/4);
-	else
-	desiredWoodPlans = 1 + (woodGathererCount/12);
-	}
 	
-	if (xsGetTime() < 6*60*1000)
+	if (xsGetTime() < 8*60*1000)
     desiredWoodPlans = 1;
     
 	if (desiredWoodPlans > 2)
@@ -209,7 +205,8 @@ rule updateGoldBreakdown
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateGoldBreakdown: ");
-
+    if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
+	return;
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
 
@@ -303,12 +300,10 @@ rule updateGoldBreakdown
     //Get the count of plans we currently have going.
     int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 
-    int desiredGoldPlans = 2;
+    int desiredGoldPlans = 1 + (goldGathererCount/12);
 	if (cMyCulture == cCultureAtlantean)
 	desiredGoldPlans = 1 + (goldGathererCount/4);
-	else
-	desiredGoldPlans = 1 + (goldGathererCount/12);
-	
+
 	if (desiredGoldPlans > 2)
 	desiredGoldPlans = 2;
 
@@ -420,13 +415,14 @@ rule updateFoodBreakdown
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateFoodBreakdown: ");
-    
+    if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
+	return;   
 	if (xsGetTime() > 20*1*1000)
 	xsSetRuleMinIntervalSelf(9);
 	
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 60.0);
+    int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 100.0);
     float foodSupply = kbResourceGet(cResourceFood);
     float woodSupply = kbResourceGet(cResourceWood);
     
@@ -441,7 +437,7 @@ rule updateFoodBreakdown
     
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
       
-    float distance = 85;
+    float distance = 100;
     if ((kbGetAge() >= cAge3) || (xsGetTime() > 12*60*1000)) 
 	distance=40.0;
 
@@ -453,7 +449,7 @@ rule updateFoodBreakdown
 	// Consider any of these below, as Aggressive Animals at the start of the game.
 	
 	if ((IsRunHuntingDogs == false) && (xsGetTime() < 20*1*1000))
-	int FakeAggressives = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+	int FakeAggressives = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAny, 0, 0, mainBaseLocation, 85);
 
 
 	
@@ -473,7 +469,7 @@ rule updateFoodBreakdown
 		if ((HippoDone == false) && (gHuntingDogsASAP == true) && (xsGetTime() < 20*1*1000))
 		{ 
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
-	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, distance);
+	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, 85);
 		if ((HippoNearMB > 1) && (cMyCulture != cCultureAtlantean))
 		aiSetMinNumberNeedForGatheringAggressvies(4);
 		else if ((HippoNearMB > 1) && (cMyCulture == cCultureAtlantean))
@@ -540,7 +536,6 @@ rule updateFoodBreakdown
     int NumVillagers = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID);
 	if ((kbGetAge() > cAge2) || (xsGetTime() > 14*60*1000))
 	{
-	if (cMyCulture != cCultureAtlantean)
 	desiredFarmers = desiredFarmers+NumVillagers*0.10;
 	if ((ShowAiEcho == true) || (ShowAiEcoEcho == true)) aiEcho("Desired farms: "+desiredFarmers+"");	
     }
@@ -548,15 +543,15 @@ rule updateFoodBreakdown
 	//titan override
     if (aiGetWorldDifficulty() == cDifficultyNightmare)
     {  
-    desiredFarmers = 26;
+    desiredFarmers = 20;
 	 if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 7;
+        desiredFarmers = 8;
 	}	
 	
-		if ((cMyCulture != cCultureAtlantean) && (desiredFarmers >= 30))
-	    desiredFarmers = 30;
-	    if ((cMyCulture == cCultureAtlantean) && (desiredFarmers >= 10)) //override for Atlantean
-        desiredFarmers = 10;
+		if ((cMyCulture != cCultureAtlantean) && (desiredFarmers >= 28))
+	    desiredFarmers = 28;
+	    if ((cMyCulture == cCultureAtlantean) && (desiredFarmers >= 12)) //override for Atlantean
+        desiredFarmers = 12;
 	
     if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
     {
@@ -1380,20 +1375,17 @@ void econAge2Handler(int age=1)
         if (cMyCulture == cCultureAtlantean)
         {
             createSimpleBuildPlan(cUnitTypeArmory, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 2);
-            createSimpleBuildPlan(cUnitTypeManor, 3, 95, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
+            createSimpleBuildPlan(cUnitTypeManor, 3, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
         }
         else
         {
             createSimpleBuildPlan(cUnitTypeArmory, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 3);
-            createSimpleBuildPlan(cUnitTypeHouse, 6, 95, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 2);
+            createSimpleBuildPlan(cUnitTypeHouse, 6, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 2);
         }
     }
 
     // Set escrow caps
     kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 800.0);    // Age 3
-	if (cMyCulture == cCultureAtlantean)
-    kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 420.0);  // Testing.. Farms are more expensive and crucial in this age
-    else 
 	kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 250.0);
 	kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 500.0);    // Age 3
     kbEscrowSetCap( cEconomyEscrowID, cResourceFavor, 30.0);
@@ -1439,7 +1431,7 @@ void econAge3Handler(int age=0)
         {
             createSimpleBuildPlan(cUnitTypeMarket, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 5);
             gExtraMarket = true; // Set the global so we know to look for SECOND market before trading.       
-            createSimpleBuildPlan(cUnitTypeHouse, 2, 95, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
+            createSimpleBuildPlan(cUnitTypeHouse, 2, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
         }
     }
 
@@ -1536,7 +1528,23 @@ void econAge4Handler(int age=0)
     kbEscrowSetCap( cMilitaryEscrowID, cResourceGold, 300.0);   
     kbEscrowSetCap( cMilitaryEscrowID, cResourceFavor, 30.0);
 }
-
+void createCivPopPlan()
+{    
+	gCivPopPlanID=aiPlanCreate("civPop", cPlanTrain);
+    if (gCivPopPlanID >= 0)
+    {
+        //Get our mainline villager PUID.
+        int gathererPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer,0);
+        aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanUnitType, 0, gathererPUID);
+        //Train off of economy escrow.
+        aiPlanSetEscrowID(gCivPopPlanID, cEconomyEscrowID);
+        //Default to 10.
+        aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0, 10);    // Default until reset by updateEM
+        aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanBuildFromType, 0, cUnitTypeAbstractSettlement);   // Abstract fixes Citadel problem
+        aiPlanSetDesiredPriority(gCivPopPlanID, 97); // MK:  Changed priority 100->97 so that oxcarts and ulfsark reserves outrank villagers.
+        aiPlanSetActive(gCivPopPlanID);
+    }
+}	
 //==============================================================================
 void initEcon() //setup the initial Econ stuff.
 {
@@ -1561,20 +1569,7 @@ void initEcon() //setup the initial Econ stuff.
     gWoodBaseID=kbBaseGetMainID(cMyID);
 	
     //Make a plan to manage the villager population.
-    gCivPopPlanID=aiPlanCreate("civPop", cPlanTrain);
-    if (gCivPopPlanID >= 0)
-    {
-        //Get our mainline villager PUID.
-        int gathererPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer,0);
-        aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanUnitType, 0, gathererPUID);
-        //Train off of economy escrow.
-        aiPlanSetEscrowID(gCivPopPlanID, cEconomyEscrowID);
-        //Default to 10.
-        aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0, 10);    // Default until reset by updateEM
-        aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanBuildFromType, 0, cUnitTypeAbstractSettlement);   // Abstract fixes Citadel problem
-        aiPlanSetDesiredPriority(gCivPopPlanID, 97); // MK:  Changed priority 100->97 so that oxcarts and ulfsark reserves outrank villagers.
-        aiPlanSetActive(gCivPopPlanID);
-    }
+    createCivPopPlan();
 
     //Create a herd plan to gather all herdables that we ecounter.
     xsEnableRule("createHerdplan");
@@ -1614,7 +1609,7 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
     float goldGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceGold);
     float favorGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFavor);
 
-    if (gWaterMap == true && RethFishEco == true && ConfirmFish == true)
+    if ((gWaterMap == true && RethFishEco == true && ConfirmFish == true) || (aiGetGameMode() == cGameModeDeathmatch))
 	{
     xsDisableSelf();
 	if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Found fish! Looks like we're going fishing then!");
@@ -2523,7 +2518,18 @@ rule tradeWithCaravans
 
         if ((mapRestrictsMarketAttack() == false) || (cRandomMapName == "watering hole"))
         {
-            chosenCorner = closestToMe;
+		     //static bool initialRand = false;
+			 //int Rand = aiRandInt(2);
+			// if (initialRand == false)
+			// Rand = 1;
+			// if (Rand == 1)
+          //  chosenCorner = secondClosestToMe;
+			//else 
+			chosenCorner = closestToMe;
+			//initialRand = true;
+			//if (cRandomMapName == "watering hole")
+			//chosenCorner = closestToMe;
+			
         }
         else
         {

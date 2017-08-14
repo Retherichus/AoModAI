@@ -42,7 +42,8 @@ rule getLoneWanderer
     inactive
     minInterval 36 //starts in cAge1
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive) < 10))
         return;
     if (kbGetTechStatus(cTechLoneWanderer) == cTechStatusAvailable)
     {
@@ -64,7 +65,7 @@ rule getEyesInTheForest
     inactive
     minInterval 36 //starts in cAge1
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge2))
         return;
     if (kbGetTechStatus(cTechEyesintheForest) == cTechStatusAvailable)
     {
@@ -91,7 +92,7 @@ rule getAuroraBorealis
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeValkyrie, cUnitStateAlive) < 2))
+    if ((kbGetAge() < cAge3) && (goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeValkyrie, cUnitStateAlive) < 3))
 	return;
     if (kbGetTechStatus(cTechAuroraBorealis) == cTechStatusAvailable)
     {
@@ -133,7 +134,7 @@ rule getSafeguard
         int x=-1;
         x = aiPlanCreate("Safeguard", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechSafeguard);
-        aiPlanSetDesiredPriority(x, 100);
+        aiPlanSetDesiredPriority(x, 25);
         aiPlanSetEscrowID(x, cMilitaryEscrowID);
         aiPlanSetActive(x);
         xsSetRuleMinIntervalSelf(300);
@@ -151,7 +152,7 @@ rule getElhrimnirKettle
         return;
     float foodSupply = kbResourceGet(cResourceFood);
 
-    if ((kbGetAge() < cAge3 && foodSupply < 1000) || (kbUnitCount(cMyID, cUnitTypeEinheriar, cUnitStateAlive) < 2))
+    if ((kbGetAge() < cAge3) && (foodSupply < 1000) || (kbUnitCount(cMyID, cUnitTypeEinheriar, cUnitStateAlive) < 2))
 	return;
     if (kbGetTechStatus(cTechEldhrimnirKettle) == cTechStatusAvailable)
     {
@@ -205,7 +206,7 @@ rule getHamarrtroll
         return;
     float woodSupply = kbResourceGet(cResourceWood);
 	
-    if ((kbGetAge() < cAge3 && woodSupply < 650) || (kbUnitCount(cMyID, cUnitTypeTroll, cUnitStateAlive) < 2))
+    if ((kbGetAge() < cAge3) && (woodSupply < 650) || (kbUnitCount(cMyID, cUnitTypeTroll, cUnitStateAlive) < 2))
 	return;
     if (kbGetTechStatus(cTechHamarrtroll) == cTechStatusAvailable)
     {
@@ -298,7 +299,7 @@ rule getSwineArray
     minInterval 60 //starts in cAge3
     group Bragi
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeUlfsark, cUnitStateAlive) < 5))
         return;
     if (kbGetTechStatus(cTechSwineArray) == cTechStatusAvailable)
     {
@@ -319,7 +320,7 @@ rule getThurisazRune
     minInterval 60 //starts in cAge3
     group Bragi
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbResourceGet(cResourceWood) < 350))
         return;
     if (kbGetTechStatus(cTechThurisazRune) == cTechStatusAvailable)
     {
@@ -342,6 +343,8 @@ rule getDwarvenAuger
     minInterval 60 //starts in cAge4
     group Baldr
 {
+    if (kbUnitCount(cMyID, cUnitTypePortableRam, cUnitStateAlive) < 2)
+	return;
     if (kbGetTechStatus(cTechDwarvenAuger) == cTechStatusAvailable)
     {
         int x=-1;
@@ -360,6 +363,8 @@ rule getSonsOfSleipnir
     minInterval 60 //starts in cAge4
     group Baldr
 {
+    if ((kbUnitCount(cMyID, cUnitTypeRaidingCavalry, cUnitStateAlive) < 4) || (kbResourceGet(cResourceFood) < 400))
+	return;
     if (kbGetTechStatus(cTechSonsofSleipnir) == cTechStatusAvailable)
     {
         int x=-1;

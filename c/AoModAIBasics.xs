@@ -169,13 +169,9 @@ extern int     cvNumberMilitaryUnitTypes = -1;
 // Random map name.  Can be set in setParameters to make scenario AI's adopt map-specific behaviors.  Must be set in setParameters() to be
 // used, there is no way to activate it later.
 
-extern string cvRandomMapName="None";    
-//==============================================================================
-// Please change the None tag above and use one of the tags below if your scenario needs a special treatment:
-// "Transport Scenario" // for islands maps
-// "Migration Scenario" // for migration maps
-// Possibly case sensitive too!
-//==============================================================================
+extern string cvRandomMapName="None"; 
+// if your scenario needs a special treatment, consider to change "None" to one of these: "Transport Scenario" or "Migration Scenario"
+
 
 extern bool    cvTransportMap = false;    // Set this to true in setParameters() to tell AI to make transports.  Note: if left
                                           // false, the init() functions may set it true if its a watery map.  If you want
@@ -1225,7 +1221,10 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
                                                       false, transportPUID, 80, baseID);
 
     // add the builders to the transport plan
-    aiPlanAddUnitType( remoteSettlementTransportPlan, builderTypeID, 3, 3, 3 );
+	int NumBuilders = 2;
+	if (cMyCulture == cCultureAtlantean)
+	NumBuilders = 1;
+    aiPlanAddUnitType( remoteSettlementTransportPlan, builderTypeID, NumBuilders, NumBuilders, NumBuilders);
 
     //Done with transport plan. build a settlement now!
     int planID=aiPlanCreate("Build Remote"+kbGetUnitTypeName(cUnitTypeSettlementLevel1),
@@ -1240,7 +1239,7 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
     //Escrow.
     aiPlanSetEscrowID(planID, cEconomyEscrowID);
     //Builders.
-    aiPlanAddUnitType(planID, builderTypeID, 3, 3, 3);
+    aiPlanAddUnitType(planID, builderTypeID, NumBuilders, NumBuilders, NumBuilders);
     //Location.
     aiPlanSetInitialPosition(planID, where);
     aiPlanSetVariableVector(planID, cBuildPlanSettlementPlacementPoint, 0, where);
@@ -1525,7 +1524,13 @@ bool createSimpleBuildPlan(int puid=-1, int number=1, int pri=100,
         aiPlanAddUnitType(planID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), numberBuilders, numberBuilders, numberBuilders);
         //Base ID.
         aiPlanSetBaseID(planID, baseID);
+		if (puid != cUnitTypeFarm)
+		{
 		aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 4.0);
+        aiPlanSetVariableInt(planID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeBuilding); 
+        aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 7);    
+        aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitValue, 0, -5.0);        // -5 points per unit		
+		}
         //Go.
         aiPlanSetActive(planID);
     }
@@ -2132,9 +2137,9 @@ void taskMilUnitTrainAtBase(int baseID = -1)
 }
 
 //==============================================================================
-// findStdPlan - borrowed from "Notonecta"
+// findPlanByString - borrowed from "Notonecta"
 //==============================================================================
-int findStdPlan(string autoName = "BUG", int iResourceType = -1, int iPlanType = cPlanGather, int iState = cPlanStateGather) 
+int findPlanByString(string autoName = "BUG", int iPlanType = -1, int iState = -1, bool ReturnNumbers = false) 
 {
     int iPlanID = aiPlanGetID(autoName);
     if (iPlanID < 0) 
@@ -2148,6 +2153,8 @@ int findStdPlan(string autoName = "BUG", int iResourceType = -1, int iPlanType =
             if (aiPlanGetName(iCurrentPlan) == (autoName + ":" + iCurrentPlan)) 
 			{
                 iPlanID = iCurrentPlan;
+				if (ReturnNumbers == true)
+				iPlanID = iNumberOfPlans;
                 break;
             }
         }

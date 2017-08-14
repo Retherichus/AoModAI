@@ -905,11 +905,11 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	if(powerProtoID == cPowerCallToArms)
 	{
 	  aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
-	  aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
-	  aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
-	  aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 20.0);
+	  aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistanceSelf);
+	  aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
+	  aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 0.0);
+	  aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
 	  aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-	  aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
 	  aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
 	  return (true);  
 	}
@@ -1036,9 +1036,9 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistance);
 		aiPlanSetVariableInt(planID,  cGodPowerPlanQueryPlayerID, 0, aiGetMostHatedPlayerID());
 		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
-		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 25.0);
-		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
-		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeLogicalTypeHouses);
+		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 50.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 6);
+		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeLogicalTypeBuildingNotTitanGate);
 		return (true);  
 	}
 	// Set up the Year of the Goat power
@@ -1302,8 +1302,7 @@ rule rUnbuild
     }
 
     aiPlanSetDesiredPriority(gUnbuildPlanID, 100);
-    aiPlanSetEscrowID(gUnbuildPlanID, -1);
-
+    aiPlanSetEscrowID(gUnbuildPlanID, cMilitaryEscrowID);
     //Setup the plan.. 
     // these are first pass.. fix these eventually.. 
     aiPlanSetVariableBool(gUnbuildPlanID, cGodPowerPlanAutoCast, 0, true); 
@@ -1312,7 +1311,7 @@ rule rUnbuild
     aiPlanSetVariableInt(gUnbuildPlanID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelUnbuild);
     aiPlanSetVariableFloat(gUnbuildPlanID,  cGodPowerPlanDistance, 0, 40.0);
     aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanUnitTypeID, 0, cUnitTypeLogicalTypeBuildingsNotWalls);
-    aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanCount, 0, 1);
+    aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanCount, 0, 3);
 
     aiPlanSetActive(gUnbuildPlanID);
     xsDisableSelf();

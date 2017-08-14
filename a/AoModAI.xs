@@ -441,13 +441,12 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
 
     static int failCount = 0;
     static bool initialResetDone = false;
-
     if (initialResetDone == false)
     {
         initialResetDone = true;
         kbEscrowAllocateCurrentResources();
         return;
-    }
+    }	
 
     bool fishingReset = false;    // Special reset in first 5 minutes for wood imbalance while fishing
                                  // (Every fishing boat trained gets double-billed.)
@@ -534,7 +533,11 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
     
     if (kbGetAge() == cAge2)
     {
-        if ((kbGetTechStatus(cTechPlow) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechPlow, true) >= 0))
+	    int numFarms = kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive);
+		if (cMyCulture == cCultureAtlantean)
+		numFarms = numFarms * 3;
+		
+        if ((kbGetTechStatus(cTechPlow) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechPlow, true) >= 0) && (numFarms >= 3))
         {
             if ((woodSupply > 50) && (goldSupply > 100))
             {
@@ -550,7 +553,8 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             if (ShowAiEcho == true) aiEcho("tasking research of tech ID"+gAge3MinorGod);
         }
         
-        if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, cTechWatchTower, true) >= 0))
+		int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAlive);
+        if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, cTechWatchTower, true) >= 0) && (numTowers > 0))
         {
             if ((woodSupply > 200) && (goldSupply > 100))
             {
@@ -671,29 +675,6 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
         }
-   /*
-   // No idea what this really does.. but I am assuming anything in the Root escrow is free for all.
-   if (foodSupply > 1200)
-   {
-       kbEscrowFlush(cEconomyEscrowID, cResourceFood, true);
-       kbEscrowFlush(cMilitaryEscrowID, cResourceFood, true);
-   }
-   if (woodSupply > 1000)
-   {
-       kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
-       kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
-   }
-   if (goldSupply > 1200)
-   {
-       kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
-       kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-   }
-   if (favorSupply > 80)
-   {
-       kbEscrowFlush(cEconomyEscrowID, cResourceFavor, true);
-       kbEscrowFlush(cMilitaryEscrowID, cResourceFavor, true);
-   }
-	*/	
   }
 }
 
@@ -730,6 +711,8 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
             milPop = milPop + (milPop * milPopDelta);
             if (milPop < 23) 
                 milPop = 23;
+            if ((gAgeFaster == true) && (gAgeReduceMil == true))
+	        milPop = eMaxMilPop;				
         }
     }
 
@@ -805,7 +788,7 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
             tradeCount = 15;
         if ((aiGetGameMode() == cGameModeLightning) && (tradeCount > 5))
             tradeCount = 5;
-        
+        aiEcho("VilPop Before: "+vilPop);
         vilPop = vilPop - tradeCount;     // Vils = total-trade
 
     }
@@ -877,7 +860,6 @@ rule updateEMAge1       // i.e. cAge1
          milPopTarget = 80;
       }
    }
-
    //All econ in the first age.
    updateEM(civPopTarget, milPopTarget, 1.0, 0.2, 1.0, 1.0, 1.0, 1.0);
 }
@@ -931,18 +913,34 @@ rule updateEMAge2
 	    milPopTarget = eMaxMilPop;
 		}		
     }
-
-
+	  
     float econPercent = 0.50;     // Econ priority rating, range 0..1
     float econEscrow = 0.50;      // Economy's share of non-root escrow, range 0..1
-
+    float WoodeconEscrow = econEscrow;
     float econAdjust = -.5 * cvMilitaryEconSlider;  // For econ purist, do lesser of 50% econ boost or 50% mil cut
                                                    // For hawk, vice versa 
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
+	
+	if ((xsGetTime() > 13*60*1000) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge2))
+	{
+	if (econEscrow < 0.85)
+	econEscrow = 0.85;
+	}
+	WoodeconEscrow = econEscrow;
+	
+	int FarmThreshold = 4;
+	if (cMyCulture == cCultureAtlantean)
+	FarmThreshold = 2;
+	
+	if ((cMyCulture != cCultureEgyptian) && (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) < FarmThreshold))
+	{
+	if (WoodeconEscrow < 0.66)
+	WoodeconEscrow= 0.66;
+	}
 
     //More military in second age
-    updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, econEscrow, econEscrow, econEscrow);
+    updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, WoodeconEscrow, econEscrow, econEscrow);
 }
 
 //==============================================================================
@@ -991,10 +989,10 @@ rule updateEMAge3
       kbUnitPickSetMinimumPop(gLateUPID, milPopTarget*.5);
       kbUnitPickSetMaximumPop(gLateUPID, milPopTarget*.75);
     }
-
+      
+	  
     float econPercent = 0.3;     // Econ priority rating, range 0..1
     float econEscrow = 0.3;      // Economy's share of non-root escrow, range 0..1
-
     float econAdjust = -.5 * cvMilitaryEconSlider;  // For econ purist, do lesser of 50% econ boost or 50% mil cut
                                                    // For hawk, vice versa 
 
@@ -1012,6 +1010,11 @@ rule updateEMAge3
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
 
+	if ((xsGetTime() > 26*60*1000) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge3))
+	{
+	if (econEscrow < 0.58)
+	econEscrow = 0.58;
+	}	
     //More military in second age
     updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, econEscrow, econEscrow, econEscrow);
 }
@@ -1043,7 +1046,7 @@ rule updateEMAge4
       civPopTarget = 56;      // 56 of first 115
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
-      if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
+      if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000) )
          civPopTarget = 35;   // limited for first 10 minutes while resource glut remains
       civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
@@ -1057,7 +1060,7 @@ rule updateEMAge4
       civPopTarget = 45; 
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
-      if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 60*8*1000) )
+      if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000) )
          civPopTarget = 35;   // limited for first 10 minutes while resource glut remains
       civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115
       if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
@@ -1089,6 +1092,11 @@ rule updateEMAge4
 
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
+	if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
+	{
+	if (econEscrow < 0.62)
+	econEscrow = 0.62;
+    }	
 
     //More military in second age
     updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, econEscrow, econEscrow, econEscrow);
@@ -1101,7 +1109,7 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
     minInterval 11 //starts in cAge1
 {
     // check for valid forecasts, exit if not ready
-    if ((gGoldForecast + gWoodForecast + gFoodForecast) < 100)
+    if (((gGoldForecast + gWoodForecast + gFoodForecast) < 100) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000))
         return; 
     float scaleFactor = 5.0;      // Higher values make prices more volatile
     float goldStatus = 0.0;
@@ -1129,7 +1137,7 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
 
     // The rates are now the instantaneous price for each resource.  Set the long-term prices by averaging this in
     // at a 5% weight.
-
+	//aiEcho("ForecastGold:  "+gGoldForecast +"."+ " ForecastWood: "+gWoodForecast +"."+ " ForecastFood: "+gFoodForecast);
     float cost = 0.0;
 
     // wood
@@ -1197,7 +1205,7 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
         {
             if (kbResourceGet(cResourceFood) < 1200)
             {
-                if (kbResourceGet(cResourceGold) > 1800)
+                if (kbResourceGet(cResourceGold) > 2800)
                 {
                     for (i = 0; < 4)
                     {
@@ -1209,9 +1217,9 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
                     aiBuyResourceOnMarket(cResourceFood);
                 }
             }
-            if (kbResourceGet(cResourceWood) < 800)
+            if (kbResourceGet(cResourceWood) < 1000)
             {
-                if (kbResourceGet(cResourceGold) > 1800)
+                if (kbResourceGet(cResourceGold) > 2700)
                 {
                     for (i = 0; < 4)
                     {
@@ -1232,11 +1240,11 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
                 aiSellResourceOnMarket(cResourceWood);
             }
         }
-        if (kbResourceGet(cResourceWood) > 1300)	// We have a lot of wood, OK to sell
+        if (kbResourceGet(cResourceWood) > 1600)	// We have a lot of wood, OK to sell
         {
             if (kbResourceGet(cResourceGold) < 1200)
             {
-                if (kbResourceGet(cResourceWood) > 1800)
+                if (kbResourceGet(cResourceWood) > 2200)
                 {
                     for (i = 0; < 4)
                     {
@@ -1261,7 +1269,7 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
         {
             if (kbResourceGet(cResourceGold) < 1200)
             {
-                if (kbResourceGet(cResourceFood) > 1800)
+                if (kbResourceGet(cResourceFood) > 2400)
                 {
                     for (i = 0; < 4)
                     {
@@ -2753,8 +2761,8 @@ void initAtlantean(void)
         exploreID = aiPlanCreate("Explore_SpecialAtlantean"+i, cPlanExplore);
         if (exploreID >= 0)
         {
-            aiPlanAddUnitType(exploreID, cUnitTypeOracleScout, 0, 1, 1);
-            aiPlanAddUnitType(exploreID, cUnitTypeOracleHero, 0, 1, 1);    // Makes sure the relic plan sees this plan as a hero source.
+            aiPlanAddUnitType(exploreID, cUnitTypeAbstractScout, 0, 1, 1);
+            //aiPlanAddUnitType(exploreID, cUnitTypeOracleHero, 0, 1, 1);    // Makes sure the relic plan sees this plan as a hero source. Also crashes the game!
             aiPlanSetVariableBool(exploreID, cExplorePlanDoLoops, 0, false);
             aiPlanSetVariableBool(exploreID, cExplorePlanOracleExplore, 0, true);
             aiPlanSetDesiredPriority(exploreID, 25);  // Allow oracleHero relic plan to steal one
@@ -2766,7 +2774,7 @@ void initAtlantean(void)
     }  
 
    // Make sure we always have at least 1 oracles
-   int oracleMaintainPlanID = createSimpleMaintainPlan(cUnitTypeOracleScout, 1, false, kbBaseGetMainID(cMyID));
+      int oracleMaintainPlanID = createSimpleMaintainPlan(cUnitTypeOracleScout, 1, false, kbBaseGetMainID(cMyID));
 
     // Special emergency manor build for Lightning
     if (aiGetGameMode() == cGameModeLightning)
@@ -2802,7 +2810,7 @@ void initAtlantean(void)
     // If I'm Kronos.. turn on unbuild..
     if (cMyCiv == cCivKronos)
         unbuildHandler();
-
+	
     if (cMyCiv == cCivOuranos)
         xsEnableRule("buildSkyPassages");
 }
@@ -2829,8 +2837,8 @@ void initChinese(void)
 		if(cMyCulture == cCultureChinese)
 	{ 
         xsEnableRule("DelayImmortalHero"); 	
-		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 3, false, kbBaseGetMainID(cMyID));
-		createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(3)+2, false, kbBaseGetMainID(cMyID));
+		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 2, false, kbBaseGetMainID(cMyID));
+		cMonkMaintain = createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(2)+3, false, kbBaseGetMainID(cMyID));
 	}
         if (aiGetWorldDifficulty() != cDifficultyEasy && cMyCulture == cCultureChinese)
             createSimpleMaintainPlan(cUnitTypeSittingTiger, 4, false, kbBaseGetMainID(cMyID));
@@ -3502,8 +3510,6 @@ void init(void)
     xsEnableRule("updateGoldBreakdown");
     //We're in a random map.
     aiSetRandomMap(true);
-    if (cvRandomMapName == "None")
-        cvRandomMapName = cRandomMapName;
     if (ShowAiTestEcho == true) aiEcho("MAP NAME "+cRandomMapName+".");
 
     //Adjust control variable sliders by random amount
@@ -3570,8 +3576,7 @@ void init(void)
     //God Powers
     initGodPowers();
     
-    //Naval
-    initNaval();
+
 
     //Create bases for all of our settlements.  Ignore any that already have
     //bases set.  If we have an invalid main base, the first base we create
@@ -3655,6 +3660,8 @@ void init(void)
     
 	//Map Specific
     initMapSpecific();
+	//Naval
+    initNaval();
 	
     //Setup the progression to follow these minor gods.
     kbTechTreeAddMinorGodPref(gAge2MinorGod);
@@ -3819,8 +3826,15 @@ void init(void)
     if (rushSize < 10)
         rushSize = 10;  // Give unitpicker something to do...
 
+    if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureNorse))
+    {
 
-    gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2+aiRandInt(2), true); // Rush with rushSize pop slots of two types, 2+rand buildings, do guess enemy unit type
+            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2, true);  // 2 buildings if egyptian or norse
+    }    
+    else
+    {
+            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 1, true); // Rush with rushSize pop slots of two types, 1 buildings, do guess enemy unit type
+    }
 
 
     if (ShowAiEcho == true) aiEcho("Setting rush unit picker for "+rushCount+" rushes with "+rushSize+" pop slots used.");
@@ -3966,7 +3980,7 @@ void init(void)
         if ( aiGetGameMode() != cGameModeDeathmatch )
             gLateUPID=initUnitPicker("Late", 2, -1, -1, minPop, maxPop, gNumberBuildings, false);   // Attack with at least 20-33 pop slots, no more than 36-49.
         else  // DM, double number of buildings
-            gLateUPID=initUnitPicker("Late", 2, -1, -1, minPop, maxPop, 2*gNumberBuildings, false);   // Attack with at least 20-33 pop slots, no more than 36-49.
+            gLateUPID=initUnitPicker("Late", 2, -1, -1, minPop, maxPop, 2*gNumberBuildings+2, false);   // Attack with at least 20-33 pop slots, no more than 36-49.
     }
     else
     {
@@ -3992,7 +4006,7 @@ void init(void)
                 gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings+1, true);    // Min: 40-59, max 70 pop slots
         }
         else  // Double buildings in DM
-            gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, 2*gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
+            gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, 2*gNumberBuildings+2, true);    // Min: 40-59, max 70 pop slots
     }
     
     int lateAttackAge = 2;
@@ -4060,7 +4074,7 @@ void init(void)
         //Standard RB setup.
         aiPlanSetNumberVariableValues(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, 5, true);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHunt, 0);
-		if (cMyCulture == cCultureAtlantean)
+		if ((cMyCulture == cCultureAtlantean) || (aiGetGameMode() == cGameModeDeathmatch))
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 0);
 		else aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 1);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHuntAggressive, 0);
@@ -4112,13 +4126,13 @@ void init(void)
         {
             createSimpleBuildPlan(cUnitTypeTemple, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 2);
             if (aiGetGameMode() == cGameModeDeathmatch)
-                createSimpleBuildPlan(cUnitTypeManor, 2, 95, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeManor, 2, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
         }
         else
         {
-            createSimpleBuildPlan(cUnitTypeTemple, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 3);
+            createSimpleBuildPlan(cUnitTypeTemple, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 5);
             if (aiGetGameMode() == cGameModeDeathmatch)
-                createSimpleBuildPlan(cUnitTypeHouse, 4, 95, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
+                createSimpleBuildPlan(cUnitTypeHouse, 4, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
         }
     }
 
@@ -5205,6 +5219,13 @@ void age5Handler(int age=4)
 
     //enable the titanplacement rule
     xsEnableRule("rPlaceTitanGate");
+    
+	// Set Escrow back to normal.
+	kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 300.0);    
+    kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 300.0);    
+    kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 300.0);    
+    kbEscrowSetCap( cEconomyEscrowID, cResourceFavor, 30.0);
+	//
     
     //enable the randomUpgrader rule
     xsEnableRule("randomUpgrader");

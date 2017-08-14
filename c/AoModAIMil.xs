@@ -1201,7 +1201,7 @@ rule activateObeliskClearingPlan // + vil hunting
     int mainBaseID = kbBaseGetMainID(cMyID);
     static int obeliskPlanCount = 0;
     // We found targets, make a plan if we don't have one.
-
+    aiPlanSetBaseID(gObeliskClearingPlanID, mainBaseID);
     if ( (gObeliskClearingPlanID < 0) )
     {
         gObeliskClearingPlanID = aiPlanCreate("Obelisk plan #"+obeliskPlanCount, cPlanDefend);
@@ -1212,7 +1212,7 @@ rule activateObeliskClearingPlan // + vil hunting
    
         aiPlanSetVariableVector(gObeliskClearingPlanID, cDefendPlanDefendPoint, 0, kbBaseGetLocation(cMyID, mainBaseID));
         aiPlanSetVariableFloat(gObeliskClearingPlanID, cDefendPlanEngageRange, 0, 110.0);   //only in close range
-        aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanRefreshFrequency, 0, 30);
+        aiPlanSetVariableInt(gObeliskClearingPlanID, cDefendPlanRefreshFrequency, 0, 15);
         aiPlanSetVariableFloat(gObeliskClearingPlanID, cDefendPlanGatherDistance, 0, 40.0);
 
         aiPlanSetUnitStance(gObeliskClearingPlanID, cUnitStanceDefensive);
@@ -1303,8 +1303,8 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
             int resourceID = aiPlanGetVariableInt(foodGatherPlanID, cGatherPlanResourceID, 0);
             if (resourceID == cResourceFood)
             {
-			int Agg = findStdPlan("AutoGPFoodHuntAggressive",cAIResourceSubTypeFarm, cPlanGather);
-			int Easy = findStdPlan("AutoGPFoodEasy",cResourceFood, cPlanGather);
+			int Agg = findPlanByString("AutoGPFoodHuntAggressive", cPlanGather);
+			int Easy = findPlanByString("AutoGPFoodEasy", cPlanGather);
 			if (Agg != -1)
 			Temp = aiPlanGetLocation(Agg);
 			else 
@@ -1400,7 +1400,9 @@ rule mainBaseDefPlan1   //Make a defend plan that protects the main base
 
         if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
             aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 1, 1);
-
+        
+		if (gAge2MinorGod == cTechAge2Okeanus)
+            aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeFlyingMedic, 1, 1, 1);
         
         aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeLogicalTypeLandMilitary, 0, 0, 2);
             
@@ -1826,7 +1828,7 @@ rule attackEnemySettlement
 	if (cMyCulture == cCultureChinese)
 	{
 	SiegeMU = cUnitTypeVermilionBird;
-	SiegeMU2 = cUnitTypeWarSalamander;  // No bonus.. but why not?
+	SiegeMU2 = cUnitTypePixiu;  // No bonus.. but why not?
 	}
 	
 	int sMUCombined = ((kbUnitCount(cMyID, SiegeMU, cUnitStateAlive)) + (kbUnitCount(cMyID, SiegeMU2, cUnitStateAlive)));
@@ -2484,13 +2486,13 @@ rule attackEnemySettlement
             aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 2, 2);
         
         if (numTitans > 0)
-            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
+            aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans, numMilUnitsInDefPlans, numMilUnitsInDefPlans);
         else
         {
             if (currentPopCap > 160)
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans, numMilUnitsInDefPlans, numMilUnitsInDefPlans);
             else
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
         }
         aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
         
@@ -2523,10 +2525,15 @@ rule attackEnemySettlement
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 3, cUnitTypeBuilding);
 	aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetTypeID, 4, cUnitTypeAbstractTradeUnit);
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);
-	
-	
+
     aiPlanSetActive(enemySettlementAttPlanID);
-    
+	if (cMyCiv == cCivKronos)
+    aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanAttackPlanID, 0, enemySettlementAttPlanID);
+	
+	int GPFindPlan = aiFindBestAttackGodPowerPlan();
+	if ((GPFindPlan > 0) && (GPFindPlan != gUnbuildPlanID))
+    aiPlanSetVariableInt(GPFindPlan, cGodPowerPlanAttackPlanID, 0, enemySettlementAttPlanID);	
+	
     if (lastTargetUnitID == targetSettlementID)
     {
         lastTargetCount = lastTargetCount + 1;
@@ -2687,7 +2694,7 @@ rule defendSettlementPosition
     }
     
     static int count = 0;
-    if (numMilUnits < 20)
+    if (numMilUnits < 14)
     {
         xsSetRuleMinIntervalSelf(11);
         if (count > 2)
@@ -4086,11 +4093,18 @@ rule createLandAttack
     aiPlanSetDesiredPriority(landAttackPlanID, 50);
     
     aiPlanSetActive(landAttackPlanID);
+	gLandAttackPlanID = landAttackPlanID;
+	if (cMyCiv == cCivKronos)
+    aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanAttackPlanID, 0, landAttackPlanID);
+	
+	int GPFindPlan = aiFindBestAttackGodPowerPlan();
+	if ((GPFindPlan > 0) && (GPFindPlan != gUnbuildPlanID))
+    aiPlanSetVariableInt(GPFindPlan, cGodPowerPlanAttackPlanID, 0, landAttackPlanID);		
     
     if (gRushAttackCount < gRushCount)
         gRushAttackCount = gRushAttackCount + 1;
     
-    gLandAttackPlanID = landAttackPlanID;
+
     if (ShowAiEcho == true) aiEcho("Creating landAttackPlan #: "+gLandAttackPlanID);
 
     attackPlanStartTime = xsGetTime();

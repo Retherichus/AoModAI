@@ -134,7 +134,10 @@ rule findOtherSettlements
     inactive
 {
     if (ShowAiEcho == true) aiEcho("findOtherSettlements:");
-        
+    int ActivePlans = findPlanByString("Remote Settlement Transport", cPlanTransport, -1, true);
+	if (ActivePlans >= 1)
+	return;
+  
     //Get our initial location.
     vector here=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
 
@@ -492,14 +495,6 @@ int setupExploreIsland()
     gLandExplorePlanID=aiPlanCreate("Explore Island"+potentialIsland, cPlanExplore);
     if (gLandExplorePlanID >= 0)
     {
-        if (cMyCulture == cCultureAtlantean )
-        {
-            aiPlanAddUnitType(gLandExplorePlanID, cUnitTypeOracleScout, 0, 1, 1);
-            aiPlanSetVariableBool(gLandExplorePlanID, cExplorePlanDoLoops, 0, false);
-            aiPlanSetVariableBool(gLandExplorePlanID, cExplorePlanOracleExplore, 0, true);
-            aiPlanSetDesiredPriority(gLandExplorePlanID, 25);  // Allow oracleHero relic plan to steal one
-        }
-        else
             aiPlanAddUnitType(gLandExplorePlanID, gLandScout, 1, 1, 1);
 
         aiPlanSetEscrowID(gLandExplorePlanID, cEconomyEscrowID);

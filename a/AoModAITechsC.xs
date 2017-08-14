@@ -355,7 +355,7 @@ rule getRammedEarth
         x = aiPlanCreate("RammedEarth", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechRammedEarth);
         aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cEconomyEscrowID);		
+        aiPlanSetEscrowID(x, cMilitaryEscrowID);		
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting RammedEarth");

@@ -10,7 +10,7 @@ rule maintainTradeUnits
     if (ShowAiEcho == true) aiEcho("maintainTradeUnits:");
    
     int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding);
-    if (numMarkets < 1)
+    if ((numMarkets < 1) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000))
         return;
     
 
@@ -262,23 +262,6 @@ rule maintainAirScouts
     aiPlanSetDesiredPriority(trainAirScoutPlanID, 100);
     aiPlanSetActive(trainAirScoutPlanID);
     if (ShowAiEcho == true) aiEcho("Training an air scout: "+kbGetProtoUnitName(unitTypeToTrain)+" at main base: "+mainBaseID);
-}
-
-//==============================================================================
-rule trainDwarves
-    minInterval 139 //starts in cAge1
-    inactive
-{
-    if (ShowAiEcho == true) aiEcho("trainDwarves:");
-
-    vector location = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
-    float distance = 40.0;
-    int numTemplesAtMainBase = getNumUnits(cUnitTypeTemple, cUnitStateAlive, -1, cMyID, location, distance);
-    if (numTemplesAtMainBase < 1)
-        return;
-    
-    gDwarfMaintainPlanID = createSimpleMaintainPlan(cUnitTypeDwarf, 2, false, -1);
-    xsDisableSelf();
 }
 
 //==============================================================================
@@ -799,10 +782,8 @@ rule maintainMilitaryTroops
     }
     else if (numUnitType1 >= gNumUnitType1ToTrain)
     {
-			if ((kbGetAge() == cAge2) && (gNumUnitType1ToTrain < 3))
-			gNumUnitType1ToTrain = 3;	
-         if ((kbGetAge() > cAge2) && (gNumUnitType1ToTrain <= 4))
-            gNumUnitType1ToTrain = 5;
+			if ((kbGetAge() == cAge2) && (gNumUnitType1ToTrain < 2))
+			gNumUnitType1ToTrain = 2;	
 
     }
     
@@ -822,8 +803,6 @@ rule maintainMilitaryTroops
     {
         if ((kbGetAge() == cAge2) && (gNumUnitType2ToTrain < 3))
             gNumUnitType2ToTrain = 3;
-        else if ((kbGetAge() >= cAge3) && (gNumUnitType2ToTrain < 4))
-            gNumUnitType2ToTrain = 4;
     }
     
     if (numUnitType3 < gNumUnitType3ToTrain)
@@ -842,8 +821,6 @@ rule maintainMilitaryTroops
     {
         if ((kbGetAge() == cAge2) && (gNumUnitType3ToTrain < 3))
             gNumUnitType3ToTrain = 3;
-        else if ((kbGetAge() >= cAge3) && (gNumUnitType3ToTrain < 4))
-            gNumUnitType3ToTrain = 4;
     }
     
     if (unitTypeToTrain == -1)
@@ -859,11 +836,11 @@ rule maintainMilitaryTroops
         
     aiPlanSetMilitary(trainMilitaryUnitPlanID, true);
     aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanUnitType, 0, unitTypeToTrain);
-	aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanFrequency, 0, 15);
+	aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanFrequency, 0, 25);
     aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanNumberToTrain, 0, 2);
     aiPlanSetVariableBool(trainMilitaryUnitPlanID, cTrainPlanUseMultipleBuildings, 0, true);
     aiPlanSetBaseID(trainMilitaryUnitPlanID, mainBaseID);
-    aiPlanSetDesiredPriority(trainMilitaryUnitPlanID, 70);
+    aiPlanSetDesiredPriority(trainMilitaryUnitPlanID, 15);
     aiPlanSetActive(trainMilitaryUnitPlanID);
 }
 
@@ -1067,6 +1044,12 @@ rule maintainHeroes
         requiredFood = 80.0;
         hero1ID =  cUnitTypeHeroNorse;
     }
+	if (xsGetTime() > 10*60*1000)
+    {
+	requiredFood = requiredFood * 2;
+	requiredGold = requiredGold * 2;
+    }	
+
     
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -1124,7 +1107,7 @@ rule makeAtlanteanHeroes
     
     int numOracleHeroes = kbUnitCount(cMyID, cUnitTypeOracleHero, cUnitStateAlive);
     int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
-    if ((kbGetAge() < cAge2) || ((numHeroes < 2) && (xsGetTime() < 7*60*1000) && (kbGetAge() == cAge2)))
+    if ((kbGetAge() < cAge2) || ((numHeroes < 1) && (xsGetTime() < 7*60*1000) && (kbGetAge() == cAge2)))
     {
         if (numOracleHeroes < 1)
         {

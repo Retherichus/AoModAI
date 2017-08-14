@@ -83,7 +83,7 @@ rule getFeetOfTheJackal
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeAnubite, cUnitStateAlive) < 2))
+    if ((kbGetAge() < cAge3 && goldSupply < 750) || (kbUnitCount(cMyID, cUnitTypeAnubite, cUnitStateAlive) < 3))
 	return;
     if (kbGetTechStatus(cTechFeetoftheJackal) == cTechStatusAvailable)
     {
@@ -110,7 +110,7 @@ rule getNecropolis
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if (kbGetAge() < cAge3 && goldSupply < 650)
+    if (kbGetAge() < cAge3 && goldSupply < 750)
 	return;
     if (kbGetTechStatus(cTechNecropolis) == cTechStatusAvailable)
     {
@@ -176,7 +176,7 @@ rule getCriosphinx
     minInterval 31
     group Bast
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 2))
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 2) || (kbResourceGet(cResourceWood) < 250))
         return;
     if (kbGetTechStatus(cTechCriosphinx) == cTechStatusAvailable)
     {
@@ -199,7 +199,7 @@ rule getHieracosphinx
     minInterval 33
     group Bast
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 2))
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 2) || (kbResourceGet(cResourceWood) < 300))
         return;
     if (kbGetTechStatus(cTechHieracosphinx) == cTechStatusAvailable)
     {
@@ -228,7 +228,7 @@ rule getShaduf
         int x=-1;
         x = aiPlanCreate("Shaduf", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechShaduf);
-        aiPlanSetDesiredPriority(x, 75);
+        aiPlanSetDesiredPriority(x, 85);
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting Shaduf");
@@ -268,7 +268,7 @@ rule getMedjay
     minInterval 29
     group Hathor
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge4) || (kbResourceGet(cResourceFood) < 1000))
         return;
     if (kbGetTechStatus(cTechMedjay) == cTechStatusAvailable)
     {
@@ -291,7 +291,7 @@ rule getCrocodopolis
     minInterval 31
     group Hathor
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypePetsuchos, cUnitStateAlive) < 2))
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypePetsuchos, cUnitStateAlive) < 3)|| (kbResourceGet(cResourceWood) < 450))
         return;
     if (kbGetTechStatus(cTechCrocodopolis) == cTechStatusAvailable)
     {
@@ -315,7 +315,7 @@ rule getBoneBow
     minInterval 27
     group Sekhmet
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeChariotArcher, cUnitStateAlive) < 5) || (kbResourceGet(cResourceWood) < 300))
         return;
     if (kbGetTechStatus(cTechBoneBow) == cTechStatusAvailable)
     {
@@ -338,7 +338,7 @@ rule getSlingsOfTheSun
     minInterval 29
     group Sekhmet
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSlinger, cUnitStateAlive) < 6) || (kbResourceGet(cResourceGold) < 600))
         return;
     if (kbGetTechStatus(cTechSlingsoftheSun) == cTechStatusAvailable)
     {
@@ -354,25 +354,26 @@ rule getSlingsOfTheSun
 }
 
 //==============================================================================
-// RULE: getStonesOfRedLinen
+// RULE: getStonesOfRedLinen // cPlanResearch is not working with this one for some reason, so we'll have to manually research it and give it 4 attempts at max.
 //==============================================================================
 rule getStonesOfRedLinen
     inactive
     minInterval 31
     group Sekhmet
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge4))
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge4) || (kbUnitCount(cMyID, cUnitTypeCatapult, cUnitStateAlive) < 1))
         return;
     if (kbGetTechStatus(cTechStonesofRedLinen) == cTechStatusAvailable)
     {
-        int x=-1;
-        x = aiPlanCreate("StonesOfRedLinen", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechStonesofRedLinen);
-        aiPlanSetDesiredPriority(x, 10);
-		aiPlanSetEscrowID(x, cMilitaryEscrowID);
-        aiPlanSetActive(x);
+	    static int Attempt = 0;
+        int SiegeCamp = findUnit(cUnitTypeSiegeCamp, cUnitStateAlive, -1, cMyID); 
+		if ((SiegeCamp > 0) && (kbResourceGet(cResourceWood) > 350) && (kbResourceGet(cResourceFavor) > 30) && (kbGetTechStatus(cTechStonesofRedLinen) < cTechStatusResearching))
+        {
+		aiTaskUnitResearch(SiegeCamp, cTechStonesofRedLinen);  
+		Attempt = Attempt + 1;
+		}
+        if (Attempt > 4)	
         xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting StonesOfRedLinen");
     }
 }
 
@@ -384,7 +385,7 @@ rule getRamOfTheWestWind
     minInterval 33
     group Sekhmet
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSiegeTower, cUnitStateAlive) < 1) || (kbResourceGet(cResourceGold) < 550))
         return;
     if (kbGetTechStatus(cTechRamoftheWestWind) == cTechStatusAvailable)
     {
@@ -481,7 +482,7 @@ rule getAtefCrown
     minInterval 27
     group Osiris
 {
-    if (kbGetTechStatus(cTechAtefCrown) == cTechStatusAvailable)
+    if ((kbGetTechStatus(cTechAtefCrown) == cTechStatusAvailable) || (kbUnitCount(cMyID, cUnitTypeMummy, cUnitStateAlive) < 2))
     {
         int x=-1;
         x = aiPlanCreate("AtefCrown", cPlanResearch);
@@ -507,7 +508,7 @@ rule getNewKingdom
         int x=-1;
         x = aiPlanCreate("AtefCrown", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechNewKingdom);
-        aiPlanSetDesiredPriority(x, 25);
+        aiPlanSetDesiredPriority(x, 50);
         aiPlanSetActive(x);
         xsDisableSelf();
         if (ShowAiEcho == true) aiEcho("Getting AtefCrown");

@@ -10,7 +10,7 @@ rule maintainTradeUnits
     if (ShowAiEcho == true) aiEcho("maintainTradeUnits:");
    
     int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding);
-    if (numMarkets < 1)
+    if ((numMarkets < 1) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000))
         return;
     
 
@@ -1067,6 +1067,12 @@ rule maintainHeroes
         requiredFood = 80.0;
         hero1ID =  cUnitTypeHeroNorse;
     }
+	if (xsGetTime() > 10*60*1000)
+    {
+	requiredFood = requiredFood * 2;
+	requiredGold = requiredGold * 2;
+    }	
+
     
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -1124,7 +1130,7 @@ rule makeAtlanteanHeroes
     
     int numOracleHeroes = kbUnitCount(cMyID, cUnitTypeOracleHero, cUnitStateAlive);
     int numHeroes = kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive);
-    if ((kbGetAge() < cAge2) || ((numHeroes < 2) && (xsGetTime() < 7*60*1000) && (kbGetAge() == cAge2)))
+    if ((kbGetAge() < cAge2) || ((numHeroes < 1) && (xsGetTime() < 7*60*1000) && (kbGetAge() == cAge2)))
     {
         if (numOracleHeroes < 1)
         {

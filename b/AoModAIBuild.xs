@@ -626,12 +626,9 @@ rule buildHouse
         int builderTypeID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0);
         if (cMyCulture == cCultureNorse)
             builderTypeID = cUnitTypeAbstractInfantry;   // Exact match for land scout, so build plan can steal scout
-
-        aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
-		if ((cMyCulture == cCultureNorse) && (kbUnitCount(cMyID, builderTypeID, cUnitStateAlive) < 3))
-		aiPlanAddUnitType(planID, cUnitTypeHeroNorse, 0, 0, 1);
-
-
+        
+		aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
+		
 	   // Added a little override as this rule didn't seem to work properly. // Reth.
 	   
 	     if ((findNumUnitsInBase(cMyID, kbBaseGetMain(cMyID), cUnitTypeTower) > 0)
@@ -686,7 +683,7 @@ rule buildHouse
             aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, true);
             aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 100.0);
             aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
-            aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
+            aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);			
 
             vector baseLocation = kbBaseGetLocation(cMyID, otherBaseID);
             aiPlanSetInitialPosition(planID, baseLocation);
@@ -757,7 +754,7 @@ rule buildHouse
         
         aiPlanSetBaseID(planID, otherBaseID);
         aiPlanSetEscrowID(planID, cEconomyEscrowID);
-        aiPlanSetDesiredPriority(planID, 100);
+        aiPlanSetDesiredPriority(planID, 100);			
         aiPlanSetActive(planID);
     }
 }
@@ -771,13 +768,6 @@ rule buildSettlements
 
 	if ((mRusher == true) && (kbGetAge() < cAge3))
 	return;
-	
-	if  ((AllyTcLimit == true) && (aiGetWorldDifficulty() >= cDifficultyHard))
-        {
-            xsEnableRule("ModifiedbuildSettlements");
-			xsDisableSelf();
-            return;
-        }
 	
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
@@ -882,107 +872,6 @@ rule buildSettlements
     //Else, do it.
     createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
 }
-
-//==============================================================================
-rule ModifiedbuildSettlements
-    minInterval 15 //starts in cAge3
-    inactive
-{
-    	if (xsGetTime() > ModdedTCTimer*60*1000)
-        {
-            AllyTcLimit = false;
-			xsEnableRule("buildSettlements");
-			xsDisableSelf();
-            return;
-        }
-		
-    if (ShowAiEcho == true) aiEcho("buildSettlements:");
-
-    //Figure out if we have any active BuildSettlements.
-    int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
-    int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
-
-    int numberSettlementsPlanned = numberSettlements + numberBuildSettlementGoals;
-
-    if (numberSettlementsPlanned >= cvMaxSettlements)
-        return;        // Don't go over script limit
-
-    if (numberBuildSettlementGoals > 1)	// Allow 2 in progress, no more
-        return;
-    if (findASettlement() == false)
-        return;
-        
-		//If we're on Easy and we have 3 settlements, go away.
-        if ((aiGetWorldDifficulty() == cDifficultyEasy) && (numberSettlementsPlanned >= 3))
-        {
-            xsDisableSelf();
-            return;
-        }
-    
-    //Don't get too many more than our human allies.
-    int largestAllyCount=-1;
-    for (i=1; < cNumberPlayers)
-    {
-        if (i == cMyID)
-            continue;
-        if (kbIsPlayerAlly(i) == true)
-            continue;
-
-        int count = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, i);
-        if (count > largestAllyCount)
-            largestAllyCount=count;
-    }
-    
-    //Never have more than 1 more settlements than any ally.
-    int difference=numberSettlementsPlanned-largestAllyCount;
-    if ((difference > 1) && (largestAllyCount>=0))     // If ally exists and we have more than 2 more...quit
-        return;
-
-    //See if there is another human on my team.
-    bool haveHumanTeammate=false;
-    for (i=1; < cNumberPlayers)
-    {
-        if (i == cMyID)
-            continue;
-        //Find the human player
-        if (kbIsPlayerAlly(i) != true)
-            continue;
-
-        //This player is a human ally and not resigned.
-        if ((kbIsPlayerAlly(i) == true) && (kbIsPlayerResigned(i) == false))
-        {
-            haveHumanTeammate=true;
-            break;
-        }
-    }
-    
-    if (haveHumanTeammate == true)
-    {
-        if (kbGetAge() == cAge3)
-        {
-            if (numberSettlementsPlanned > 4)
-                return;
-        }
-        else if (kbGetAge() == cAge4)
-        {
-            if (numberSettlementsPlanned >= cvMaxSettlements)
-                return;
-        }
-    }
-    if (ShowAiEcho == true) aiEcho("Creating another settlement goal.");
-
-    int numBuilders = 3;
-    if (cMyCulture == cCultureAtlantean)
-        numBuilders = 1;
-        
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-        builderType = cUnitTypeAbstractInfantry;
-        
-    //Else, do it.
-    createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
-} 
-
 
 //==============================================================================
 rule buildSettlementsEarly  //age 1/2 handler
@@ -1659,7 +1548,7 @@ rule mainBaseAreaWallTeam1
         aiPlanSetVariableFloat(mainBaseAreaWallTeam1PlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
         aiPlanSetBaseID(mainBaseAreaWallTeam1PlanID, mainBaseID);
         aiPlanSetEscrowID(mainBaseAreaWallTeam1PlanID, cMilitaryEscrowID);
-		if (cMyCulture == cCultureNorse)
+		if ((cMyCulture == cCultureNorse) && (kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive)) < 2)
 		aiPlanSetDesiredPriority(mainBaseAreaWallTeam1PlanID, 99);
         else aiPlanSetDesiredPriority(mainBaseAreaWallTeam1PlanID, 100);
         aiPlanSetActive(mainBaseAreaWallTeam1PlanID, true);
@@ -1942,7 +1831,7 @@ rule mainBaseAreaWallTeam2
         aiPlanSetVariableFloat(mainBaseAreaWallTeam2PlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
         aiPlanSetBaseID(mainBaseAreaWallTeam2PlanID, mainBaseID);
         aiPlanSetEscrowID(mainBaseAreaWallTeam2PlanID, cEconomyEscrowID);
-		if (cMyCulture == cCultureNorse)
+	    if ((cMyCulture == cCultureNorse) && (kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive)) < 2)
 		aiPlanSetDesiredPriority(mainBaseAreaWallTeam2PlanID, 99);
         else aiPlanSetDesiredPriority(mainBaseAreaWallTeam2PlanID, 100);
         aiPlanSetActive(mainBaseAreaWallTeam2PlanID, true);
@@ -3041,6 +2930,11 @@ rule buildFortress
             aiPlanSetVariableVector(planID, cBuildPlanCenterPosition, 0, location);
             aiPlanSetVariableFloat(planID, cBuildPlanCenterPositionDistance, 0, 11.0);          
             aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 0.0);
+            aiPlanSetVariableInt(planID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeTree); 
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 10);    
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitValue, 0, -20.0);        // -20 points per unit
+            // Weight it to stay very close to center point.
+            aiPlanSetVariableVector(planID, cBuildPlanInfluencePosition, 0, location);    // Position influence for landing position			
         }
         
         aiPlanSetActive(planID);
@@ -3319,7 +3213,8 @@ rule buildBuildingsAtOtherBase
     int builderType = cUnitTypeAbstractVillager;
     if (cMyCulture == cCultureNorse)
         builderType = cUnitTypeAbstractInfantry;
-
+    
+	
     //Force building #1 to go down.
     int buildBuilding1AtOtherBasePlanID = aiPlanCreate("buildBuilding1AtOtherBase", cPlanBuild);
     if (buildBuilding1AtOtherBasePlanID >= 0)
@@ -3336,6 +3231,11 @@ rule buildBuildingsAtOtherBase
         else
             aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 10.0);
         aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
+        aiPlanSetVariableInt(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeTree); 
+        aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluenceUnitDistance, 0, 10);    
+        aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluenceUnitValue, 0, -20.0);        // -20 points per unit
+        // Weight it to stay very close to center point.
+        aiPlanSetVariableVector(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluencePosition, 0, location);    // Position influence for landing position				
 
         aiPlanSetDesiredPriority(buildBuilding1AtOtherBasePlanID, 100);
         aiPlanAddUnitType(buildBuilding1AtOtherBasePlanID, builderType, 1, 1, 1);
@@ -3474,6 +3374,7 @@ rule buildBuildingsAtOtherBase2
     if (cMyCulture == cCultureNorse)
         builderType = cUnitTypeAbstractInfantry;
 
+	
     //Force building #1 to go down.
     int buildBuilding1AtOtherBasePlanID = aiPlanCreate("buildBuilding1AtOtherBase", cPlanBuild);
     if (buildBuilding1AtOtherBasePlanID >= 0)
@@ -3483,6 +3384,11 @@ rule buildBuildingsAtOtherBase2
         aiPlanSetVariableInt(buildBuilding1AtOtherBasePlanID, cBuildPlanMaxRetries, 0, 10);
         aiPlanSetVariableBool(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
         aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanRandomBPValue, 0, 0.99);
+        aiPlanSetVariableInt(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeTree); 
+        aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluenceUnitDistance, 0, 10);    
+        aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluenceUnitValue, 0, -20.0);        // -20 points per unit
+        // Weight it to stay very close to center point.
+        aiPlanSetVariableVector(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluencePosition, 0, location);    // Position influence for landing position		
         
         aiPlanSetVariableVector(buildBuilding1AtOtherBasePlanID, cBuildPlanCenterPosition, 0, location);
             aiPlanSetVariableFloat(buildBuilding1AtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 10.0);
@@ -4881,7 +4787,6 @@ rule rebuildMarket  // If market dies, restart
 //==============================================================================
 rule makeExtraMarket    //If it takes more than 5 minutes to place our trade market, throw down a local one
     inactive
-//    minInterval 31 //starts in cAge3, activated in tradeWithCaravans
     minInterval 37 //starts in cAge3, activated in tradeWithCaravans
 {
 

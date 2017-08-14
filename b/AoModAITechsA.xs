@@ -34,7 +34,7 @@ rule getFocus
     inactive
     minInterval 23
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbResourceGet(cResourceWood) < 250))
         return;
     if (kbGetTechStatus(cTechFocus) == cTechStatusAvailable)
     {
@@ -110,7 +110,7 @@ rule getHephaestusRevenge
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeAutomaton, cUnitStateAlive) < 2))
+    if ((kbGetAge() < cAge3 && goldSupply < 650) || (kbUnitCount(cMyID, cUnitTypeAutomaton, cUnitStateAlive) < 3))
 	return;
     if (kbGetTechStatus(cTechHephaestusRevenge) == cTechStatusAvailable)
     {
@@ -138,7 +138,7 @@ rule getVolcanicForge
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
 
-    if (kbGetAge() < cAge2 && goldSupply < 650 && foodSupply < 900)
+    if (kbGetAge() < cAge3 && goldSupply < 650 && foodSupply < 900)
 	return;
 	
     if (kbGetTechStatus(cTechVolcanicForge) == cTechStatusAvailable)
@@ -170,7 +170,7 @@ rule getHeartOfTheTitans
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if (kbGetAge() < cAge3 && goldSupply < 650)
+    if ((kbGetAge() < cAge3) && (goldSupply < 650) || (goldSupply < 450))
 	return;
     if (kbGetTechStatus(cTechHeartoftheTitans) == cTechStatusAvailable)
     {
@@ -197,7 +197,7 @@ rule getAlluvialClay
         return;
     float goldSupply = kbResourceGet(cResourceGold);
 
-    if ((kbGetAge() < cAge3 && goldSupply < 750) || (kbUnitCount(cMyID, cUnitTypePromethean, cUnitStateAlive) < 2))
+    if ((kbGetAge() < cAge3 && goldSupply < 750) || (kbUnitCount(cMyID, cUnitTypePromethean, cUnitStateAlive) < 3))
 	return;
     if (kbGetTechStatus(cTechAlluvialClay) == cTechStatusAvailable)
     {
@@ -271,7 +271,7 @@ rule getLemurianDescendants
     minInterval 27
     group Theia
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbResourceGet(cResourceGold) < 250) || (kbResourceGet(cResourceFood) < 300))
         return;
     if (kbGetTechStatus(cTechLemurianDescendants) == cTechStatusAvailable)
     {
@@ -295,7 +295,7 @@ rule getLanceOfStone
 {
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
-    if (kbGetTechStatus(cTechLanceofStone) == cTechStatusAvailable)
+    if ((kbGetTechStatus(cTechLanceofStone) == cTechStatusAvailable) || (kbUnitCount(cMyID, cUnitTypeLancerHero, cUnitStateAlive) < 3))
     {
         int x=-1;
         x = aiPlanCreate("LanceOfStone", cPlanResearch);
@@ -317,7 +317,7 @@ rule getHeroicRenewal
     minInterval 27
     group Hyperion
 {
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeHero, cUnitStateAlive) < 3))
         return;
     if (kbGetTechStatus(cTechHeroicRenewal) == cTechStatusAvailable)
     {
@@ -340,7 +340,7 @@ rule getGemino
     minInterval 29
     group Hyperion
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSatyr, cUnitStateAlive) < 2))
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeSatyr, cUnitStateAlive) < 2) || (kbResourceGet(cResourceWood) < 350))
         return;
     if (kbGetTechStatus(cTechGemino) == cTechStatusAvailable)
     {
@@ -387,6 +387,8 @@ rule getEyesOfAtlas
     minInterval 29
     group Atlas
 {
+    if (kbUnitCount(cMyID, cUnitTypeMythUnit, cUnitStateAlive) < 3)
+	return;
     if (kbGetTechStatus(cTechEyesofAtlas) == cTechStatusAvailable)
     {
         int x=-1;
@@ -408,6 +410,8 @@ rule getIoGuardian
     minInterval 31
     group Atlas
 {
+    if (kbUnitCount(cMyID, cUnitTypeArgus, cUnitStateAlive) < 3)
+	return;
     if (kbGetTechStatus(cTechIoGuardian) == cTechStatusAvailable)
     {
         int x=-1;
@@ -431,6 +435,8 @@ rule getMythicRejuvenation
     minInterval 27
     group Hekate
 {
+    if (kbUnitCount(cMyID, cUnitTypeMythUnit, cUnitStateAlive) < 3)
+	return;
     if (kbGetTechStatus(cTechMythicRejuvenation) == cTechStatusAvailable)
     {
         int x=-1;
@@ -452,7 +458,9 @@ rule getCelerity
     minInterval 29
     group Hekate
 {
-    if (kbGetTechStatus(cTechCelerity) == cTechStatusAvailable)
+    if (kbUnitCount(cMyID, cUnitTypeMythUnit, cUnitStateAlive) < 3)
+	return;
+    if ((kbGetTechStatus(cTechCelerity) == cTechStatusAvailable))
     {
         int x=-1;
         x = aiPlanCreate("Celerity", cPlanResearch);
@@ -473,6 +481,8 @@ rule getAsperBlood
     minInterval 31
     group Hekate
 {
+    if(kbUnitCount(cMyID, cUnitTypeLampades, cUnitStateAlive) < 2)
+	return;
     if (kbGetTechStatus(cTechAsperBlood) == cTechStatusAvailable)
     {
         int x=-1;

@@ -1524,7 +1524,13 @@ bool createSimpleBuildPlan(int puid=-1, int number=1, int pri=100,
         aiPlanAddUnitType(planID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), numberBuilders, numberBuilders, numberBuilders);
         //Base ID.
         aiPlanSetBaseID(planID, baseID);
+		if (puid != cUnitTypeFarm)
+		{
 		aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 4.0);
+        aiPlanSetVariableInt(planID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeBuilding); 
+        aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 7);    
+        aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitValue, 0, -5.0);        // -5 points per unit		
+		}
         //Go.
         aiPlanSetActive(planID);
     }

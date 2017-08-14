@@ -26,7 +26,8 @@ extern bool NoFishing = false;
 void preInitMap()
 {
     if (ShowAiEcho == true) aiEcho("preInitMap:");    
- 
+    if (cvRandomMapName == "None")
+        cvRandomMapName = cRandomMapName; 
     int transport = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
     // Decide if we have a water map.
     if ((cRandomMapName == "archipelago") ||
@@ -224,7 +225,24 @@ void preInitMap()
     {
         cvMapSubType = WATERNOMADMAP;
     }
+	
+	if (cvRandomMapName == "Transport Scenario")
+    {
+        gTransportMap = true;
+        gWaterMap = true;
+        xsEnableRule("fishing"); // force builds the dock.
+    }	
+	
+	if (cvRandomMapName == "Migration Scenario")
+    {
+        gTransportMap = true;
+        gWaterMap = true;
+		cvMapSubType = VINLANDSAGAMAP;
+        xsEnableRule("fishing"); // force builds the dock.
+    }		
+	
 
+	
     //Tell the AI what kind of map we are on.
     aiSetWaterMap(gTransportMap == true);
 }
@@ -545,7 +563,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
     int planID=-1;
     if ( cvMapSubType == WATERNOMADMAP )
     {
-        int num = kbUnitCount(cMyID, cUnitTypeUnit, cUnitStateAny);
+        int num = kbUnitCount(cMyID, cUnitTypeLogicalTypeGarrisonOnBoats, cUnitStateAny);
         planID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 100, gVinlandsagaInitialBaseID);
         if ( planID >= 0 )
         {
@@ -566,12 +584,13 @@ void vinlandsagaBaseCallback(int parm1=-1)
         if (planID >= 0)
         {
             if (cMyCulture == cCultureAtlantean)
-                aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, 1, 3, 3);         
+                aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, 0, 3, 3);         
             else
-                aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, 1, 5, 5);
+                aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, 0, 5, 5);
 
-            aiPlanAddUnitType(planID, cUnitTypeLogicalTypeLandMilitary, 0, 1, 8);
-			aiPlanAddUnitType(planID, cUnitTypeHero, 0, 1, 1);
+            aiPlanAddUnitType(planID, cUnitTypeLogicalTypeGarrisonOnBoats, 0, 1, 8);
+			aiPlanAddUnitType(planID, cUnitTypeHero, 1, 1, 1);
+			if (cMyCiv != cCivOdin)
             aiPlanAddUnitType(planID, gLandScout, 1, 1, 1);
             if (cMyCulture == cCultureNorse)
                 aiPlanAddUnitType(planID, cUnitTypeOxCart, 0, 1, 4);
@@ -629,7 +648,7 @@ rule transportAllUnits
     if ( planID >= 0 )
     {
         aiPlanSetVariableBool(planID, cTransportPlanReturnWhenDone, 0, false);
-        aiPlanAddUnitType(planID, cUnitTypeUnit, 1, num, num);
+        aiPlanAddUnitType(planID, cUnitTypeLogicalTypeGarrisonOnBoats, 1, num, num);
         aiPlanAddUnitType(planID, cUnitTypeHero, 1, 1, 1);
         aiPlanSetActive(planID);
     }
@@ -973,6 +992,7 @@ bool mapPreventsWalls() //some maps do not allow walls or it doesn't make sense 
         cRandomMapName == "the void" ||
         cRandomMapName == "daemonwood" ||
         cRandomMapName == "black forest" ||
+        cRandomMapName == "holy mountain" ||		
         cRandomMapName == "akIslandDom" )
     {
         return(true);
