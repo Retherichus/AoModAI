@@ -769,13 +769,6 @@ rule buildSettlements
 	if ((mRusher == true) && (kbGetAge() < cAge3))
 	return;
 	
-	if  ((AllyTcLimit == true) && (aiGetWorldDifficulty() >= cDifficultyHard))
-        {
-            xsEnableRule("ModifiedbuildSettlements");
-			xsDisableSelf();
-            return;
-        }
-	
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
     int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
@@ -879,107 +872,6 @@ rule buildSettlements
     //Else, do it.
     createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
 }
-
-//==============================================================================
-rule ModifiedbuildSettlements
-    minInterval 15 //starts in cAge3
-    inactive
-{
-    	if (xsGetTime() > ModdedTCTimer*60*1000)
-        {
-            AllyTcLimit = false;
-			xsEnableRule("buildSettlements");
-			xsDisableSelf();
-            return;
-        }
-		
-    if (ShowAiEcho == true) aiEcho("buildSettlements:");
-
-    //Figure out if we have any active BuildSettlements.
-    int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
-    int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
-
-    int numberSettlementsPlanned = numberSettlements + numberBuildSettlementGoals;
-
-    if (numberSettlementsPlanned >= cvMaxSettlements)
-        return;        // Don't go over script limit
-
-    if (numberBuildSettlementGoals > 1)	// Allow 2 in progress, no more
-        return;
-    if (findASettlement() == false)
-        return;
-        
-		//If we're on Easy and we have 3 settlements, go away.
-        if ((aiGetWorldDifficulty() == cDifficultyEasy) && (numberSettlementsPlanned >= 3))
-        {
-            xsDisableSelf();
-            return;
-        }
-    
-    //Don't get too many more than our human allies.
-    int largestAllyCount=-1;
-    for (i=1; < cNumberPlayers)
-    {
-        if (i == cMyID)
-            continue;
-        if (kbIsPlayerAlly(i) == true)
-            continue;
-
-        int count = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, i);
-        if (count > largestAllyCount)
-            largestAllyCount=count;
-    }
-    
-    //Never have more than 1 more settlements than any ally.
-    int difference=numberSettlementsPlanned-largestAllyCount;
-    if ((difference > 1) && (largestAllyCount>=0))     // If ally exists and we have more than 2 more...quit
-        return;
-
-    //See if there is another human on my team.
-    bool haveHumanTeammate=false;
-    for (i=1; < cNumberPlayers)
-    {
-        if (i == cMyID)
-            continue;
-        //Find the human player
-        if (kbIsPlayerAlly(i) != true)
-            continue;
-
-        //This player is a human ally and not resigned.
-        if ((kbIsPlayerAlly(i) == true) && (kbIsPlayerResigned(i) == false))
-        {
-            haveHumanTeammate=true;
-            break;
-        }
-    }
-    
-    if (haveHumanTeammate == true)
-    {
-        if (kbGetAge() == cAge3)
-        {
-            if (numberSettlementsPlanned > 4)
-                return;
-        }
-        else if (kbGetAge() == cAge4)
-        {
-            if (numberSettlementsPlanned >= cvMaxSettlements)
-                return;
-        }
-    }
-    if (ShowAiEcho == true) aiEcho("Creating another settlement goal.");
-
-    int numBuilders = 3;
-    if (cMyCulture == cCultureAtlantean)
-        numBuilders = 1;
-        
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-        builderType = cUnitTypeAbstractInfantry;
-        
-    //Else, do it.
-    createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
-} 
-
 
 //==============================================================================
 rule buildSettlementsEarly  //age 1/2 handler
@@ -5663,8 +5555,6 @@ rule BunkerUpWonderFortess
     inactive
 {	
 
-
-
     static int gBunkerUpWonder2PlanID=-1;
     static vector WonderPlace = cInvalidVector;
 
@@ -5848,4 +5738,45 @@ rule BunkerUpWonderFortess
         aiPlanSetActive(BunkerUpWonder2);
         gBunkerUpWonder2PlanID = BunkerUpWonder2;	
     }
-}	
+}
+//==============================================================================
+rule rebuildSiegeCamp
+    inactive
+    minInterval 37 
+{
+    xsSetRuleMinIntervalSelf(45);
+    int mainBaseID = kbBaseGetMainID(cMyID);
+    int numSiegeCamps = kbUnitCount(cMyID, cUnitTypeSiegeCamp, cUnitStateAliveOrBuilding);
+    
+    int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
+    if (activeBuildPlans > 0)
+    {
+        for (i = 0; < activeBuildPlans)
+        {
+            int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
+            if (aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeSiegeCamp)
+            {
+                return;
+            }
+        }
+    }
+        
+    if ((numSiegeCamps > 0) || (kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive) < 10) || (kbResourceGet(cResourceGold) < 150))
+    {
+        return;
+    }
+    
+    int builderType = cUnitTypeAbstractVillager;
+    
+    int RebuildSiegeCamp = aiPlanCreate("RebuildSiegeCamp", cPlanBuild);
+    if (RebuildSiegeCamp >= 0)
+    {
+        aiPlanSetVariableInt(RebuildSiegeCamp, cBuildPlanBuildingTypeID, 0, cUnitTypeSiegeCamp);      
+        aiPlanSetDesiredPriority(RebuildSiegeCamp, 100);
+        aiPlanAddUnitType(RebuildSiegeCamp, builderType, 1, 1, 1);
+        aiPlanSetEscrowID(RebuildSiegeCamp, cMilitaryEscrowID);
+        aiPlanSetBaseID(RebuildSiegeCamp, mainBaseID);
+        aiPlanSetActive(RebuildSiegeCamp);
+        xsSetRuleMinIntervalSelf(60);
+    }
+}

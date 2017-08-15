@@ -354,25 +354,26 @@ rule getSlingsOfTheSun
 }
 
 //==============================================================================
-// RULE: getStonesOfRedLinen
+// RULE: getStonesOfRedLinen // cPlanResearch is not working with this one for some reason, so we'll have to manually research it and give it 4 attempts at max.
 //==============================================================================
 rule getStonesOfRedLinen
     inactive
     minInterval 31
     group Sekhmet
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge4))
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge4) || (kbUnitCount(cMyID, cUnitTypeCatapult, cUnitStateAlive) < 1))
         return;
     if (kbGetTechStatus(cTechStonesofRedLinen) == cTechStatusAvailable)
     {
-        int x=-1;
-        x = aiPlanCreate("StonesOfRedLinen", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechStonesofRedLinen);
-        aiPlanSetDesiredPriority(x, 10);
-		aiPlanSetEscrowID(x, cMilitaryEscrowID);
-        aiPlanSetActive(x);
+	    static int Attempt = 0;
+        int SiegeCamp = findUnit(cUnitTypeSiegeCamp, cUnitStateAlive, -1, cMyID); 
+		if ((SiegeCamp > 0) && (kbResourceGet(cResourceWood) > 350) && (kbResourceGet(cResourceFavor) > 30) && (kbGetTechStatus(cTechStonesofRedLinen) < cTechStatusResearching))
+        {
+		aiTaskUnitResearch(SiegeCamp, cTechStonesofRedLinen);  
+		Attempt = Attempt + 1;
+		}
+        if (Attempt > 4)	
         xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting StonesOfRedLinen");
     }
 }
 

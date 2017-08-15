@@ -14,7 +14,7 @@ rule updateWoodBreakdown
     inactive
 {   
     if (ShowAiEcho == true) aiEcho("updateWoodBreakdown: ");
-    if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4))
+    if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
 	return;
     int mainBaseID = kbBaseGetMainID(cMyID);
   
@@ -205,7 +205,7 @@ rule updateGoldBreakdown
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateGoldBreakdown: ");
-    if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4))
+    if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
 	return;
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
@@ -415,7 +415,7 @@ rule updateFoodBreakdown
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateFoodBreakdown: ");
-    if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4))
+    if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
 	return;   
 	if (xsGetTime() > 20*1*1000)
 	xsSetRuleMinIntervalSelf(9);

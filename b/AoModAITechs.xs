@@ -1523,8 +1523,10 @@ rule getBoilingOil
         return;
     
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
+	int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
+	int Sbuildings = numFortresses + numTowers;
     int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding);
-    if ((numFortresses < 1) || (numMarkets < 1))
+    if ((Sbuildings < 1) || (numMarkets < 1))
         return;
         
     float woodSupply = kbResourceGet(cResourceWood);
@@ -2150,6 +2152,8 @@ rule getMediumInfantry
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechMediumInfantry;
+	if (cMyCulture == cCultureChinese)
+	techID = cTechMediumBarracks;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
         xsDisableSelf();
@@ -2215,6 +2219,8 @@ rule getMediumCavalry
     if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
         return;
     int techID = cTechMediumCavalry;
+	if (cMyCulture == cCultureChinese)
+	techID = cTechMediumStable;	
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
         xsDisableSelf();

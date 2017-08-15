@@ -13,8 +13,6 @@ rule maintainTradeUnits
     if ((numMarkets < 1) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000))
         return;
     
-
-	
 	if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa && IsRunTradeUnits1 == false)
 	{
 	static int OldgMaxTradeCarts = 22; // Default

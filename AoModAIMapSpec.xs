@@ -413,7 +413,6 @@ rule findVinlandsagaBase
     else
     {
         mainlandGroupID=kbFindAreaGroupByLocation(cAreaGroupTypeLand, 0.5, 0.5);  // Can fail if mountains at map center
-//      mainlandGroupID=kbFindAreaGroup(cAreaGroupTypeLand, 1.2, kbAreaGetIDByPosition(location));   // Instead, look for one 20% larger than start area group.
     }
 
     if (mainlandGroupID < 0)
@@ -653,47 +652,6 @@ rule transportAllUnits
         aiPlanSetActive(planID);
     }
 }
-
-//==============================================================================
-void nomadBuildSettlementCallBack(int parm1=-1)
-{
-    if (ShowAiEcho == true) aiEcho("nomadBuildSettlementCallBack:");
-
-    //Find our one settlement.and make it the main base.
-    int settlementID=findUnit(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
-    if (settlementID < 0)
-    {
-        //Enable the rule that looks for a settlement.
-        int nomadSettlementGoalID=createBuildSettlementGoal("BuildNomadSettlement", 0, -1, -1, 1, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder,0), true, 100);
-        if (nomadSettlementGoalID != -1)
-        {
-            //Create the callback goal.
-            int nomadCallbackGID=createCallbackGoal("Nomad BuildSettlement Callback", "nomadBuildSettlementCallBack", 1, 0, -1, false);
-            if (nomadCallbackGID >= 0)
-                aiPlanSetVariableInt(nomadSettlementGoalID, cGoalPlanDoneGoal, 0, nomadCallbackGID);
-        }
-        return;
-    }
-
-    //Kill the villie explore plan.
-    aiPlanDestroy(gNomadExplorePlanID1);
-
-    //Find our one settlement and make it the main base.
-    int newBaseID=kbUnitGetBaseID(findUnit(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding));
-    aiSwitchMainBase(newBaseID, true);
-    kbBaseSetMain(cMyID, newBaseID, true);
-
-    //Unpause the age upgrades.
-    aiSetPauseAllAgeUpgrades(false);
-    //Unpause the pause kicker.
-    xsEnableRule("unPauseAge2");
-    xsSetRuleMinInterval("unPauseAge2", 15);
-
-    //Turn on buildhouse.
-    xsEnableRule("buildHouse");
-    xsDisableSelf();
-}
-
 //==============================================================================
 rule nomadSearchMode
     inactive

@@ -790,10 +790,7 @@ rule buildSettlements
             return;
         }
 
-
-
-    //Don't get too many more than our human allies, stops after 25 min.
-
+	//Don't get too many more than our human allies, stops after 12 min.
     int largestAllyCount=-1;
 	if (xsGetTime() < 12*60*1000)
 	{	
@@ -4265,15 +4262,14 @@ rule buildGoldMineTower
     if ((currentWood < 300) || (currentGold < 150))
         return;
         
-    if (((currentFood > 500) && (currentGold > 300) && (kbGetAge() == cAge2))
-     || ((currentFood > 700) && (currentGold > 700) && (kbGetAge() == cAge3)))
+    if ((currentFood > 700) && (currentGold > 700) && (kbGetAge() == cAge3))
         return;
     
     int towerLimit = kbGetBuildLimit(cMyID, cUnitTypeTower);
     if (numTowers >= towerLimit)
         return;
 
-    if ((numTowers > 15) && (kbGetAge() == cAge2))
+    if ((numTowers > 8) && (kbGetAge() == cAge3))
         return;
 
     if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
@@ -4361,7 +4357,7 @@ rule buildGoldMineTower
 //==============================================================================
 rule buildMBTower
 //    minInterval 70 //starts in cAge2
-    minInterval 30 //starts in cAge2
+    minInterval 22 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("buildMBTower:");
@@ -5037,10 +5033,11 @@ rule buildGarden
 	  aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
 	  aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
 	  aiPlanSetDesiredPriority(planID, 100);
-
-		int builderTypeID = cUnitTypeVillagerChinese;
-
-		aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
+	  aiPlanAddUnitType(planID, cUnitTypeVillagerChinese, 1, 1, 1);
+	  
+	  if ((numberOfGardens >= 4) && (kbGetAge() == cAge2))
+	  aiPlanSetEscrowID(planID, cMilitaryEscrowID);
+	  else 
 	  aiPlanSetEscrowID(planID, cEconomyEscrowID);
 
 	  vector backVector = kbBaseGetBackVector(cMyID, kbBaseGetMainID(cMyID));
@@ -5391,7 +5388,7 @@ inactive
 
 //==============================================================================
 rule BunkerUpWonderTower
-    minInterval 22 
+    minInterval 18 
     inactive
 {	
 
@@ -5478,14 +5475,54 @@ rule BunkerUpWonderTower
     
     int building1ID = -1;
     building1ID = cUnitTypeTower;
+    int numBuilders = 2;
+	if (cMyCulture == cCultureAtlantean)
+	numBuilders = 1;
 
-
-    int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
+    int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 50.0);
 
 
         
-            if (numBuilding1NearBase > 3)
-            return;
+     if (numBuilding1NearBase > 3)
+    {	
+     switch(cMyCulture)
+    {
+        case cCultureGreek:
+        {
+            building1ID = cUnitTypeFortress;
+            numBuilders = 4;
+            break;
+        }
+        case cCultureEgyptian:
+        {
+            building1ID = cUnitTypeMigdolStronghold;
+            numBuilders = 4;
+            break;
+        }
+        case cCultureNorse:
+        {
+            building1ID = cUnitTypeHillFort;
+            numBuilders = 4;
+            break;
+        }
+        case cCultureAtlantean:
+        {
+            building1ID = cUnitTypePalace;
+            numBuilders = 1;
+            break;
+        }
+        case cCultureChinese:
+        {
+            building1ID = cUnitTypeCastle;
+            numBuilders = 3;
+            break;
+        }		
+    }
+	   int numBuilding2NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 50.0);	
+       if (numBuilding2NearBase > 3)
+       return;
+	}
+
 			 
     bool planActive = false;
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
@@ -5525,7 +5562,7 @@ rule BunkerUpWonderTower
         builderType = cUnitTypeAbstractInfantry;
 
     //Force building #1 to go down.
-    int BunkerUpWonder1 = aiPlanCreate("buildBuilding1AtOtherBase", cPlanBuild);
+    int BunkerUpWonder1 = aiPlanCreate("Bunker Up that Wonder", cPlanBuild);
     if (BunkerUpWonder1 >= 0)
     {
         aiPlanSetInitialPosition(BunkerUpWonder1, location);
@@ -5541,203 +5578,51 @@ rule BunkerUpWonderTower
         aiPlanSetVariableFloat(BunkerUpWonder1, cBuildPlanBuildingBufferSpace, 0, 0.0);
 
         aiPlanSetDesiredPriority(BunkerUpWonder1, 100);
-        aiPlanAddUnitType(BunkerUpWonder1, builderType, 1, 1, 2);
+        aiPlanAddUnitType(BunkerUpWonder1, builderType, numBuilders, numBuilders, numBuilders);
         aiPlanSetEscrowID(BunkerUpWonder1, cMilitaryEscrowID);
         aiPlanSetBaseID(BunkerUpWonder1, otherBaseID);
         aiPlanSetActive(BunkerUpWonder1);
         gBunkerUpWonder1PlanID = BunkerUpWonder1;	
     }
 }
-
 //==============================================================================
-rule BunkerUpWonderFortess
-    minInterval 22 
+rule rebuildSiegeCamp
     inactive
-{	
-
-
-
-    static int gBunkerUpWonder2PlanID=-1;
-    static vector WonderPlace = cInvalidVector;
-
-	static int WonderUnitID=-1;
-    //Find wonder, search for ally first then mine.
-	    int TCunitQueryID = kbUnitQueryCreate("findPlentyVault");
-        kbUnitQuerySetPlayerRelation(TCunitQueryID, cPlayerRelationAlly);
-        kbUnitQuerySetUnitType(TCunitQueryID, cUnitTypeWonder);
-        kbUnitQuerySetState(TCunitQueryID, cUnitStateAliveOrBuilding);
-        kbUnitQueryResetResults(TCunitQueryID);
-        int numberFound = kbUnitQueryExecute(TCunitQueryID);
-        WonderUnitID = kbUnitQueryGetResult(TCunitQueryID, 0);
-
-		if (WonderUnitID <= 0)
-		{      // Try self	
-	    TCunitQueryID = kbUnitQueryCreate("findPlentyVault");
-        kbUnitQuerySetPlayerRelation(TCunitQueryID, cPlayerRelationSelf);
-        kbUnitQuerySetUnitType(TCunitQueryID, cUnitTypeWonder);
-        kbUnitQuerySetState(TCunitQueryID, cUnitStateAliveOrBuilding);
-        kbUnitQueryResetResults(TCunitQueryID);
-        int numberFoundSelf = kbUnitQueryExecute(TCunitQueryID);
-        WonderUnitID = kbUnitQueryGetResult(TCunitQueryID, 0);
-		}
-		
-		if (WonderUnitID <= 0)
-		return;		
-		
-		 WonderPlace = kbUnitGetPosition(WonderUnitID);
-		 vector location = kbUnitGetPosition(WonderUnitID);
-		 vector frontVector = cInvalidVector;
-		 vector backVector = cInvalidVector;
-		 vector origLocation = location;
-		 
-         frontVector = kbBaseGetFrontVector(cMyID, kbBaseGetMainID(cMyID));
-	     backVector = kbBaseGetBackVector(cMyID, kbBaseGetMainID(cMyID));
-    
-    float fx = xsVectorGetX(frontVector);
-    float fz = xsVectorGetZ(frontVector);
-    float fxOrig = fx;
-    float fzOrig = fz;
-    float bx = xsVectorGetX(backVector);
-    float bz = xsVectorGetZ(backVector);
-    float bxOrig = bx;
-    float bzOrig = bz;
-	
-	fx = fzOrig * (-21);
-    fz = fxOrig * 21;
-
-            frontVector = xsVectorSetX(frontVector, fx);
-            frontVector = xsVectorSetZ(frontVector, fz);
-            frontVector = xsVectorSetY(frontVector, 0.0);
-			
-			backVector = xsVectorSetX(backVector, bx);
-            backVector = xsVectorSetZ(backVector, bz);
-            backVector = xsVectorSetY(backVector, 0.0);
-
-			
-			if (aiRandInt(2) > 0)
-            location = origLocation + frontVector;
-			else location = origLocation + backVector;
- 
-    float woodSupply = kbResourceGet(cResourceWood);
-    float goldSupply = kbResourceGet(cResourceGold);
-    if ((woodSupply < 200) || (goldSupply < 120))
-        return;
-    
+    minInterval 37 
+{
+    xsSetRuleMinIntervalSelf(45);
     int mainBaseID = kbBaseGetMainID(cMyID);
-    int otherBaseUnitID = WonderUnitID;
-    if (otherBaseUnitID < 0)
-        return;
-    else
-    {
-        int otherBaseID=kbUnitGetBaseID(WonderUnitID);
-        if (otherBaseID == mainBaseID)
-        {
-            return;
-        }
-    }
+    int numSiegeCamps = kbUnitCount(cMyID, cUnitTypeSiegeCamp, cUnitStateAliveOrBuilding);
     
-	int numBuilders = -1;
-    int building1ID = -1;
-    switch(cMyCulture)
-    {
-        case cCultureGreek:
-        {
-            building1ID = cUnitTypeFortress;
-            numBuilders = 4;
-            break;
-        }
-        case cCultureEgyptian:
-        {
-            building1ID = cUnitTypeMigdolStronghold;
-            numBuilders = 4;
-            break;
-        }
-        case cCultureNorse:
-        {
-            building1ID = cUnitTypeHillFort;
-            numBuilders = 4;
-            break;
-        }
-        case cCultureAtlantean:
-        {
-            building1ID = cUnitTypePalace;
-            numBuilders = 1;
-            break;
-        }
-        case cCultureChinese:
-        {
-            building1ID = cUnitTypeCastle;
-            numBuilders = 3;
-            break;
-        }		
-    }
-
-
-    int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
-
-
-        
-            if (numBuilding1NearBase > 3)
-            return;
-			 
-    bool planActive = false;
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
     if (activeBuildPlans > 0)
     {
         for (i = 0; < activeBuildPlans)
         {
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
-            if (aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == building1ID)
+            if (aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeSiegeCamp)
             {
-                vector buildPlanCenterPos = aiPlanGetVariableVector(buildPlanIndexID, cBuildPlanCenterPosition, 0);
-                if (ShowAiEcho == true) aiEcho("buildPlanCenterPos: "+buildPlanCenterPos);
-                if ((aiPlanGetBaseID(buildPlanIndexID) == otherBaseID) || (equal(location, buildPlanCenterPos) == true))
-                {
-                    planActive = true;
-                }
-                    
-                int enemySettlementAtBuildPlanPos = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationEnemy, buildPlanCenterPos, 15.0);
-                int motherNatureSettlementAtBuildPlanPos = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, 0, buildPlanCenterPos, 15.0);
-                enemySettlementAtBuildPlanPos = enemySettlementAtBuildPlanPos - motherNatureSettlementAtBuildPlanPos;
-                int alliedSettlementAtBuildPlanPos = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly, buildPlanCenterPos, 15.0);
-                if ((enemySettlementAtBuildPlanPos > 0) || (alliedSettlementAtBuildPlanPos > 0))
-                {
-                    aiPlanDestroy(buildPlanIndexID);
-                }
+                return;
             }
         }
     }
-    
-    if (planActive == true)
+        
+    if ((numSiegeCamps > 0) || (kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive) < 10) || (kbResourceGet(cResourceGold) < 150))
     {
         return;
     }
-
+    
     int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-        builderType = cUnitTypeAbstractInfantry;
-
-    //Force building #2 to go down.
-    int BunkerUpWonder2 = aiPlanCreate("buildBuilding1AtOtherBase", cPlanBuild);
-    if (BunkerUpWonder2 >= 0)
+    
+    int RebuildSiegeCamp = aiPlanCreate("RebuildSiegeCamp", cPlanBuild);
+    if (RebuildSiegeCamp >= 0)
     {
-        aiPlanSetInitialPosition(BunkerUpWonder2, location);
-        aiPlanSetVariableInt(BunkerUpWonder2, cBuildPlanBuildingTypeID, 0, building1ID);
-        aiPlanSetVariableInt(BunkerUpWonder2, cBuildPlanMaxRetries, 0, 10);
-        aiPlanSetVariableBool(BunkerUpWonder2, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-        aiPlanSetVariableFloat(BunkerUpWonder2, cBuildPlanRandomBPValue, 0, 0.99);
-		aiPlanSetVariableFloat(BunkerUpWonder2, cBuildPlanInfluencePositionDistance, 0, 35.0);
-        aiPlanSetVariableFloat(BunkerUpWonder2, cBuildPlanInfluencePositionValue, 0, 100.0);
-        
-        aiPlanSetVariableVector(BunkerUpWonder2, cBuildPlanCenterPosition, 0, location);
-        aiPlanSetVariableFloat(BunkerUpWonder2, cBuildPlanCenterPositionDistance, 0, 10.0);
-        aiPlanSetVariableFloat(BunkerUpWonder2, cBuildPlanBuildingBufferSpace, 0, 0.0);
-
-        aiPlanSetDesiredPriority(BunkerUpWonder2, 100);
-        aiPlanAddUnitType(BunkerUpWonder2, builderType, numBuilders, numBuilders, numBuilders);
-        aiPlanSetEscrowID(BunkerUpWonder2, cMilitaryEscrowID);
-        aiPlanSetBaseID(BunkerUpWonder2, otherBaseID);
-        aiPlanSetActive(BunkerUpWonder2);
-        gBunkerUpWonder2PlanID = BunkerUpWonder2;	
+        aiPlanSetVariableInt(RebuildSiegeCamp, cBuildPlanBuildingTypeID, 0, cUnitTypeSiegeCamp);      
+        aiPlanSetDesiredPriority(RebuildSiegeCamp, 100);
+        aiPlanAddUnitType(RebuildSiegeCamp, builderType, 1, 1, 1);
+        aiPlanSetEscrowID(RebuildSiegeCamp, cMilitaryEscrowID);
+        aiPlanSetBaseID(RebuildSiegeCamp, mainBaseID);
+        aiPlanSetActive(RebuildSiegeCamp);
+        xsSetRuleMinIntervalSelf(60);
     }
-}	
+}

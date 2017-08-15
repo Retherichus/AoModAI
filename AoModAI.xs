@@ -273,8 +273,6 @@ mutable void buildHandler(int protoID=-1) { }
 mutable void gpHandler(int powerID=-1)    { }
 mutable int createBuildSettlementGoal(string name="BUG", int minAge=-1, int maxAge=-1, int baseID=-1, int numberUnits=1, 
 int builderUnitTypeID=-1, bool autoUpdate=true, int pri=100) { }
-mutable int getEconPop(void) {}
-mutable int getMilPop(void) {}
 mutable int getSoftPopCap(void) {}
 mutable void unbuildHandler() { }
 mutable void age5Handler(int age=4) { }
@@ -4596,10 +4594,6 @@ void age2Handler(int age=1)
     //Norse.
     else if (cMyCulture == cCultureNorse)
     {
-        // add an extra ulfsark builder
-        //aiPlanSetVariableInt(gUlfsarkMaintainPlanID, cTrainPlanNumberToMaintain, 0, aiPlanGetVariableInt(gUlfsarkMaintainPlanID, cTrainPlanNumberToMaintain, 0)+1);
-        //aiPlanSetVariableInt(gUlfsarkMaintainMilPlanID, cTrainPlanNumberToMaintain, 0, aiPlanGetVariableInt(gUlfsarkMaintainMilPlanID, cTrainPlanNumberToMaintain, 0)+1);
-
         //We always want 3 Norse heroes.
         gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypeHeroNorse, 3, false, kbBaseGetMainID(cMyID));
         aiPlanSetDesiredPriority(gHero1MaintainPlan, 100);
@@ -5093,7 +5087,13 @@ void age3Handler(int age=2)
         {
             xsEnableRule("getMediumCavalry");
             xsEnableRule("getMediumInfantry");
+			xsEnableRule("getMediumArchers");
         }
+        else if (cMyCulture == cCultureChinese)
+        {
+            xsEnableRule("getMediumCavalry");
+            xsEnableRule("getMediumInfantry");
+        }		
     }
 }
 
@@ -5223,7 +5223,6 @@ void age5Handler(int age=4)
 
 //==============================================================================
 rule ShouldIResign
-//    minInterval 63 //starts in cAge1
     minInterval 53 //starts in cAge1
     active
 {
@@ -5397,25 +5396,6 @@ rule ShouldIResign
     }
 }
 
-
-//==============================================================================
-void gpHandler(int powerProtoID=-1) //god power handler
-{ 
-    if (powerProtoID == -1)
-        return;
-    if (powerProtoID == cPowerSpy)
-        return;
-
-    // If the power is TitanGate, then we need to launch the repair plan to build it..
-    if (powerProtoID == cPowerTitanGate)
-    {
-        // Don't look for it now, just set up the rule that looks for it
-        // and then launches a repair plan to build it. 
-        xsEnableRule("repairTitanGate");
-        return;
-    }
-}
-
 //==============================================================================
 void resignHandler(int result =-1)
 {
@@ -5457,7 +5437,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 		if (xsGetTime() > 1*30*1000)  // Disable if we've tried for too long.
         xsDisableSelf();
 	
-			// Disable early fishing for Nomad & Highland, to later be enabled.
+		  // Disable early fishing for Nomad & Highland, to later be enabled.
 		
 		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") ||(cRandomMapName == "vinlandsaga") ||(cRandomMapName == "team migration") ||(NoFishing == true))
 		  {
@@ -5466,8 +5446,6 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 		  return;
 	      }
 
-        
-	
     //Create the fish query.
     static int unitQueryID=-1;
     if (unitQueryID < 0)
@@ -5496,13 +5474,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 
         //Fire up.
         if (gMaintainWaterXPortPlanID < 0 && gTransportMap == true) 
-	    {
         gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 1, false, -1);
-        //aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 55);
-        }
-
-
-	
 			
         xsDisableSelf();
     }
@@ -5688,10 +5660,7 @@ rule watchForFirstWonderDone    //See who makes the first wonder, note its ID, m
                         aiPlanSetActive(gEnemyWonderDefendPlan);
                         if (ShowAiEcho == true) aiEcho("Creating ally wonder defend plan");
 		                if (bWonderDefense == true)
-		                {
-		                xsEnableRule("BunkerUpWonderTower");
-		                xsEnableRule("BunkerUpWonderFortess");
-	                    }						
+		                xsEnableRule("BunkerUpWonderTower");			
                     }
                 }
             }
@@ -5747,10 +5716,8 @@ rule watchForWonder  // See if my wonder has been placed.  If so, go build it.
         aiPlanSetActive(gWonderDefendPlan); 
         if (ShowAiEcho == true) aiEcho("Creating wonder defend plan");
 		if (bWonderDefense == true)
-		{
 		xsEnableRule("BunkerUpWonderTower");
-		xsEnableRule("BunkerUpWonderFortess");
-	    }
+	    
     }
 
     // we have a wonder, get a titan
@@ -5826,9 +5793,6 @@ rule goAndGatherRelics
     if (ShowAiEcho == true) aiEcho("Creating relic gathering plan with unit type "+gGatherRelicType);
     gRelicGatherPlanID = aiPlanCreate("Relic Gather", cPlanGatherRelic);
 	
-	
-
-    
     if (gRelicGatherPlanID >= 0)
     {
         aiPlanAddUnitType(gRelicGatherPlanID, gGatherRelicType, 1, 1, 1);
@@ -5900,7 +5864,6 @@ rule spotAgeUpgrades    //detect age upgrades given as starting condtions or via
         }
     }
 }
-
 //==============================================================================
 void main(void)
 {
@@ -5919,25 +5882,6 @@ void main(void)
     else
         xsDisableRule("age1Progress");
 }
-
-//==============================================================================
-// build handler
-//==============================================================================
-void buildHandler(int protoID=-1) 
-{
-   if (protoID == cUnitTypeSettlement)
-   {
-      for (i=1; < cNumberPlayers)
-      {
-         if (i == cMyID)
-            continue;
-         if (kbIsPlayerAlly(i) == true)
-            continue;
-         aiCommsSendStatement(i, cAICommPromptAIBuildSettlement, -1);
-      }
-   }
-}
-
 //==============================================================================
 // god power handler
 //==============================================================================
@@ -5978,7 +5922,14 @@ void gpHandler(int powerProtoID=-1)
    {
       type=cAICommPromptEconomicGodPower;
    }
-
+    // If the power is TitanGate, then we need to launch the repair plan to build it..
+    if (powerProtoID == cPowerTitanGate)
+    {
+        // Don't look for it now, just set up the rule that looks for it
+        // and then launches a repair plan to build it. 
+        xsEnableRule("repairTitanGate");
+        return;
+    }
    //Tell all the enemy players
    for (i=1; < cNumberPlayers)
    {
@@ -5988,12 +5939,4 @@ void gpHandler(int powerProtoID=-1)
          continue;
       aiCommsSendStatement(i, type, -1);
    }
-}
-
-//==============================================================================
-// attackChatCallback
-//==============================================================================
-void attackChatCallback(int parm1=-1)
-{
-    aiCommsSendStatement(aiGetMostHatedPlayerID(), cAICommPromptAIAttack, -1); 
 }

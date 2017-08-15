@@ -808,16 +808,6 @@ int findNumUnitsInBase(int playerID = 0, int baseID = -1, int unitTypeID = -1, i
     kbUnitQueryResetResults(unitQueryID);
     return(kbUnitQueryExecute(unitQueryID));
 }
-
-//==============================================================================
-int getPlanPopSlots(int planID=-1)  //Returns the total pop slots taken by units in this plan
-{
-    if (ShowAiEcho == true) aiEcho("getPlanPopSlots:");
-
-    int unitCount = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
-    return(3 * unitCount);
-}  
-
 //==============================================================================
 int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
     int unitPickerID=-1, int repeat=-1, int minAge=-1, int maxAge=-1,
@@ -1071,42 +1061,6 @@ int createTransportPlan(string name="BUG", int startAreaID=-1, int goalAreaID=-1
     //Done.
     return(planID);
 }
-
-//==============================================================================
-int getEconPop(void)    //Returns the unit count of villagers, dwarves, fishing boats, trade carts and oxcarts
-{
-    if (ShowAiEcho == true) aiEcho("getEconPop:");
-
-    int retVal = 0;
-
-    retVal = retVal + kbUnitCount(cMyID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer, 0), cUnitStateAlive);
-    retVal = retVal + kbUnitCount(cMyID, cUnitTypeAbstractTradeUnit, cUnitStateAlive);
-    if (cMyCulture == cCultureNorse)
-    {
-        retVal = retVal + kbUnitCount(cMyID, cUnitTypeDwarf, cUnitStateAlive);
-        retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipNorse, cUnitStateAlive);
-        retVal = retVal + kbUnitCount(cMyID, cUnitTypeOxCart, cUnitStateAlive);
-    }
-    else if (cMyCulture == cCultureGreek)
-        retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipGreek, cUnitStateAlive);
-    else if (cMyCulture == cCultureEgyptian)
-        retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipEgyptian, cUnitStateAlive);
-    else if (cMyCulture == cCultureAtlantean)
-        retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipAtlantean, cUnitStateAlive);   
-	else if (cMyCulture == cCultureChinese)
-        retVal = retVal + kbUnitCount(cMyID, cUnitTypeFishingShipChinese, cUnitStateAlive);   	
-    
-    return(retVal);
-}
-
-//==============================================================================
-int getMilPop(void) //Returns the pop slots used by military units
-{
-    if (ShowAiEcho == true) aiEcho("getMilPop:");
-
-    return(kbGetPop() - getEconPop());
-}
-
 //==============================================================================
 vector findBestSettlement(int playerID=0)   //Will find the closet settlement of the given playerID
 {
@@ -1275,35 +1229,6 @@ bool findASettlement()  //Will find an unclaimed settlement
         return(true);
     return(false);
 }
-
-//==============================================================================
-int findBiggestBorderArea(int areaID=-1)    //given an area ID, find the biggest border area in tiles
-{
-    if (ShowAiEcho == true) aiEcho("findBiggestBorderArea:");
-
-    if (areaID == -1)
-        return(-1);
-
-    int numBorders=kbAreaGetNumberBorderAreas(areaID);
-    int borderArea=-1;
-    int numTiles=-1;
-    int bestTiles=-1;
-    int bestArea=-1;
-
-    for (i=0; < numBorders)
-    {
-        borderArea=kbAreaGetBorderAreaID(areaID, i);
-        numTiles=kbAreaGetNumberTiles(borderArea);
-        if (numTiles > bestTiles)
-        {
-            bestTiles=numTiles;
-            bestArea=borderArea;
-        }
-    }
-
-    return(bestArea);
-}
-
 //==============================================================================
 int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 {
@@ -1526,7 +1451,7 @@ bool createSimpleBuildPlan(int puid=-1, int number=1, int pri=100,
         aiPlanSetBaseID(planID, baseID);
 		if (puid != cUnitTypeFarm)
 		{
-		aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 4.0);
+		//aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 4.0);
         aiPlanSetVariableInt(planID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeBuilding); 
         aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 7);    
         aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitValue, 0, -5.0);        // -5 points per unit		
@@ -1792,44 +1717,6 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
         
     }
 }
-
-//==============================================================================
-int getNumPlayersByRel(bool ally = true)
-{
-    if (ShowAiEcho == true) aiEcho("**!!**!!** getNumPlayersByRel:");
-    if (ally == true)
-        if (ShowAiEcho == true) aiEcho("ally");
-    else
-        if (ShowAiEcho == true) aiEcho("enemy");
-        
-    int numPlayersByRel = 0;
-    int playerID = -1;
-    for (playerID = 1; < cNumberPlayers)
-    {
-        if (playerID == cMyID)
-            continue;
-        
-        if (ally == true)
-        {
-            if (kbIsPlayerAlly(playerID) == false)
-                continue;
-        }
-        else
-        {
-            if (kbIsPlayerEnemy(playerID) == false)
-                continue;
-        }
-        
-        if ((kbIsPlayerResigned(playerID) == false) && (kbHasPlayerLost(playerID) == false))
-        {
-            numPlayersByRel = numPlayersByRel + 1;
-        }
-    }
-    if (ShowAiEcho == true) aiEcho("numPlayersByRel: "+numPlayersByRel);
-    
-    return(numPlayersByRel);
-}
-
 //==============================================================================
 vector calcMonumentPos(int which=-1)
 {

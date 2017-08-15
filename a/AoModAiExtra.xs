@@ -27,8 +27,6 @@ extern int gLandScoutSpecialUlfsark = -1;
 extern bool IsRunTradeUnits1 = false;
 extern bool IsRunTradeUnits2 = false;
 extern bool IsRunHuntingDogs = false;
-extern bool IsRunWallSize = false;
-extern int numTeesNearMainBase = -1;
 extern int gDefendPlentyVault = -1;
 extern int gHeavyGPTech=-1;
 extern int gHeavyGPPlan=-1;
@@ -50,6 +48,7 @@ extern int eChineseHero = -1;
 extern int cMonkMaintain = -1;
 extern const int cGaiaID = 0;
 extern int StuckTransformID = 0;
+extern bool HasHumanAlly = false;
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -102,7 +101,6 @@ extern int gTitanTradeCarts = 15;         // Max trade carts for Titan (+5)
 extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, (All modes).
 extern bool DisallowPullBack = false;  // set true to make the AI no longer retreat(All modes).
 extern int ModdedTCTimer = 25;
-extern bool AllyTcLimit = false; // This enables the modified rule and disables the original one.
 // End of STINNERV
 
 // If gSuperboom is set to true, the numbers below are what the Ai will attempt to gather in Archaic Age or untill X minutes have passed.
@@ -140,21 +138,21 @@ extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wo
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 800;             // Food
-extern int RethLGGAge2 = 450;              // Gold
-extern int RethLGWAge2 = 550;              // Wood
+extern int RethLGFAge2 = 500;             // Food
+extern int RethLGGAge2 = 400;              // Gold
+extern int RethLGWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLGFAge3 = 1200;              // Food
-extern int RethLGGAge3 = 1000;              // Gold
-extern int RethLGWAge3 = 700;              // Wood
+extern int RethLGFAge3 = 600;              // Food
+extern int RethLGGAge3 = 500;              // Gold
+extern int RethLGWAge3 = 500;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLGFAge4 = 1500;              // Food
-extern int RethLGGAge4 = 1200;              // Gold
-extern int RethLGWAge4 = 1000;              // Wood
+extern int RethLGFAge4 = 1000;              // Food
+extern int RethLGGAge4 = 800;              // Gold
+extern int RethLGWAge4 = 800;              // Wood
 
 
 //==============================================================================
@@ -162,63 +160,63 @@ extern int RethLGWAge4 = 1000;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLEFAge2 = 800;              // Food
+extern int RethLEFAge2 = 650;              // Food
 extern int RethLEGAge2 = 550;              // Gold
-extern int RethLEWAge2 = 100;              // Wood
+extern int RethLEWAge2 = 200;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLEFAge3 = 1300;              // Food
-extern int RethLEGAge3 = 1100;              // Gold
-extern int RethLEWAge3 = 450;              // Wood
+extern int RethLEFAge3 = 700;              // Food
+extern int RethLEGAge3 = 600;              // Gold
+extern int RethLEWAge3 = 300;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLEFAge4 = 1500;              // Food
-extern int RethLEGAge4 = 1300;              // Gold
-extern int RethLEWAge4 = 700;              // Wood
+extern int RethLEFAge4 = 1000;              // Food
+extern int RethLEGAge4 = 800;              // Gold
+extern int RethLEWAge4 = 600;              // Wood
 
 //==============================================================================
 //Norse
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 900;             // Food
-extern int RethLNGAge2 = 450;              // Gold
-extern int RethLNWAge2 = 550;              // Wood
+extern int RethLNFAge2 = 500;             // Food
+extern int RethLNGAge2 = 400;              // Gold
+extern int RethLNWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLNFAge3 = 1200;              // Food
-extern int RethLNGAge3 = 1000;              // Gold
-extern int RethLNWAge3 = 750;              // Wood
+extern int RethLNFAge3 = 600;              // Food
+extern int RethLNGAge3 = 500;              // Gold
+extern int RethLNWAge3 = 500;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLNFAge4 = 1500;              // Food
-extern int RethLNGAge4 = 1200;              // Gold
-extern int RethLNWAge4 = 1000;              // Wood
+extern int RethLNFAge4 = 1000;              // Food
+extern int RethLNGAge4 = 800;              // Gold
+extern int RethLNWAge4 = 800;              // Wood
 
 //==============================================================================
 //Atlantean
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 800;              // Food
-extern int RethLAGAge2 = 450;              // Gold
-extern int RethLAWAge2 = 650;              // Wood
+extern int RethLAFAge2 = 500;              // Food
+extern int RethLAGAge2 = 400;              // Gold
+extern int RethLAWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLAFAge3 = 1200;              // Food
-extern int RethLAGAge3 = 1000;              // Gold
-extern int RethLAWAge3 = 800;              // Wood
+extern int RethLAFAge3 = 600;              // Food
+extern int RethLAGAge3 = 500;              // Gold
+extern int RethLAWAge3 = 500;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLAFAge4 = 1500;              // Food
-extern int RethLAGAge4 = 1200;              // Gold
-extern int RethLAWAge4 = 1000;              // Wood
+extern int RethLAFAge4 = 1000;              // Food
+extern int RethLAGAge4 = 800;              // Gold
+extern int RethLAWAge4 = 800;              // Wood
 
 
 //==============================================================================
@@ -226,21 +224,21 @@ extern int RethLAWAge4 = 1000;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLCFAge2 = 800;              // Food
-extern int RethLCGAge2 = 450;              // Gold
-extern int RethLCWAge2 = 550;              // Wood
+extern int RethLCFAge2 = 500;              // Food
+extern int RethLCGAge2 = 400;              // Gold
+extern int RethLCWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLCFAge3 = 1200;              // Food
-extern int RethLCGAge3 = 1000;              // Gold
-extern int RethLCWAge3 = 650;              // Wood
+extern int RethLCFAge3 = 600;              // Food
+extern int RethLCGAge3 = 500;              // Gold
+extern int RethLCWAge3 = 500;              // Wood
 
 //Age 4 (Mythic Age)
 
-extern int RethLCFAge4 = 1500;              // Food
-extern int RethLCGAge4 = 1200;              // Gold
-extern int RethLCWAge4 = 1000;              // Wood
+extern int RethLCFAge4 = 1000;              // Food
+extern int RethLCGAge4 = 800;              // Gold
+extern int RethLCWAge4 = 800;              // Wood
 
 //==============================================================================
 //PART 3 Overrides & Rules
@@ -259,7 +257,7 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetRelicEventHandler("relicHandler");
 	aiSetRetreatEventHandler("retreatHandler");
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
-
+	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
 	if ((bWallUp == true) && (cvMapSubType == VINLANDSAGAMAP) && (cvOkToBuildWalls == true))  // enable in Heroic Age.
@@ -387,7 +385,7 @@ void initRethlAge2(void)
     //HateScripts
     xsEnableRuleGroup("HateScripts");
 	
-	if (bWallAllyMB == true)
+	if ((bWallAllyMB == true) && (HasHumanAlly == true))
 	xsEnableRule("WallAllyMB");
 	
 	if (bWallCleanup == true)
@@ -529,10 +527,7 @@ rule ActivateRethOverridesAge3
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge3Hyperion) == cTechStatusActive)
         xsEnableRuleGroup("Hyperion");		
 		
-		if (cMyCiv != cCivThor)
         xsEnableRuleGroup("ArmoryAge2");
-        if (cMyCiv == cCivThor)
-        xsEnableRuleGroup("ArmoryThor");
 		
 		if (cMyCiv == cCivPoseidon)
 		xsEnableRule("buildManyBuildings");
@@ -569,6 +564,10 @@ rule ActivateRethOverridesAge3
 	    gBuildWalls = true;
         gBuildWallsAtMainBase = true;
 	    }		
+		
+	    if (cMyCulture == cCultureEgyptian)
+        xsEnableRule("rebuildSiegeCamp");		
+		
 		xsDisableSelf();
            
     }
@@ -589,13 +588,32 @@ rule ActivateRethOverridesAge4
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge4Chongli) == cTechStatusActive)
 		xsEnableRuleGroup("Chongli");
 		
-
-		
         //Egyptian MINOR GOD SPECIFIC	
 	    if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Horus) == cTechStatusActive)
         xsEnableRuleGroup("Horus");
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Osiris) == cTechStatusActive)
-        xsEnableRuleGroup("Osiris");
+		{
+		xsEnableRuleGroup("Osiris");
+	    eOsiris=aiPlanCreate("Son of Osiris Empower", cPlanEmpower);
+        if (eOsiris >= 0)
+        {
+            aiPlanSetEconomy(eOsiris, true);
+            aiPlanAddUnitType(eOsiris, cUnitTypePharaohofOsiris, 1, 1, 1);
+            aiPlanSetVariableInt(eOsiris, cEmpowerPlanTargetTypeID, 0, cUnitTypeAbstractSettlement);
+            aiPlanSetDesiredPriority(eOsiris, 91);
+			aiPlanSetActive(eOsiris);
+        }
+	    Pempowermarket=aiPlanCreate("Pharaoh Secondary Empower", cPlanEmpower);
+        if (Pempowermarket >= 0)
+        {
+            aiPlanSetEconomy(Pempowermarket, true);
+            aiPlanAddUnitType(Pempowermarket, cUnitTypePharaohSecondary, 1, 1, 1);
+            aiPlanSetVariableInt(Pempowermarket, cEmpowerPlanTargetTypeID, 0, cUnitTypeMarket);
+			aiPlanSetDesiredPriority(Pempowermarket, 90);
+			aiPlanSetActive(Pempowermarket);
+        }		
+		}
+		
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge4Thoth) == cTechStatusActive)
 		xsEnableRuleGroup("Thoth");
 	
@@ -635,8 +653,8 @@ rule ActivateRethOverridesAge4
 		{
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeScoutChinese, 0.1);
 		if (cMyCiv == cCivShennong)
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLanceShennong, 0.6);
-		else kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLance, 0.6);
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLanceShennong, 0.9);
+		else kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLance, 0.8);
 		}
 		if (cMyCulture == cCultureNorse)
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractArcher, 0.2+aiRandInt(3)); // Ok to Bogsveigir now
@@ -1416,7 +1434,167 @@ rule BanditMigdolRemoval
 	   }
    }
 }
+rule AntiInf
+minInterval 5
+inactive 
+group HateScripts
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
 
+   if (aiGetWorldDifficulty() == cDifficultyEasy)
+   {
+	xsDisableSelf();
+	return;
+   }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+		if (cMyCulture == cCultureGreek)
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypeToxotes);
+        if (cMyCulture == cCultureEgyptian)
+		    kbUnitQuerySetUnitType(unitQueryID, cUnitTypeChariotArcher);
+        if (cMyCulture == cCultureNorse)
+		    kbUnitQuerySetUnitType(unitQueryID, cUnitTypeThrowingAxeman);
+        if (cMyCulture == cCultureAtlantean)
+		    kbUnitQuerySetUnitType(unitQueryID, cUnitTypeArcherAtlantean);
+        if (cMyCulture == cCultureChinese)
+            kbUnitQuerySetUnitType(unitQueryID, cUnitTypeChuKoNu);
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeAbstractInfantry);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+		if (cMyCulture == cCultureNorse)
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 12);
+		else kbUnitQuerySetMaximumDistance(enemyQueryID, 20);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+       if ((kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeHuskarl) == true) || (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeTridentSoldier) == true))
+            continue;
+			
+	   if (numberFoundTemp > 0)
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
+
+rule AntiArch
+minInterval 5  
+inactive
+group HateScripts 
+{
+   static int unitQueryID=-1;
+   static int enemyQueryID=-1;
+
+   if (aiGetWorldDifficulty() == cDifficultyEasy)
+   {
+	xsDisableSelf();
+	return;
+   }
+
+   //If we don't have the query yet, create one.
+   if (unitQueryID < 0)
+   unitQueryID=kbUnitQueryCreate("My Siege Query");
+   
+   //Define a query to get all matching units
+   if (unitQueryID != -1)
+   {
+		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
+		if (cMyCulture == cCultureGreek)
+			kbUnitQuerySetUnitType(unitQueryID, cUnitTypePeltast);
+        if (cMyCulture == cCultureEgyptian)
+		    kbUnitQuerySetUnitType(unitQueryID, cUnitTypeSlinger);
+        if (cMyCulture == cCultureNorse)
+		    kbUnitQuerySetUnitType(unitQueryID, cUnitTypeBogsveigir);
+        if (cMyCulture == cCultureAtlantean)
+		    kbUnitQuerySetUnitType(unitQueryID, cUnitTypeJavelinCavalry);
+        if (cMyCulture == cCultureChinese)
+            kbUnitQuerySetUnitType(unitQueryID, cUnitTypeMountedArcher);		
+		
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);		
+	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
+   }
+
+   kbUnitQueryResetResults(unitQueryID);
+   int siegeFound=kbUnitQueryExecute(unitQueryID);
+
+   if (siegeFound < 1)
+	return;
+
+   //If we don't have the query yet, create one.
+   if (enemyQueryID < 0)
+   enemyQueryID=kbUnitQueryCreate("Target Enemy Query");
+   
+   //Define a query to get all matching units
+   if (enemyQueryID != -1)
+   {
+		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
+		if (cMyCulture == cCultureChinese)
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeAbstractCavalry);
+        else if (cMyCulture == cCultureNorse)	
+        kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeLogicalTypeIdleCivilian);		
+		else kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeAbstractArcher);
+	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
+		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
+		kbUnitQuerySetAscendingSort(enemyQueryID, true);
+        if (cMyCulture == cCultureEgyptian)		
+		kbUnitQuerySetMaximumDistance(enemyQueryID, 12);
+	    else kbUnitQuerySetMaximumDistance(enemyQueryID, 18);
+   }
+
+   int numberFoundTemp = 0;
+   int enemyUnitIDTemp = 0;
+
+   for (i=0; < siegeFound)
+   {
+	   kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
+	   kbUnitQueryResetResults(enemyQueryID);
+	   numberFoundTemp=kbUnitQueryExecute(enemyQueryID);
+	   
+        if (kbUnitIsType(kbUnitQueryGetResult(enemyQueryID, 0), cUnitTypeShip) == true)
+         continue;
+			
+	   if (numberFoundTemp > 0)
+	   {
+		enemyUnitIDTemp = kbUnitQueryGetResult(enemyQueryID, 0);
+		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
+	   }
+   }
+}
 //==============================================================================
 // IHateVillagers
 //==============================================================================
@@ -1460,7 +1638,7 @@ rule IHateVillagers
    if (enemyQueryID != -1)
    {
 		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeAbstractVillager);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeLogicalTypeIdleCivilian); // also caravans 
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
@@ -1604,7 +1782,7 @@ rule IHateBuildingsBeheAndScarab
    if (enemyQueryID != -1)
    {
 		kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeBuilding);
+		kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeLogicalTypeBuildingsNotWalls);
 	        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
 		kbUnitQuerySetSeeableOnly(enemyQueryID, true);
 		kbUnitQuerySetAscendingSort(enemyQueryID, true);
@@ -1873,6 +2051,8 @@ inactive
 		 xsEnableRule("defendAlliedBase");
 		 xsEnableRule("Helpme");
 		 IhaveAllies = true;
+		 if ((kbIsPlayerHuman(i) == true) && (kbIsPlayerMutualAlly(i) == true))
+		 HasHumanAlly = true;
 		 return;
 		 }
 		 else
@@ -2641,8 +2821,6 @@ inactive
 	  return;
 	  xsDisableSelf();
       }
-	  
-     
       if (kbUnitIsType(StuckTransformID, cUnitTypeUlfsark))
       {
 	  vector currentPosition = kbUnitGetPosition(StuckTransformID);	  

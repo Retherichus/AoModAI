@@ -162,7 +162,7 @@ extern int RethLGWAge4 = 800;              // Wood
 //Age 2 (Classical Age)
 extern int RethLEFAge2 = 650;              // Food
 extern int RethLEGAge2 = 550;              // Gold
-extern int RethLEWAge2 = 100;              // Wood
+extern int RethLEWAge2 = 200;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -564,6 +564,10 @@ rule ActivateRethOverridesAge3
 	    gBuildWalls = true;
         gBuildWallsAtMainBase = true;
 	    }		
+		
+	    if (cMyCulture == cCultureEgyptian)
+        xsEnableRule("rebuildSiegeCamp");		
+		
 		xsDisableSelf();
            
     }

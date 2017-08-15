@@ -1275,35 +1275,6 @@ bool findASettlement()  //Will find an unclaimed settlement
         return(true);
     return(false);
 }
-
-//==============================================================================
-int findBiggestBorderArea(int areaID=-1)    //given an area ID, find the biggest border area in tiles
-{
-    if (ShowAiEcho == true) aiEcho("findBiggestBorderArea:");
-
-    if (areaID == -1)
-        return(-1);
-
-    int numBorders=kbAreaGetNumberBorderAreas(areaID);
-    int borderArea=-1;
-    int numTiles=-1;
-    int bestTiles=-1;
-    int bestArea=-1;
-
-    for (i=0; < numBorders)
-    {
-        borderArea=kbAreaGetBorderAreaID(areaID, i);
-        numTiles=kbAreaGetNumberTiles(borderArea);
-        if (numTiles > bestTiles)
-        {
-            bestTiles=numTiles;
-            bestArea=borderArea;
-        }
-    }
-
-    return(bestArea);
-}
-
 //==============================================================================
 int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 {
@@ -1526,7 +1497,7 @@ bool createSimpleBuildPlan(int puid=-1, int number=1, int pri=100,
         aiPlanSetBaseID(planID, baseID);
 		if (puid != cUnitTypeFarm)
 		{
-		aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 4.0);
+		//aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 4.0);
         aiPlanSetVariableInt(planID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeBuilding); 
         aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 7);    
         aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitValue, 0, -5.0);        // -5 points per unit		

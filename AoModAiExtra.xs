@@ -138,13 +138,13 @@ extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wo
 //Greek
 //==============================================================================
 //Age 2 (Classical Age)
-extern int RethLGFAge2 = 500;             // Food
+extern int RethLGFAge2 = 600;             // Food
 extern int RethLGGAge2 = 400;              // Gold
 extern int RethLGWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLGFAge3 = 600;              // Food
+extern int RethLGFAge3 = 700;              // Food
 extern int RethLGGAge3 = 500;              // Gold
 extern int RethLGWAge3 = 500;              // Wood
 
@@ -181,13 +181,13 @@ extern int RethLEWAge4 = 600;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLNFAge2 = 500;             // Food
+extern int RethLNFAge2 = 600;             // Food
 extern int RethLNGAge2 = 400;              // Gold
 extern int RethLNWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLNFAge3 = 600;              // Food
+extern int RethLNFAge3 = 700;              // Food
 extern int RethLNGAge3 = 500;              // Gold
 extern int RethLNWAge3 = 500;              // Wood
 
@@ -202,13 +202,13 @@ extern int RethLNWAge4 = 800;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLAFAge2 = 500;              // Food
+extern int RethLAFAge2 = 600;              // Food
 extern int RethLAGAge2 = 400;              // Gold
 extern int RethLAWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLAFAge3 = 600;              // Food
+extern int RethLAFAge3 = 700;              // Food
 extern int RethLAGAge3 = 500;              // Gold
 extern int RethLAWAge3 = 500;              // Wood
 
@@ -224,13 +224,13 @@ extern int RethLAWAge4 = 800;              // Wood
 //==============================================================================
 
 //Age 2 (Classical Age)
-extern int RethLCFAge2 = 500;              // Food
+extern int RethLCFAge2 = 600;              // Food
 extern int RethLCGAge2 = 400;              // Gold
 extern int RethLCWAge2 = 400;              // Wood
 
 //Age 3 (Heroic Age)
 
-extern int RethLCFAge3 = 600;              // Food
+extern int RethLCFAge3 = 700;              // Food
 extern int RethLCGAge3 = 500;              // Gold
 extern int RethLCWAge3 = 500;              // Wood
 

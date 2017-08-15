@@ -306,7 +306,6 @@ rule NavalGoalMonitor
    }
    aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanAutoUpdateBase, 0, false);
    aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanSetAreaGroups, 0, false);
-   //aiPlanSetDesiredPriority(gNavalAttackGoalID, 53);
 }
 
 //==============================================================================

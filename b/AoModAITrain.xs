@@ -13,8 +13,6 @@ rule maintainTradeUnits
     if ((numMarkets < 1) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000))
         return;
     
-
-	
 	if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa && IsRunTradeUnits1 == false)
 	{
 	static int OldgMaxTradeCarts = 22; // Default
@@ -60,7 +58,6 @@ rule maintainTradeUnits
                 }
                 else
                 {
-                    //if (ShowAiEcho == true) aiEcho("plan to train trade unit: "+kbGetProtoUnitName(tradeCartPUID)+" at main base: "+mainBaseID+" exists, returning");
                     if (numTradeUnits < 2) 
                     {
                         if (foodSupply > 300)
@@ -554,12 +551,6 @@ rule trainMythUnit
         }
     }
 
-
-
-
-	
-    //if (ShowAiEcho == true) aiEcho("TrainMythUnit gets "+puid+": a "+kbGetProtoUnitName(puid));
-
     if (puid < 0)
         return;
 
@@ -874,7 +865,6 @@ rule maintainSiegeUnits
         if (aiRandInt(2) == 0)
 		siegeUnitType1 = cUnitTypeBallista;
 		else siegeUnitType1 = cUnitTypePortableRam;
-		
     }
     else if (cMyCulture == cCultureChinese)
     {
@@ -885,7 +875,11 @@ rule maintainSiegeUnits
         if (kbGetAge() < cAge4)
             siegeUnitType1 = cUnitTypeTridentSoldier;
         else
-            siegeUnitType1 = cUnitTypeFireSiphon;
+		{
+	    if (aiRandInt(2) == 0)
+		siegeUnitType1 = cUnitTypeFireSiphon;
+		else siegeUnitType1 = cUnitTypeOnager;
+		}
     }
     
     bool siegeUnitType1BeingTrained = false;
@@ -900,7 +894,6 @@ rule maintainSiegeUnits
             int trainPlanIndexID = aiPlanGetIDByIndex(cPlanTrain, -1, true, i);
             if ((siegeUnitType1 == aiPlanGetVariableInt(trainPlanIndexID, cTrainPlanUnitType, 0)) && (aiPlanGetBaseID(trainPlanIndexID) == mainBaseID))
             {
-                //if (ShowAiEcho == true) aiEcho("plan to train siegeUnitType1: "+kbGetProtoUnitName(siegeUnitType1)+" at main base: "+mainBaseID+" exists");
                 siegeUnitType1BeingTrained = true;
             }
         }
@@ -922,7 +915,7 @@ rule maintainSiegeUnits
     if (kbGetAge() > cAge3)
         numSiegeUnitType1ToTrain = 5;
 	
-	if ((cMyCulture == cCultureNorse) && (siegeUnitType1 == cUnitTypePortableRam)) // train some PortableRams?
+	if ((cMyCulture == cCultureNorse) && (siegeUnitType1 == cUnitTypePortableRam) || (cMyCulture == cCultureAtlantean) && (siegeUnitType1 == cUnitTypeFireSiphon)) // train some PortableRams or Siphons?
 	numSiegeUnitType1ToTrain = 3;
     
 	if ((numSiegeUnitType1 < numSiegeUnitType1ToTrain) && (siegeUnitType1BeingTrained == false))

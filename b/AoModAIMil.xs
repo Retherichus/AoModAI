@@ -2327,13 +2327,7 @@ rule attackEnemySettlement
     if (targetSettlementID == enemyMainBaseUnitID)
     {
         if (ShowAiEcho == true) aiEcho("Enemy Settlement is his mainbase");
-        if ((kbGetAge() < cAge4) && (1 + getNumPlayersByRel(true) - getNumPlayersByRel(false) < 0))
-        {
-           if (ShowAiEcho == true) aiEcho ("Not yet in Age4 and there are too many enemy players, returning!");
-            return;
-        }
-        else
-        {
+		
             if ((numTitansIngDefendPlan > 0)
              || ((numMilUnitsInDefPlans >= 16) && ((numSiegeUnitsIngDefendPlan > 1) || (numMilUnitsInDefPlans >= 25) && (aiRandInt(10) == 1) ||
 			 ((numSiegeUnitsIngDefendPlan > 1) && (numMythUnitsIngDefendPlan > 0) && (numMilUnitsInDefPlans >= 12)))))
@@ -2346,7 +2340,6 @@ rule attackEnemySettlement
                if (ShowAiEcho == true) aiEcho ("returning as we don't have enough troops to attack his main base");
                 return;
             }
-        }
     }
     else
     {
@@ -2444,7 +2437,7 @@ rule attackEnemySettlement
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 2, 2);
             
             if (numMilUnitsInDefPlans < 14)
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, 8, 12, 12);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans, 12, 14);
             else
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
         }
@@ -2458,7 +2451,7 @@ rule attackEnemySettlement
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 2, 4);
             
             if (numMilUnitsInDefPlans < 14)
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, 8, 12, 12);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans, 12, 14);
             else
                 aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.90, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
         }
@@ -2490,9 +2483,9 @@ rule attackEnemySettlement
         else
         {
             if (currentPopCap > 160)
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans, numMilUnitsInDefPlans, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans, numMilUnitsInDefPlans);
             else
-                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
+                aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
         }
         aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
         
@@ -4050,7 +4043,7 @@ rule createLandAttack
         if (kbGetAge() == cAge2)
             aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans);
         else
-            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.95, numMilUnitsInDefPlans, numMilUnitsInDefPlans); 
+            aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans * 0.9, numMilUnitsInDefPlans, numMilUnitsInDefPlans); 
             
         aiPlanSetVariableInt(landAttackPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
     }
