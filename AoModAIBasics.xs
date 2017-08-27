@@ -1085,7 +1085,6 @@ vector findBestSettlement(int playerID=0)   //Will find the closet settlement of
         kbUnitQuerySetPlayerID(unitQueryID, playerID);
         kbUnitQuerySetUnitType(unitQueryID, cUnitTypeSettlement);
         kbUnitQuerySetState(unitQueryID, cUnitStateAny);
-		kbUnitQuerySetSeeableOnly(unitQueryID, true);
     }
     else
         return(cInvalidVector);
@@ -1183,25 +1182,7 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
     aiPlanAddUnitType( remoteSettlementTransportPlan, builderTypeID, NumBuilders, NumBuilders, NumBuilders);
 
     //Done with transport plan. build a settlement now!
-    int planID=aiPlanCreate("Build Remote"+kbGetUnitTypeName(cUnitTypeSettlementLevel1),
-                           cPlanBuild);
-    if (planID < 0)
-        return;
-    //Puid.
-    aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeSettlementLevel1);
-    //Priority.
-    aiPlanSetDesiredPriority(planID, 80);
-    aiPlanSetEconomy(planID, true);
-    //Escrow.
-    aiPlanSetEscrowID(planID, cEconomyEscrowID);
-    //Builders.
-    aiPlanAddUnitType(planID, builderTypeID, NumBuilders, NumBuilders, NumBuilders);
-    //Location.
-    aiPlanSetInitialPosition(planID, where);
-    aiPlanSetVariableVector(planID, cBuildPlanSettlementPlacementPoint, 0, where);
-    //Go.
-    aiPlanSetActive(planID);
-   
+    createBuildSettlementGoal("Remote Settlement", kbGetAge(), -1, kbAreaGetIDByPosition(where), NumBuilders, builderTypeID, true, 100);
     
 	aiPlanDestroy(rExploreIsland);
 	rExploreIsland = -1;
@@ -1209,9 +1190,12 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
 	if (rExploreIsland == -1)
 	{
 	rExploreIsland=aiPlanCreate("Explore there..", cPlanExplore); 
-    aiPlanAddUnitType(rExploreIsland, cUnitTypeAbstractVillager, 0, 0, 2);
+    aiPlanAddUnitType(rExploreIsland, builderTypeID, 0, 0, NumBuilders);
 	aiPlanSetInitialPosition(rExploreIsland, where);
-    aiPlanSetDesiredPriority(rExploreIsland, 1);
+	aiPlanAddWaypoint(rExploreIsland, where);
+	aiPlanSetVariableBool(rExploreIsland, cExplorePlanDoLoops, 0, false);
+	aiPlanSetVariableBool(rExploreIsland, cExplorePlanReExploreAreas,0, false);
+	aiPlanSetDesiredPriority(rExploreIsland, 1);
     aiPlanSetActive(rExploreIsland);
 	}
    

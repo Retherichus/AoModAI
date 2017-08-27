@@ -1119,8 +1119,8 @@ rule mainBaseAreaWallTeam1
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam1:");
 	int Temple = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
 	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000) || (kbGetAge() < cAge2) && (Temple < 1 ) || (kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean)
-	|| (cvMapSubType == NOMADMAP) && (kbGetAge() < cAge2) != (cMyCulture == cCultureNorse))
-	return;
+	|| (cvMapSubType == NOMADMAP) && (kbGetAge() < cAge2) != (cMyCulture == cCultureNorse) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 6*60*1000))
+    return;	
 	
 	if (kbGetAge() > cAge1)
 	xsSetRuleMinIntervalSelf(23);
@@ -4097,7 +4097,7 @@ rule buildGoldMineTower
     if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop))
         return;
     float goldSupply = kbResourceGet(cResourceGold);
-	if ((kbGetAge() < cAge3) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+	if ((kbGetAge() < cAge3) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 6*60*1000))
 	return; // We need the gold to advance quicker.
 	
 	if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
@@ -4214,11 +4214,12 @@ rule buildGoldMineTower
 
 //==============================================================================
 rule buildMBTower
-//    minInterval 70 //starts in cAge2
     minInterval 22 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("buildMBTower:");
+    if ((aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 6*60*1000))
+    return;	
     
     int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
     
@@ -4755,8 +4756,6 @@ rule buildManyBuildings
    inactive
 {
    float currentWood=kbResourceGet(cResourceWood);
-
-
    static int unitQueryID=-1;
 
    if (cMyCiv != cCivPoseidon)
@@ -4771,13 +4770,7 @@ rule buildManyBuildings
    int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAlive);
    int numberSettlements=kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
 
-   if (numberOfFortresses < 1 || numberSettlements < 2)
-      return;
-
-   if (kbGetAge() < 2)
-      return;
-
-   if (currentWood < 1000)
+   if ((numberOfFortresses < 1) || (numberSettlements < 2) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 6*60*1000) || (kbGetAge() < 2) || (currentWood < 1000))
       return;
 
  if (numberOfArcheryRange+numberOfBarracks+numberOfStables < 34)
@@ -5010,8 +5003,8 @@ inactive
 	int Villagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
 	if (cMyCulture == cCultureAtlantean)
 	Villagers = Villagers * 3;
-    if ((Villagers < 18) || (kbGetAge() < cAge2) || (xsGetTime() < 10*60*1000))
-    return;
+    if ((Villagers < 18) || (kbGetAge() < cAge2) || (xsGetTime() < 10*60*1000) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 6*60*1000))
+    return;	
 	
 	static int lastTargetPlayerIDSaveTime = -1;
     static int lastTargetPlayerID = -1;
