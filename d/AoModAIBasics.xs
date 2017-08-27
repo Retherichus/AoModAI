@@ -205,7 +205,6 @@ extern bool KoTHOkNow = false;
 extern bool DestroyTransportPlan = false;  
 extern bool DestroyHTransportPlan = false;
 extern bool DestroyKOTHLandPlan = false;
-extern int rExploreIsland = -1;
 //==============================================================================
 int getAreaGroupByArea(int areaID=-1)   //this is such shit, but there is no other possibility
                                         //as far as I can see :-(
@@ -1085,7 +1084,6 @@ vector findBestSettlement(int playerID=0)   //Will find the closet settlement of
         kbUnitQuerySetPlayerID(unitQueryID, playerID);
         kbUnitQuerySetUnitType(unitQueryID, cUnitTypeSettlement);
         kbUnitQuerySetState(unitQueryID, cUnitStateAny);
-		kbUnitQuerySetSeeableOnly(unitQueryID, true);
     }
     else
         return(cInvalidVector);
@@ -1201,20 +1199,6 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
     aiPlanSetVariableVector(planID, cBuildPlanSettlementPlacementPoint, 0, where);
     //Go.
     aiPlanSetActive(planID);
-   
-    
-	aiPlanDestroy(rExploreIsland);
-	rExploreIsland = -1;
-	
-	if (rExploreIsland == -1)
-	{
-	rExploreIsland=aiPlanCreate("Explore there..", cPlanExplore); 
-    aiPlanAddUnitType(rExploreIsland, cUnitTypeAbstractVillager, 0, 0, 2);
-	aiPlanSetInitialPosition(rExploreIsland, where);
-    aiPlanSetDesiredPriority(rExploreIsland, 1);
-    aiPlanSetActive(rExploreIsland);
-	}
-   
 }
 
 //==============================================================================
@@ -1245,6 +1229,132 @@ bool findASettlement()  //Will find an unclaimed settlement
         return(true);
     return(false);
 }
+//==============================================================================
+int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
+{
+    if (ShowAiEcho == true) aiEcho("newResourceBase:");
+
+    int queryUnitID=cUnitTypeGold;
+    if (resourceID==cResourceWood)
+        queryUnitID=cUnitTypeTree;
+
+    static int resourceQueryID=-1;
+    if (resourceQueryID < 0)
+        resourceQueryID=kbUnitQueryCreate("Resource Query");
+    configQuery(resourceQueryID, queryUnitID, -1, cUnitStateAlive, 0, kbBaseGetLocation(cMyID, kbBaseGetMain(cMyID)), true);
+    kbUnitQueryResetResults(resourceQueryID);
+    int numResults = kbUnitQueryExecute(resourceQueryID);
+
+    if ( numResults <= 0 )
+    {
+        //if (ShowAiEcho == true) aiEcho("newResourceBase: no resources found, return!");
+        return(-1);
+    }
+    vector there = kbUnitGetPosition(kbUnitQueryGetResult(resourceQueryID, 0)); // just take the closest
+   
+    // nothing to do then. Should not happen anyway, because of findCreateResourceBase()
+    // see updateGoldBreakdown and updateWoodBreakdown
+    if ( isOnMyIsland(there) )
+    {
+        //if (ShowAiEcho == true) aiEcho("newResourceBase: resource found on my island, return!");
+        return(-1);
+    }
+
+    //Create transport plan to get vills to the other island
+    // but just do one per detected resource site!
+    // therefore remember the pos where we did the transport to
+    if (resourceID==cResourceGold)
+    {
+        static vector gTransportToGoldPos = cInvalidVector;
+        // been there, done that
+        if ( equal(gTransportToGoldPos, there) )
+        {
+            //if (ShowAiEcho == true) aiEcho("newResourceBase: already transported vills to gold position, return!");
+            return(-1);
+        }
+    }
+    else if (resourceID==cResourceWood)
+    {
+        static vector gTransportToWoodPos = cInvalidVector;
+        // been there, done that
+        if ( equal(gTransportToWoodPos, there) )
+        {
+            //if (ShowAiEcho == true) aiEcho("newResourceBase: already transported vills to wood position, return!");
+            return(-1);
+        }
+    }
+
+    //Get our initial location.
+    int startBaseID = -1;
+    if ( oldResourceBase >= 0 )
+        startBaseID = oldResourceBase;
+    else
+        startBaseID = kbBaseGetMainID(cMyID);
+    vector here=kbBaseGetLocation(cMyID, startBaseID);
+    int startAreaID=kbAreaGetIDByPosition(here);
+
+    int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+    if (transportPUID < 0)
+    {
+        //if (ShowAiEcho == true) aiEcho("newResourceBase: no transport unit type, return!");
+        return(-1);
+    }
+
+    int resurceTransportPlan = -1;
+    resurceTransportPlan=createTransportPlan("Remote Resource Transport", startAreaID, kbAreaGetIDByPosition(there), false, transportPUID, 80, startBaseID);
+
+    // TODO: add all dwarves
+    int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
+    int numVills = 0.5 + aiGetResourceGathererPercentage(resourceID, cRGPActual) * gathererCount;
+    aiPlanAddUnitType(resurceTransportPlan, cUnitTypeAbstractVillager, numVills, numVills, numVills);
+    if ( cMyCulture == cCultureNorse )
+        aiPlanAddUnitType( resurceTransportPlan, cUnitTypeOxCart, 1, 1, 1 );
+
+    aiPlanSetRequiresAllNeedUnits( resurceTransportPlan, true );
+    aiPlanSetActive(resurceTransportPlan);
+
+    // remember the position that we did the transport to.
+    if (resourceID==cResourceGold)
+        gTransportToGoldPos = there;
+    else
+        gTransportToWoodPos = there;
+
+    //Create a new base.
+    string basename="";
+    if (resourceID==cResourceGold)
+        basename="Gold Base"+kbBaseGetNextID();
+    else
+        basename="Wood Base"+kbBaseGetNextID();
+
+    int newBaseID=kbBaseCreate(cMyID, basename, there, 40.0);
+    if (newBaseID > -1)
+    {
+        kbBaseSetEconomy(cMyID, newBaseID, true);
+        //Set the resource distance limit.
+        kbBaseSetMaximumResourceDistance(cMyID, newBaseID, gMaximumBaseResourceDistance);
+        //if (ShowAiEcho == true) aiEcho("newResourceBase at location:"+there);
+    }
+
+    int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
+    int towerLimit = kbGetBuildLimit(cMyID, cUnitTypeTower);
+    if (numTowers >= towerLimit)
+        return(newBaseID);
+	
+    int builderTypeID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder,0);
+    int buildTowerPlanID = aiPlanCreate("Build Resource Tower", cPlanBuild);
+    if (buildTowerPlanID >= 0)
+    {
+        aiPlanSetVariableInt(buildTowerPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeTower);
+        aiPlanSetDesiredPriority(buildTowerPlanID, 100);
+        aiPlanSetBaseID(buildTowerPlanID, newBaseID);
+        aiPlanSetVariableInt(buildTowerPlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(there));
+        aiPlanAddUnitType(buildTowerPlanID, builderTypeID, 1, 2, 2);
+        aiPlanSetEscrowID(buildTowerPlanID, cEconomyEscrowID);
+        aiPlanSetActive(buildTowerPlanID);
+    }
+    return(newBaseID);
+}
+
 //==============================================================================
 void setTownLocation(void)
 {

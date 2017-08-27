@@ -39,12 +39,20 @@ rule updateWoodBreakdown
     int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
+    
+        bool reducedWoodGathererCount = false;
+
+    if ((woodGathererCount <= 0) && (kbGetAge() <= cAge2))
+        {
+			woodGathererCount = 1;
+            reducedWoodGathererCount = true;
+        }
 
      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-      {
+   {
             if ((foodGathererCount > 2) && (goldGathererCount > 0))
 			woodGathererCount = 1; 
-      }
+   }
    
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -107,7 +115,7 @@ rule updateWoodBreakdown
     if (woodGathererCount < desiredWoodPlans)
         desiredWoodPlans = woodGathererCount;
 
-    if (desiredWoodPlans < numWoodPlans)
+    if ((desiredWoodPlans < numWoodPlans) && (reducedWoodGathererCount == false))
         desiredWoodPlans = numWoodPlans;    // Try to preserve existing plans
 
     // Three cases are possible:
@@ -181,6 +189,12 @@ rule updateWoodBreakdown
             else
                 gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, mainBaseID);
 
+            if((gWoodBaseID < 0) && (gTransportMap == true))
+            {            
+                // try to find a wood base on another island
+                gWoodBaseID = newResourceBase(oldWoodBase, cResourceWood);
+            }
+
             if (gWoodBaseID >= 0)
             {
                 numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
@@ -235,12 +249,28 @@ rule updateGoldBreakdown
         numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
     int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
 
-   if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
+    bool reducedGoldGathererCount = false;
+
+    if (goldGathererCount <= 0) //always some units on gold, unless there are no gold sites
+    {
+        if ((numGoldSites > 0) && (kbGetAge() >= cAge1))
+        {
+
+			goldGathererCount = 1;
+            reducedGoldGathererCount = true;
+        }
+    }
+	
+   
+      if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
    {
             if (foodGathererCount > 1)
 			goldGathererCount = 1;      
    } 
    
+   
+   
+
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 14;
@@ -251,14 +281,6 @@ rule updateGoldBreakdown
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2) && (xsGetTime() > 16*60*1000))
     {
-		int Wanted = 2;
-		if (cMyCulture == cCultureAtlantean)
-		Wanted = 1;
-		int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy, 65);
-	    if ((cMyCulture == cCultureAtlantean) && (numVillagers >= 3) && (closeMainBaseSites > 0)
-		|| (cMyCulture != cCultureAtlantean) && (numVillagers >= 5) && (closeMainBaseSites > 0))
-        goldGathererCount = Wanted;
-		else 
         goldGathererCount = 0;
     }
 //Test end
@@ -300,7 +322,7 @@ rule updateGoldBreakdown
     if (goldGathererCount < desiredGoldPlans)
         desiredGoldPlans = goldGathererCount;
 
-    if (desiredGoldPlans < numGoldPlans)
+    if ((desiredGoldPlans < numGoldPlans) && (reducedGoldGathererCount == false))
         desiredGoldPlans = numGoldPlans;    // Try to preserve existing plans
 
     if (ShowAiEcho == true) aiEcho("desiredGoldPlans: "+desiredGoldPlans);
@@ -375,6 +397,12 @@ rule updateGoldBreakdown
                 gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, randomBaseID);
             else
                 gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, mainBaseID);
+
+            if ((gGoldBaseID < 0) && (gTransportMap == true)) // did not find base on my mainbase
+            {
+                // try to find a gold base on another island
+                gGoldBaseID = newResourceBase(oldGoldBase, cResourceGold);
+            }
 
             if (gGoldBaseID >= 0)
             {
@@ -453,7 +481,7 @@ rule updateFoodBreakdown
 	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, 85);
 		if ((HippoNearMB > 1) && (cMyCulture != cCultureAtlantean))
 		aiSetMinNumberNeedForGatheringAggressvies(4);
-		if ((HippoNearMB > 1) && (cMyCulture == cCultureAtlantean))
+		else if ((HippoNearMB > 1) && (cMyCulture == cCultureAtlantean))
 		{
 		aiSetMinNumberNeedForGatheringAggressvies(1);
 		aSpecialReset = true;
@@ -1624,7 +1652,7 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
         return;
     }
 
-    if ((gathererCount < 4) && (numberEasyResourceSpots > 0))
+    if ((gathererCount < 5) && (numberEasyResourceSpots > 0))
     return;
    
 

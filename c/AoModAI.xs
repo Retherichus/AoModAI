@@ -503,7 +503,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
     static int count = 0;
     
     int mainBaseUnitID = getMainBaseUnitIDForPlayer(cMyID);
-	
+    
     if (kbGetAge() > cAge1)
     {
         if (foodSupply < 90)
@@ -866,31 +866,25 @@ rule updateEMAge1       // i.e. cAge1
    {
       if (aiGetWorldDifficulty() == cDifficultyEasy)
       {
-         civPopTarget = 20;
+         civPopTarget = 21;
          milPopTarget = 10;
          if (cMyCulture == cCultureAtlantean)
             civPopTarget = 27;   // Make up for oracles
       }
       else if (aiGetWorldDifficulty() == cDifficultyModerate)
       {
-         civPopTarget = 20;
-         if (cMyCulture == cCultureAtlantean)
          civPopTarget = 21;
          milPopTarget = 30;
       }
       else if (aiGetWorldDifficulty() == cDifficultyHard)
       {
 
-		 civPopTarget = 20;
-         if (cMyCulture == cCultureAtlantean)
-         civPopTarget = 21; 
+		 civPopTarget = 21;
          milPopTarget = 60;
       }
       else
       {
-		 civPopTarget = 20;
-         if (cMyCulture == cCultureAtlantean)
-         civPopTarget = 21; 		 
+		 civPopTarget = 21;
          milPopTarget = 80;
       }
    }
@@ -1572,13 +1566,13 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (goldAssignment > lastGoldAssignment)
         {
-            goldAssignment = lastGoldAssignment + 0.04;
+            goldAssignment = lastGoldAssignment + 0.03;
             if (goldAssignment > 0.45)
                 goldAssignment = 0.45;
         }
         else if (goldAssignment < lastGoldAssignment)
         {
-            goldAssignment = lastGoldAssignment - 0.04;
+            goldAssignment = lastGoldAssignment - 0.03;
             if (goldAssignment < 0.05)
                 goldAssignment = 0.05;
         }
@@ -1587,13 +1581,13 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (woodAssignment > lastWoodAssignment)
         {
-            woodAssignment = lastWoodAssignment + 0.04;
+            woodAssignment = lastWoodAssignment + 0.03;
             if (woodAssignment > 0.45)
                 woodAssignment = 0.45;
         }
         else if (woodAssignment < lastWoodAssignment)
         {
-            woodAssignment = lastWoodAssignment - 0.04;
+            woodAssignment = lastWoodAssignment - 0.03;
             if (woodAssignment < 0.05)
                 woodAssignment = 0.05;
         }
@@ -1602,7 +1596,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (foodAssignment > lastFoodAssignment)
         {
-            foodAssignment = lastFoodAssignment + 0.05;
+            foodAssignment = lastFoodAssignment + 0.03;
             if ((foodAssignment > 0.65) && (kbGetAge() > cAge1))
             {
                 if (foodOverride == false)
@@ -1623,16 +1617,16 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
                 goldAssignment = 0.30;
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
-    int minVillagers = 14;
+    int minVillagers = 16;
     if (cMyCulture == cCultureAtlantean)
         minVillagers = 5;
 	if (aiGetWorldDifficulty() > cDifficultyHard)
 	minVillagers = minVillagers / 2;		
     int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
-    if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2) && (xsGetTime() > 16*60*1000))
+    if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2))
     {
         goldAssignment = 0.0;
-        woodAssignment = 0.1;
+        woodAssignment = 0.0;
         foodAssignment = 1.0;
     }
 //Test end
@@ -1711,12 +1705,12 @@ void setMilitaryUnitCostForecast(void)
 	if (kbGetAge() == cAge3)
 	{
 		upID = gLateUPID;
-		totalAmount = 2000;
+		totalAmount = 3000;
 	}
 	if (kbGetAge() >= cAge4)
 	{
 		upID = gLateUPID;
-		totalAmount = 3400;
+		totalAmount = 5000;
 	}
 
    int origGold = gGoldForecast;
@@ -1729,8 +1723,8 @@ void setMilitaryUnitCostForecast(void)
    float foodCost = 0.0;
    float totalCost = 0.0;
 
-   int unitID = kbUnitPickGetResult( upID, 0); // Primary unit
-   float weight = 1.0;
+	int unitID = kbUnitPickGetResult( upID, 0); // Primary unit
+	float weight = 1.0;
    int numUnits = kbUnitPickGetDesiredNumberUnitTypes(upID);
 
    if (numUnits == 2)
@@ -1838,20 +1832,30 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 	gGoldForecast = RethLCGAge4+.0;
 	gWoodForecast = RethLCWAge4+.0;
     }
-    }
+    }	
+
+// for titan
+    if (RethEcoGoals == true && aiGetWorldDifficulty() > cDifficultyHard)
+	{
+    gFoodForecast = gFoodForecast * 1.5;
+	gGoldForecast = gGoldForecast * 1.5;
+	gWoodForecast = gWoodForecast * 1.5;
+    }	
+	
 
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
-	
-    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 5*60*1000))
+    float favorSupply = kbResourceGet(cResourceFavor);
+    
+    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 7*60*1000))
     {
-            if (foodSupply < 1200)
-                gFoodForecast = gFoodForecast + (1200 - foodSupply);
-            if (woodSupply < 800)
-                gWoodForecast = gWoodForecast + (800 - woodSupply);
-            if (goldSupply < 1100)
-                gGoldForecast = gGoldForecast + (1100 - goldSupply);
+            if (foodSupply < 1400)
+                gFoodForecast = gFoodForecast + (1400 - foodSupply);
+            if (woodSupply < 1200)
+                gWoodForecast = gWoodForecast + (1200 - woodSupply);
+            if (goldSupply < 1400)
+                gGoldForecast = gGoldForecast + (1400 - goldSupply);
     }
     else
     {
@@ -1905,20 +1909,17 @@ rule econForecastAge4		// Rule activates when age 4 research begins
         if (woodSupply < 300)
             gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
-    if (cMyCulture == cCultureEgyptian)
-	gWoodForecast = gWoodForecast * 0.5;
+
 	setMilitaryUnitCostForecast(); // add units before scaling down
 	
-    if (woodSupply > 1700)
-        gWoodForecast = gWoodForecast * 0.4;
-    else if (woodSupply > 1600)
-        gWoodForecast = gWoodForecast * 0.5;
-    else if (woodSupply > 1500)
+    if (woodSupply > 2000)
         gWoodForecast = gWoodForecast * 0.6;
-    else if (woodSupply > 1400)
+    else if (woodSupply > 1600)
         gWoodForecast = gWoodForecast * 0.7;
-    else if (woodSupply > 1300)
-        gWoodForecast = gWoodForecast * 0.8;	
+    else if (woodSupply > 1500)
+        gWoodForecast = gWoodForecast * 0.8;
+    else if (woodSupply > 1400)
+        gWoodForecast = gWoodForecast * 0.9;
     
 
     
@@ -1993,10 +1994,19 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 	gWoodForecast = RethLCWAge3+.0;
     }
     }	
+
+	// for titan
+    if (RethEcoGoals == true && aiGetWorldDifficulty() > cDifficultyHard)
+	{
+    gFoodForecast = gFoodForecast * 1.5;
+	gGoldForecast = gGoldForecast * 1.5;
+	gWoodForecast = gWoodForecast * 1.5;
+    }	
 	
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
+    float favorSupply = kbResourceGet(cResourceFavor);
     
     if (((ageStartTime != -1) && (xsGetTime() - ageStartTime > 5*60*1000)) || (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) > 0))
     {
@@ -2095,8 +2105,10 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
       gGoldForecast = gGoldForecast + 50*temps;
       }		
     }
-    if (cMyCulture == cCultureEgyptian)
-	gWoodForecast = gWoodForecast * 0.6;
+    
+	//setMilitaryUnitCostForecast();  // add units before scaling down
+	
+
     if (woodSupply > 1100)
         gWoodForecast = gWoodForecast * 0.5;
     else if (woodSupply > 1000)
@@ -2202,7 +2214,16 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 	gWoodForecast = RethLCWAge2+.0;
     }
     }
+
+	// for titan
+    if (RethEcoGoals == true && aiGetWorldDifficulty() > cDifficultyHard)
+	{
+    gFoodForecast = gFoodForecast * 1.3;
+	gGoldForecast = gGoldForecast * 1.3;
+	gWoodForecast = gWoodForecast * 1.3;
+    }
     
+
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -2213,7 +2234,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     else
         numArmories = kbUnitCount(cMyID, cUnitTypeArmory, cUnitStateAliveOrBuilding);
 
-    if ((numArmories < 1) && (cMyCulture != cCultureEgyptian))
+    if (numArmories < 1)
     {
         if (woodSupply < 300)
             gWoodForecast = gWoodForecast + (300 - woodSupply);
@@ -2311,8 +2332,8 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     {
         if (kbUnitCount(cMyID, cUnitTypeBarracks, cUnitStateAliveOrBuilding) < 2)
         {
-            if (goldSupply < 300)
-                gGoldForecast = gGoldForecast + (300 - goldSupply);
+            if (woodSupply < 300)
+                gWoodForecast = gWoodForecast + (300 - woodSupply);
         }
     }
     else if (cMyCulture == cCultureGreek)
@@ -2360,43 +2381,42 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
       gGoldForecast = gGoldForecast + 50*temps;
       }		
     }
-	if (cMyCulture == cCultureEgyptian)
-	gWoodForecast = gWoodForecast * 0.5;
+	
     if ((gWoodForecast > 800) && ((xsGetTime() > (15*60*1000))))
 	gWoodForecast = 800;
 	
 
-    if (woodSupply > 900)
+    if (woodSupply > 700)
         gWoodForecast = gWoodForecast * 0.5;
-    else if (woodSupply > 800)
-        gWoodForecast = gWoodForecast * 0.6;
-    else if (woodSupply > 700)
-        gWoodForecast = gWoodForecast * 0.7;
     else if (woodSupply > 600)
-        gWoodForecast = gWoodForecast * 0.8;
+        gWoodForecast = gWoodForecast * 0.6;
     else if (woodSupply > 500)
+        gWoodForecast = gWoodForecast * 0.7;
+    else if (woodSupply > 400)
+        gWoodForecast = gWoodForecast * 0.8;
+    else if (woodSupply > 300)
         gWoodForecast = gWoodForecast * 0.9;
         
-    if (goldSupply > 1000)
+    if (goldSupply > 900)
         gGoldForecast = gGoldForecast * 0.5;
-    else if (goldSupply > 900)
-        gGoldForecast = gGoldForecast * 0.6;
     else if (goldSupply > 800)
-        gGoldForecast = gGoldForecast * 0.7;
-    else if (goldSupply > 700)
-        gGoldForecast = gGoldForecast * 0.8;
+        gGoldForecast = gGoldForecast * 0.6;
     else if (goldSupply > 600)
+        gGoldForecast = gGoldForecast * 0.7;
+    else if (goldSupply > 550)
+        gGoldForecast = gGoldForecast * 0.8;
+    else if (goldSupply > 500)
         gGoldForecast = gGoldForecast * 0.9;
         
-    if (foodSupply > 1200)
+    if (foodSupply > 1100)
         gFoodForecast = gFoodForecast * 0.5;
-    else if (foodSupply > 1100)
-        gFoodForecast = gFoodForecast * 0.6;
     else if (foodSupply > 1000)
-        gFoodForecast = gFoodForecast * 0.7;
+        gFoodForecast = gFoodForecast * 0.6;
     else if (foodSupply > 900)
-        gFoodForecast = gFoodForecast * 0.8;
+        gFoodForecast = gFoodForecast * 0.7;
     else if (foodSupply > 800)
+        gFoodForecast = gFoodForecast * 0.8;
+    else if (foodSupply > 700)
         gFoodForecast = gFoodForecast * 0.9;
 
     if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
@@ -2405,6 +2425,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 
 //==============================================================================
 rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in setEarlyEcon rule, ending when next age upgrade starts
+//    minInterval 23
     minInterval 7
     inactive
 {
@@ -2416,9 +2437,6 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
 		gSuperboom = false;
         return;
     }
-	int mainBaseUnitID = findUnit(cUnitTypeAbstractSettlement, cUnitStateAlive);
-	if ((kbGetAge() == cAge1) && (kbResourceGet(cResourceFood) >= 400) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching))
-    aiTaskUnitResearch(mainBaseUnitID, gAge2MinorGod);
 	
     if (kbGetTechStatus(gAge2MinorGod) >= cTechStatusResearching)	
     {	// Next age upgrade is on the way
@@ -2470,8 +2488,15 @@ if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCul
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
     
-    if ((woodSupply < 300) && (cMyCulture != cCultureEgyptian))
+    if (woodSupply < 300)
         gWoodForecast = gWoodForecast + (300 - woodSupply);
+ 
+    if (xsGetTime() > 3*60*1000)
+    {
+        gGoldForecast = gGoldForecast + 100;
+        if (cMyCiv == cCivThor)  // add 100 to cover early dwarfage
+            gGoldForecast = gGoldForecast + 100;
+    }
 
     if ((gFarming == true) && (cMyCulture == cCultureEgyptian))
     {
@@ -2560,8 +2585,9 @@ void initGreek(void)
 void initEgyptian(void)
 {
 
-        //Create a simple TC empower plan
-
+    //Create a simple TC empower plan if we're not on Vinlandsaga.
+    if ((cvRandomMapName != "vinlandsaga") && (cvRandomMapName != "team migration"))
+    {
         gEmpowerPlanID=aiPlanCreate("Pharaoh Empower", cPlanEmpower);
         if (gEmpowerPlanID >= 0)
         {
@@ -2572,7 +2598,7 @@ void initEgyptian(void)
 			aiPlanSetActive(gEmpowerPlanID);
 			
         }
-
+    }
 	
     //Egyptian scout types.
     gLandScout=cUnitTypePriest;
@@ -2642,9 +2668,11 @@ void initNorse(void)
             aiPlanSetVariableInt(ulfsarkReservePlanID, cReservePlanPlanType, 0, cPlanBuild);
             aiPlanSetActive(ulfsarkReservePlanID);
         }
-    }
+
         //Create a simple plan to maintain X Ulfsarks.
         xsEnableRule("ulfsarkMaintain");
+    }
+
     // On easy or moderate, get two extra oxcarts ASAP before we're at econ pop cap
     if ( aiGetWorldDifficulty() <= cDifficultyModerate )
     {
@@ -2740,7 +2768,7 @@ void initAtlantean(void)
             //aiPlanAddUnitType(exploreID, cUnitTypeOracleHero, 0, 1, 1);    // Makes sure the relic plan sees this plan as a hero source. Also crashes the game!
             aiPlanSetVariableBool(exploreID, cExplorePlanDoLoops, 0, false);
             aiPlanSetVariableBool(exploreID, cExplorePlanOracleExplore, 0, true);
-            aiPlanSetDesiredPriority(exploreID, 80);  // Allow oracleHero relic plan to steal one
+            aiPlanSetDesiredPriority(exploreID, 25);  // Allow oracleHero relic plan to steal one
             aiPlanSetActive(exploreID);
         }
 
@@ -2805,13 +2833,16 @@ void initChinese(void)
     gGardenBuildLimit = 10;
 		
 	if (cMyCiv == cCivFuxi)
-	xsEnableRule("rSpeedUpBuilding");
+	{ 
+	 xsEnableRule("rSpeedUpBuilding");
+	}
 		
-
+		if(cMyCulture == cCultureChinese)
+	{ 
         xsEnableRule("DelayImmortalHero"); 	
 		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 2, false, kbBaseGetMainID(cMyID));
 		cMonkMaintain = createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(2)+3, false, kbBaseGetMainID(cMyID));
-
+	}
         if (aiGetWorldDifficulty() != cDifficultyEasy && cMyCulture == cCultureChinese)
             createSimpleMaintainPlan(cUnitTypeSittingTiger, 4, false, kbBaseGetMainID(cMyID));
 
@@ -2861,15 +2892,22 @@ void initChinese(void)
         gAge4MinorGod = cvAge4GodChoice;
 }
 
+
 rule DelayImmortalHero
 minInterval 10
 inactive
 {
+
     if (kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding) < 1)
 	return;
+
 	eChineseHero = createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 1, true, kbBaseGetMainID(cMyID));  // Eco
     mChineseImmortal = createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 0, false, kbBaseGetMainID(cMyID)); // Mil
+	
+	
 	xsDisableSelf();
+	
+
 }
 //==============================================================================
 int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,

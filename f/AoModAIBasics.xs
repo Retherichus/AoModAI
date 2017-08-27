@@ -205,7 +205,6 @@ extern bool KoTHOkNow = false;
 extern bool DestroyTransportPlan = false;  
 extern bool DestroyHTransportPlan = false;
 extern bool DestroyKOTHLandPlan = false;
-extern int rExploreIsland = -1;
 //==============================================================================
 int getAreaGroupByArea(int areaID=-1)   //this is such shit, but there is no other possibility
                                         //as far as I can see :-(
@@ -1085,7 +1084,6 @@ vector findBestSettlement(int playerID=0)   //Will find the closet settlement of
         kbUnitQuerySetPlayerID(unitQueryID, playerID);
         kbUnitQuerySetUnitType(unitQueryID, cUnitTypeSettlement);
         kbUnitQuerySetState(unitQueryID, cUnitStateAny);
-		kbUnitQuerySetSeeableOnly(unitQueryID, true);
     }
     else
         return(cInvalidVector);
@@ -1201,20 +1199,6 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
     aiPlanSetVariableVector(planID, cBuildPlanSettlementPlacementPoint, 0, where);
     //Go.
     aiPlanSetActive(planID);
-   
-    
-	aiPlanDestroy(rExploreIsland);
-	rExploreIsland = -1;
-	
-	if (rExploreIsland == -1)
-	{
-	rExploreIsland=aiPlanCreate("Explore there..", cPlanExplore); 
-    aiPlanAddUnitType(rExploreIsland, cUnitTypeAbstractVillager, 0, 0, 2);
-	aiPlanSetInitialPosition(rExploreIsland, where);
-    aiPlanSetDesiredPriority(rExploreIsland, 1);
-    aiPlanSetActive(rExploreIsland);
-	}
-   
 }
 
 //==============================================================================

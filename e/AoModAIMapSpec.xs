@@ -279,13 +279,12 @@ void initMapSpecific()
         //Enable the rule that looks for the mainland.
         xsEnableRule("findVinlandsagaBase");
         //Turn off auto dropsite building.
-		int House = cUnitTypeHouse;
-		if (cMyCulture == cCultureAtlantean)
-		House = cUnitTypeManor;
-   		createSimpleBuildPlan(House, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1); 
         aiSetAllowAutoDropsites(false);
-        aiSetAllowBuildings(true);
-
+        aiSetAllowBuildings(false);
+		if (cMyCulture == cCultureAtlantean)
+        aiSetMinNumberNeedForGatheringAggressvies(1);
+		else aiSetMinNumberNeedForGatheringAggressvies(2);
+		
         // Move the transport toward map center to find continent quickly.
         int transportID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0));
         vector nearCenter = kbGetMapCenter();
@@ -389,24 +388,15 @@ void initMapSpecific()
 
 //==============================================================================
 rule findVinlandsagaBase
-    minInterval 4 //starts in cAge1
+    minInterval 10 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("findVinlandsagaBase:");
+
     //Save our initial base ID.
     gVinlandsagaInitialBaseID=kbBaseGetMainID(cMyID);
-	
-	static bool RunOnce = false;
-	if ((cMyCulture == cCultureEgyptian) && (RunOnce == false))
-	{
-	RunOnce = true;
-	int Pharaoh=findUnit(cUnitTypePharaoh, cUnitStateAlive, -1, cMyID);
-	int TC=findUnit(cUnitTypeDropsite, cUnitStateAliveOrBuilding, -1, cMyID);
-	if ((Pharaoh != -1) && (TC != -1))
-	aiTaskUnitWork(Pharaoh, TC);
-	}
-    
-	//Get our initial location.
+
+    //Get our initial location.
     vector location=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
     //Find the mainland area group.
     int mainlandGroupID=-1;
@@ -424,8 +414,8 @@ rule findVinlandsagaBase
     {
         mainlandGroupID=kbFindAreaGroupByLocation(cAreaGroupTypeLand, 0.5, 0.5);  // Can fail if mountains at map center
     }
-    float easyAmount = kbGetAmountValidResources(gVinlandsagaInitialBaseID, cResourceFood, cAIResourceSubTypeEasy, 45);
-    if ((mainlandGroupID < 0) || (xsGetTime() < 1.9*60*1000) && (easyAmount >= 50))
+
+    if (mainlandGroupID < 0)
         return;
 
     if (ShowAiEcho == true) aiEcho("findVinlandsagaBase: Found the mainland, AGID="+mainlandGroupID+".");
@@ -445,6 +435,7 @@ rule findVinlandsagaBase
         int callbackGID=createCallbackGoal("Vinlandsaga Base Callback", "vinlandsagaBaseCallback", 1, 0, -1, false);
         if (callbackGID >= 0)
             aiPlanSetVariableInt(mainlandBaseGID, cGoalPlanDoneGoal, 0, callbackGID);
+			VinLandBase = mainlandBaseGID;
     }
 
     //Done.
@@ -492,14 +483,12 @@ rule vinlandsagaEnableFishing
         kbUnitQuerySetPlayerID(wdQueryID, cMyID);
         if (cMyCulture == cCultureGreek)
             kbUnitQuerySetUnitType(wdQueryID, cUnitTypeStorehouse);
-        if (cMyCulture == cCultureChinese)
-            kbUnitQuerySetUnitType(wdQueryID, cUnitTypeStoragePit);			
-        else if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureAtlantean))
-            kbUnitQuerySetUnitType(wdQueryID, cUnitTypeAbstractVillager);
+        else if (cMyCulture == cCultureEgyptian)
+            kbUnitQuerySetUnitType(wdQueryID, cUnitTypeLumberCamp);
         else if (cMyCulture == cCultureNorse)
             kbUnitQuerySetUnitType(wdQueryID, cUnitTypeLogicalTypeLandMilitary);
         kbUnitQuerySetAreaGroupID(wdQueryID, kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) );
-        kbUnitQuerySetState(wdQueryID, cUnitStateAliveOrBuilding);
+        kbUnitQuerySetState(wdQueryID, cUnitStateAlive);
     }
     //Reset the results.
     kbUnitQueryResetResults(wdQueryID);
@@ -522,7 +511,7 @@ rule vinlandsagaEnableFishing
     xsSetRuleMinInterval("unPauseAge2", 15);
 
     //Create a simple plan to maintain X Ulfsarks (since we didn't do this as part of initNorse).
-    //createSimpleMaintainPlan(cUnitTypeUlfsark, gMaintainNumberLandScouts+1, true, kbBaseGetMainID(cMyID));
+    createSimpleMaintainPlan(cUnitTypeUlfsark, gMaintainNumberLandScouts+1, true, kbBaseGetMainID(cMyID));
 
     //Disable us.
     xsDisableSelf();
@@ -536,6 +525,8 @@ void vinlandsagaBaseCallback(int parm1=-1)
 
     //Get our water transport type.
     int transportPUID=cUnitTypeTransport;
+    if (transportPUID < 0)
+        return;
     //Get our main base.  This needs to be different than our initial base.
     if (kbBaseGetMainID(cMyID) == gVinlandsagaInitialBaseID)
         return;
@@ -588,7 +579,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
     else
     {
         //Create the scout/villager xport plan.  If it works, add the unit type(s).
-        planID=createTransportPlan("Villager Transport", startAreaID, goalAreaID, false, transportPUID, 100, gVinlandsagaInitialBaseID);
+        planID=createTransportPlan("Villager Transport", startAreaID, goalAreaID, true, transportPUID, 100, gVinlandsagaInitialBaseID);
         if (planID >= 0)
         {
             if (cMyCulture == cCultureAtlantean)
@@ -617,7 +608,6 @@ void vinlandsagaBaseCallback(int parm1=-1)
 
     xsDisableRule("setEarlyEcon");
     xsEnableRule("econForecastAge1");
-	xsEnableRule("transportAllUnits");
 
     //Enable the rule that will eventually enable fishing and other stuff.
     xsEnableRule("vinlandsagaEnableFishing");
@@ -629,48 +619,37 @@ rule transportAllUnits
     minInterval 5 //starts in cAge1
 {
     if (ShowAiEcho == true) aiEcho("transportAllUnits:");    
-    static int transportAllUnitsID=-1;
-    int num = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeLogicalTypeGarrisonOnBoats);
-    if ( num <= 0 )
-        return;
 
+    int num = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID);
+    if ( num <= 0 )
+    {
+        xsDisableSelf();
+        return;
+    }
 
     //Get our water transport type.
     int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
-	int numTransport = kbUnitCount(cMyID, transportPUID, cUnitStateAlive);
+    if (transportPUID < 0)
+        return;
+	
     //Get our start area ID.
     int startAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, gVinlandsagaInitialBaseID));
     //Get our goal area ID.
-    int ActiveTransportPlans = aiPlanGetNumber(cPlanTransport, -1, true);
-	if (ActiveTransportPlans > 0)
-    {
-        for (i = 0; < ActiveTransportPlans)
-        {
-            int TransportPlanID = aiPlanGetIDByIndex(cPlanTransport, -1, true, i);
-            if (TransportPlanID == -1)
-                continue;
-		    if (TransportPlanID == transportAllUnitsID)	
-		    {
-		    if (numTransport < 1)
-		    aiPlanDestroy(transportAllUnitsID);
-	        return; 
-		   }
-	    }
-    }		
-
-    if ((aiPlanGetIDByTypeAndVariableType(cPlanTransport) >= 0) || (numTransport < 1))
-        return;
     int goalAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
+
+    if (aiPlanGetIDByTypeAndVariableType(cPlanTransport) >= 0)
+        return;
+
     goalAreaID = verifyVinlandsagaBase( goalAreaID );  // Make sure it borders water,or find one that does.
 
-    
-    transportAllUnitsID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 100, gVinlandsagaInitialBaseID);
-    if ( transportAllUnitsID >= 0 )
+    int planID=-1;
+    planID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 100, gVinlandsagaInitialBaseID);
+    if ( planID >= 0 )
     {
-        aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanReturnWhenDone, 0, false);
-        aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 1, num, num);
-        aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHero, 1, 1, 1);
-        aiPlanSetActive(transportAllUnitsID);
+        aiPlanSetVariableBool(planID, cTransportPlanReturnWhenDone, 0, false);
+        aiPlanAddUnitType(planID, cUnitTypeLogicalTypeGarrisonOnBoats, 1, num, num);
+        aiPlanAddUnitType(planID, cUnitTypeHero, 1, 1, 1);
+        aiPlanSetActive(planID);
     }
 }
 //==============================================================================
@@ -730,7 +709,8 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
 {
      if (ShowAiEcho == true) aiEcho("nomadBuildMode:");
 
-    int count = -1;   // How many settlements found?
+     int count = -1;   // How many settlements found?
+
     static int settlementQuery = -1;    // All gaia settlements
     if (settlementQuery < 0)
     {
@@ -747,9 +727,6 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
         kbUnitQuerySetPlayerID(builderQuery, cMyID);
         kbUnitQuerySetUnitType(builderQuery, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0));
         kbUnitQuerySetState(builderQuery, cUnitStateAlive);
-		if (cMyCiv == cCivOuranos)
-	    kbUnitQuerySetMaximumDistance(builderQuery, 90.0);
-		else 
         kbUnitQuerySetMaximumDistance(builderQuery, 30.0);
         kbUnitQuerySetAscendingSort(builderQuery, true);
     }  

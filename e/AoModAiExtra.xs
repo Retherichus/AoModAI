@@ -42,6 +42,7 @@ extern int MoreFarms = 26;
 extern bool TitanAvailable = false;
 extern int KOTHBASE = -1;
 extern bool WaitForDock = false;
+extern int VinLandBase = -1;
 extern int mChineseImmortal = -1;
 extern int eChineseHero = -1;
 extern int cMonkMaintain = -1;
@@ -107,7 +108,7 @@ extern int ModdedTCTimer = 25;
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
 extern int eBoomFood = 600;              // Food
-extern int eBoomGold = 200;              // Gold
+extern int eBoomGold = 120;              // Gold
 extern int eBoomWood = 200;              // Wood, duh.
 
 
@@ -650,7 +651,7 @@ rule ActivateRethOverridesAge4
 		// Unit picker
 		
 		if (cMyCiv == cCivZeus)
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMyrmidon, 0.6+aiRandInt(2));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMyrmidon, 0.6+aiRandInt(3));
 		if (cMyCulture == cCultureChinese)
 		{
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeScoutChinese, 0.1);
@@ -660,16 +661,16 @@ rule ActivateRethOverridesAge4
 		}
 		if (cMyCulture == cCultureNorse)
 		{
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeJarl, 0.7+aiRandInt(2));
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeHuskarl, 0.5+aiRandInt(2));
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractArcher, 0.2+aiRandInt(4)); // Ok to Bogsveigir now
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeJarl, 0.7+aiRandInt(3));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeHuskarl, 0.5+aiRandInt(3));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractArcher, 0.2+aiRandInt(3)); // Ok to Bogsveigir now
 		}
 		if (cMyCulture == cCultureAtlantean)
 		{
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeTridentSoldier, 0.6+aiRandInt(3));
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeArcherAtlantean, 0.7+aiRandInt(3));
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(3));
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeSwordsman, 0.2);
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeArcherAtlantean, 0.7+aiRandInt(4));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(4));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeSwordsman, 0.25);
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMaceman, 0.1);
 		}		
 		//
@@ -2747,7 +2748,8 @@ bool Filled = false;
            int planState = aiPlanGetState(TransportAttPlanID);
 		   int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
            attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
-           int numMilUnitsNearAttPlan = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, attPlanPosition);
+		   //aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 97);
+           int numMilUnitsNearAttPlan = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, attPlanPosition, 100);
            int numInPlan = aiPlanGetNumberUnits(TransportAttPlanID, cUnitTypeLogicalTypeLandMilitary);
 		   int numTransport = kbUnitCount(cMyID, transportPUID, cUnitStateAlive);
            if (numMilUnitsNearAttPlan >= 20)
@@ -2804,19 +2806,13 @@ bool Filled = false;
 	if (targetSettlementID == -1)
 	targetSettlementID = findUnit(cUnitTypeUnit, cUnitStateAlive, -1, AttackPlayer); 
 	vector targetSettlementPos = kbUnitGetPosition(targetSettlementID); // uses main TC
-    vector RandUnit = kbUnitGetPosition(findUnit(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, AttackPlayer));
-	vector RandBuilding = kbUnitGetPosition(findUnit(cUnitTypeLogicalTypeBuildingsNotWalls, cUnitStateAlive, -1, AttackPlayer));
-    vector RandVillager = kbUnitGetPosition(findUnit(cUnitTypeAbstractVillager, cUnitStateAlive, -1, AttackPlayer));	
-	aiPlanSetNumberVariableValues(TransportAttPlanID, cAttackPlanTargetAreaGroups, 5, true);   
-	aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 0, kbAreaGroupGetIDByPosition(attPlanPosition));
-	aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 1, kbAreaGroupGetIDByPosition(targetSettlementPos));
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 2, kbAreaGroupGetIDByPosition(RandUnit));
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 3, kbAreaGroupGetIDByPosition(RandBuilding));
-	aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 4, kbAreaGroupGetIDByPosition(RandVillager));	
+	aiPlanSetNumberVariableValues(TransportAttPlanID, cAttackPlanTargetAreaGroups, 1, true);  
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 0, kbAreaGroupGetIDByPosition(targetSettlementPos));
+    
 	
 	aiPlanAddUnitType(TransportAttPlanID, cUnitTypeHumanSoldier, 0, 0, 1);
 	attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
-    //aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);
+    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);
     aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
  
     
@@ -2851,8 +2847,8 @@ inactive
 {
 	  if (StuckTransformID == 0)
 	  {
-	  xsDisableSelf();
 	  return;
+	  xsDisableSelf();
       }
       if (kbUnitIsType(StuckTransformID, cUnitTypeUlfsark))
       {

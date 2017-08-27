@@ -682,22 +682,16 @@ rule maintainMilitaryTroops
         unitType1 = cUnitTypeSlinger;
         unitType2 = cUnitTypeAxeman;
         unitType3 = cUnitTypeSpearman;
-		if (kbGetAge() >= cAge3)
-		{
+		if (kbGetAge() > cAge3)
 		unitType1 = cUnitTypeChariotArcher;
-		unitType2 = cUnitTypeCamelry;
-		}
     }
     else if (cMyCulture == cCultureNorse)
     {
         unitType1 = cUnitTypeThrowingAxeman;
         unitType2 = cUnitTypeRaidingCavalry;
         unitType3 = cUnitTypeUlfsark;
-		if (kbGetAge() >= cAge3)
-		{
-		unitType1 = cUnitTypeHuskarl;
+		if (kbGetAge() > cAge3)
 		unitType2 = cUnitTypeJarl;
-		}
     }
     else if (cMyCulture == cCultureAtlantean)
     {
@@ -705,10 +699,7 @@ rule maintainMilitaryTroops
         unitType2 = cUnitTypeMaceman;
         unitType3 = cUnitTypeSwordsman;
         if (kbGetAge() > cAge3)
-		{
-		unitType2 = cUnitTypeRoyalGuard;		
 		unitType3 = cUnitTypeTridentSoldier; 
-		}
     }
     else if (cMyCulture == cCultureChinese)
     {
@@ -780,6 +771,12 @@ rule maintainMilitaryTroops
                 unitTypeToTrain = unitType1;
         }
     }
+    else if (numUnitType1 >= gNumUnitType1ToTrain)
+    {
+			if ((kbGetAge() == cAge2) && (gNumUnitType1ToTrain < 2))
+			gNumUnitType1ToTrain = 2;	
+
+    }
     
     if (numUnitType2 < gNumUnitType2ToTrain)
     {
@@ -793,6 +790,11 @@ rule maintainMilitaryTroops
                 unitTypeToTrain = unitType2;
         }
     }
+    else if (numUnitType2 >= gNumUnitType2ToTrain)
+    {
+        if ((kbGetAge() == cAge2) && (gNumUnitType2ToTrain < 3))
+            gNumUnitType2ToTrain = 3;
+    }
     
     if (numUnitType3 < gNumUnitType3ToTrain)
     {
@@ -805,6 +807,11 @@ rule maintainMilitaryTroops
             else if ((foodSupply > 205) && (goldSupply > 120))
                 unitTypeToTrain = unitType3;
         }
+    }
+    else if (numUnitType3 >= gNumUnitType3ToTrain)
+    {
+        if ((kbGetAge() == cAge2) && (gNumUnitType3ToTrain < 3))
+            gNumUnitType3ToTrain = 3;
     }
     
     if (unitTypeToTrain == -1)

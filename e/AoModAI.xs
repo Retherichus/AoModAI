@@ -503,7 +503,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
     static int count = 0;
     
     int mainBaseUnitID = getMainBaseUnitIDForPlayer(cMyID);
-	
+    
     if (kbGetAge() > cAge1)
     {
         if (foodSupply < 90)
@@ -866,31 +866,25 @@ rule updateEMAge1       // i.e. cAge1
    {
       if (aiGetWorldDifficulty() == cDifficultyEasy)
       {
-         civPopTarget = 20;
+         civPopTarget = 21;
          milPopTarget = 10;
          if (cMyCulture == cCultureAtlantean)
             civPopTarget = 27;   // Make up for oracles
       }
       else if (aiGetWorldDifficulty() == cDifficultyModerate)
       {
-         civPopTarget = 20;
-         if (cMyCulture == cCultureAtlantean)
          civPopTarget = 21;
          milPopTarget = 30;
       }
       else if (aiGetWorldDifficulty() == cDifficultyHard)
       {
 
-		 civPopTarget = 20;
-         if (cMyCulture == cCultureAtlantean)
-         civPopTarget = 21; 
+		 civPopTarget = 21;
          milPopTarget = 60;
       }
       else
       {
-		 civPopTarget = 20;
-         if (cMyCulture == cCultureAtlantean)
-         civPopTarget = 21; 		 
+		 civPopTarget = 21;
          milPopTarget = 80;
       }
    }
@@ -1578,7 +1572,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         }
         else if (goldAssignment < lastGoldAssignment)
         {
-            goldAssignment = lastGoldAssignment - 0.04;
+            goldAssignment = lastGoldAssignment - 0.03;
             if (goldAssignment < 0.05)
                 goldAssignment = 0.05;
         }
@@ -1593,7 +1587,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         }
         else if (woodAssignment < lastWoodAssignment)
         {
-            woodAssignment = lastWoodAssignment - 0.04;
+            woodAssignment = lastWoodAssignment - 0.03;
             if (woodAssignment < 0.05)
                 woodAssignment = 0.05;
         }
@@ -1689,7 +1683,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFavor, aiGetResourceGathererPercentage(cResourceFavor, cRGPScript));
 
      if (ShowAiEcoEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
-     if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+     aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
 
 }
 
@@ -2405,6 +2399,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 
 //==============================================================================
 rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in setEarlyEcon rule, ending when next age upgrade starts
+//    minInterval 23
     minInterval 7
     inactive
 {
@@ -2416,9 +2411,6 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
 		gSuperboom = false;
         return;
     }
-	int mainBaseUnitID = findUnit(cUnitTypeAbstractSettlement, cUnitStateAlive);
-	if ((kbGetAge() == cAge1) && (kbResourceGet(cResourceFood) >= 400) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching))
-    aiTaskUnitResearch(mainBaseUnitID, gAge2MinorGod);
 	
     if (kbGetTechStatus(gAge2MinorGod) >= cTechStatusResearching)	
     {	// Next age upgrade is on the way
@@ -2560,8 +2552,9 @@ void initGreek(void)
 void initEgyptian(void)
 {
 
-        //Create a simple TC empower plan
-
+    //Create a simple TC empower plan if we're not on Vinlandsaga.
+    if ((cvRandomMapName != "vinlandsaga") && (cvRandomMapName != "team migration"))
+    {
         gEmpowerPlanID=aiPlanCreate("Pharaoh Empower", cPlanEmpower);
         if (gEmpowerPlanID >= 0)
         {
@@ -2572,7 +2565,7 @@ void initEgyptian(void)
 			aiPlanSetActive(gEmpowerPlanID);
 			
         }
-
+    }
 	
     //Egyptian scout types.
     gLandScout=cUnitTypePriest;
@@ -2642,9 +2635,11 @@ void initNorse(void)
             aiPlanSetVariableInt(ulfsarkReservePlanID, cReservePlanPlanType, 0, cPlanBuild);
             aiPlanSetActive(ulfsarkReservePlanID);
         }
-    }
+
         //Create a simple plan to maintain X Ulfsarks.
         xsEnableRule("ulfsarkMaintain");
+    }
+
     // On easy or moderate, get two extra oxcarts ASAP before we're at econ pop cap
     if ( aiGetWorldDifficulty() <= cDifficultyModerate )
     {
