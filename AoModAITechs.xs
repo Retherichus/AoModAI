@@ -2096,7 +2096,7 @@ rule getBeastSlayer
     
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
     {
-        if (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching)
+        if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (TitanAvailable == true))
         {
             if ((favorSupply > 15) && (goldSupply > 500) && (foodSupply > 500) && (woodSupply > 500))
             {
@@ -2119,10 +2119,10 @@ rule getBeastSlayer
         specialUnitID = cUnitTypeHetairoi;
     
     int numSpecialUnits = kbUnitCount(cMyID, specialUnitID, cUnitStateAlive);
-    if (numSpecialUnits < 1)
+    if (numSpecialUnits < 4)
         return;
 
-    if (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching)
+    if ((kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (TitanAvailable == true))
     {
         if ((goldSupply < 600) || (foodSupply < 500) || (favorSupply < 25))
             return;

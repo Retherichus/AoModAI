@@ -134,9 +134,21 @@ rule findOtherSettlements
     inactive
 {
     if (ShowAiEcho == true) aiEcho("findOtherSettlements:");
+	static int PlanStartTime = -1;
+	int Builder = cUnitTypeAbstractVillager;
+	if (cMyCulture == cCultureNorse)
+	Builder = cUnitTypeAbstractInfantry;
+	int TotalBuilders = kbUnitCount(cMyID, Builder, cUnitStateAlive);
+	if (cMyCulture == cCultureAtlantean)
+	TotalBuilders = TotalBuilders * 3;
+	
     int ActivePlans = findPlanByString("Remote Settlement Transport", cPlanTransport, -1, true);
+	if ((ActivePlans >= 1) || (TotalBuilders < 12) || (kbCanAffordUnit(cUnitTypeSettlementLevel1, cEconomyEscrowID) == false) || (xsGetTime() < PlanStartTime + 2.5*60*1000))
+	{
 	if (ActivePlans >= 1)
+	PlanStartTime = xsGetTime();
 	return;
+	}
   
     //Get our initial location.
     vector here=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
@@ -161,7 +173,7 @@ rule findOtherSettlements
         return;
 
     claimSettlement(there);
-
+    PlanStartTime = xsGetTime();
     // remember the position that we did the transport to.
     gTransportToSettlementPos = there;
 }

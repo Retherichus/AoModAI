@@ -30,7 +30,6 @@ extern bool IsRunHuntingDogs = false;
 extern int gDefendPlentyVault = -1;
 extern int gHeavyGPTech=-1;
 extern int gHeavyGPPlan=-1;
-extern int gTradeMaintainPlanID=-1;
 extern int gDefendPlentyVaultWater=-1;
 extern int WallAllyPlanID=-1;
 extern bool KOTHStopRefill = false;
@@ -48,6 +47,7 @@ extern int cMonkMaintain = -1;
 extern const int cGaiaID = 0;
 extern int StuckTransformID = 0;
 extern bool HasHumanAlly = false;
+extern int MyFortress = cUnitTypeAbstractFortress;
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -107,14 +107,14 @@ extern int ModdedTCTimer = 25;
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
 extern int eBoomFood = 600;              // Food
-extern int eBoomGold = 200;              // Gold
-extern int eBoomWood = 200;              // Wood, duh.
+extern int eBoomGold = 100;              // Gold
+extern int eBoomWood = 150;              // Wood, duh.
 
 
 //Egyptians have their own, because they don't like wood as much.
 
 extern int egBoomGold = 300;              // Gold
-extern int egBoomWood = 150;              // Wood
+extern int egBoomWood = 100;              // Wood
 
 
 // For RethFishEco, this affects Fishing Maps ONLY, if you have it enabled.
@@ -298,6 +298,16 @@ void initRethlAge1(void)  // Am I doing this right??
 		UseStandardPop = true;
 		aiEcho("Warning:  Modded Protox file detected, results may vary.");
 		}
+		if (cMyCulture == cCultureEgyptian)
+		MyFortress = cUnitTypeMigdolStronghold;
+        if (cMyCulture == cCultureGreek)
+        MyFortress = cUnitTypeFortress;
+        else if (cMyCulture == cCultureNorse)
+        MyFortress = cUnitTypeHillFort;
+        else if (cMyCulture == cCultureAtlantean)
+        MyFortress = cUnitTypePalace;	
+        else if (cMyCulture == cCultureChinese)
+        MyFortress = cUnitTypeCastle;
 }
 
 //==============================================================================
@@ -650,7 +660,7 @@ rule ActivateRethOverridesAge4
 		// Unit picker
 		
 		if (cMyCiv == cCivZeus)
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMyrmidon, 0.6+aiRandInt(2));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMyrmidon, 0.5+aiRandInt(3));
 		if (cMyCulture == cCultureChinese)
 		{
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeScoutChinese, 0.1);
@@ -668,9 +678,9 @@ rule ActivateRethOverridesAge4
 		{
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeTridentSoldier, 0.6+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeArcherAtlantean, 0.7+aiRandInt(3));
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(3));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(5));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeSwordsman, 0.2);
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMaceman, 0.1);
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMaceman, 0.05);
 		}		
 		//
 		
@@ -885,13 +895,6 @@ rule ALLYCatchUp   // a reverse-tweaked updatePlayerToAttack rule to find allies
 		   donateWAmount = 750;
 		   if (goldSupply > 5000)
 		   donateGAmount = 1000;	   
-		   }
-		   
-		   if ((VillagerScore <= 12) && (VillagerScore >= 7) && (aiGetWorldDifficulty() < cDifficultyNightmare))
-		   {
-		   donateFAmount = donateFAmount+100;
-		   donateWAmount = donateWAmount+100;
-		   donateGAmount = donateGAmount+100;
 		   }
 		   if (foodSupply > fAmount)
 		   aiTribute(actualPlayerID, cResourceFood, donateFAmount);
@@ -2764,26 +2767,17 @@ bool Filled = false;
 		   aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
            aiPlanAddUnitType(TransportAttPlanID, cUnitTypeLogicalTypeLandMilitary, 0, 0, numMilUnitsNearAttPlan);
            }		   
-           if (ShowAiEcho == true) aiEcho("planState: "+planState);
-           
-           if (attackPlanID == TransportAttPlanID)
-           {
-				if ((aiPlanGetState(attackPlanID) == cPlanStateTransport) && (numTransport < 1))
-                {
-                    aiPlanDestroy(attackPlanID);
-                    xsSetRuleMinIntervalSelf(5);
-					return;
-                }				   
+           if (ShowAiEcho == true) aiEcho("planState: "+planState);		   
 		   
            if ((numInPlan < 1) || (xsGetTime() > attackPlanStartTime + 30*60*1000) || (planState == cPlanStateNone) && (xsGetTime() > attackPlanStartTime + 5*60*1000) ||
-           (planState == cPlanStateGather) && (xsGetTime() > attackPlanStartTime + 5*60*1000))
+           (planState == cPlanStateGather) && (xsGetTime() > attackPlanStartTime + 5*60*1000) 
+		   || ((aiPlanGetState(attackPlanID) == cPlanStateTransport) && (numTransport < 1) (aiPlanGetVariableInt(attackPlanID, cAttackPlanNumberAttacks, 0) > 0)))
            {
            aiPlanDestroy(TransportAttPlanID);
            if (ShowAiEcho == true) aiEcho("Deleted");
            xsSetRuleMinIntervalSelf(5);
            }
-           return;		
-         }		   
+           return;		   
 	    }
 	 }
   }

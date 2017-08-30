@@ -134,10 +134,7 @@ rule getGoldenBandedStaff
     }
 }
 
-
 //Huangdi
-
-
 //==============================================================================
 // RULE: getStoneArmor
 //==============================================================================
@@ -197,7 +194,7 @@ rule getLandlordSpirit
     group Dabogong
 {
     float foodSupply = kbResourceGet(cResourceFood);
-	if (foodSupply < 400)
+	if ((foodSupply < 500) || (kbGetAge() < cAge4))
 	return;
 	
     if (kbGetTechStatus(cTechLandlordSpirit) == cTechStatusAvailable)
@@ -259,10 +256,6 @@ rule getHouseAltars
         if (ShowAiEcho == true) aiEcho("Getting HouseAltars");
     }
 }
-
-
-
-
 
 // Zhongkui
 
@@ -372,6 +365,8 @@ rule getTigerSpirit
     minInterval 27
     group Xiwangmu
 {
+    if (kbUnitCount(cMyID, cUnitTypeWhiteTiger, cUnitStateAlive) < 2)
+	return;
     if (kbGetTechStatus(cTechTigerSpirit) == cTechStatusAvailable)
     {
         int x=-1;
@@ -385,31 +380,8 @@ rule getTigerSpirit
     }
 }
 
-//==============================================================================
-// RULE: getCelestialPalace
-//==============================================================================
-rule getCelestialPalace
-    inactive
-    minInterval 27
-    group Xiwangmu
-{
-    if (kbGetTechStatus(cTechCelestialPalace) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("CelestialPalace", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechCelestialPalace);
-        aiPlanSetDesiredPriority(x, 10);
-        aiPlanSetEscrowID(x, cMilitaryEscrowID);		
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting CelestialPalace");
-    }
-}
-
 
 // Chongli
-
-
 //==============================================================================
 // RULE: getHeavenlyFire
 //==============================================================================

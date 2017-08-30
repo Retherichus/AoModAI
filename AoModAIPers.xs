@@ -47,7 +47,7 @@ void persDecidePersonality(void)
         {
             aiEcho("Choosing personality:  Economic Boomer (Builder)");
             cvRushBoomSlider = -0.9;
-            cvMilitaryEconSlider = -0.7;
+            cvMilitaryEconSlider = -0.9;
             cvOffenseDefenseSlider = 0.0;
             cvSliderNoise = 0.2; 
             break;
@@ -55,9 +55,6 @@ void persDecidePersonality(void)
         case 3:  // Balanced
         {
             aiEcho("Choosing personality:  Balanced (Standard)");
-            cvRushBoomSlider = 0.0;            
-            cvMilitaryEconSlider = 0.0;
-            cvOffenseDefenseSlider = 0.0;
             cvSliderNoise = 0.2;
             break;
         }

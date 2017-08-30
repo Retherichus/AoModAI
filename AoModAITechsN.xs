@@ -43,7 +43,7 @@ rule getLoneWanderer
     minInterval 36 //starts in cAge1
 {
     
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive) < 10))
+    if ((kbGetAge() < cAge3) || (kbUnitCount(cMyID, cUnitTypeUlfsark, cUnitStateAlive) < 5) || (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive) < 10))
         return;
     if (kbGetTechStatus(cTechLoneWanderer) == cTechStatusAvailable)
     {
@@ -65,7 +65,7 @@ rule getEyesInTheForest
     inactive
     minInterval 36 //starts in cAge1
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbGetAge() < cAge2))
+    if (kbGetAge() < cAge4)
         return;
     if (kbGetTechStatus(cTechEyesintheForest) == cTechStatusAvailable)
     {
@@ -152,7 +152,7 @@ rule getElhrimnirKettle
         return;
     float foodSupply = kbResourceGet(cResourceFood);
 
-    if ((kbGetAge() < cAge3) && (foodSupply < 1000) || (kbUnitCount(cMyID, cUnitTypeEinheriar, cUnitStateAlive) < 2))
+    if ((kbGetAge() < cAge4) && (foodSupply < 1250) || (kbUnitCount(cMyID, cUnitTypeEinheriar, cUnitStateAlive) < 3))
 	return;
     if (kbGetTechStatus(cTechEldhrimnirKettle) == cTechStatusAvailable)
     {
@@ -167,35 +167,7 @@ rule getElhrimnirKettle
     }
 }
 
-
-
 //Forseti
-//==============================================================================
-rule getHallOfThanes
-    inactive
-    minInterval 60 //starts in cAge2
-    group Forseti
-{
-    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
-        return;
-    float woodSupply = kbResourceGet(cResourceWood);
-	
-    if (kbGetAge() < cAge3 && woodSupply < 550)
-	return;
-    if (kbGetTechStatus(cTechHallofThanes) == cTechStatusAvailable)
-    {
-        int x=-1;
-        x = aiPlanCreate("HallOfThanes", cPlanResearch);
-        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechHallofThanes);
-        aiPlanSetDesiredPriority(x, 15);
-		aiPlanSetEscrowID(x, cMilitaryEscrowID);
-        aiPlanSetActive(x);
-        xsDisableSelf();
-        if (ShowAiEcho == true) aiEcho("Getting HallOfThanes");
-    }
-}
-
-
 //==============================================================================
 rule getHamarrtroll
     inactive
@@ -320,7 +292,8 @@ rule getThurisazRune
     minInterval 60 //starts in cAge3
     group Bragi
 {
-    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbResourceGet(cResourceWood) < 350))
+    if ((gAgeFaster == true && kbGetAge() < AgeFasterStop) || (kbResourceGet(cResourceWood) < 350) 
+	|| (kbUnitCount(cMyID, cUnitTypeMythUnit, cUnitStateAlive) < 2))
         return;
     if (kbGetTechStatus(cTechThurisazRune) == cTechStatusAvailable)
     {

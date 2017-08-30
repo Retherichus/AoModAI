@@ -659,176 +659,6 @@ rule hesperides //Watch for ownership of a hesperides tree, make driads if you o
 }
 
 //==============================================================================
-rule maintainMilitaryTroops
-    minInterval 15 //starts in cAge2
-    inactive
-{        
-    if (ShowAiEcho == true) aiEcho("maintainMilitaryTroops:");
-
-    int unitTypeToTrain = -1;
-    int unitType1 = -1;
-    int unitType2 = -1;
-    int unitType3 = -1;
-	int Dice = 0;
-    
-    if (cMyCulture == cCultureGreek)
-    {
-        unitType1 = cUnitTypeToxotes;
-        unitType2 = cUnitTypeHippikon;
-        unitType3 = cUnitTypeHoplite;
-    }
-    else if (cMyCulture == cCultureEgyptian)
-    {
-        unitType1 = cUnitTypeSlinger;
-        unitType2 = cUnitTypeAxeman;
-        unitType3 = cUnitTypeSpearman;
-		if (kbGetAge() >= cAge3)
-		{
-		unitType1 = cUnitTypeChariotArcher;
-		unitType2 = cUnitTypeCamelry;
-		}
-    }
-    else if (cMyCulture == cCultureNorse)
-    {
-        unitType1 = cUnitTypeThrowingAxeman;
-        unitType2 = cUnitTypeRaidingCavalry;
-        unitType3 = cUnitTypeUlfsark;
-		if (kbGetAge() >= cAge3)
-		{
-		unitType1 = cUnitTypeHuskarl;
-		unitType2 = cUnitTypeJarl;
-		}
-    }
-    else if (cMyCulture == cCultureAtlantean)
-    {
-        unitType1 = cUnitTypeJavelinCavalry;
-        unitType2 = cUnitTypeMaceman;
-        unitType3 = cUnitTypeSwordsman;
-        if (kbGetAge() > cAge3)
-		{
-		unitType2 = cUnitTypeRoyalGuard;		
-		unitType3 = cUnitTypeTridentSoldier; 
-		}
-    }
-    else if (cMyCulture == cCultureChinese)
-    {
-        unitType1 = cUnitTypeChuKoNu;
-        unitType2 = cUnitTypeHalberdier;
-        unitType3 = cUnitTypeFireLance;
-        if (kbGetAge() > cAge3)
-		{
-		Dice = aiRandInt(3);
-		if (Dice < 2)
-		unitType1 = cUnitTypeMountedArcher;
-        else unitType1 = cUnitTypeChuKoNu;	
-        }			
-    }	
-    
-    bool unitType1BeingTrained = false;
-    bool unitType2BeingTrained = false;
-    bool unitType3BeingTrained = false;
-    
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    int activeTrainPlans = aiPlanGetNumber(cPlanTrain, -1, true);
-    if (activeTrainPlans > 0)
-    {
-        for (i = 0; < activeTrainPlans)
-        {
-            int trainPlanIndexID = aiPlanGetIDByIndex(cPlanTrain, -1, true, i);
-            if ((unitType1 == aiPlanGetVariableInt(trainPlanIndexID, cTrainPlanUnitType, 0)) && (aiPlanGetBaseID(trainPlanIndexID) == mainBaseID))
-            {
-                unitType1BeingTrained = true;
-            }
-            else if ((unitType2 == aiPlanGetVariableInt(trainPlanIndexID, cTrainPlanUnitType, 0)) && (aiPlanGetBaseID(trainPlanIndexID) == mainBaseID))
-            {
-                unitType2BeingTrained = true;
-            }
-            else if ((unitType3 == aiPlanGetVariableInt(trainPlanIndexID, cTrainPlanUnitType, 0)) && (aiPlanGetBaseID(trainPlanIndexID) == mainBaseID))
-            {
-                unitType3BeingTrained = true;
-            }
-        }
-    }
-    
-    if ((unitType1BeingTrained == true) && (unitType2BeingTrained == true) && (unitType3BeingTrained == true))
-    {
-        //if (ShowAiEcho == true) aiEcho("all three unit types are being trained, returning");
-        return;
-    }
-    
-    
-    int numUnitType1 = kbUnitCount(cMyID, unitType1, cUnitStateAlive);
-    int numUnitType2 = kbUnitCount(cMyID, unitType2, cUnitStateAlive);
-    int numUnitType3 = kbUnitCount(cMyID, unitType3, cUnitStateAlive);
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float woodSupply = kbResourceGet(cResourceWood);
-    float foodSupply = kbResourceGet(cResourceFood);
-	int NeededWood = 130;
-	if ((cMyCulture == cCultureAtlantean) && (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive) < 2))
-	NeededWood = NeededWood * 2; // farms take prio over archers!
-    
-    if (numUnitType1 < gNumUnitType1ToTrain)
-    {
-        if  (unitType1BeingTrained == false)
-        {
-            if (numUnitType1 < 1)
-                unitTypeToTrain = unitType1;
-            else if ((numUnitType1 < 3) && ((woodSupply > NeededWood) && (goldSupply > 100)) || (kbGetAge() < cAge3) && (numUnitType1 < 6) && (woodSupply > NeededWood) && (goldSupply > 100))
-                unitTypeToTrain = unitType1;
-            else if ((woodSupply > 245) && (goldSupply > 144))
-                unitTypeToTrain = unitType1;
-        }
-    }
-    
-    if (numUnitType2 < gNumUnitType2ToTrain)
-    {
-        if (unitType2BeingTrained == false)
-        {
-            if (numUnitType2 < 1)
-                unitTypeToTrain = unitType2;
-            else if ((numUnitType2 < 2) && ((foodSupply > 110) && (goldSupply > 120)))
-                unitTypeToTrain = unitType2;
-            else if ((foodSupply > 180) && (goldSupply > 195))
-                unitTypeToTrain = unitType2;
-        }
-    }
-    
-    if (numUnitType3 < gNumUnitType3ToTrain)
-    {
-        if (unitType3BeingTrained == false)
-        {
-            if (numUnitType3 < 1)
-                unitTypeToTrain = unitType3;
-            else if ((numUnitType3 < 2) && ((foodSupply > 125) && (goldSupply > 80)))
-                unitTypeToTrain = unitType3;
-            else if ((foodSupply > 205) && (goldSupply > 120))
-                unitTypeToTrain = unitType3;
-        }
-    }
-    
-    if (unitTypeToTrain == -1)
-    {
-        if (ShowAiEcho == true) aiEcho("military unitTypeToTrain == -1, returning");
-        return;
-    }
-
-    string planName = "MilitaryUnit "+kbGetProtoUnitName(unitTypeToTrain)+" maintain";    
-    int trainMilitaryUnitPlanID = aiPlanCreate(planName, cPlanTrain);
-    if (trainMilitaryUnitPlanID < 0)
-        return;
-        
-    aiPlanSetMilitary(trainMilitaryUnitPlanID, true);
-    aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanUnitType, 0, unitTypeToTrain);
-	aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanFrequency, 0, 25);
-    aiPlanSetVariableInt(trainMilitaryUnitPlanID, cTrainPlanNumberToTrain, 0, 2);
-    aiPlanSetVariableBool(trainMilitaryUnitPlanID, cTrainPlanUseMultipleBuildings, 0, true);
-    aiPlanSetBaseID(trainMilitaryUnitPlanID, mainBaseID);
-    aiPlanSetDesiredPriority(trainMilitaryUnitPlanID, 15);
-    aiPlanSetActive(trainMilitaryUnitPlanID);
-}
-
-//==============================================================================
 rule maintainSiegeUnits
     minInterval 23 //starts in cAge3
     inactive
@@ -893,11 +723,8 @@ rule maintainSiegeUnits
     }
     
     if (siegeUnitType1BeingTrained == true)
-    {
-        //if (ShowAiEcho == true) aiEcho("siegeUnitType1 is being trained, returning");
         return;
-    }
-	
+
     int numSiegeUnitType1 = kbUnitCount(cMyID, siegeUnitType1, cUnitStateAliveOrBuilding);
     
     float goldSupply = kbResourceGet(cResourceGold);
@@ -1313,7 +1140,7 @@ rule makeAtlanteanHeroesFallBack
                     }
                 }
         
-                if (unitIDToUse != -1)
+                if ((unitIDToUse != -1) && (kbUnitIsType(unitIDToUse, cUnitTypeOracleScout) == false))
                 {
                     aiTaskUnitTransform(unitIDToUse);
                     if (ShowAiEcho == true) aiEcho("Attempting to transform unit with ID:"+unitIDToUse+" to a hero");

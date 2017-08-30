@@ -1182,8 +1182,21 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
     aiPlanAddUnitType( remoteSettlementTransportPlan, builderTypeID, NumBuilders, NumBuilders, NumBuilders);
 
     //Done with transport plan. build a settlement now!
-    createBuildSettlementGoal("Remote Settlement", kbGetAge(), -1, kbAreaGetIDByPosition(where), NumBuilders, builderTypeID, true, 100);
     
+    int planID=aiPlanCreate("Build Remote"+kbGetUnitTypeName(cUnitTypeSettlementLevel1),
+                           cPlanBuild);
+    if (planID < 0)
+        return;
+
+    aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeSettlementLevel1);
+    aiPlanSetDesiredPriority(planID, 100);
+    aiPlanSetEconomy(planID, true);
+    aiPlanSetEscrowID(planID, cEconomyEscrowID);
+    aiPlanAddUnitType(planID, builderTypeID, NumBuilders, NumBuilders, NumBuilders);
+    aiPlanSetInitialPosition(planID, where);
+    aiPlanSetVariableVector(planID, cBuildPlanSettlementPlacementPoint, 0, where);
+	aiPlanSetActive(planID);
+	createBuildSettlementGoal("Remote Settlement", kbGetAge(), -1, kbAreaGetIDByPosition(where), NumBuilders, builderTypeID, true, 100);
 	aiPlanDestroy(rExploreIsland);
 	rExploreIsland = -1;
 	
@@ -1195,6 +1208,8 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
 	aiPlanAddWaypoint(rExploreIsland, where);
 	aiPlanSetVariableBool(rExploreIsland, cExplorePlanDoLoops, 0, false);
 	aiPlanSetVariableBool(rExploreIsland, cExplorePlanReExploreAreas,0, false);
+	aiPlanSetVariableVector(rExploreIsland, cExplorePlanQuitWhenPointIsVisiblePt, 0, where);
+	aiPlanSetVariableBool(rExploreIsland, cExplorePlanQuitWhenPointIsVisible,0, true);
 	aiPlanSetDesiredPriority(rExploreIsland, 1);
     aiPlanSetActive(rExploreIsland);
 	}
@@ -1327,7 +1342,7 @@ bool createSimpleBuildPlan(int puid=-1, int number=1, int pri=100,
 		{
 		//aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 4.0);
         aiPlanSetVariableInt(planID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeBuilding); 
-        aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 6);    
+        aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 9);    
         aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitValue, 0, -5.0);        // -5 points per unit		
 		}
         //Go.
