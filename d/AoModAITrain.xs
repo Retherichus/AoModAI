@@ -17,8 +17,6 @@ rule maintainTradeUnits
 	{
 	static int OldgMaxTradeCarts = 22; // Default
 	OldgMaxTradeCarts = gMaxTradeCarts;
-	if (aiGetWorldDifficulty() == cDifficultyNightmare)
-    OldgMaxTradeCarts = gTitanTradeCarts;	
 	gMaxTradeCarts = 3;
 	IsRunTradeUnits1  = true;
     }
@@ -77,20 +75,23 @@ rule maintainTradeUnits
 	int numIdleTrade = getNumUnits(tradeCartPUID, cUnitStateAlive, cActionIdle, cMyID);
 	if ((NumTcs < 1) || (numIdleTrade > 4)) // don't train caravans if you have no TC or if too many are idle.
     return;
+   
     int tradeTargetPop = gMaxTradeCarts;
-   	if (aiGetWorldDifficulty() == cDifficultyNightmare)
-    tradeTargetPop = gTitanTradeCarts;	
     if ((cvMaxTradePop >= 0) && (tradeTargetPop > cvMaxTradePop))    // Stay under control variable limit
         tradeTargetPop = cvMaxTradePop;
+		
+	if (aiGetWorldDifficulty() == cDifficultyNightmare)
+	{
+    gMaxTradeCarts = gTitanTradeCarts;
+	    if ((cvMaxTradePop >= 0) && (tradeTargetPop > cvMaxTradePop))    // Stay under control variable limit
+        tradeTargetPop = cvMaxTradePop;
+	}    
     int unitTypeToTrain = -1;
     
-    if (NumTcs >=5)
-	NumTcs = 5;
-	if ((aiGetWorldDifficulty() == cDifficultyNightmare) && (NumTcs >= 2))
-	NumTcs = 2;
+  
 	
-    if ((NumTcs > 1) || (IhaveAllies == true) || (foodSupply > 1500))
-        tradeTargetPop = tradeTargetPop + 3 + NumTcs;
+    if (foodSupply > 1500)
+        tradeTargetPop = tradeTargetPop + 5;
     
     static bool firstRun = true;
     if (firstRun == true)

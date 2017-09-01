@@ -397,6 +397,7 @@ rule updateFoodBreakdown
     if (ShowAiEcho == true) aiEcho("updateFoodBreakdown: ");
     if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
 	return;   
+	if (xsGetTime() > 20*1*1000)
 	xsSetRuleMinIntervalSelf(9);
 	
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -417,7 +418,7 @@ rule updateFoodBreakdown
     
 	float distance = gMaximumBaseResourceDistance;
 	if (xsGetTime() > 12*60*1000)
-	distance = 45;
+	distance = 40;
 	
     //Get the number of valid resources spots.
     int numberAggressiveResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
@@ -460,6 +461,17 @@ rule updateFoodBreakdown
     }
     
     int numberEasyResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, distance);
+
+    //int numHerdables = kbUnitCount(cMyID, cUnitTypeHerdable);
+	//if ((numHerdables > 0) && (kbGetAge() < cAge3) && (xsGetTime() < 12*60*1000))
+    //{   
+        // We have herdables, make up for the fact that the resource count excludes them.
+		// ^ FALSE!! they need a base value of 51 food to be detected and 
+		// added to the AutoGP/breakdowns!
+		// Fattened or not, it does not matter if their initial value is set to anything < 51.
+        //numberEasyResourceSpots = numberEasyResourceSpots + 1;
+    //}
+
     int totalNumberResourceSpots = numberAggressiveResourceSpots + numberEasyResourceSpots;
    
     // Only do one aggressive site at a time, they tend to take lots of gatherers
@@ -481,37 +493,17 @@ rule updateFoodBreakdown
         modifiedFoodGathererCount = true;
     }
     
-    int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
-
     int desiredFarmers = 24;
-    if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 9;		
-	
     // Up it a little bit as our civ population raises.	
     int NumVillagers = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID);
-	if ((kbGetAge() > cAge2) || (xsGetTime() > 10*60*1000))
+	if ((kbGetAge() > cAge2) || (xsGetTime() > 14*60*1000))
 	{
 	desiredFarmers = desiredFarmers+NumVillagers*0.10;
 	if ((ShowAiEcho == true) || (ShowAiEcoEcho == true)) aiEcho("Desired farms: "+desiredFarmers+"");	
     }
-	
-	//titan override
-    if (aiGetWorldDifficulty() == cDifficultyNightmare)
-    {  
-    desiredFarmers = 20;
-	 if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 7;
-	}
-		if ((cMyCulture != cCultureAtlantean) && (desiredFarmers >= 28))
-	    desiredFarmers = 28;
-	    if ((cMyCulture == cCultureAtlantean) && (desiredFarmers >= 12)) //override for Atlantean
-        desiredFarmers = 12;
-	
-    if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
-    {
-        foodGathererCount = desiredFarmers + (numSettlements - 1);
-        modifiedFoodGathererCount = true;
-    }
+	if (desiredFarmers >= 28)
+	   desiredFarmers = 28;
+
 
     MoreFarms = desiredFarmers; // Update build more farms
     // Preference order is existing farms (except in age 1), new farms if low on food sites, aggressive hunt (size permitting), easy, then age 1 farms.  
@@ -750,9 +742,7 @@ rule updateFoodBreakdown
     if (cMyCulture == cCultureChinese)
         minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() - 1;		
 		
-     if ((xsGetTime() < 1*50*1000) && (cMyCulture != cCultureAtlantean))
-	 numberAggressiveResourceSpots = 0;
-	 
+
     // Start a new plan if we have enough villies and we have the resource.
     // If we have a plan open, don't kill it as long as we are within 1 of the needed min...the plan will steal from elsewhere.
     if ((numPlansUnassigned > 0) && (numberAggressiveResourceSpots > 0)
@@ -899,7 +889,7 @@ rule updateFoodBreakdown
 				if (aiGetWorldDifficulty() == cDifficultyNightmare)
 			    numFarmPlansWanted = numFarmPlansWanted + 1;
 				else if ((aiGetWorldDifficulty() == cDifficultyHard) && (IncreasePlans == true) && (aiGetGameMode() != cGameModeLightning))
-			    numFarmPlansWanted = numFarmPlansWanted + 2;	
+			    numFarmPlansWanted = 1 + ( farmers / aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0) );	
 				else numFarmPlansWanted = numFarmPlansWanted + 1;
             }                
         }

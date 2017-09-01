@@ -39,7 +39,7 @@ rule norseInfantryBuild
 
     int planIDToAddUnit=aiPlanGetIDByTypeAndVariableType(cPlanBuild, -1, -1);
     //aiEcho("planIDToAddUnit: "+planIDToAddUnit+"");
-    if ((planIDToAddUnit < 0) || (aiPlanGetVariableInt(planIDToAddUnit, cBuildPlanBuildingTypeID, 0) == cUnitTypeFarm))
+    if (planIDToAddUnit < 0)
         return;
 
     kbUnitQueryResetResults(unitQueryID);
@@ -771,16 +771,16 @@ rule buildSettlements
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
     int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
-	int MaxInProgress = 2;
+	int MaxInProgress = 1; // actually 2.
 	if (aiGetGameMode() == cGameModeDeathmatch)
-    MaxInProgress = 4;
+    MaxInProgress = 2;
 	
     int numberSettlementsPlanned = numberSettlements + numberBuildSettlementGoals;
 
     if (numberSettlementsPlanned >= cvMaxSettlements)
         return;        // Don't go over script limit
 
-    if (numberBuildSettlementGoals >= MaxInProgress)	// Allow 2 in progress, no more
+    if (numberBuildSettlementGoals > MaxInProgress)	// Allow 2 in progress, no more
         return;
     if (findASettlement() == false)
         return;
@@ -791,7 +791,60 @@ rule buildSettlements
             xsDisableSelf();
             return;
         }
+
+	//Don't get too many more than our human allies, stops after 12 min.
+    int largestAllyCount=-1;
+	if (xsGetTime() < 12*60*1000)
+	{	
+    for (i=1; < cNumberPlayers)
+    {
+        if (i == cMyID)
+            continue;
+        if (kbIsPlayerAlly(i) == false)
+            continue;
+        if (kbIsPlayerHuman(i) == false)     // MK:  Only worry about humans, no sense holding back for confused AI ally
+            continue;
+        int count = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, i);
+        if (count > largestAllyCount)
+            largestAllyCount=count;
+    }
+    }
+    //Never have more than 2 more settlements than any human ally.
+    int difference=numberSettlementsPlanned-largestAllyCount;
+    if ((difference > 2) && (largestAllyCount>=0))     // If ally exists and we have more than 2 more...quit
+        return;
+
+    //See if there is another human on my team.
+    bool haveHumanTeammate=false;
+    for (i=1; < cNumberPlayers)
+    {
+        if (i == cMyID)
+            continue;
+        //Find the human player
+        if (kbIsPlayerHuman(i) != true)
+            continue;
+
+        //This player is a human ally and not resigned.
+        if ((kbIsPlayerAlly(i) == true) && (kbIsPlayerResigned(i) == false))
+        {
+            haveHumanTeammate=true;
+            break;
+        }
+    }
     
+    if (haveHumanTeammate == true)
+    {
+        if (kbGetAge() == cAge3)
+        {
+            if (numberSettlementsPlanned > 5)
+                return;
+        }
+        else if (kbGetAge() == cAge4)
+        {
+            if (numberSettlementsPlanned >= cvMaxSettlements)
+                return;
+        }
+    }
     if (ShowAiEcho == true) aiEcho("Creating another settlement goal.");
 
     int numBuilders = 3;
@@ -830,13 +883,13 @@ rule buildSettlementsEarly  //age 1/2 handler
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals = aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
     int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
-	int MaxInProgress = 2;
+	int MaxInProgress = 1; // actually 2.
 	if (aiGetGameMode() == cGameModeDeathmatch)
-    MaxInProgress = 4;
+    MaxInProgress = 2;
 	
     int numberSettlementsPlanned = numberSettlements + numberBuildSettlementGoals;
 
-    if (numberBuildSettlementGoals >= MaxInProgress)	// Allow 2 in progress, no more
+    if (numberBuildSettlementGoals > MaxInProgress)	// Allow 2 in progress, no more
         return;
     if (findASettlement() == false)
         return;
@@ -943,7 +996,7 @@ rule dockMonitor
     }
 
     int desiredDocks = 1;
-    if (cRandomMapName == "anatolia") 
+    if ((cRandomMapName == "anatolia") || (cvMapSubType == VINLANDSAGAMAP))
     {
         desiredDocks = 2;
         gDockBaseID = kbBaseGetMainID(cMyID);
@@ -1066,7 +1119,7 @@ rule mainBaseAreaWallTeam1
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam1:");
 	int Temple = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
 	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000) || (kbGetAge() < cAge2) && (Temple < 1 ) || (kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean)
-	|| (cvMapSubType == NOMADMAP) && (kbGetAge() < cAge2) != (cMyCulture == cCultureNorse) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 8*60*1000))
+	|| (cvMapSubType == NOMADMAP) && (kbGetAge() < cAge2) != (cMyCulture == cCultureNorse) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 6*60*1000))
     return;	
 	
 	if (kbGetAge() > cAge1)
@@ -1167,6 +1220,21 @@ rule mainBaseAreaWallTeam1
     int mainBaseAreaWallTeam1PlanID = aiPlanCreate("mainBaseAreaWallTeam1PlanID", cPlanBuildWall);
     if (mainBaseAreaWallTeam1PlanID != -1)
     {
+        if (cRandomMapName == "ghost lake") 
+            gMainBaseAreaWallRadius = 26;
+        else if (cRandomMapName == "marsh")
+            gMainBaseAreaWallRadius = 26;
+        else if (cRandomMapName == "jotunheim")
+            gMainBaseAreaWallRadius = 29;
+        else if (cRandomMapName == "anatolia")
+            gMainBaseAreaWallRadius = 29;
+        else if (cRandomMapName == "savannah")
+            gMainBaseAreaWallRadius = 28;
+        else if (cRandomMapName == "alfheim")
+            gMainBaseAreaWallRadius = 26;
+        else if (cRandomMapName == "tundra")    //TODO: find the best radius
+            gMainBaseAreaWallRadius = 26;
+        
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, 20, true);
         int numAreasAdded = 0;
 
@@ -2658,8 +2726,16 @@ rule buildFortress
     else
         xsSetRuleMinIntervalSelf(19);
 
-    int bigBuildingID = MyFortress;	
-	
+    int bigBuildingID = cUnitTypeMigdolStronghold;
+    if (cMyCulture == cCultureGreek)
+        bigBuildingID = cUnitTypeFortress;
+    else if (cMyCulture == cCultureNorse)
+        bigBuildingID = cUnitTypeHillFort;
+    else if (cMyCulture == cCultureAtlantean)
+        bigBuildingID = cUnitTypePalace;	
+    else if (cMyCulture == cCultureChinese)
+        bigBuildingID = cUnitTypeCastle;		
+
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     if (numFortresses >= kbGetBuildLimit(cMyID, bigBuildingID))
         return;
@@ -3731,7 +3807,7 @@ rule destroyUnnecessaryDropsites
                 vector dropsiteLocation = kbUnitGetPosition(dropsiteID);
                 int numAnimals = getNumUnits(cUnitTypeHuntedResource, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int numWildCrops = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
-                int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, dropsiteLocation, 25.0);
+                int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int numGoldMines = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int NumFarms = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, -1, cMyID, dropsiteLocation, 17.0);
 				
@@ -3880,7 +3956,7 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
     if (ShowAiEcho == true) aiEcho("rebuildDropsites:");
     
     float woodSupply = kbResourceGet(cResourceWood);
-    if ((woodSupply < 150) && (cMyCulture != cCultureEgyptian))
+    if (woodSupply < 150)
         return;
 
     vector location = cInvalidVector;
@@ -4021,7 +4097,7 @@ rule buildGoldMineTower
     if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop))
         return;
     float goldSupply = kbResourceGet(cResourceGold);
-	if ((kbGetAge() < cAge3) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 12*60*1000))
+	if ((kbGetAge() < cAge3) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 6*60*1000))
 	return; // We need the gold to advance quicker.
 	
 	if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
@@ -4041,7 +4117,7 @@ rule buildGoldMineTower
     float currentGold = kbResourceGet(cResourceGold);
     float currentFood = kbResourceGet(cResourceFood);
 
-    if ((currentWood < 400) || (currentGold < 450))
+    if ((currentWood < 300) || (currentGold < 150))
         return;
         
     if ((currentFood > 700) && (currentGold > 700) && (kbGetAge() == cAge3))
@@ -4199,7 +4275,9 @@ rule buildMBTower
             }
         }
     }
-	
+    
+   
+    
    int attempt = 0;
    vector testVec = cInvalidVector;
    float spacingDistance = 24.0; // Mid- and corner-spots on a square with 'radius' spacingDistance, i.e. each side is 2 * spacingDistance.
@@ -4285,7 +4363,7 @@ rule buildMBTower
       kbUnitQueryResetResults(towerSearch);
       if (kbUnitQueryExecute(towerSearch) < 1)
       {  // Site is clear, use it
-         if (kbAreaGroupGetIDByPosition(testVec) == kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))))
+         if ( kbAreaGroupGetIDByPosition(testVec) == kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) )
          {  // Make sure it's in same areagroup.
             success = true;
             break;
@@ -4309,7 +4387,7 @@ rule buildMBTower
     if (buildMBTowerPlanID >= 0)
     {
         if (success == true)
-        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 16);
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, exclusionRadius);
         else
         aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 50.0);	
         aiPlanSetInitialPosition(buildMBTowerPlanID, mainBaseLocation);
@@ -4454,7 +4532,7 @@ rule buildExtraFarms
 	
     int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 85.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 >= MoreFarms - 1) || (numFarmsNearMainBaseInR30 >= 29) || (numVillagers < 10) || (numFarmsNearMainBaseInR30 < 7))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 >= MoreFarms - 1) || (numFarmsNearMainBaseInR30 >= 29) || (numVillagers < 10) || (numFarmsNearMainBaseInR30 < 7) || (numFarmsNearMainBaseInR30 > 20) && (aiGetWorldDifficulty() > cDifficultyHard))
     {
         xsSetRuleMinIntervalSelf(50);
         return;
@@ -4470,6 +4548,7 @@ rule buildExtraFarms
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if ((aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeFarm) && (aiPlanGetBaseID(buildPlanIndexID) == mainBaseID))
             {
+			//aiEcho("I returned here, Plan already pending");
                 return;
             }
         }
@@ -4480,7 +4559,7 @@ rule buildExtraFarms
         resourceSupply = kbResourceGet(cResourceGold);
 	int NeededRes = 350;
 	int MilBuildings = kbUnitCount(cMyID, cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAlive);  
-	if ((numFarmsNearMainBaseInR30 < 13) && (MilBuildings > 2))
+	if ((numFarmsNearMainBaseInR30 < 13) && (MilBuildings > 1))
 	NeededRes = 100;
     
     if (resourceSupply < NeededRes)
@@ -4691,7 +4770,7 @@ rule buildManyBuildings
    int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAlive);
    int numberSettlements=kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
 
-   if ((numberOfFortresses < 1) || (numberSettlements < 2) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 8*60*1000) || (kbGetAge() < 2) || (currentWood < 1000))
+   if ((numberOfFortresses < 1) || (numberSettlements < 2) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 6*60*1000) || (kbGetAge() < 2) || (currentWood < 1000))
       return;
 
  if (numberOfArcheryRange+numberOfBarracks+numberOfStables < 34)
@@ -4924,7 +5003,7 @@ inactive
 	int Villagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
 	if (cMyCulture == cCultureAtlantean)
 	Villagers = Villagers * 3;
-    if ((Villagers < 18) || (kbGetAge() < cAge2) || (xsGetTime() < 10*60*1000) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000))
+    if ((Villagers < 18) || (kbGetAge() < cAge2) || (xsGetTime() < 10*60*1000) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 6*60*1000))
     return;	
 	
 	static int lastTargetPlayerIDSaveTime = -1;
@@ -5225,40 +5304,44 @@ rule BunkerUpWonderTower
 	numBuilders = 1;
 
     int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 50.0);
+
+
         
-    if (numBuilding1NearBase > 3)
+     if (numBuilding1NearBase > 3)
     {	
      switch(cMyCulture)
     {
         case cCultureGreek:
         {
-
+            building1ID = cUnitTypeFortress;
             numBuilders = 4;
             break;
         }
         case cCultureEgyptian:
         {
+            building1ID = cUnitTypeMigdolStronghold;
             numBuilders = 4;
             break;
         }
         case cCultureNorse:
         {
+            building1ID = cUnitTypeHillFort;
             numBuilders = 4;
             break;
         }
         case cCultureAtlantean:
         {
-
+            building1ID = cUnitTypePalace;
             numBuilders = 1;
             break;
         }
         case cCultureChinese:
         {
+            building1ID = cUnitTypeCastle;
             numBuilders = 3;
             break;
         }		
     }
-	   building1ID = MyFortress;
 	   int numBuilding2NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 50.0);	
        if (numBuilding2NearBase > 3)
        return;

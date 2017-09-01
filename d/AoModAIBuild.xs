@@ -3731,7 +3731,7 @@ rule destroyUnnecessaryDropsites
                 vector dropsiteLocation = kbUnitGetPosition(dropsiteID);
                 int numAnimals = getNumUnits(cUnitTypeHuntedResource, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int numWildCrops = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
-                int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, dropsiteLocation, 25.0);
+                int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int numGoldMines = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int NumFarms = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, -1, cMyID, dropsiteLocation, 17.0);
 				
@@ -4309,7 +4309,7 @@ rule buildMBTower
     if (buildMBTowerPlanID >= 0)
     {
         if (success == true)
-        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 16);
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 30);
         else
         aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 50.0);	
         aiPlanSetInitialPosition(buildMBTowerPlanID, mainBaseLocation);

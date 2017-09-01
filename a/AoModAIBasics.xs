@@ -1937,16 +1937,3 @@ int findPlanByString(string autoName = "BUG", int iPlanType = -1, int iState = -
     }
     return(iPlanID);
 }
-//==============================================================================
-bool AgingUp() 
-{
-    if (kbGetTechStatus(gAge2MinorGod) == cTechStatusResearching)
-            return(true);
-    if (kbGetTechStatus(gAge3MinorGod) == cTechStatusResearching)
-            return(true);
-    if (kbGetTechStatus(gAge4MinorGod) == cTechStatusResearching)
-            return(true);
-    if (kbGetTechStatus(cTechSecretsoftheTitans) == cTechStatusResearching)
-            return(true);			
-    return(false);
-}

@@ -107,7 +107,7 @@ extern int ModdedTCTimer = 25;
 // Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
 
 extern int eBoomFood = 600;              // Food
-extern int eBoomGold = 150;              // Gold
+extern int eBoomGold = 100;              // Gold
 extern int eBoomWood = 150;              // Wood, duh.
 
 
@@ -404,6 +404,11 @@ void initRethlAge2(void)
 	if (gTransportMap == true)
 	xsEnableRule("TransportBuggedUnits");
 	
+	//Lower vills needed for hunt
+	if (cMyCulture == cCultureAtlantean)
+	aiSetMinNumberNeedForGatheringAggressvies(2);
+	else aiSetMinNumberNeedForGatheringAggressvies(5);
+	
 	// Up Immortal count for chinese
 	if (cMyCulture == cCultureChinese)
 	aiPlanSetVariableInt(mChineseImmortal, cTrainPlanNumberToMaintain, 0, 6);
@@ -675,7 +680,7 @@ rule ActivateRethOverridesAge4
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeArcherAtlantean, 0.7+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(5));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeSwordsman, 0.2);
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMaceman, 0.05);
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMaceman, 0.1);
 		}		
 		//
 		

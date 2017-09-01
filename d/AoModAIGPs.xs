@@ -1030,7 +1030,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	// Or actually destroy the plan and use painful manual casting
 	if(powerProtoID == cPowerTsunami)
 	{
-		xsEnableRule("rTsunami");
+//		xsEnableRule("rTsunami");
 		return (false);  
 		}
 		
@@ -1991,8 +1991,7 @@ rule rShiftingSand
    aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
 
    aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelDualLocation);
-   if(aiCastGodPowerAtPosition(aiGetGodPowerTechIDForSlot(1), kbUnitGetPosition(kbUnitQueryGetResult(queryID, 0))) == true)
-   xsDisableSelf();
+   
 }
 
 // Chinese rules, copy paste from WarriorMario //////////
@@ -2192,7 +2191,7 @@ inactive
 	static int enemyUnitsQuery = -1;
 	static int directionQuery = -1;
 	float townRange = 25;
-	int numReqUnits = 10;
+	int numReqUnits = 25;
 	if(enemyTownQuery == -1)
 	{
 		enemyTownQuery = kbUnitQueryCreate("Enemy Town Query");
@@ -2205,10 +2204,8 @@ inactive
 	{
 		enemyUnitsQuery = kbUnitQueryCreate("Enemy Units Query");
 		kbUnitQuerySetPlayerID(enemyUnitsQuery, cMyID);
-		kbUnitQuerySetSeeableOnly(enemyUnitsQuery, true);
-		kbUnitQuerySetMaximumDistance(enemyUnitsQuery, 60);
 		kbUnitQuerySetPlayerRelation(enemyUnitsQuery, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyUnitsQuery, cUnitTypeLogicalTypeBuildingsNotWalls);
+		kbUnitQuerySetUnitType(enemyUnitsQuery, cUnitTypeLogicalTypeMilitaryUnitsAndBuildings);
 		kbUnitQuerySetState(enemyUnitsQuery, cUnitStateAliveOrBuilding);
 	}
 	if(directionQuery == -1)
@@ -2251,7 +2248,9 @@ inactive
 			// So uhm get the distance between the start and end position do that 2x and subtract it from the realfinalposition
 			vector finalPosition = position - (position-startPosition)*2;
 			if(aiCastGodPowerAtPositionFacingPosition(cTechTsunami,startPosition,finalPosition))
-			xsDisableSelf();
+			{
+			
+			}
 			
 		}
 	}

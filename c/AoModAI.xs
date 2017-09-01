@@ -50,7 +50,7 @@ extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age hand
 
 
 // Trade globals
-extern int gMaxTradeCarts = 20;           // Max trade carts
+extern int gMaxTradeCarts = 23;           // Max trade carts
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -551,7 +551,11 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, cTechWatchTower, true) >= 0) && (numTowers > 0))
         {
             if ((woodSupply > 200) && (goldSupply > 100))
-            aiTaskUnitResearch(mainBaseUnitID, findUnit(cUnitTypeTower));
+            {
+                kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
+                kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
+                if (ShowAiEcho == true) aiEcho("Flushing economy wood and gold escrow");
+            }
         }
         
         if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < gEarlySettlementTarget))
@@ -605,7 +609,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
             }
         }
         
-        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 3))
+        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 4))
         {
             if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) && (foodSupply > 200) || (cMyCulture == cCultureEgyptian) && (goldSupply > 360) && (foodSupply > 250))
             {
@@ -700,16 +704,19 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
             milPopDelta = milPopDelta / (2.0 + cvMilitaryEconSlider);
             milPop = milPop + (milPop * milPopDelta);
         }
-            if (milPop < 26) 
-                milPop = 26;
+            if (milPop < 34) 
+                milPop = 34;
             if (gAgeReduceMil == true)
 	        milPop = eMaxMilPop;		
     }
+
+   
 
     if ((milPop < 0) && (cvMaxMilPop >= 0))      // milPop says no limit, but cvMaxMilPop has one
         milPop = cvMaxMilPop;      
     if ((milPop > cvMaxMilPop) && (cvMaxMilPop >= 0))  // cvMaxMilPop has limit and milPop is over it
         milPop = cvMaxMilPop;
+
 
     aiSetEconomyPop(econPop);
     aiSetMilitaryPop(milPop);
@@ -812,7 +819,7 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     //Update the number of vils to maintain.
 	int gathererPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer,0);
 	if ((kbCanAffordUnit(gathererPUID, cEconomyEscrowID) == true) && (kbUnitCount(cMyID, gathererPUID, cUnitStateAlive) < vilPop * 0.8) && 
-	(kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive) > 0) && (kbGetPopCap() != kbGetPop()) && (AgingUp() == false))
+	(kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive) > 0) && (kbGetPopCap() != kbGetPop()))
 	{
 	static int FailedToTrain = 0;
 	static int LastCount = 0;
@@ -831,7 +838,7 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
 	FailedToTrain = FailedToTrain+1;
 	//aiEcho("Fail: "+FailedToTrain);
 	}
-	if (FailedToTrain >= 4)
+	if (FailedToTrain >= 8)
 	{
 	aiPlanDestroy(gCivPopPlanID);
 	FailedToTrain = 0;
@@ -932,29 +939,31 @@ rule updateEMAge2
 		
     float econPercent = 0.50;     // Econ priority rating, range 0..1
     float econEscrow = 0.50;      // Economy's share of non-root escrow, range 0..1
+    float WoodeconEscrow = econEscrow;
     float econAdjust = -.5 * cvMilitaryEconSlider;  // For econ purist, do lesser of 50% econ boost or 50% mil cut
-                                             // For hawk, vice versa 
+                                                   // For hawk, vice versa 
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
 	
 	if ((xsGetTime() > 13*60*1000) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge2))
 	{
-	if (econEscrow < 0.55)
-	econEscrow = 0.55;
+	if (econEscrow < 0.70)
+	econEscrow = 0.70;
 	}
-	float foodEscrow = econEscrow;
-    float woodEscrow = econEscrow;
-	float goldEscrow = econEscrow;
-
-    if (foodEscrow < 0.20)
-	foodEscrow = 0.20;
-    if ((woodEscrow < 0.20) && (cMyCulture != cCultureEgyptian))
-	woodEscrow = 0.20;	
-    if ((goldEscrow < 0.20) && (cMyCulture == cCultureEgyptian))
-	goldEscrow = 0.20;		
+	WoodeconEscrow = econEscrow;
+	
+	int FarmThreshold = 4;
+	if (cMyCulture == cCultureAtlantean)
+	FarmThreshold = 2;
+	
+	if ((cMyCulture != cCultureEgyptian) && (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) < FarmThreshold))
+	{
+	if (WoodeconEscrow < 0.50)
+	WoodeconEscrow= 0.50;
+	}
 
     //More military in second age
-    updateEM(civPopTarget, milPopTarget, econPercent, 0.2, foodEscrow, woodEscrow, goldEscrow, econEscrow);
+    updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, WoodeconEscrow, econEscrow, econEscrow);
 }
 
 //==============================================================================
@@ -1021,6 +1030,11 @@ rule updateEMAge3
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
 
+	if ((xsGetTime() > 26*60*1000) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge3))
+	{
+	if (econEscrow < 0.58)
+	econEscrow = 0.58;
+	}	
     //More military in second age
     updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, econEscrow, econEscrow, econEscrow);
 }
@@ -1100,8 +1114,8 @@ rule updateEMAge4
     econEscrow = econPercent;
 	if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
 	{
-	if (econEscrow < 0.55)
-	econEscrow = 0.5;
+	if (econEscrow < 0.62)
+	econEscrow = 0.62;
     }	
 
     //More military in second age
@@ -1641,8 +1655,8 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 	 intWood = intWood / 3;
 	 intGold = intGold / 3;
 	 }
-     if (ShowAiEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
-     if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+     aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
+     aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
 
 }
 
@@ -2359,8 +2373,12 @@ if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCul
 //==============================================================================
 void initGreek(void)
 {
+
     //Modify our favor need.  A pseudo-hack.
     aiSetFavorNeedModifier(10.0);
+
+	if (aiGetWorldDifficulty() != cDifficultyEasy)
+    createSimpleMaintainPlan(cUnitTypePetrobolos, 4, false, kbBaseGetMainID(cMyID));
 	
     //Greek scout types.
     gLandScout=cUnitTypeScout;
@@ -2574,7 +2592,13 @@ void initNorse(void)
 //==============================================================================
 void initAtlantean(void)
 {
+
     // Atlantean
+
+   
+    if (aiGetWorldDifficulty() != cDifficultyEasy)
+    createSimpleMaintainPlan(cUnitTypeOnager, 3, false, kbBaseGetMainID(cMyID));
+
     gLandScout=cUnitTypeOracleScout;
     gWaterScout=cUnitTypeFishingShipAtlantean;
     gAirScout=-1;
@@ -2648,6 +2672,7 @@ void initAtlantean(void)
 //==============================================================================
 void initChinese(void)
 {
+
     // Chinese
 
     gLandScout=cUnitTypeScoutChinese;
@@ -2659,12 +2684,16 @@ void initChinese(void)
 		
 	if (cMyCiv == cCivFuxi)
 	xsEnableRule("rSpeedUpBuilding");
-	
+		
+
         xsEnableRule("DelayImmortalHero"); 	
 		createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 2, false, kbBaseGetMainID(cMyID));
 		cMonkMaintain = createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(2)+3, false, kbBaseGetMainID(cMyID));
-      
-	  //Create the Chinese scout plans.
+
+        if (aiGetWorldDifficulty() != cDifficultyEasy && cMyCulture == cCultureChinese)
+            createSimpleMaintainPlan(cUnitTypeSittingTiger, 4, false, kbBaseGetMainID(cMyID));
+
+      //Create the Chinese scout plans.
     int exploreID=-1;
     int i = 0;
  
@@ -3643,11 +3672,11 @@ void init(void)
     if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureNorse))
     {
 
-            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2, false);  // 2 buildings if egyptian or norse
+            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2, true);  // 2 buildings if egyptian or norse
     }    
     else
     {
-            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 1, false); // Rush with rushSize pop slots of two types, 1 buildings, do guess enemy unit type
+            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 1, true); // Rush with rushSize pop slots of two types, 1 buildings, do guess enemy unit type
     }
 
 
@@ -3690,8 +3719,9 @@ void init(void)
     }
 
     if (ShowAiEcho == true) aiEcho("gRushCount: "+gRushCount+", gRushSize: "+gRushSize+", gFirstRushSize: "+gFirstRushSize);
-	if ((aiGetWorldDifficulty() > cDifficultyHard) && (gRushCount < 1))
-	gRushCount = 1;	
+
+	if ((aiGetWorldDifficulty() > cDifficultyModerate) && (gRushCount < 1))
+	gRushCount = 1;
 	
 	if (gRushCount > 2)
 	{
@@ -3709,7 +3739,7 @@ void init(void)
 	    kbUnitPickSetCostWeight(gRushUPID, 7.0);
 	    kbUnitPickSetCombatEfficiencyWeight(gRushUPID, 4.0);
 		kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMythUnit, 0.0);
-        kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 3, 1, true);
+        kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 3, 2, true);
 		
 		if (cMyCulture == cCultureGreek)
         {
@@ -3717,7 +3747,9 @@ void init(void)
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHoplite, 0.3);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.2);
 		 if (cMyCiv == cCivPoseidon)
-		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.3);	 
+		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.3);
+		 if (cMyCiv == cCivHades)
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 0.6);		 
         }
         if (cMyCulture == cCultureEgyptian)
         {
@@ -3737,10 +3769,8 @@ void init(void)
         if (cMyCulture == cCultureAtlantean)
         {
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeJavelinCavalry, 1.0);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSwordsman, 0.5);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMaceman, 0.1);
-		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeChieroballista, 0.0);
-		 kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 2, 1, true);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSwordsman, 0.4);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMaceman, 0.2);
         }
         if (cMyCulture == cCultureChinese)
         {
@@ -3814,12 +3844,12 @@ void init(void)
         if ( aiGetGameMode() != cGameModeDeathmatch )
         {
             if (gTransportMap == true)
-                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings, false);    // Min: 40-59, max 70 pop slots
+                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings, true);    // Min: 40-59, max 70 pop slots
             else
-                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings+1, false);    // Min: 40-59, max 70 pop slots
+                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings+1, true);    // Min: 40-59, max 70 pop slots
         }
         else  // Double buildings in DM
-            gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, 2*gNumberBuildings+2, false);    // Min: 40-59, max 70 pop slots
+            gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, 2*gNumberBuildings+2, true);    // Min: 40-59, max 70 pop slots
     }
     
     int lateAttackAge = 2;
@@ -4952,10 +4982,22 @@ void age4Handler(int age=3)
             xsEnableRuleGroup("championGreek"); //because we set the attack goal to idle until cTechForgeofOlympus is researched
         }
     }
-    if (cMyCulture == cCultureEgyptian)
+    else if (cMyCulture == cCultureEgyptian)
+    {         
+
+        //Catapults.
+        if (aiGetWorldDifficulty() != cDifficultyEasy)
+            createSimpleMaintainPlan(cUnitTypeCatapult, 4, false, kbBaseGetMainID(cMyID));
+        //Set the build limit for Outposts.
         aiSetMaxLOSProtoUnitLimit(11);
 
-    
+    }
+    else if (cMyCulture == cCultureNorse)
+    {
+        // maintain 4 ballista
+        if (aiGetWorldDifficulty() != cDifficultyEasy)
+            createSimpleMaintainPlan(cUnitTypeBallista, 3, false, kbBaseGetMainID(cMyID));
+    }
 
     //If we're in deathmatch, no more hard pop cap.
     if (aiGetGameMode() == cGameModeDeathmatch)

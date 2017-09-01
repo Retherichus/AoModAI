@@ -771,16 +771,16 @@ rule buildSettlements
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
     int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
-	int MaxInProgress = 2;
+	int MaxInProgress = 1; // actually 2.
 	if (aiGetGameMode() == cGameModeDeathmatch)
-    MaxInProgress = 4;
+    MaxInProgress = 3;
 	
     int numberSettlementsPlanned = numberSettlements + numberBuildSettlementGoals;
 
     if (numberSettlementsPlanned >= cvMaxSettlements)
         return;        // Don't go over script limit
 
-    if (numberBuildSettlementGoals >= MaxInProgress)	// Allow 2 in progress, no more
+    if (numberBuildSettlementGoals > MaxInProgress)	// Allow 2 in progress, no more
         return;
     if (findASettlement() == false)
         return;
@@ -830,13 +830,13 @@ rule buildSettlementsEarly  //age 1/2 handler
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals = aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
     int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
-	int MaxInProgress = 2;
+	int MaxInProgress = 1; // actually 2.
 	if (aiGetGameMode() == cGameModeDeathmatch)
-    MaxInProgress = 4;
+    MaxInProgress = 3;
 	
     int numberSettlementsPlanned = numberSettlements + numberBuildSettlementGoals;
 
-    if (numberBuildSettlementGoals >= MaxInProgress)	// Allow 2 in progress, no more
+    if (numberBuildSettlementGoals > MaxInProgress)	// Allow 2 in progress, no more
         return;
     if (findASettlement() == false)
         return;
@@ -3731,7 +3731,7 @@ rule destroyUnnecessaryDropsites
                 vector dropsiteLocation = kbUnitGetPosition(dropsiteID);
                 int numAnimals = getNumUnits(cUnitTypeHuntedResource, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int numWildCrops = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
-                int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, dropsiteLocation, 25.0);
+                int numTrees = getNumUnits(cUnitTypeTree, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int numGoldMines = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, dropsiteLocation, 17.0);
                 int NumFarms = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, -1, cMyID, dropsiteLocation, 17.0);
 				
@@ -4041,7 +4041,7 @@ rule buildGoldMineTower
     float currentGold = kbResourceGet(cResourceGold);
     float currentFood = kbResourceGet(cResourceFood);
 
-    if ((currentWood < 400) || (currentGold < 450))
+    if ((currentWood < 300) || (currentGold < 150))
         return;
         
     if ((currentFood > 700) && (currentGold > 700) && (kbGetAge() == cAge3))
@@ -4309,7 +4309,7 @@ rule buildMBTower
     if (buildMBTowerPlanID >= 0)
     {
         if (success == true)
-        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 16);
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, exclusionRadius);
         else
         aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 50.0);	
         aiPlanSetInitialPosition(buildMBTowerPlanID, mainBaseLocation);
@@ -4454,7 +4454,7 @@ rule buildExtraFarms
 	
     int numFarmsNearMainBaseInR30 = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 85.0);
     
-    if ((gFarming == false) || (numFarmsNearMainBaseInR30 >= MoreFarms - 1) || (numFarmsNearMainBaseInR30 >= 29) || (numVillagers < 10) || (numFarmsNearMainBaseInR30 < 7))
+    if ((gFarming == false) || (numFarmsNearMainBaseInR30 >= MoreFarms - 1) || (numFarmsNearMainBaseInR30 >= 29) || (numVillagers < 10) || (numFarmsNearMainBaseInR30 < 7) || (numFarmsNearMainBaseInR30 > 20) && (aiGetWorldDifficulty() > cDifficultyHard))
     {
         xsSetRuleMinIntervalSelf(50);
         return;
@@ -4470,6 +4470,7 @@ rule buildExtraFarms
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if ((aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeFarm) && (aiPlanGetBaseID(buildPlanIndexID) == mainBaseID))
             {
+			//aiEcho("I returned here, Plan already pending");
                 return;
             }
         }
@@ -4480,7 +4481,7 @@ rule buildExtraFarms
         resourceSupply = kbResourceGet(cResourceGold);
 	int NeededRes = 350;
 	int MilBuildings = kbUnitCount(cMyID, cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAlive);  
-	if ((numFarmsNearMainBaseInR30 < 13) && (MilBuildings > 2))
+	if ((numFarmsNearMainBaseInR30 < 13) && (MilBuildings > 1))
 	NeededRes = 100;
     
     if (resourceSupply < NeededRes)
