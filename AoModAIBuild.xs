@@ -2874,7 +2874,7 @@ rule buildTowerAtOtherBase
     minInterval 61 //starts in cAge2
     inactive
 {
-    if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop))
+    if ((gAgeFaster == true) && (kbGetAge() < AgeFasterStop) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 8*60*1000))
         return;
     if (ShowAiEcho == true) aiEcho("buildTowerAtOtherBase: ");
 	
@@ -2997,7 +2997,6 @@ rule buildTowerAtOtherBase
         aiPlanSetDesiredPriority(buildTowerAtOtherBasePlanID, 100);
         aiPlanSetVariableBool(buildTowerAtOtherBasePlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
         aiPlanSetVariableFloat(buildTowerAtOtherBasePlanID, cBuildPlanRandomBPValue, 0, 0.99);
-        
         aiPlanSetVariableVector(buildTowerAtOtherBasePlanID, cBuildPlanCenterPosition, 0, otherBaseLocation);
         aiPlanSetVariableFloat(buildTowerAtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 13.0);
         aiPlanAddUnitType(buildTowerAtOtherBasePlanID, builderType, 1, 1, 1);

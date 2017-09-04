@@ -1030,9 +1030,9 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	// Or actually destroy the plan and use painful manual casting
 	if(powerProtoID == cPowerTsunami)
 	{
-		xsEnableRule("rTsunami");
+		// disabled
 		return (false);  
-		}
+    }
 		
 	// Set up the Uproot power
 	if(powerProtoID == cPowerUproot)
@@ -1234,7 +1234,7 @@ rule rAge4FindGP
 
 //==============================================================================
 rule rCeaseFire
-    minInterval 32 //starts in cAge2
+    minInterval 35 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("rCeaseFire:");    
@@ -1307,7 +1307,7 @@ rule rUnbuild
     }
 
     aiPlanSetDesiredPriority(gUnbuildPlanID, 100);
-    aiPlanSetEscrowID(gUnbuildPlanID, cMilitaryEscrowID);
+    aiPlanSetEscrowID(gUnbuildPlanID, -1);
     //Setup the plan.. 
     // these are first pass.. fix these eventually.. 
     aiPlanSetVariableBool(gUnbuildPlanID, cGodPowerPlanAutoCast, 0, true); 
@@ -1316,7 +1316,7 @@ rule rUnbuild
     aiPlanSetVariableInt(gUnbuildPlanID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelUnbuild);
     aiPlanSetVariableFloat(gUnbuildPlanID,  cGodPowerPlanDistance, 0, 40.0);
     aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanUnitTypeID, 0, cUnitTypeLogicalTypeBuildingsNotWalls);
-    aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanCount, 0, 3);
+    aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanCount, 0, 5);
 
     aiPlanSetActive(gUnbuildPlanID);
     xsDisableSelf();
@@ -1954,7 +1954,7 @@ rule rShiftingSand
    inactive
 {
    static int queryID = -1;
-
+   static int Attempt = 0;
    int planID = gShiftingSandPlanID;
    int mainBaseID = kbBaseGetMainID(cMyID);
    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
@@ -1980,18 +1980,15 @@ rule rShiftingSand
 	return;
 
    aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true);
-     
    aiPlanSetVariableInt(planID, cGodPowerPlanQueryID, 0, queryID);
    aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, cPlayerRelationEnemy);
-
    aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, kbUnitGetPosition(kbUnitQueryGetResult(queryID, 0)));
    aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 1, mainBaseLocation);
-
    aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 1);
    aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
-
    aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelDualLocation);
-   if(aiCastGodPowerAtPosition(aiGetGodPowerTechIDForSlot(1), kbUnitGetPosition(kbUnitQueryGetResult(queryID, 0))) == true)
+   Attempt = Attempt + 1;
+   if (Attempt >= 3)
    xsDisableSelf();
 }
 
@@ -2173,89 +2170,6 @@ inactive
 			}
 		}
 	}
-}
-
-//==============================================================================
-// rTsunami
-// When to cast Tsunami:
-// - Enemy town
-// - Enough enemy buildings and units
-// Then we want to know how to cast Tsunami:
-// - In the direction of the houses
-// This is gonna be ugly
-//==============================================================================
-rule rTsunami
-minInterval 25
-inactive
-{
-	static int enemyTownQuery = -1;
-	static int enemyUnitsQuery = -1;
-	static int directionQuery = -1;
-	float townRange = 25;
-	int numReqUnits = 10;
-	if(enemyTownQuery == -1)
-	{
-		enemyTownQuery = kbUnitQueryCreate("Enemy Town Query");
-		kbUnitQuerySetPlayerID(enemyTownQuery, cMyID);
-		kbUnitQuerySetPlayerRelation(enemyTownQuery, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyTownQuery, cUnitTypeAbstractSettlement);
-		kbUnitQuerySetState(enemyTownQuery, cUnitStateAlive);
-	}
-	if(enemyUnitsQuery == -1)
-	{
-		enemyUnitsQuery = kbUnitQueryCreate("Enemy Units Query");
-		kbUnitQuerySetPlayerID(enemyUnitsQuery, cMyID);
-		kbUnitQuerySetSeeableOnly(enemyUnitsQuery, true);
-		kbUnitQuerySetMaximumDistance(enemyUnitsQuery, 60);
-		kbUnitQuerySetPlayerRelation(enemyUnitsQuery, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyUnitsQuery, cUnitTypeLogicalTypeBuildingsNotWalls);
-		kbUnitQuerySetState(enemyUnitsQuery, cUnitStateAliveOrBuilding);
-	}
-	if(directionQuery == -1)
-	{
-		directionQuery = kbUnitQueryCreate("Enemy Tower Query");
-		kbUnitQuerySetPlayerID(directionQuery, cMyID);
-		kbUnitQuerySetPlayerRelation(directionQuery, cPlayerRelationEnemy);
-		kbUnitQuerySetState(directionQuery, cUnitStateAlive);
-	}
-	int numTowns = kbUnitQueryExecute(enemyTownQuery);
-	for(i=0;< numTowns)
-	{
-		vector position = kbUnitGetPosition(kbUnitQueryGetResult(enemyTownQuery,i));
-		kbUnitQueryResetResults(enemyUnitsQuery);
-		kbUnitQuerySetPosition(enemyUnitsQuery, position);
-		kbUnitQuerySetMaximumDistance(enemyUnitsQuery,townRange);
-		if(kbUnitQueryExecute(enemyUnitsQuery)>=numReqUnits)
-		{
-			// Valid town
-			// Now get a good direction... I guess players and AI all love towers so lets try and nuke those
-			kbUnitQueryResetResults(directionQuery);
-			kbUnitQuerySetUnitType(directionQuery, cUnitTypeTower);
-			kbUnitQuerySetPosition(directionQuery, position);
-			kbUnitQuerySetMaximumDistance(directionQuery,townRange);
-			int numBuildings = kbUnitQueryExecute(directionQuery);
-			if(numBuildings==0)// Try other military buildings :/
-			{
-				kbUnitQueryResetResults(directionQuery);
-				kbUnitQuerySetUnitType(directionQuery, cUnitTypeMilitaryBuilding);
-				numBuildings = kbUnitQueryExecute(directionQuery);
-			}
-			if(numBuildings==0)// Still nothing
-			{
-				// This should never happen as we already checked for this but maybe in the nanosecond all the buildings died...
-				continue;// Better luck next town
-			}
-			// Okay now the shit that is super easy but is always done in the wrong order... Even by the devs so we have to fix that too
-			// aiCastGodPowerAtPositionFacingPosition() basically faces in the opposite direction because the dev rushed it.
-			vector startPosition = kbUnitGetPosition(kbUnitQueryGetResult(directionQuery,0));
-			// So uhm get the distance between the start and end position do that 2x and subtract it from the realfinalposition
-			vector finalPosition = position - (position-startPosition)*2;
-			if(aiCastGodPowerAtPositionFacingPosition(cTechTsunami,startPosition,finalPosition))
-			xsDisableSelf();
-			
-		}
-	}
-	
 }
 //==============================================================================
 rule rYearOfTheGoat

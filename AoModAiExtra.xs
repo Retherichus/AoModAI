@@ -108,7 +108,7 @@ extern int ModdedTCTimer = 25;
 
 extern int eBoomFood = 600;              // Food
 extern int eBoomGold = 150;              // Gold
-extern int eBoomWood = 150;              // Wood, duh.
+extern int eBoomWood = 100;              // Wood, duh.
 
 
 //Egyptians have their own, because they don't like wood as much.

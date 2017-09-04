@@ -768,7 +768,7 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAlive);
     if (numMarkets > 0)
     {
-        int tradeCount = numTradeUnits + 2;
+        int tradeCount = numTradeUnits;
         if ((kbGetAge() == cAge3) && (tradeCount < 7))
             tradeCount = 7;
         else if ((kbGetAge() > cAge3) && (tradeCount < 15))
@@ -1488,7 +1488,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         if ((numFishBoats < 4) && (kbGetAge() > cAge2) && (numberMainBaseSites < 1) || (numGoldSites < 1))
         {
             foodOverride = true;
-            minFoodGatherers = 21;
+            minFoodGatherers = 20;
             if (cMyCulture == cCultureAtlantean)
                 minFoodGatherers = 8;
         }
@@ -1568,8 +1568,8 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         else if (foodAssignment < lastFoodAssignment)
         {
             foodAssignment = lastFoodAssignment - 0.04;
-			if (foodAssignment < 0.25)
-                foodAssignment = 0.25;
+			if (foodAssignment < 0.30)
+                foodAssignment = 0.30;
         }
     }
 //Test
@@ -1642,7 +1642,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 	 intGold = intGold / 3;
 	 }
      if (ShowAiEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
-     if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+     aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
 
 }
 
@@ -2057,7 +2057,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
     }
 	setMilitaryUnitCostForecast(); // add units before scaling down
     if (cMyCulture == cCultureEgyptian)
-	gWoodForecast = gWoodForecast * 0.7;
+	gWoodForecast = gWoodForecast * 0.8;
 	
     if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
@@ -2065,7 +2065,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 
 //==============================================================================
 rule econForecastAge2		// Rule activates when age 2 research begins, turns off when age 3 research begins
-    minInterval 11
+    minInterval 9
     inactive
 {
     static int ageStartTime = -1;
@@ -2139,28 +2139,24 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     int Armory = cUnitTypeArmory;
     if (cMyCiv == cCivThor)
     Armory = cUnitTypeDwarfFoundry;
-    int numArmories = kbUnitCount(cMyID, Armory, cUnitStateAliveOrBuilding);
 
     if ((kbUnitCount(cMyID, Armory, cUnitStateAliveOrBuilding) < 1) && (cMyCulture != cCultureEgyptian))
     addUnitForecast(Armory, 1);
     
-    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 5*60*1000) && (numArmories > 0))
+    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 5*60*1000))
     {
-        if (goldSupply < 800)
-            gGoldForecast = gGoldForecast + (800 - goldSupply);
-        if (foodSupply < 1200)
-            gFoodForecast = gFoodForecast + (1200 - foodSupply);
-        if (woodSupply < 450) 
-            gWoodForecast = gWoodForecast + (450 - woodSupply);
+        addTechForecast(gAge3MinorGod);
+        if (woodSupply < 250)
+            gWoodForecast = gWoodForecast + (250 - woodSupply);
     }
     else
     {
-        if (goldSupply < 400)
-            gGoldForecast = gGoldForecast + (400 - goldSupply);
-        if (foodSupply < 500)
-            gFoodForecast = gFoodForecast + (500 - foodSupply);
-        if (woodSupply < 450)
-            gWoodForecast = gWoodForecast + (450 - woodSupply);
+        if (goldSupply < 300)
+            gGoldForecast = gGoldForecast + (300 - goldSupply);
+        if (foodSupply < 300)
+            gFoodForecast = gFoodForecast + (300 - foodSupply);
+        if (woodSupply < 300)
+            gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
 	
     // Watchtower
@@ -2247,7 +2243,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     }
 	setMilitaryUnitCostForecast(); // add units before scaling down
 	if (cMyCulture == cCultureEgyptian)
-	gWoodForecast = gWoodForecast * 0.5;
+	gWoodForecast = gWoodForecast * 0.7;
     if ((gWoodForecast > 800) && ((xsGetTime() > (15*60*1000))))
 	gWoodForecast = 800;
 	
@@ -2329,20 +2325,24 @@ if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCul
 	gGoldForecast = egBoomGold+.0;
 	gWoodForecast = egBoomWood+.0;
 }
+    if (cMyCulture == cCultureAtlantean)
+    gGoldForecast = gGoldForecast + 50;
 	
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
     float foodSupply = kbResourceGet(cResourceFood);
-    
+    if  (kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding) < 1)
+		 addUnitForecast(cUnitTypeTemple, 1);
+		 
     if ((woodSupply < 300) && (cMyCulture != cCultureEgyptian))
         gWoodForecast = gWoodForecast + (300 - woodSupply);
 
     if ((gFarming == true) && (cMyCulture == cCultureEgyptian))
     {
-        if (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) < 18)
+        if (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) < 10)
         {
-            if (goldSupply < 300)
-                gGoldForecast = gGoldForecast + (300 - goldSupply);
+            if (goldSupply < 200)
+                gGoldForecast = gGoldForecast + (200 - goldSupply);
         }
     }
     
@@ -3690,7 +3690,7 @@ void init(void)
     }
 
     if (ShowAiEcho == true) aiEcho("gRushCount: "+gRushCount+", gRushSize: "+gRushSize+", gFirstRushSize: "+gFirstRushSize);
-	if ((aiGetWorldDifficulty() > cDifficultyHard) && (gRushCount < 1))
+	if ((aiGetWorldDifficulty() > cDifficultyModerate) && (gRushCount < 1))
 	gRushCount = 1;	
 	
 	if (gRushCount > 2)
@@ -3922,7 +3922,10 @@ void init(void)
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFood, 1.5);
         aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, cResourceFavor, 10.0);
         //Set our farm limits.
-        aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 20);  //  Up from 4
+		if (cMyCulture == cCultureAtlantean)
+		aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 15);
+        else 
+		aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0, 20);  //  Up from 4
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanMaxFarmLimit, 0, 32);     //  Up from 24
         aiSetFarmLimit(aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanFarmLimitPerPlan, 0));
         //Do our late econ init.

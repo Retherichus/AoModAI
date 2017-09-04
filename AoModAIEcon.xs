@@ -10,7 +10,7 @@
 
 //==============================================================================
 rule updateWoodBreakdown
-    minInterval 10
+    minInterval 12
     inactive
 {   
     if (ShowAiEcho == true) aiEcho("updateWoodBreakdown: ");
@@ -40,11 +40,7 @@ rule updateWoodBreakdown
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
 
-     if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-      {
-            if ((foodGathererCount > 2) && (goldGathererCount > 0))
-			woodGathererCount = 1; 
-      }
+
    
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -84,7 +80,7 @@ rule updateWoodBreakdown
     // b) the number of plans active that have resource sites, either main base or wood base.
 
     //Count of sites.
-    int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy);
+    int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy, 85);
     
     int numberWoodBaseSites = 0;
     if ( (gWoodBaseID >= 0) && (gWoodBaseID != mainBaseID) )    // Count wood base if different
@@ -95,12 +91,12 @@ rule updateWoodBreakdown
 
     int desiredWoodPlans = 1 + (woodGathererCount/12);
 	if (cMyCulture == cCultureAtlantean)
-	desiredWoodPlans = 1 + (woodGathererCount/4);
+	desiredWoodPlans = 1 + (woodGathererCount/5);
 	
 	if (xsGetTime() < 8*60*1000)
     desiredWoodPlans = 1;
     
-	if (desiredWoodPlans > 2)
+	if (desiredWoodPlans >= 2)
 	desiredWoodPlans = 2;
 
     if (woodGathererCount < desiredWoodPlans)
@@ -131,7 +127,10 @@ rule updateWoodBreakdown
 
         if (numberWoodBaseSites > 0)  // We do have remote wood
         {
-            aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 0.2, gWoodBaseID);
+            if (gTransportMap == true)
+                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+            else
+                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
             aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
         }
         else  // No remote wood...bummer.  Kill old breakdown, look for more
@@ -146,7 +145,10 @@ rule updateWoodBreakdown
             if (gWoodBaseID >= 0)
             {
                 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
-                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 0.2, gWoodBaseID);
+                if (gTransportMap == true)
+                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 1.0, gWoodBaseID);
+                else
+                    aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, 0.2, gWoodBaseID);
             }
             else
             {
@@ -162,7 +164,7 @@ rule updateWoodBreakdown
 
         if (numberWoodBaseSites >= desiredWoodPlans)  // We have enough remote wood
         {
-            aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 0.2, gWoodBaseID);
+            aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans, woodPriority, 1.0, gWoodBaseID);
             aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
         }
         else if (numberWoodBaseSites > 0)   // We have some, but not enough
@@ -234,11 +236,7 @@ rule updateGoldBreakdown
         numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
     int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
 
-   if ((kbGetAge() < cAge2) && (cMyCulture == cCultureAtlantean) && (gHuntingDogsASAP == true) && (ConfirmFish == false))
-   {
-            if (foodGathererCount > 1)
-			goldGathererCount = 1;      
-   } 
+
    
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
@@ -290,7 +288,7 @@ rule updateGoldBreakdown
 	if (cMyCulture == cCultureAtlantean)
 	desiredGoldPlans = 1 + (goldGathererCount/4);
 
-	if (desiredGoldPlans > 2)
+	if (desiredGoldPlans >= 2)
 	desiredGoldPlans = 2;
 
    if (xsGetTime() < 11*60*1000)
@@ -326,7 +324,7 @@ rule updateGoldBreakdown
         if (numberGoldBaseSites > 0)  // We do have remote gold
         {
 
-            aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans, goldPriority, 0.2, gGoldBaseID);
+            aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
             aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);
         }
         else  // No remote gold...bummer.  Kill old breakdown, look for more
@@ -340,7 +338,7 @@ rule updateGoldBreakdown
             if (gGoldBaseID >= 0)
             {
                 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);      // We can have the full amount
-                aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans, goldPriority, 1.0, gGoldBaseID);
+                aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, 1.0, gGoldBaseID);
             }
             else
             {
@@ -416,8 +414,8 @@ rule updateFoodBreakdown
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
     
 	float distance = gMaximumBaseResourceDistance;
-	if (xsGetTime() > 12*60*1000)
-	distance = 45;
+	if ((kbGetAge() >= cAge3) || (xsGetTime() > 13*60*1000))
+	distance = 50;
 	
     //Get the number of valid resources spots.
     int numberAggressiveResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
@@ -442,6 +440,8 @@ rule updateFoodBreakdown
 		{ 
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
 	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, 85);
+		if (HippoNearMB == 0)
+		HippoNearMB = getNumUnits(cUnitTypeBoar, cUnitStateAny, 0, 0, mainBaseLocation, 65);
 		if ((HippoNearMB > 1) && (cMyCulture != cCultureAtlantean))
 		aiSetMinNumberNeedForGatheringAggressvies(4);
 		if ((HippoNearMB > 1) && (cMyCulture == cCultureAtlantean))
@@ -460,6 +460,8 @@ rule updateFoodBreakdown
     }
     
     int numberEasyResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, distance);
+	if ((xsGetTime() < 15*60*1000) && (kbGetAge() < cAge3))
+    numberEasyResourceSpots = numberEasyResourceSpots + 1;
     int totalNumberResourceSpots = numberAggressiveResourceSpots + numberEasyResourceSpots;
    
     // Only do one aggressive site at a time, they tend to take lots of gatherers
@@ -678,10 +680,22 @@ rule updateFoodBreakdown
     {
         unassigned = unassigned - farmerReserve;
     }
-
+	
+	float aggressiveAmount = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
+    float easyAmount = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, distance);
+	float totalAmount = aggressiveAmount + easyAmount;
+    int numAggrResourceSpotsInR70 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, 70.0);
+    int numEasyResourceSpotsInR70 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 70.0);
+    int numResourceSpotsInR70 = numAggrResourceSpotsInR70 + numEasyResourceSpotsInR70;
+	
+    if ((xsGetTime() > 9*60*1000) && (woodSupply > 300) && (cRandomMapName == "tundra") || (aiGetGameMode() == cGameModeLightning) || (aiGetGameMode() == cGameModeDeathmatch))
+        totalAmount = 200; 
+		
     int TempleUp = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
     if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)) && (TempleUp > 0))   // can build farms
     {
+	if ((totalAmount < 1500) || (gFarming == true) || (kbGetAge() > cAge2) || (numResourceSpotsInR70 < 2) && (xsGetTime() > 6*60*1000) || (xsGetTime() > 8.5*60*1000))
+	{
         if (cMyCulture == cCultureAtlantean)
         {
           farmerPreBuild = 2;
@@ -708,6 +722,7 @@ rule updateFoodBreakdown
             }
         }
     }
+	}
     
     int numPlansWanted = 1 + unassigned/12;
     if (cMyCulture == cCultureAtlantean)
@@ -750,7 +765,7 @@ rule updateFoodBreakdown
     if (cMyCulture == cCultureChinese)
         minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() - 1;		
 		
-     if ((xsGetTime() < 1*50*1000) && (cMyCulture != cCultureAtlantean))
+     if ((xsGetTime() < 1*50*1000) && (cMyCulture != cCultureAtlantean) && (cvRandomMapName != "erebus"))
 	 numberAggressiveResourceSpots = 0;
 	 
     // Start a new plan if we have enough villies and we have the resource.
@@ -811,8 +826,8 @@ rule updateFoodBreakdown
     }  	
 	if (kbGetAge() < cAge2)
 	{
-	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, mainBaseLocation, 45);
-	float easyHunt = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 45);
+	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, mainBaseLocation, 55);
+	float easyHunt = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 55);
 	if ((easyHunt > 50) && (Chickens <= 0))
 	{
     numberAggressiveResourceSpots = 0;	

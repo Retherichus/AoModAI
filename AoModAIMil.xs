@@ -454,7 +454,7 @@ rule monitorAttPlans
             if (attackPlanID == gEnemySettlementAttPlanID)
             {
                 static int countA = 0;
-                float distanceA = 30.0;
+                float distanceA = 45.0;
                 if (ShowAiEcho == true) aiEcho("gEnemySettlementAttPlanID:  "+attackPlanID+"");
 				if (ShowAiEcho == true) aiEcho("NumInPlan:  "+numMilUnitsInPlan+"");
                 if (killSettlementAttPlanCount != -1)
@@ -572,7 +572,7 @@ rule monitorAttPlans
                     }
                     
                     // Check to see if the gather phase is taking too long and just launch the attack if so.
-                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 10*1000))
+                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 1*20*1000))
                     {
                         if ((numEnemyMilUnitsNearMBInR70 > 10) || (numEnemyMilUnitsNearDefBInR40 > 6))
                         {
@@ -583,7 +583,7 @@ rule monitorAttPlans
                         {
                             if (countA < 0)
                                 countA = 0;
-                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceA + countA * 10);
+                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceA + countA * 12);
                             countA = countA + 1;
                         }
                     }
@@ -694,7 +694,7 @@ rule monitorAttPlans
                         aiPlanSetDesiredPriority(attackPlanID, 50);
                     }
                     
-                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 10*1000))
+                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 1*20*1000))
                     {
                         if ((numEnemyMilUnitsNearMBInR85 > 6) || (numEnemyMilUnitsNearDefBInR50 > 6))
                         {
@@ -703,7 +703,7 @@ rule monitorAttPlans
                         }
                         else
                         {
-                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceB + countB * 5);
+                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceB + countB * 7);
                             countB = countB + 1;
                         }
                     }
@@ -817,7 +817,7 @@ rule monitorAttPlans
             else if (attackPlanID == gLandAttackPlanID)
             {
                 static int countD = 0;
-                float distanceD = 25.0;
+                float distanceD = 45.0;
                 if (ShowAiEcho == true) aiEcho("gLandAttackPlanID:  "+attackPlanID+"");
 				if (ShowAiEcho == true) aiEcho("NumInPlan:  "+numMilUnitsInPlan+"");
                 if (killLandAttPlanCount != -1)
@@ -893,7 +893,7 @@ rule monitorAttPlans
                         aiPlanSetDesiredPriority(attackPlanID, 50);
                     }
                     
-                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 10*1000))
+                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 1*20*1000))
                     {
                         if ((numEnemyMilUnitsNearMBInR85 > 14) || (numEnemyMilUnitsNearDefBInR50 > 14))
                         {
