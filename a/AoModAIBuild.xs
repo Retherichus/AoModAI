@@ -2997,6 +2997,7 @@ rule buildTowerAtOtherBase
         aiPlanSetDesiredPriority(buildTowerAtOtherBasePlanID, 100);
         aiPlanSetVariableBool(buildTowerAtOtherBasePlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
         aiPlanSetVariableFloat(buildTowerAtOtherBasePlanID, cBuildPlanRandomBPValue, 0, 0.99);
+        
         aiPlanSetVariableVector(buildTowerAtOtherBasePlanID, cBuildPlanCenterPosition, 0, otherBaseLocation);
         aiPlanSetVariableFloat(buildTowerAtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 13.0);
         aiPlanAddUnitType(buildTowerAtOtherBasePlanID, builderType, 1, 1, 1);
@@ -3055,7 +3056,7 @@ rule buildBuildingsAtOtherBase
 
     //return if we already have a building1 at the other base
     int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
-    if ((cMyCulture == cCultureEgyptian)|| (cMyCulture == cCultureNorse))
+    if (cMyCulture == cCultureEgyptian)
     {
         if (numBuilding1NearBase > 1)
             return;
@@ -3072,6 +3073,8 @@ rule buildBuildingsAtOtherBase
                 else 
                 building1ID = cUnitTypeArcheryRange;
 	    }
+        if (cMyCulture == cCultureNorse)
+        building1ID = cUnitTypeLonghouse;
         if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
         if (cMyCulture == cCultureChinese)
@@ -3083,10 +3086,9 @@ rule buildBuildingsAtOtherBase
          numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
         }
     }
-    if (numBuilding1NearBase > 0)
-    return;		
 	}
-
+        if (numBuilding1NearBase > 0)
+		return;	
     
     float buffer = 20.0;
     if (cRandomMapName == "jotunheim")

@@ -129,7 +129,7 @@ extern int RethLGWAge4 = 800;              // Wood
 //Age 2 (Classical Age)
 extern int RethLEFAge2 = 650;              // Food
 extern int RethLEGAge2 = 550;              // Gold
-extern int RethLEWAge2 = 250;              // Wood
+extern int RethLEWAge2 = 200;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -224,8 +224,6 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetRelicEventHandler("relicHandler");
 	aiSetRetreatEventHandler("retreatHandler");
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
-	if (cMyCulture != cCultureAtlantean)
-	aiSetMinNumberNeedForGatheringAggressvies(7);
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
@@ -386,6 +384,7 @@ rule ActivateRethOverridesAge1
    active
    runImmediately
 {
+        initRethlAge1();
 		if (gHuntingDogsASAP == true)
 		xsEnableRule("HuntingDogsAsap");
 		
@@ -642,6 +641,7 @@ rule ActivateRethOverridesAge4
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeTridentSoldier, 0.6+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeArcherAtlantean, 0.7+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(5));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeSwordsman, 0.2);
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMaceman, 0.05);
 		}		
 		//

@@ -10,7 +10,7 @@
 
 //==============================================================================
 rule updateWoodBreakdown
-    minInterval 20
+    minInterval 12
     inactive
 {   
     if (ShowAiEcho == true) aiEcho("updateWoodBreakdown: ");
@@ -31,18 +31,17 @@ rule updateWoodBreakdown
         randomBaseID = mainBaseID;
     }
         
-    int woodPriority=50;
+    int woodPriority=45;
     if (cMyCulture == cCultureEgyptian)
-	   woodPriority=55;
+        woodPriority=40;
 
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
     int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
-    int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy, 85);
-    if ((woodGathererCount <= 0) && (closeMainBaseSites > 0) && (kbGetAge() < cAge3)) //always some units on wood,
-        woodGathererCount = 1;
 
+
+   
 //Test
     //if we lost a lot of villagers, keep them close to our settlements (=farming)
     int minVillagers = 14;
@@ -57,6 +56,7 @@ rule updateWoodBreakdown
 		int Wanted = 2;
 		if (cMyCulture == cCultureAtlantean)
 		Wanted = 1;
+		int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy, 85);
 	    if ((cMyCulture == cCultureAtlantean) && (numVillagers >= 2) && (kbCanAffordUnit(gathererPUID, cEconomyEscrowID) == false) && (closeMainBaseSites > 0)
 		|| (cMyCulture != cCultureAtlantean) && (numVillagers >= 5) && (closeMainBaseSites > 0))
         woodGathererCount = Wanted;
@@ -197,7 +197,7 @@ rule updateWoodBreakdown
 
 //==============================================================================
 rule updateGoldBreakdown
-    minInterval 23
+    minInterval 10
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateGoldBreakdown: ");
@@ -220,9 +220,7 @@ rule updateGoldBreakdown
     }
     float goldSupply = kbResourceGet(cResourceGold);
         
-   int goldPriority=49; // Lower than wood for non-Egyptians
-   if (cMyCulture == cCultureEgyptian)    // Higher than Egyptian wood
-      goldPriority=56;
+   int goldPriority=56; // Testing
 
 
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
@@ -237,9 +235,7 @@ rule updateGoldBreakdown
     if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
         numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
     int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
-    int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy, 65);
-    if ((goldGathererCount <= 0) && (closeMainBaseSites > 0) && (kbGetAge() < cAge3)) //always some units on gold.
-        goldGathererCount = 1;
+
 
    
 //Test
@@ -255,6 +251,7 @@ rule updateGoldBreakdown
 		int Wanted = 2;
 		if (cMyCulture == cCultureAtlantean)
 		Wanted = 1;
+		int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy, 65);
 	    if ((cMyCulture == cCultureAtlantean) && (numVillagers >= 3) && (closeMainBaseSites > 0)
 		|| (cMyCulture != cCultureAtlantean) && (numVillagers >= 5) && (closeMainBaseSites > 0))
         goldGathererCount = Wanted;
@@ -417,9 +414,7 @@ rule updateFoodBreakdown
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
     
 	float distance = gMaximumBaseResourceDistance;
-	if (kbGetAge() == cAge1)
-	distance = 95;
-	if ((kbGetAge() >= cAge3) || (xsGetTime() > 15*60*1000))
+	if (kbGetAge() >= cAge3)
 	distance = 50;
 	
     //Get the number of valid resources spots.
@@ -445,8 +440,6 @@ rule updateFoodBreakdown
 		{ 
 		// Force early aggressive hunting for these, as they are not likely to kill a villager.
 	    int HippoNearMB = getNumUnits(cUnitTypeHippo, cUnitStateAny, 0, 0, mainBaseLocation, 85);
-		if (HippoNearMB == 0)
-		HippoNearMB = getNumUnits(cUnitTypeBoar, cUnitStateAny, 0, 0, mainBaseLocation, 65);
 		if ((HippoNearMB > 1) && (cMyCulture != cCultureAtlantean))
 		aiSetMinNumberNeedForGatheringAggressvies(4);
 		if ((HippoNearMB > 1) && (cMyCulture == cCultureAtlantean))
@@ -478,12 +471,14 @@ rule updateFoodBreakdown
     int gathererCount = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
     
+    bool modifiedFoodGathererCount = false;
     if (foodGathererCount <= 0) //always some units on food
     {
         if (totalNumberResourceSpots > 0)
             foodGathererCount = 2;
         else
             foodGathererCount = 1;     // Avoid div 0
+        modifiedFoodGathererCount = true;
     }
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
@@ -515,6 +510,7 @@ rule updateFoodBreakdown
     if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
     {
         foodGathererCount = desiredFarmers + (numSettlements - 1);
+        modifiedFoodGathererCount = true;
     }
 
     MoreFarms = desiredFarmers; // Update build more farms
@@ -682,18 +678,10 @@ rule updateFoodBreakdown
     {
         unassigned = unassigned - farmerReserve;
     }
-	
-	float aggressiveAmount = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, distance);
-    float easyAmount = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, distance);
-	float totalAmount = aggressiveAmount + easyAmount;
-	
-    if ((xsGetTime() > 9*60*1000) && (woodSupply > 300) && (cRandomMapName == "tundra") || (aiGetGameMode() == cGameModeLightning) || (aiGetGameMode() == cGameModeDeathmatch))
-        totalAmount = 200; 
-		
+
     int TempleUp = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
-    if ((kbGetAge() > cAge1) && (xsGetTime() > 8*60*1000) || (kbGetAge() > cAge1) && (easyAmount < 800) || 
-	(cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000) && (TempleUp > 0) && (easyAmount < 800) || (gFarming == true))   // can build farms
-	{
+    if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)) && (TempleUp > 0))   // can build farms
+    {
         if (cMyCulture == cCultureAtlantean)
         {
           farmerPreBuild = 2;
@@ -720,18 +708,19 @@ rule updateFoodBreakdown
             }
         }
     }
-	
     
     int numPlansWanted = 1 + unassigned/12;
     if (cMyCulture == cCultureAtlantean)
         numPlansWanted = 1 + unassigned/4;
     
-    int farmThreshold = 10;
+    int farmThreshold = 9;
     if (cMyCulture == cCultureAtlantean)
-        farmThreshold = 4;
+        farmThreshold = 3;
     
     if ((gFarming == true) && (farmerReserve >= farmThreshold))
-        numPlansWanted = 1;	
+        numPlansWanted = 1;
+    if ((gFarming == true) && (farmerReserve >= farmThreshold*2))
+        numPlansWanted = 0;		
 
     int numTemples = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding);
     int houseProtoID = cUnitTypeHouse;
@@ -743,14 +732,7 @@ rule updateFoodBreakdown
         numPlansWanted = 1;
 
     if (unassigned <= 0)
-    {
-        if (kbGetAge() < cAge3)
-        {
-            unassigned = 1;
-        }
-        else
-            numPlansWanted = 0;
-    }
+       numPlansWanted = 0;
     
 
     if (numPlansWanted > totalNumberResourceSpots)
@@ -764,9 +746,11 @@ rule updateFoodBreakdown
     int numPlansUnassigned = numPlansWanted;
     int minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() - 2;    // Don't start a new aggressive plan unless we have this many vills...buffer above strict minimum.
     if (cMyCulture == cCultureAtlantean)
-        minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() + 0;		
+        minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() + 0;
+    if (cMyCulture == cCultureChinese)
+        minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() - 1;		
 		
-     if ((xsGetTime() < 1*50*1000) && (cMyCulture != cCultureAtlantean) && (cvRandomMapName != "erebus"))
+     if ((xsGetTime() < 1*50*1000) && (cMyCulture != cCultureAtlantean))
 	 numberAggressiveResourceSpots = 0;
 	 
     // Start a new plan if we have enough villies and we have the resource.
@@ -804,7 +788,7 @@ rule updateFoodBreakdown
     }
 
     // If we still have some unassigned, and we're in the first age, and we're not egyptian, try to dump them into a plan.
-    if ((kbGetAge() == cAge1) && (unassigned > 0) && (cMyCulture != cCultureEgyptian) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching))
+    if ((kbGetAge() == cAge1) && (unassigned > 0) && (cMyCulture != cCultureEgyptian))
     {
         if ((aggHunters > 0) && (unassigned > 0))
         {
@@ -827,8 +811,8 @@ rule updateFoodBreakdown
     }  	
 	if (kbGetAge() < cAge2)
 	{
-	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, mainBaseLocation, 55);
-	float easyHunt = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 55);
+	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, mainBaseLocation, 45);
+	float easyHunt = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 45);
 	if ((easyHunt > 50) && (Chickens <= 0))
 	{
     numberAggressiveResourceSpots = 0;	
@@ -1523,13 +1507,26 @@ rule setEarlyEcon   //Initial econ is set to all food, below.  This changes it t
     float goldGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceGold);
     float favorGPct=aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFavor);
 
+    if ((gWaterMap == true && RethFishEco == true && ConfirmFish == true) || (aiGetGameMode() == cGameModeDeathmatch))
+	{
+    xsDisableSelf();
+	if (ShowAiEcho == true || ShowAiEcoEcho == true) aiEcho("Found fish! Looks like we're going fishing then!");
+	
+	aiSetResourceGathererPercentage(cResourceFood, foodGPct, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceWood, woodGPct, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceGold, goldGPct, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceFavor, favorGPct, false, cRGPScript);
+    aiNormalizeResourceGathererPercentages(cRGPScript);
+	xsEnableRule("econForecastAge1");
+	return;
+	}
 	
 	
 	if (ShowAiEcho == true) aiEcho("setEarlyEcon: ");
     int gathererCount = kbUnitCount(cMyID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer, 0), cUnitStateAlive);
 
     if (cMyCulture == cCultureAtlantean)
-        gathererCount = 6; // just go
+        gathererCount = gathererCount * 3;
 	  
     gathererCount = gathererCount + kbUnitCount(cMyID, cUnitTypeDwarf, cUnitStateAlive);
     gathererCount = gathererCount + kbUnitCount(cMyID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0), cUnitStateAlive);
@@ -1691,7 +1688,7 @@ rule fishing
 	return;
 	}
 	
-    if ((gTransportMap == true) || (cRandomMapName == "anatolia") && (gWaterExploreID == -1))
+    if (((gTransportMap == true) || RethFishEco == true || (cRandomMapName == "anatolia")) && (gWaterExploreID == -1))
     {
         //Make a plan to explore with the water scout.
         gWaterExploreID = aiPlanCreate("Explore_Water", cPlanExplore);
