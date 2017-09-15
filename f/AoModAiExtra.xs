@@ -640,6 +640,7 @@ rule ActivateRethOverridesAge4
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeTridentSoldier, 0.6+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeArcherAtlantean, 0.7+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(5));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMaceman, 0.05);
 		}		
 		//
 		

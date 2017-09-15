@@ -127,6 +127,48 @@ rule getNecropolis
 
 //Bast
 //==============================================================================
+// RULE: getAdzeOfWepwawet
+//==============================================================================
+rule getAdzeOfWepwawet
+    inactive
+    minInterval 27
+    group Bast
+{
+    if (gAgeFaster == true && kbGetAge() < AgeFasterStop)
+        return;
+    if (kbGetTechStatus(cTechAdzeofWepwawet) == cTechStatusAvailable)
+    {
+        int x=-1;
+        x = aiPlanCreate("AdzeOfWepwawet", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechAdzeofWepwawet);
+        aiPlanSetDesiredPriority(x, 25);
+        aiPlanSetActive(x);
+        xsDisableSelf();
+        if (ShowAiEcho == true) aiEcho("Getting AdzeOfWepwawet");
+    }
+}
+
+//==============================================================================
+// RULE: getSacredCats
+//==============================================================================
+rule getSacredCats
+    inactive
+    minInterval 29
+    group Bast
+{
+    if (kbGetTechStatus(cTechSacredCats) == cTechStatusAvailable)
+    {
+        int x=-1;
+        x = aiPlanCreate("SacredCats", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechSacredCats);
+        aiPlanSetDesiredPriority(x, 25);
+        aiPlanSetActive(x);
+        xsDisableSelf();
+        if (ShowAiEcho == true) aiEcho("Getting SacredCats");
+    }
+}
+
+//==============================================================================
 // RULE: getCriosphinx
 //==============================================================================
 rule getCriosphinx
@@ -464,7 +506,7 @@ rule getNewKingdom
     if (kbGetTechStatus(cTechNewKingdom) == cTechStatusAvailable)
     {
         int x=-1;
-        x = aiPlanCreate("NewKingdom", cPlanResearch);
+        x = aiPlanCreate("AtefCrown", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechNewKingdom);
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetActive(x);
@@ -492,3 +534,5 @@ rule getBookofThoth
         if (ShowAiEcho == true) aiEcho("Getting BookofThoth");
     }
 }
+
+

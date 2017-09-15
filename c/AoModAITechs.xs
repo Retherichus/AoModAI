@@ -125,8 +125,12 @@ rule getArchitects
         }
         return;
     }
+    static int ruleStartTime = -1;
+    
+    if (ruleStartTime == -1)
+        ruleStartTime = xsGetTime();
         
-    if ((gBuildTowers == true) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching))
+    if ((gBuildTowers == true) && ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) || (xsGetTime() - ruleStartTime < 2*60*1000)))
         return;
     
     if (kbGetAge() == cAge3)
@@ -136,9 +140,68 @@ rule getArchitects
     }
     else
     {
-        if ((foodSupply < 400) || (woodSupply < 500))
-        return;
+        bool milUpgradesResearched = false;
+        bool armUpgradesResearched = false;
+        if (cMyCulture == cCultureEgyptian)
+        {
+            if ((kbGetTechStatus(cTechChampionAxemen) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechChampionSpearmen) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechChampionSlingers) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechChampionChariots) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechChampionCamelry) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechChampionElephants) >= cTechStatusResearching))
+            {
+                milUpgradesResearched = true;
+            }
+        }
+        else
+        {
+            if ((kbGetTechStatus(cTechChampionInfantry) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechChampionCavalry) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechChampionArchers) >= cTechStatusResearching))
+            {
+                milUpgradesResearched = true;
+            }
+            if (cMyCulture == cCultureAtlantean)
+            {
+                if (kbGetTechStatus(cTechChampionChieroballista) < cTechStatusResearching)
+                {
+                    milUpgradesResearched = false;
+                }
+            }
+        }
         
+        if (cMyCiv == cCivThor)
+        {
+            if ((kbGetTechStatus(cTechMeteoricIronMail) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechDragonscaleShields) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechBurningPitchThor) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechHammeroftheGods) >= cTechStatusResearching))
+            {
+                armUpgradesResearched = true;
+            }
+        }
+        else
+        {
+            if ((kbGetTechStatus(cTechIronMail) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechIronShields) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechBurningPitch) >= cTechStatusResearching)
+             || (kbGetTechStatus(cTechIronWeapons) >= cTechStatusResearching))
+            {
+                armUpgradesResearched = true;
+            }
+        }
+        
+        if ((milUpgradesResearched == false) || (armUpgradesResearched == false))
+        {
+            if ((foodSupply < 800) || (woodSupply < 1000))
+                return;
+        }
+        else
+        {
+            if ((foodSupply < 400) || (woodSupply < 500))
+                return;
+        }
     }
 
     if (kbGetTechStatus(techID) < cTechStatusResearching)
@@ -232,8 +295,10 @@ rule getEnclosedDeck
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
     
+    if ((foodSupply < 400) || (woodSupply < 400))
+        return;
         
-    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetAge() == cAge2) || (foodSupply < 400) || (woodSupply < 400))
+    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetAge() == cAge2))
         return;
 
     int enclosedDeckID=aiPlanCreate("getEnclosedDeck", cPlanProgression);
@@ -342,7 +407,7 @@ rule getHusbandry
     inactive
 {
     int techID = cTechHusbandry;
-    if ((kbGetTechStatus(techID) > cTechStatusResearching) || (cMyCulture == cCultureAtlantean))
+    if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
         xsDisableSelf();
         return;
@@ -368,6 +433,8 @@ rule getHusbandry
     }
     
     int buildingType = cUnitTypeGranary;
+    if (cMyCulture == cCultureAtlantean)
+        buildingType = cUnitTypeGuild;
     else if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
     else if (cMyCulture == cCultureChinese)
@@ -383,7 +450,7 @@ rule getHusbandry
     int numHerdables = kbUnitCount(cMyID, cUnitTypeHerdable);     
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
-    if ((woodSupply < 200) || (goldSupply < 110) || (kbGetTechStatus(cTechPickaxe) < cTechStatusResearching) || (kbGetTechStatus(cTechHandAxe) < cTechStatusResearching))
+    if ((woodSupply < 200) || (goldSupply < 110) || (kbGetTechStatus(cTechPickaxe) < cTechStatusResearching) || (kbGetTechStatus(cTechHandAxe) < cTechStatusResearching) || (cMyCulture == cCultureAtlantean) && (numHerdables < 5))
         return;
        
     if ((gHuntersExist == true) && (kbGetTechStatus(cTechHuntingDogs) < cTechStatusResearching))
@@ -673,6 +740,57 @@ rule getHuntingDogs
     if (ShowAiEcho == true) aiEcho("numAggressivePlans: "+numAggressivePlans);
     if (numAggressivePlans > 0)
         count = numAggressivePlans;
+    
+    int unitType = -1;
+    if (cMyCulture == cCultureNorse)
+        unitType = cUnitTypeOxCart;
+    else if (cMyCulture == cCultureAtlantean)
+        unitType = cUnitTypeVillagerAtlantean;
+    if (count < 1)
+    {
+        int activeGatherPlans = aiPlanGetNumber(cPlanGather, cPlanStateGather, true);
+        for (i = 0; < activeGatherPlans)
+        {
+            int foodGatherPlanID = aiPlanGetIDByIndex(cPlanGather, cPlanStateGather, true, i);
+            int resourceID = aiPlanGetVariableInt(foodGatherPlanID, cGatherPlanResourceID, 0);
+            if (resourceID == cResourceFood)
+            {
+                //if (ShowAiEcho == true) aiEcho("*___hunting dogs check");
+                int dropsiteID = aiPlanGetVariableInt(foodGatherPlanID, cGatherPlanDropsiteID, 0);
+                if ((cMyCulture == cCultureNorse) || (cMyCulture == cCultureAtlantean))
+                {
+                    int numUnitsInThePlan = aiPlanGetNumberUnits(foodGatherPlanID, cUnitTypeUnit);
+                    for (j = 0; < numUnitsInThePlan)
+                    {
+                        int unitID = aiPlanGetUnitByIndex(foodGatherPlanID, j);
+                        if (kbUnitIsType(unitID, unitType) == true)
+                        {
+                            dropsiteID = unitID;
+                            if (cMyCulture == cCultureNorse)
+                                if (ShowAiEcho == true) aiEcho("unit is an ox cart, ID is: "+dropsiteID+", breaking off");
+                            else if (cMyCulture == cCultureAtlantean)
+                                if (ShowAiEcho == true) aiEcho("unit is an Atlantean villager, ID is: "+dropsiteID+", breaking off");
+                            break;
+                        }
+                    }
+                }
+                if (dropsiteID != -1)
+                {
+                    vector dropsiteLocation = kbUnitGetPosition(dropsiteID);
+                    if (ShowAiEcho == true) aiEcho("dropsiteLocation: "+dropsiteLocation);
+                    float distance = 15.0;
+                    if (cMyCulture == cCultureNorse)
+                        distance = 20.0;
+                    int numHuntAnimals = getNumUnits(cUnitTypeHuntable, cUnitStateAlive, -1, 0, dropsiteLocation, distance + 2);
+                    int numWildCrops = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, dropsiteLocation, distance);
+                    if (ShowAiEcho == true) aiEcho("numHuntAnimals: "+numHuntAnimals);
+                    if (ShowAiEcho == true) aiEcho("numWildCrops: "+numWildCrops);
+                    if ((numHuntAnimals > 0) && (numWildCrops < 1))
+                        count = count + 1;
+                }
+            }
+        }
+    }
     
     if (count < 1)  //we have no hunters
     {

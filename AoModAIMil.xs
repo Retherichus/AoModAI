@@ -87,13 +87,10 @@ rule monitorDefPlans
                         aiPlanAddUnitType(defendPlanID, cUnitTypeLogicalTypeLandMilitary, 0, 0, 1);
                     
                     if ((secondsUnderAttack > 0) || (enemyMilUnitsInR80 > 8))
-                        aiPlanSetDesiredPriority(defendPlanID, 54);
+                        aiPlanSetDesiredPriority(defendPlanID, 50);
                     else
                     {
-                        if (kbGetAge() > cAge3)
                             aiPlanSetDesiredPriority(defendPlanID, 38); //TODO: find the best value
-                        else
-                            aiPlanSetDesiredPriority(defendPlanID, 40);
                     }
                     
                     //override if there is an enemy Titan near our main base
@@ -454,7 +451,7 @@ rule monitorAttPlans
             if (attackPlanID == gEnemySettlementAttPlanID)
             {
                 static int countA = 0;
-                float distanceA = 45.0;
+                float distanceA = 30.0;
                 if (ShowAiEcho == true) aiEcho("gEnemySettlementAttPlanID:  "+attackPlanID+"");
 				if (ShowAiEcho == true) aiEcho("NumInPlan:  "+numMilUnitsInPlan+"");
                 if (killSettlementAttPlanCount != -1)
@@ -583,7 +580,7 @@ rule monitorAttPlans
                         {
                             if (countA < 0)
                                 countA = 0;
-                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceA + countA * 12);
+                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceA + countA * 10);
                             countA = countA + 1;
                         }
                     }
@@ -703,7 +700,7 @@ rule monitorAttPlans
                         }
                         else
                         {
-                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceB + countB * 7);
+                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceB + countB * 5);
                             countB = countB + 1;
                         }
                     }
@@ -817,7 +814,7 @@ rule monitorAttPlans
             else if (attackPlanID == gLandAttackPlanID)
             {
                 static int countD = 0;
-                float distanceD = 45.0;
+                float distanceD = 25.0;
                 if (ShowAiEcho == true) aiEcho("gLandAttackPlanID:  "+attackPlanID+"");
 				if (ShowAiEcho == true) aiEcho("NumInPlan:  "+numMilUnitsInPlan+"");
                 if (killLandAttPlanCount != -1)
@@ -1589,12 +1586,12 @@ rule otherBasesDefPlans //Make defend plans that protect the other bases
 
 //==============================================================================
 rule attackEnemySettlement
-    minInterval 18 //starts in cAge2
+    minInterval 15 //starts in cAge2
     inactive
 {
 
     if (ShowAiEcho == true) aiEcho("attackEnemySettlement:");
-    xsSetRuleMinIntervalSelf(22+aiRandInt(12));
+    xsSetRuleMinIntervalSelf(15+aiRandInt(18));
     int numMilUnits = kbUnitCount(cMyID, cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive);
     int numSiegeWeapons = kbUnitCount(cMyID, cUnitTypeAbstractSiegeWeapon, cUnitStateAlive);
     int numRagnorokHeroes = kbUnitCount(cMyID, cUnitTypeHeroRagnorok, cUnitStateAlive);
@@ -1698,7 +1695,7 @@ rule attackEnemySettlement
     float savedDistanceToClosestSettlement = 1000.0;
     float savedDistanceToSecondClosestSettlement = 1001.0;
     
-	if ((kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2)) // Try not to get stuck in Classical forever.
+	if ((xsGetTime() > 15*60*1000) && (kbGetAge() < cAge3)) // Try not to get stuck in Classical forever.
 	return;
 	
     int playerID = -1;
@@ -2014,8 +2011,8 @@ rule attackEnemySettlement
            if (ShowAiEcho == true) aiEcho ("returning as we don't have a Titan, a siege weapon, or a military myth unit");
             return;
         }
-        else if (((woodSupply < 30) || (goldSupply < 80) || (foodSupply < 90) && (UseStandardPop == false) && (currentPop <= currentPopCap - 3 - number) ||
-		 (foodSupply < 900)) && (UseStandardPop == true) && (numMilUnitsInDefPlans*3 < targetPop))
+        else if ((woodSupply < 30) || (goldSupply < 80) || (foodSupply < 90) || (UseStandardPop == false) && (currentPop <= currentPopCap - 3 - number) ||
+		 (UseStandardPop == true) && (numMilUnitsInDefPlans*3 < targetPop))
         {
            if (ShowAiEcho == true) aiEcho ("returning as we don't have enough resources");
             return;
@@ -2024,8 +2021,8 @@ rule attackEnemySettlement
     else
     {
 
-        if (((woodSupply < 30) || (goldSupply < 80) || (foodSupply < 90)) && (UseStandardPop == false) && (currentPop <= currentPopCap - 3 - number) 
-		|| (foodSupply < 90) && (UseStandardPop == true) && (numMilUnitsInDefPlans*3 < targetPop))
+        if ((woodSupply < 30) || (goldSupply < 80) || (foodSupply < 90) || (UseStandardPop == false) && (currentPop <= currentPopCap - 3 - number) 
+		|| (UseStandardPop == true) && (numMilUnitsInDefPlans*3 < targetPop))
         {
            if (ShowAiEcho == true) aiEcho ("returning as we don't have enough resources");
             return;
@@ -2634,7 +2631,7 @@ rule createRaidingParty
             }
         }
     }
-	if ((kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2)) // Try not to get stuck in Classical forever.
+	if ((xsGetTime() > 15*60*1000) && (kbGetAge() < cAge3)) // Try not to get stuck in Classical forever.
 	return;
     
     float woodSupply = kbResourceGet(cResourceWood);
@@ -3077,7 +3074,7 @@ rule randomAttackGenerator
         }
     }
     
-    if ((kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2)) // Try not to get stuck in Classical forever.
+    if ((xsGetTime() > 15*60*1000) && (kbGetAge() < cAge3)) // Try not to get stuck in Classical forever.
 	return;
 	
     float woodSupply = kbResourceGet(cResourceWood);
@@ -3431,7 +3428,7 @@ rule createLandAttack
     inactive
 {
 	
-	xsSetRuleMinIntervalSelf(19+aiRandInt(12));
+	xsSetRuleMinIntervalSelf(15+aiRandInt(12));
     if (ShowAiEcho == true) aiEcho("createLandAttack:");
     if ((mRusher == true) && (kbGetAge() < cAge3))
 	xsSetRuleMinIntervalSelf(12);
@@ -3465,7 +3462,6 @@ rule createLandAttack
     numEnemySettlements = numEnemySettlements - numMotherNatureSettlements;
     if (ShowAiEcho == true) aiEcho("modified numEnemySettlements: "+numEnemySettlements);
     int numEnemyMilUnitsNearMBInR80 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, 80.0, true);
-    int numEnemyMilUnitsNearMBInR85 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, 85.0, true);
     int numEnemyTitansNearMBInR85 = getNumUnitsByRel(cUnitTypeAbstractTitan, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, 85.0, true);
 
     vector defPlanBaseLocation = cInvalidVector;
@@ -3518,7 +3514,7 @@ rule createLandAttack
             }
         }
     }
-    if ((kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2)) // Try not to get stuck in Classical forever.
+    if ((xsGetTime() > 15*60*1000) && (kbGetAge() < cAge3)) // Try not to get stuck in Classical forever.
 	return;
     int enemyPlayerID = aiGetMostHatedPlayerID();
     int numTargetPlayerSettlements = kbUnitCount(enemyPlayerID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
@@ -3586,8 +3582,8 @@ rule createLandAttack
     }
     else
     {
-        if ((foodSupply < 50) || (goldSupply < 50) && (UseStandardPop == false) && (currentPop <= currentPopCap - 3 - number)
-		|| (goldSupply < 50) && (UseStandardPop == true) && (numMilUnitsInDefPlans*3 < targetPop))
+        if ((foodSupply < 50) || (goldSupply < 50) || (UseStandardPop == false) && (currentPop <= currentPopCap - 3 - number)
+		|| (UseStandardPop == true) && (numMilUnitsInDefPlans*3 < targetPop))
         {
             if (ShowAiEcho == true) aiEcho("returning as we don't have enough resources");
             return;
@@ -3659,9 +3655,9 @@ rule createLandAttack
         if (ShowAiEcho == true) aiEcho("returning as there is a gRandomAttackPlanID active and gathering units");
         return;
     }
-    else if ((randomAttackPlanActive == true) && (aiPlanGetNumberUnits(gRandomAttackPlanID, cUnitTypeLogicalTypeLandMilitary) > 5) && (numMilUnitsInDefPlans < 15)) //trying this..
+    else if ((randomAttackPlanActive == true) && (aiPlanGetNumberUnits(gRandomAttackPlanID, cUnitTypeLogicalTypeLandMilitary) > 10) && (numMilUnitsInDefPlans < 15)) //trying this..
     {
-        if (ShowAiEcho == true) aiEcho("returning as there is a gRandomAttackPlanID active and there are more than 15 units in the plan");
+        if (ShowAiEcho == true) aiEcho("returning as there is a gRandomAttackPlanID active and there are more than 10 units in the plan");
         return;
     }
     else if ((settlementPosDefPlanActive == true) && (kbGetAge() > cAge2) || (myBaseAtDefPlanPosition + alliedBaseAtDefPlanPosition < 1) && (Combined > 9))

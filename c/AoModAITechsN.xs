@@ -244,6 +244,26 @@ rule getRime
         if (ShowAiEcho == true) aiEcho("Getting Rime");
     }
 }
+
+//==============================================================================
+rule getWinterHarvest
+    inactive
+    minInterval 60 //starts in cAge3
+    group Skadi
+{
+    if (kbGetTechStatus(cTechWinterHarvest) == cTechStatusAvailable)
+    {
+        int x=-1;
+        x = aiPlanCreate("WinterHarvest", cPlanResearch);
+        aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechWinterHarvest);
+        aiPlanSetDesiredPriority(x, 20);
+        aiPlanSetActive(x);
+        xsDisableSelf();
+        if (ShowAiEcho == true) aiEcho("Getting WinterHarvest");
+    }
+}
+
+
 //Bragi
 //==============================================================================
 rule getSwineArray

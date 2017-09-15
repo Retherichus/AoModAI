@@ -129,7 +129,7 @@ extern int RethLGWAge4 = 800;              // Wood
 //Age 2 (Classical Age)
 extern int RethLEFAge2 = 650;              // Food
 extern int RethLEGAge2 = 550;              // Gold
-extern int RethLEWAge2 = 250;              // Wood
+extern int RethLEWAge2 = 200;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -224,18 +224,13 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetRelicEventHandler("relicHandler");
 	aiSetRetreatEventHandler("retreatHandler");
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
-	if (cMyCulture == cCultureAtlantean)
-    aiSetMinNumberNeedForGatheringAggressvies(2);
-	else
-	aiSetMinNumberNeedForGatheringAggressvies(7);
-
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
-	if (cvMapSubType == VINLANDSAGAMAP)
-	{
-		cvOkToBuildWalls = false;
-		bWallUp = false;
+	if ((bWallUp == true) && (cvMapSubType == VINLANDSAGAMAP) && (cvOkToBuildWalls == true))  // enable in Heroic Age.
+    {
+	    gBuildWalls = false;
+        gBuildWallsAtMainBase = false;
 	}
 	  // Check with allies and enable donations
        xsEnableRule("MonitorAllies");
@@ -275,11 +270,11 @@ void initRethlAge1(void)  // Am I doing this right??
 		MyFortress = cUnitTypeMigdolStronghold;
         if (cMyCulture == cCultureGreek)
         MyFortress = cUnitTypeFortress;
-        if (cMyCulture == cCultureNorse)
+        else if (cMyCulture == cCultureNorse)
         MyFortress = cUnitTypeHillFort;
-        if (cMyCulture == cCultureAtlantean)
+        else if (cMyCulture == cCultureAtlantean)
         MyFortress = cUnitTypePalace;	
-        if (cMyCulture == cCultureChinese)
+        else if (cMyCulture == cCultureChinese)
         MyFortress = cUnitTypeCastle;
 }
 
@@ -385,10 +380,11 @@ void initRethlAge2(void)
 // RULE ActivateRethOverridesAge 1-4
 //==============================================================================
 rule ActivateRethOverridesAge1
-   minInterval 2
+   minInterval 1
    active
    runImmediately
 {
+        initRethlAge1();
 		if (gHuntingDogsASAP == true)
 		xsEnableRule("HuntingDogsAsap");
 		
@@ -533,7 +529,12 @@ rule ActivateRethOverridesAge3
 				aiPlanSetActive(CPlanID);
             }
         }		
-	
+	    
+		if ((bWallUp == true) && (cvMapSubType == VINLANDSAGAMAP) && (cvOkToBuildWalls == true)) // it's okay now.
+        {
+	    gBuildWalls = true;
+        gBuildWallsAtMainBase = true;
+	    }		
 		
 	    if (cMyCulture == cCultureEgyptian)
         xsEnableRule("rebuildSiegeCamp");		
@@ -640,6 +641,8 @@ rule ActivateRethOverridesAge4
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeTridentSoldier, 0.6+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeArcherAtlantean, 0.7+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(5));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeSwordsman, 0.2);
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMaceman, 0.05);
 		}		
 		//
 		
@@ -714,7 +717,7 @@ rule HuntingDogsAsap
    HuntingDogsUpgBuilding = cUnitTypeGuild;
    
    
-   if ((WaitForDock == true) && (kbGetAge() < cAge2) || (cMyCulture == cCultureAtlantean) && (kbUnitCount(cMyID, cUnitTypeManor, cUnitStateAlive) < 1))
+   if ((WaitForDock == true) && (kbGetAge() < cAge2))
    return;
 
       if (cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse && kbUnitCount(cMyID, HuntingDogsUpgBuilding, cUnitStateAlive) < 1)
@@ -1278,6 +1281,9 @@ rule IHateMonks
 	   }
    }
 }
+
+
+
 //==============================================================================
 // IHateBuildingsHadesSpecial
 //==============================================================================
@@ -2105,7 +2111,10 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     }
 
     vector baseLoc = kbBaseGetLocation(cMyID, baseID); 
+	vector baseLoc2 = kbBaseGetLocation(cMyID, baseID); 
     startAreaID = kbAreaGetIDByPosition(baseLoc);
+    
+	
 	int ActiveTransportPlans = aiPlanGetNumber(cPlanTransport, -1, true);
 	//aiEcho("ActiveTransportPlans:  "+ActiveTransportPlans+" ");
     if (ActiveTransportPlans >= 1)
@@ -2115,11 +2124,13 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     }
 	// prepare other units too
 	
+	
 	if (KoTHOkNow == true)
     {
 	baseID = KOTHBASE;
     KOTHTHomeTransportPlan=createTransportPlan("GO HOME AGAIN", kbAreaGetIDByPosition(where), startAreaID, false, transportPUID, 97, baseID);
 	aiPlanAddUnitType(KOTHTHomeTransportPlan, cUnitTypeHumanSoldier, 3, 6, 10);
+	//aiPlanAddUnitType(KOTHTHomeTransportPlan, HeroType, 1, 1, 4);
     KoTHOkNow = false;
 	if (ShowAiEcho == true) aiEcho("GO HOME TRIGGERED");
     return;													  
@@ -2136,7 +2147,9 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	
 	if (ShowAiEcho == true) aiEcho("GO TO VAULT TRIGGERED");
 	}
-}
+    //Done
+	// Never use cUnitTypeLogicalTypeLandMilitary, Stymphalian Birds and other birds in general, are considered a land unit and will crash the game.
+	}
 
 //==============================================================================
 rule GetKOTHVault

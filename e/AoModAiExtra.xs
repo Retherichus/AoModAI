@@ -229,10 +229,10 @@ void initRethlAge1(void)  // Am I doing this right??
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
-	if ((bWallUp == true) && (cvMapSubType == VINLANDSAGAMAP) && (cvOkToBuildWalls == true))  // enable in Heroic Age.
-    {
-	    gBuildWalls = false;
-        gBuildWallsAtMainBase = false;
+	if (cvMapSubType == VINLANDSAGAMAP)
+	{
+		cvOkToBuildWalls = false;
+		bWallUp = false;
 	}
 	  // Check with allies and enable donations
        xsEnableRule("MonitorAllies");
@@ -272,11 +272,11 @@ void initRethlAge1(void)  // Am I doing this right??
 		MyFortress = cUnitTypeMigdolStronghold;
         if (cMyCulture == cCultureGreek)
         MyFortress = cUnitTypeFortress;
-        else if (cMyCulture == cCultureNorse)
+        if (cMyCulture == cCultureNorse)
         MyFortress = cUnitTypeHillFort;
-        else if (cMyCulture == cCultureAtlantean)
+        if (cMyCulture == cCultureAtlantean)
         MyFortress = cUnitTypePalace;	
-        else if (cMyCulture == cCultureChinese)
+        if (cMyCulture == cCultureChinese)
         MyFortress = cUnitTypeCastle;
 }
 
@@ -382,7 +382,7 @@ void initRethlAge2(void)
 // RULE ActivateRethOverridesAge 1-4
 //==============================================================================
 rule ActivateRethOverridesAge1
-   minInterval 1
+   minInterval 2
    active
    runImmediately
 {
@@ -530,12 +530,7 @@ rule ActivateRethOverridesAge3
 				aiPlanSetActive(CPlanID);
             }
         }		
-	    
-		if ((bWallUp == true) && (cvMapSubType == VINLANDSAGAMAP) && (cvOkToBuildWalls == true)) // it's okay now.
-        {
-	    gBuildWalls = true;
-        gBuildWallsAtMainBase = true;
-	    }		
+	
 		
 	    if (cMyCulture == cCultureEgyptian)
         xsEnableRule("rebuildSiegeCamp");		
@@ -1281,9 +1276,6 @@ rule IHateMonks
 	   }
    }
 }
-
-
-
 //==============================================================================
 // IHateBuildingsHadesSpecial
 //==============================================================================
@@ -2111,10 +2103,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     }
 
     vector baseLoc = kbBaseGetLocation(cMyID, baseID); 
-	vector baseLoc2 = kbBaseGetLocation(cMyID, baseID); 
     startAreaID = kbAreaGetIDByPosition(baseLoc);
-    
-	
 	int ActiveTransportPlans = aiPlanGetNumber(cPlanTransport, -1, true);
 	//aiEcho("ActiveTransportPlans:  "+ActiveTransportPlans+" ");
     if (ActiveTransportPlans >= 1)
@@ -2124,13 +2113,11 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     }
 	// prepare other units too
 	
-	
 	if (KoTHOkNow == true)
     {
 	baseID = KOTHBASE;
     KOTHTHomeTransportPlan=createTransportPlan("GO HOME AGAIN", kbAreaGetIDByPosition(where), startAreaID, false, transportPUID, 97, baseID);
 	aiPlanAddUnitType(KOTHTHomeTransportPlan, cUnitTypeHumanSoldier, 3, 6, 10);
-	//aiPlanAddUnitType(KOTHTHomeTransportPlan, HeroType, 1, 1, 4);
     KoTHOkNow = false;
 	if (ShowAiEcho == true) aiEcho("GO HOME TRIGGERED");
     return;													  
@@ -2147,9 +2134,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	
 	if (ShowAiEcho == true) aiEcho("GO TO VAULT TRIGGERED");
 	}
-    //Done
-	// Never use cUnitTypeLogicalTypeLandMilitary, Stymphalian Birds and other birds in general, are considered a land unit and will crash the game.
-	}
+}
 
 //==============================================================================
 rule GetKOTHVault

@@ -682,8 +682,10 @@ rule buildHouse
             aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, true);
             aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 100.0);
             aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
-            aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);			
-
+            aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);	
+            aiPlanSetVariableInt(planID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeBuilding); 
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 9);    
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitValue, 0, -5.0);   
             vector baseLocation = kbBaseGetLocation(cMyID, otherBaseID);
             aiPlanSetInitialPosition(planID, baseLocation);
             
@@ -943,14 +945,17 @@ rule dockMonitor
     }
 
     int desiredDocks = 1;
-    if (cRandomMapName == "anatolia") 
+    if (cRandomMapName == "anatolia")
     {
         desiredDocks = 2;
         gDockBaseID = kbBaseGetMainID(cMyID);
+		
     }
+    if ((cvMapSubType == VINLANDSAGAMAP) && (findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeDock) < 0) && (kbGetAge() > cAge1))	
+    desiredDocks = 2;
     
     // everything ok. we have enough docks
-    if ((gTransportMap == false) && (numDocks >= desiredDocks))
+    if ((gTransportMap == false) && (numDocks >= desiredDocks) || (numDocks >= desiredDocks))
     {
         if (ShowAiEcho == true) aiEcho("gTransportMap == false and we have at least 1 dock, returning");
         return;
@@ -1000,7 +1005,7 @@ rule dockMonitor
         aiPlanAddUnitType(buildDock, builderType, 1, 1, 1);
         aiPlanSetEscrowID(buildDock, cEconomyEscrowID);
         aiPlanSetActive(buildDock);
-        xsSetRuleMinIntervalSelf(89);
+        xsSetRuleMinIntervalSelf(90);
     }
 }
 
@@ -1510,7 +1515,6 @@ rule mainBaseAreaWallTeam2
     
 	if (kbGetAge() > cAge1)
 	xsSetRuleMinIntervalSelf(23);
-	
 	
     float goldSupply = kbResourceGet(cResourceGold);
 
@@ -2733,10 +2737,6 @@ rule buildFortress
                 return;
             
             float buffer = 40.0;
-            if (cRandomMapName == "jotunheim")
-                buffer = 40.0;
-            
-
             float woodAmountInR20 = kbGetAmountValidResources(otherBaseID, cResourceWood, cAIResourceSubTypeEasy, 20.0);
             
 
@@ -3020,7 +3020,7 @@ rule buildBuildingsAtOtherBase
  
     float woodSupply = kbResourceGet(cResourceWood);
     float goldSupply = kbResourceGet(cResourceGold);
-    if ((woodSupply < 200) || (goldSupply < 120))
+    if ((woodSupply < 250) || (goldSupply < 200))
         return;
     
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -3089,9 +3089,6 @@ rule buildBuildingsAtOtherBase
 
     
     float buffer = 20.0;
-    if (cRandomMapName == "jotunheim")
-        buffer = 40.0;
-    
     float woodAmountInR20 = kbGetAmountValidResources(otherBaseID, cResourceWood, cAIResourceSubTypeEasy, 20.0);
     
 
@@ -3482,7 +3479,6 @@ rule buildArmory
 //==============================================================================
 rule fixUnfinishedWalls
     inactive
-//    minInterval 77 //starts in cAge2
     minInterval 83 //starts in cAge2
 {
     if (ShowAiEcho == true) aiEcho("fixUnfinishedWalls:");
@@ -3803,7 +3799,6 @@ rule destroyUnnecessaryDropsites
 }
 //==============================================================================
 rule findMySettlementsBeingBuilt
-//    minInterval 16 //starts in cAge2
     minInterval 479 //starts in cAge1, is set to 7 after 8 minutes
     inactive
 {
@@ -3871,7 +3866,6 @@ rule findMySettlementsBeingBuilt
 
 //==============================================================================
 rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
-//    minInterval 53 //starts in cAge2
     minInterval 59 //starts in cAge2
     inactive
 {    
@@ -4012,7 +4006,6 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
 
 //==============================================================================
 rule buildGoldMineTower
-//    minInterval 33 //starts in cAge2
     minInterval 47 //starts in cAge2
     inactive
 {
@@ -4307,9 +4300,9 @@ rule buildMBTower
     if (buildMBTowerPlanID >= 0)
     {
         if (success == true)
-        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 16);
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 18);
         else
-        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 50.0);	
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 30.0);	
         aiPlanSetInitialPosition(buildMBTowerPlanID, mainBaseLocation);
         aiPlanSetVariableInt(buildMBTowerPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeTower);
         aiPlanSetDesiredPriority(buildMBTowerPlanID, 100);
@@ -4563,13 +4556,9 @@ rule makeExtraMarket    //If it takes more than 5 minutes to place our trade mar
     inactive
     minInterval 37 //starts in cAge3, activated in tradeWithCaravans
 {
-
-    if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa)
-	return;
-	
     xsSetRuleMinIntervalSelf(37);
     static int ruleStartTime = -1;
-    if (ShowAiEcho == true) aiEcho("*!*!*!*!*!*makeExtraMarket:");
+    if (ShowAiEcho == true) aiEcho("makeExtraMarket:");
     if (ruleStartTime == -1)
         ruleStartTime = xsGetTime();
     
@@ -4683,22 +4672,19 @@ rule buildManyBuildings
 	return;
    }
   
-   int numberOfArcheryRange=kbUnitCount(cMyID, cUnitTypeArcheryRange, cUnitStateAlive);
-   int numberOfBarracks=kbUnitCount(cMyID, cUnitTypeAcademy, cUnitStateAlive);
-   int numberOfStables=kbUnitCount(cMyID, cUnitTypeStable, cUnitStateAlive);
-   int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAlive);
+   int MilBuildings=kbUnitCount(cMyID, cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAliveOrBuilding);
+   int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
    int numberSettlements=kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
 
-   if ((numberOfFortresses < 1) || (numberSettlements < 2) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 8*60*1000) || (kbGetAge() < 2) || (currentWood < 1000))
+   if ((numberOfFortresses < 1) || (numberSettlements < 2) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 8*60*1000) || (kbGetAge() < cAge3) || (currentWood < 1000))
       return;
 
- if (numberOfArcheryRange+numberOfBarracks+numberOfStables < 34)
+ if (MilBuildings < 34)
  {
    int planID=aiPlanCreate("Build More Buildings", cPlanBuild);
    if (planID >= 0)
    {
       int randSelect=aiRandInt(3);
-
       if (randSelect == 0)
 	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeArcheryRange);
       else if (randSelect == 1)
@@ -5134,8 +5120,6 @@ rule BunkerUpWonderTower
     minInterval 18 
     inactive
 {	
-
-
     static int gBunkerUpWonder1PlanID=-1;
     static vector WonderPlace = cInvalidVector;
 	

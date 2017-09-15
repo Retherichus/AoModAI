@@ -784,7 +784,7 @@ int getMainBaseUnitIDForPlayer(int playerID = -1)
 }
 
 //==============================================================================
-int findNumUnitsInBase(int playerID = 0, int baseID = -1, int unitTypeID = -1, int state = cUnitStateAliveOrBuilding, int action = cActionAny)
+int findNumUnitsInBase(int playerID = 0, int baseID = -1, int unitTypeID = -1, int state = cUnitStateAliveOrBuilding)
 {
     if (ShowAiEcho == true) aiEcho("findNumUnitsInBase:");
 
@@ -802,7 +802,6 @@ int findNumUnitsInBase(int playerID = 0, int baseID = -1, int unitTypeID = -1, i
         kbUnitQuerySetBaseID(unitQueryID, baseID);
         kbUnitQuerySetUnitType(unitQueryID, unitTypeID);
         kbUnitQuerySetState(unitQueryID, state);
-		kbUnitQuerySetActionType(unitQueryID, action);
     }
     else
         return(-1);

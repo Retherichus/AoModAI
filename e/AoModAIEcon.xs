@@ -17,7 +17,6 @@ rule updateWoodBreakdown
     if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
 	return;
     int mainBaseID = kbBaseGetMainID(cMyID);
-  
     int randomBase = findUnit(cUnitTypeAbstractSettlement);
     if (randomBase < 0)
         return;
@@ -37,8 +36,6 @@ rule updateWoodBreakdown
 
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
     int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
-    int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
-    int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
     int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy, 85);
     if ((woodGathererCount <= 0) && (closeMainBaseSites > 0) && (kbGetAge() < cAge3)) //always some units on wood,
         woodGathererCount = 1;
@@ -205,7 +202,6 @@ rule updateGoldBreakdown
 	return;
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-
     int randomBase = findUnit(cUnitTypeAbstractSettlement);
     if (randomBase < 0)
         return;
@@ -220,18 +216,14 @@ rule updateGoldBreakdown
     }
     float goldSupply = kbResourceGet(cResourceGold);
         
-   int goldPriority=49; // Lower than wood for non-Egyptians
-   if (cMyCulture == cCultureEgyptian)    // Higher than Egyptian wood
-      goldPriority=56;
+    int goldPriority=49; // Lower than wood for non-Egyptians
+    if (cMyCulture == cCultureEgyptian)    // Higher than Egyptian wood
+       goldPriority=56;
 
 
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
-   int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
-   int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
-   int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
-
+    int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
  
-    
     int numMainBaseGoldSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
     int numGoldBaseSites = 0;
     if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
@@ -766,10 +758,18 @@ rule updateFoodBreakdown
     if (cMyCulture == cCultureAtlantean)
         minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives() + 0;		
 		
-     if ((xsGetTime() < 1*50*1000) && (cMyCulture != cCultureAtlantean) && (cvRandomMapName != "erebus"))
-	 numberAggressiveResourceSpots = 0;
-	 
-    // Start a new plan if we have enough villies and we have the resource.
+    if ((xsGetTime() < 1*50*1000) && (cMyCulture != cCultureAtlantean) && (cvRandomMapName != "erebus"))
+	numberAggressiveResourceSpots = 0;
+	
+	if (kbGetAge() < cAge2)
+	{
+	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, mainBaseLocation, 55);
+	float easyHunt = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 55);
+	if ((easyHunt > 50) && (Chickens <= 0))
+    numberAggressiveResourceSpots = 0;	
+	}	 
+    
+	// Start a new plan if we have enough villies and we have the resource.
     // If we have a plan open, don't kill it as long as we are within 1 of the needed min...the plan will steal from elsewhere.
     if ((numPlansUnassigned > 0) && (numberAggressiveResourceSpots > 0)
      && ((unassigned > minVillsToStartAggressive) || ((numAggressivePlans > 0) && (unassigned >= minVillsToStartAggressive - 1))))   // Need a plan, have resources and enough hunters...or one plan exists already.
@@ -825,17 +825,6 @@ rule updateFoodBreakdown
         easy = easy + unassigned;
         unassigned = 0;
     }  	
-	if (kbGetAge() < cAge2)
-	{
-	int Chickens = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, mainBaseLocation, 55);
-	float easyHunt = kbGetAmountValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 55);
-	if ((easyHunt > 50) && (Chickens <= 0))
-	{
-    numberAggressiveResourceSpots = 0;	
-	aggHunters = 0;
-	numberEasyResourceSpots = 1;
-	}
-	}
 
     // Now, the number of farmers we want is the unassigned total, plus reserve (existing farms) and prebuild (plan ahead).
     farmers = farmerReserve + farmerPreBuild;
@@ -1498,13 +1487,6 @@ void initEcon() //setup the initial Econ stuff.
         gEarlySettlementTarget = 2;
 
     if (ShowAiEcho == true) aiEcho("Early settlement target is "+gEarlySettlementTarget);
-
-    if ((cvRandomMapName != "vinlandsaga") &&
-        (cvRandomMapName != "nomad") &&
-        (cvRandomMapName != "team migration"))
-    {
-        xsEnableRule("buildSettlementsEarly");    // Turn on monitor, otherwise it waits for age 2 handler
-    }
     
     //enable the setEarlyEcon rule
     xsEnableRule("setEarlyEcon");

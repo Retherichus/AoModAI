@@ -454,7 +454,7 @@ rule monitorAttPlans
             if (attackPlanID == gEnemySettlementAttPlanID)
             {
                 static int countA = 0;
-                float distanceA = 45.0;
+                float distanceA = 30.0;
                 if (ShowAiEcho == true) aiEcho("gEnemySettlementAttPlanID:  "+attackPlanID+"");
 				if (ShowAiEcho == true) aiEcho("NumInPlan:  "+numMilUnitsInPlan+"");
                 if (killSettlementAttPlanCount != -1)
@@ -583,7 +583,7 @@ rule monitorAttPlans
                         {
                             if (countA < 0)
                                 countA = 0;
-                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceA + countA * 12);
+                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceA + countA * 10);
                             countA = countA + 1;
                         }
                     }
@@ -703,7 +703,7 @@ rule monitorAttPlans
                         }
                         else
                         {
-                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceB + countB * 7);
+                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, distanceB + countB * 5);
                             countB = countB + 1;
                         }
                     }
@@ -817,7 +817,7 @@ rule monitorAttPlans
             else if (attackPlanID == gLandAttackPlanID)
             {
                 static int countD = 0;
-                float distanceD = 45.0;
+                float distanceD = 25.0;
                 if (ShowAiEcho == true) aiEcho("gLandAttackPlanID:  "+attackPlanID+"");
 				if (ShowAiEcho == true) aiEcho("NumInPlan:  "+numMilUnitsInPlan+"");
                 if (killLandAttPlanCount != -1)
@@ -1698,7 +1698,7 @@ rule attackEnemySettlement
     float savedDistanceToClosestSettlement = 1000.0;
     float savedDistanceToSecondClosestSettlement = 1001.0;
     
-	if ((kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2)) // Try not to get stuck in Classical forever.
+	if ((xsGetTime() > 15*60*1000) && (kbGetAge() < cAge3)) // Try not to get stuck in Classical forever.
 	return;
 	
     int playerID = -1;
@@ -2634,7 +2634,7 @@ rule createRaidingParty
             }
         }
     }
-	if ((kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2)) // Try not to get stuck in Classical forever.
+	if ((xsGetTime() > 15*60*1000) && (kbGetAge() < cAge3)) // Try not to get stuck in Classical forever.
 	return;
     
     float woodSupply = kbResourceGet(cResourceWood);
@@ -3077,7 +3077,7 @@ rule randomAttackGenerator
         }
     }
     
-    if ((kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2)) // Try not to get stuck in Classical forever.
+    if ((xsGetTime() > 15*60*1000) && (kbGetAge() < cAge3)) // Try not to get stuck in Classical forever.
 	return;
 	
     float woodSupply = kbResourceGet(cResourceWood);
@@ -3518,7 +3518,7 @@ rule createLandAttack
             }
         }
     }
-    if ((kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2)) // Try not to get stuck in Classical forever.
+    if ((xsGetTime() > 15*60*1000) && (kbGetAge() < cAge3)) // Try not to get stuck in Classical forever.
 	return;
     int enemyPlayerID = aiGetMostHatedPlayerID();
     int numTargetPlayerSettlements = kbUnitCount(enemyPlayerID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);

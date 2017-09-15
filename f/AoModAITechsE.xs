@@ -464,7 +464,7 @@ rule getNewKingdom
     if (kbGetTechStatus(cTechNewKingdom) == cTechStatusAvailable)
     {
         int x=-1;
-        x = aiPlanCreate("NewKingdom", cPlanResearch);
+        x = aiPlanCreate("AtefCrown", cPlanResearch);
         aiPlanSetVariableInt(x, cResearchPlanTechID, 0, cTechNewKingdom);
         aiPlanSetDesiredPriority(x, 50);
         aiPlanSetActive(x);
