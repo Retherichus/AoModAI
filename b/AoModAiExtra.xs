@@ -19,10 +19,8 @@ extern int gShiftingSandPlanID= -1;
 mutable void retreatHandler(int planID=-1) {}
 mutable void relicHandler(int relicID=-1) {}
 mutable void wonderDeathHandler(int playerID=-1) { }
-extern bool ConfirmFish = false;          // Don't change this, It's for extra safety when fishing, and it'll enable itself if fish is found.
 extern bool gHuntingDogsASAP = false;     // Will automatically be called upon if there is huntable nearby the MB.
 extern int gGardenBuildLimit = 0;
-extern int HateChoice = -1;
 extern int gLandScoutSpecialUlfsark = -1;
 extern bool IsRunTradeUnits1 = false;
 extern bool IsRunTradeUnits2 = false;
@@ -48,6 +46,7 @@ extern const int cGaiaID = 0;
 extern int StuckTransformID = 0;
 extern bool HasHumanAlly = false;
 extern int MyFortress = cUnitTypeAbstractFortress;
+extern int aGoalID = 0;
 
 //////////////// aiEchoDEBUG ////////////////
 
@@ -71,13 +70,10 @@ extern bool gWallsInDM = true;            // This allows the Ai to build walls i
 extern bool gAgeFaster = false;            // This will lower/halt most non economical upgrades until Mythic Age, this will allow the Ai to age up faster.
 extern int AgeFasterStop = cAge3;         // Age to stop gAgeFaster if enabled. "cAge1" Archaic, "cAge2" Classical, "cAge3" Heroic, "cAge4" Mythic.
 extern bool gAgeReduceMil = false;         // This will lower the amount of military units the AI will train until Mythic Age, this will also help the AI to advance a little bit faster, more configs below.
-extern bool gSuperboom = true;            // The Ai will set goals to harvest X Food, X Gold and X Wood at a set timer, see below for conf.
 extern bool RethEcoGoals = true;          // Similar to gSuperboom, this will take care of the resources the Ai will try to maintain in Age 2-4, see more below.
-extern bool RethFishEco = true;          // Changes the default fishing plan, by forcing early fishing(On fishing maps only). This causes the villagers to go heavy on Wood for the first 2 minutes of the game.
 extern bool bWallUp = true;              // This ensures that the Ai will build walls, regardless of personality.
 extern bool OneMBDefPlanOnly = true;      // Only allow one active "idle defense plan for Mainbase (6 units, 12 if set to false)"
 
-extern bool ResInflate = true;            // Sets the food multiplier to 1.0 once above 5k food.
 extern bool gHuntEarly = true;            // This will make villagers hunt aggressive animals way earlier, though this can be a little bit dangerous! (Damn you Elephants!) 
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
 extern bool gEarlyMonuments = false;       // This allows the Ai to build Monuments in Archaic Age. Egyptian only.
@@ -101,34 +97,6 @@ extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, (All
 extern bool DisallowPullBack = false;  // set true to make the AI no longer retreat(All modes).
 extern int ModdedTCTimer = 25;
 // End of STINNERV
-
-// If gSuperboom is set to true, the numbers below are what the Ai will attempt to gather in Archaic Age or untill X minutes have passed.
-// This can be a bit unstable if you leave it on for more than 4+ min, but it's usually very rewarding. 
-// Note: This is always delayed by 2 minutes into the game. this is due to EarlyEcon rules, which release villagers for other tasks at the 2 minute marker.
-
-extern int eBoomFood = 600;              // Food
-extern int eBoomGold = 150;              // Gold
-extern int eBoomWood = 150;              // Wood, duh.
-
-
-//Egyptians have their own, because they don't like wood as much.
-
-extern int egBoomGold = 300;              // Gold
-extern int egBoomWood = 100;              // Wood
-
-
-// For RethFishEco, this affects Fishing Maps ONLY, if you have it enabled.
-// If the Ai fails to find any valid fishing spot for any reason, it'll scrap this fishing plan and return to normal resource distribution.
-
-extern int eFBoomFood = 20;              // Food
-extern int eFBoomGold = 0;              // Gold
-extern int eFBoomWood = 50;             // Wood, The Ai will automatically boost it, if it's too low.
-
-
-//Timer for gSuperboom & fishing
-extern int eBoomTimer = 7;                // Minutes this plan will remain active. It'll disable itself after X minutes set.(minus delay) 
-extern int eFishTimer = 75;                // Seconds the Ai will go heavy on Wood, this supports the Ai in building early fishing ships.
-
 
 // For RethEcoGoals, AoModAi do normally calculate the resources it needs, though.. we want it to keep some extra resources at all times, 
 // so, let's make it a little bit more ''static'' by setting resource goals a little closer to what Admiral Ai use.
@@ -161,7 +129,7 @@ extern int RethLGWAge4 = 800;              // Wood
 //Age 2 (Classical Age)
 extern int RethLEFAge2 = 650;              // Food
 extern int RethLEGAge2 = 550;              // Gold
-extern int RethLEWAge2 = 200;              // Wood
+extern int RethLEWAge2 = 250;              // Wood
 
 //Age 3 (Heroic Age)
 
@@ -256,13 +224,23 @@ void initRethlAge1(void)  // Am I doing this right??
 	aiSetRelicEventHandler("relicHandler");
 	aiSetRetreatEventHandler("retreatHandler");
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
+	if (cMyCulture == cCultureAtlantean)
+	{
+    aiSetMinNumberNeedForGatheringAggressvies(2);
+	aiSetMinNumberWantForGatheringAggressives(2);
+	}
+	else
+	{
+	aiSetMinNumberNeedForGatheringAggressvies(6);
+    aiSetMinNumberWantForGatheringAggressives(7);
+    }
 	
 	if (cMyCulture == cCultureEgyptian && gEarlyMonuments == true)
     xsEnableRule("buildMonuments");
-	if ((bWallUp == true) && (cvMapSubType == VINLANDSAGAMAP) && (cvOkToBuildWalls == true))  // enable in Heroic Age.
-    {
-	    gBuildWalls = false;
-        gBuildWallsAtMainBase = false;
+	if (cvMapSubType == VINLANDSAGAMAP)
+	{
+		cvOkToBuildWalls = false;
+		bWallUp = false;
 	}
 	  // Check with allies and enable donations
        xsEnableRule("MonitorAllies");
@@ -302,11 +280,11 @@ void initRethlAge1(void)  // Am I doing this right??
 		MyFortress = cUnitTypeMigdolStronghold;
         if (cMyCulture == cCultureGreek)
         MyFortress = cUnitTypeFortress;
-        else if (cMyCulture == cCultureNorse)
+        if (cMyCulture == cCultureNorse)
         MyFortress = cUnitTypeHillFort;
-        else if (cMyCulture == cCultureAtlantean)
+        if (cMyCulture == cCultureAtlantean)
         MyFortress = cUnitTypePalace;	
-        else if (cMyCulture == cCultureChinese)
+        if (cMyCulture == cCultureChinese)
         MyFortress = cUnitTypeCastle;
 }
 
@@ -380,7 +358,6 @@ void initRethlAge2(void)
 	   if ((cRandomMapName == "highland") || (cRandomMapName == "nomad"))
 	{
 	gWaterMap=true;
-	ConfirmFish=true;
 	xsEnableRule("fishing");
 	if (ShowAiEcho == true) aiEcho("Fishing enabled for Nomad and Highland map");
 	}
@@ -413,11 +390,10 @@ void initRethlAge2(void)
 // RULE ActivateRethOverridesAge 1-4
 //==============================================================================
 rule ActivateRethOverridesAge1
-   minInterval 1
+   minInterval 2
    active
    runImmediately
 {
-        initRethlAge1();
 		if (gHuntingDogsASAP == true)
 		xsEnableRule("HuntingDogsAsap");
 		
@@ -562,12 +538,7 @@ rule ActivateRethOverridesAge3
 				aiPlanSetActive(CPlanID);
             }
         }		
-	    
-		if ((bWallUp == true) && (cvMapSubType == VINLANDSAGAMAP) && (cvOkToBuildWalls == true)) // it's okay now.
-        {
-	    gBuildWalls = true;
-        gBuildWallsAtMainBase = true;
-	    }		
+	
 		
 	    if (cMyCulture == cCultureEgyptian)
         xsEnableRule("rebuildSiegeCamp");		
@@ -674,8 +645,6 @@ rule ActivateRethOverridesAge4
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeTridentSoldier, 0.6+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeArcherAtlantean, 0.7+aiRandInt(3));
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(5));
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeSwordsman, 0.2);
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMaceman, 0.05);
 		}		
 		//
 		
@@ -750,7 +719,7 @@ rule HuntingDogsAsap
    HuntingDogsUpgBuilding = cUnitTypeGuild;
    
    
-   if ((WaitForDock == true) && (kbGetAge() < cAge2))
+   if ((WaitForDock == true) && (kbGetAge() < cAge2) || (cMyCulture == cCultureAtlantean) && (kbUnitCount(cMyID, cUnitTypeManor, cUnitStateAlive) < 1))
    return;
 
       if (cMyCulture != cCultureAtlantean && cMyCulture != cCultureNorse && kbUnitCount(cMyID, HuntingDogsUpgBuilding, cUnitStateAlive) < 1)
@@ -1314,9 +1283,6 @@ rule IHateMonks
 	   }
    }
 }
-
-
-
 //==============================================================================
 // IHateBuildingsHadesSpecial
 //==============================================================================
@@ -2144,10 +2110,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     }
 
     vector baseLoc = kbBaseGetLocation(cMyID, baseID); 
-	vector baseLoc2 = kbBaseGetLocation(cMyID, baseID); 
     startAreaID = kbAreaGetIDByPosition(baseLoc);
-    
-	
 	int ActiveTransportPlans = aiPlanGetNumber(cPlanTransport, -1, true);
 	//aiEcho("ActiveTransportPlans:  "+ActiveTransportPlans+" ");
     if (ActiveTransportPlans >= 1)
@@ -2157,13 +2120,11 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
     }
 	// prepare other units too
 	
-	
 	if (KoTHOkNow == true)
     {
 	baseID = KOTHBASE;
     KOTHTHomeTransportPlan=createTransportPlan("GO HOME AGAIN", kbAreaGetIDByPosition(where), startAreaID, false, transportPUID, 97, baseID);
 	aiPlanAddUnitType(KOTHTHomeTransportPlan, cUnitTypeHumanSoldier, 3, 6, 10);
-	//aiPlanAddUnitType(KOTHTHomeTransportPlan, HeroType, 1, 1, 4);
     KoTHOkNow = false;
 	if (ShowAiEcho == true) aiEcho("GO HOME TRIGGERED");
     return;													  
@@ -2180,9 +2141,7 @@ void ClaimKoth(vector where=cInvalidVector, int baseToUseID=-1)
 	
 	if (ShowAiEcho == true) aiEcho("GO TO VAULT TRIGGERED");
 	}
-    //Done
-	// Never use cUnitTypeLogicalTypeLandMilitary, Stymphalian Birds and other birds in general, are considered a land unit and will crash the game.
-	}
+}
 
 //==============================================================================
 rule GetKOTHVault

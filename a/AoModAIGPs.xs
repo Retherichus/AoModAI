@@ -1032,7 +1032,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	{
 		// disabled
 		return (false);  
-		}
+    }
 		
 	// Set up the Uproot power
 	if(powerProtoID == cPowerUproot)
@@ -1234,7 +1234,7 @@ rule rAge4FindGP
 
 //==============================================================================
 rule rCeaseFire
-    minInterval 32 //starts in cAge2
+    minInterval 35 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("rCeaseFire:");    
@@ -1307,7 +1307,7 @@ rule rUnbuild
     }
 
     aiPlanSetDesiredPriority(gUnbuildPlanID, 100);
-    aiPlanSetEscrowID(gUnbuildPlanID, cMilitaryEscrowID);
+    aiPlanSetEscrowID(gUnbuildPlanID, -1);
     //Setup the plan.. 
     // these are first pass.. fix these eventually.. 
     aiPlanSetVariableBool(gUnbuildPlanID, cGodPowerPlanAutoCast, 0, true); 
@@ -1316,7 +1316,7 @@ rule rUnbuild
     aiPlanSetVariableInt(gUnbuildPlanID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelUnbuild);
     aiPlanSetVariableFloat(gUnbuildPlanID,  cGodPowerPlanDistance, 0, 40.0);
     aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanUnitTypeID, 0, cUnitTypeLogicalTypeBuildingsNotWalls);
-    aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanCount, 0, 3);
+    aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanCount, 0, 5);
 
     aiPlanSetActive(gUnbuildPlanID);
     xsDisableSelf();
@@ -1773,7 +1773,7 @@ rule rGaiaForestPower
 		    int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 35.0);
-	if (NumTreesMB < 3)
+	if (NumTreesMB <= 5)
 	JustCastIt = true;
     static int count = 0;
     bool autoCast = aiPlanGetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0);
@@ -1954,7 +1954,7 @@ rule rShiftingSand
    inactive
 {
    static int queryID = -1;
-
+   static int Attempt = 0;
    int planID = gShiftingSandPlanID;
    int mainBaseID = kbBaseGetMainID(cMyID);
    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
@@ -1980,18 +1980,15 @@ rule rShiftingSand
 	return;
 
    aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true);
-     
    aiPlanSetVariableInt(planID, cGodPowerPlanQueryID, 0, queryID);
    aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, cPlayerRelationEnemy);
-
    aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 0, kbUnitGetPosition(kbUnitQueryGetResult(queryID, 0)));
    aiPlanSetVariableVector(planID, cGodPowerPlanTargetLocation, 1, mainBaseLocation);
-
    aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 1);
    aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
-
    aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelDualLocation);
-   if(aiCastGodPowerAtPosition(aiGetGodPowerTechIDForSlot(1), kbUnitGetPosition(kbUnitQueryGetResult(queryID, 0))) == true)
+   Attempt = Attempt + 1;
+   if (Attempt >= 3)
    xsDisableSelf();
 }
 
@@ -2179,25 +2176,12 @@ rule rYearOfTheGoat
 minInterval 15
 inactive
 {
-	vector position = kbGetTownLocation()+ vector(2,2,2);// Little bit off the town position
-	// Cast in archaic because we're rushing
-	if(cvRushBoomSlider>0.5)
-	{
+	    vector position = kbGetTownLocation()+ vector(2,2,2);// Little bit off the town position
 		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
 		xsDisableSelf();
-	}
-	else if(cvRushBoomSlider>0.0&&kbGetAge()>cAge1)
-	{
-		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
-		xsDisableSelf();
-	}
-	else if(kbGetAge()>cAge2)
-	{
-		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
-		xsDisableSelf();
-	}
-	
 }
+	
+
 
 //==============================================================================
 // RULE rCastHeavyGP -- TARTARIAN

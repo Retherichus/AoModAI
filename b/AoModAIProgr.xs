@@ -110,7 +110,7 @@ void progressAge4Handler(int age=3)
 
 //==============================================================================
 rule unPauseAge2
-    minInterval 91 //starts in cAge1
+    minInterval 185 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("unPauseAge2:");
@@ -129,7 +129,7 @@ rule unPauseAge2
 
 //==============================================================================
 rule unPauseAge3
-    minInterval 90 //starts in cAge2
+    minInterval 120 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("unPauseAge3:");

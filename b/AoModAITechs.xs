@@ -125,12 +125,8 @@ rule getArchitects
         }
         return;
     }
-    static int ruleStartTime = -1;
-    
-    if (ruleStartTime == -1)
-        ruleStartTime = xsGetTime();
         
-    if ((gBuildTowers == true) && ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) || (xsGetTime() - ruleStartTime < 2*60*1000)))
+    if ((gBuildTowers == true) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching))
         return;
     
     if (kbGetAge() == cAge3)
@@ -140,68 +136,9 @@ rule getArchitects
     }
     else
     {
-        bool milUpgradesResearched = false;
-        bool armUpgradesResearched = false;
-        if (cMyCulture == cCultureEgyptian)
-        {
-            if ((kbGetTechStatus(cTechChampionAxemen) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechChampionSpearmen) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechChampionSlingers) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechChampionChariots) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechChampionCamelry) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechChampionElephants) >= cTechStatusResearching))
-            {
-                milUpgradesResearched = true;
-            }
-        }
-        else
-        {
-            if ((kbGetTechStatus(cTechChampionInfantry) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechChampionCavalry) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechChampionArchers) >= cTechStatusResearching))
-            {
-                milUpgradesResearched = true;
-            }
-            if (cMyCulture == cCultureAtlantean)
-            {
-                if (kbGetTechStatus(cTechChampionChieroballista) < cTechStatusResearching)
-                {
-                    milUpgradesResearched = false;
-                }
-            }
-        }
+        if ((foodSupply < 400) || (woodSupply < 500))
+        return;
         
-        if (cMyCiv == cCivThor)
-        {
-            if ((kbGetTechStatus(cTechMeteoricIronMail) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechDragonscaleShields) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechBurningPitchThor) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechHammeroftheGods) >= cTechStatusResearching))
-            {
-                armUpgradesResearched = true;
-            }
-        }
-        else
-        {
-            if ((kbGetTechStatus(cTechIronMail) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechIronShields) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechBurningPitch) >= cTechStatusResearching)
-             || (kbGetTechStatus(cTechIronWeapons) >= cTechStatusResearching))
-            {
-                armUpgradesResearched = true;
-            }
-        }
-        
-        if ((milUpgradesResearched == false) || (armUpgradesResearched == false))
-        {
-            if ((foodSupply < 800) || (woodSupply < 1000))
-                return;
-        }
-        else
-        {
-            if ((foodSupply < 400) || (woodSupply < 500))
-                return;
-        }
     }
 
     if (kbGetTechStatus(techID) < cTechStatusResearching)
@@ -295,10 +232,8 @@ rule getEnclosedDeck
     float foodSupply = kbResourceGet(cResourceFood);
     float goldSupply = kbResourceGet(cResourceGold);
     
-    if ((foodSupply < 400) || (woodSupply < 400))
-        return;
         
-    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetAge() == cAge2))
+    if ((foodSupply > 560) && (goldSupply > 350) && (kbGetAge() == cAge2) || (foodSupply < 400) || (woodSupply < 400))
         return;
 
     int enclosedDeckID=aiPlanCreate("getEnclosedDeck", cPlanProgression);
@@ -407,7 +342,7 @@ rule getHusbandry
     inactive
 {
     int techID = cTechHusbandry;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
+    if ((kbGetTechStatus(techID) > cTechStatusResearching) || (cMyCulture == cCultureAtlantean))
     {
         xsDisableSelf();
         return;
@@ -433,9 +368,7 @@ rule getHusbandry
     }
     
     int buildingType = cUnitTypeGranary;
-    if (cMyCulture == cCultureAtlantean)
-        buildingType = cUnitTypeGuild;
-    else if (cMyCulture == cCultureNorse)
+    if (cMyCulture == cCultureNorse)
         buildingType = cUnitTypeOxCart;
     else if (cMyCulture == cCultureChinese)
         buildingType = cUnitTypeStoragePit;			
@@ -450,7 +383,7 @@ rule getHusbandry
     int numHerdables = kbUnitCount(cMyID, cUnitTypeHerdable);     
     float goldSupply = kbResourceGet(cResourceGold);
     float woodSupply = kbResourceGet(cResourceWood);
-    if ((woodSupply < 200) || (goldSupply < 110) || (kbGetTechStatus(cTechPickaxe) < cTechStatusResearching) || (kbGetTechStatus(cTechHandAxe) < cTechStatusResearching) || (cMyCulture == cCultureAtlantean) && (numHerdables < 5))
+    if ((woodSupply < 200) || (goldSupply < 110) || (kbGetTechStatus(cTechPickaxe) < cTechStatusResearching) || (kbGetTechStatus(cTechHandAxe) < cTechStatusResearching))
         return;
        
     if ((gHuntersExist == true) && (kbGetTechStatus(cTechHuntingDogs) < cTechStatusResearching))
@@ -479,7 +412,6 @@ rule getPickaxe
     int techID = cTechPickaxe;
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
-        xsEnableRule("getShaftMine");
         xsDisableSelf();
         return;
     }
@@ -551,7 +483,6 @@ rule getHandaxe
     int techID = cTechHandAxe;
     if (kbGetTechStatus(cTechHandAxe) > cTechStatusResearching)
     {
-        xsEnableRule("getBowSaw");
         xsDisableSelf();
         return;
     }
@@ -615,73 +546,6 @@ rule getHandaxe
 }
    
 //==============================================================================
-rule getPlow
-    minInterval 241 //starts in cAge1, gets set to 19
-    inactive
-{
-    int techID = cTechPlow;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsEnableRule("getIrrigation");
-        xsDisableSelf();
-        return;
-    }
-    
-    static bool update = false;
-    if (update == false)
-    {
-        xsSetRuleMinIntervalSelf(19);
-        update = true;
-    }
-    
-    if (ShowAiEcho == true) aiEcho("getPlow:");
-    
-    if (kbGetAge() < cAge2)
-    {
-        return;
-    }
-
-    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-        }
-        return;
-    }
-    
-    int buildingType = cUnitTypeGranary;
-    if (cMyCulture == cCultureAtlantean)
-        buildingType = cUnitTypeGuild;
-    else if (cMyCulture == cCultureNorse)
-        buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
-        
-    int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
-    if (numResearchBuildings < 1)
-        return;
-     
-    int numFarms = kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding);
-    if (numFarms < 1)
-        return;
-        
-    //Farming is worthless without plow, get it first
-    int plowPlanID=aiPlanCreate("getPlow", cPlanProgression);
-    if (plowPlanID != 0)
-    {
-        aiPlanSetVariableInt(plowPlanID, cProgressionPlanGoalTechID, 0, techID);
-        aiPlanSetDesiredPriority(plowPlanID, 100);      // Do it ASAP!
-        aiPlanSetEscrowID(plowPlanID, cEconomyEscrowID);
-        aiPlanSetActive(plowPlanID);
-        if (ShowAiEcho == true) aiEcho("getting Plow");
-        xsSetRuleMinIntervalSelf(241);
-        update = false;
-    }
-}
-
-//==============================================================================
 rule getHuntingDogs
     minInterval 167 //starts in cAge1, gets set to 11
     inactive
@@ -741,57 +605,6 @@ rule getHuntingDogs
     if (numAggressivePlans > 0)
         count = numAggressivePlans;
     
-    int unitType = -1;
-    if (cMyCulture == cCultureNorse)
-        unitType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureAtlantean)
-        unitType = cUnitTypeVillagerAtlantean;
-    if (count < 1)
-    {
-        int activeGatherPlans = aiPlanGetNumber(cPlanGather, cPlanStateGather, true);
-        for (i = 0; < activeGatherPlans)
-        {
-            int foodGatherPlanID = aiPlanGetIDByIndex(cPlanGather, cPlanStateGather, true, i);
-            int resourceID = aiPlanGetVariableInt(foodGatherPlanID, cGatherPlanResourceID, 0);
-            if (resourceID == cResourceFood)
-            {
-                //if (ShowAiEcho == true) aiEcho("*___hunting dogs check");
-                int dropsiteID = aiPlanGetVariableInt(foodGatherPlanID, cGatherPlanDropsiteID, 0);
-                if ((cMyCulture == cCultureNorse) || (cMyCulture == cCultureAtlantean))
-                {
-                    int numUnitsInThePlan = aiPlanGetNumberUnits(foodGatherPlanID, cUnitTypeUnit);
-                    for (j = 0; < numUnitsInThePlan)
-                    {
-                        int unitID = aiPlanGetUnitByIndex(foodGatherPlanID, j);
-                        if (kbUnitIsType(unitID, unitType) == true)
-                        {
-                            dropsiteID = unitID;
-                            if (cMyCulture == cCultureNorse)
-                                if (ShowAiEcho == true) aiEcho("unit is an ox cart, ID is: "+dropsiteID+", breaking off");
-                            else if (cMyCulture == cCultureAtlantean)
-                                if (ShowAiEcho == true) aiEcho("unit is an Atlantean villager, ID is: "+dropsiteID+", breaking off");
-                            break;
-                        }
-                    }
-                }
-                if (dropsiteID != -1)
-                {
-                    vector dropsiteLocation = kbUnitGetPosition(dropsiteID);
-                    if (ShowAiEcho == true) aiEcho("dropsiteLocation: "+dropsiteLocation);
-                    float distance = 15.0;
-                    if (cMyCulture == cCultureNorse)
-                        distance = 20.0;
-                    int numHuntAnimals = getNumUnits(cUnitTypeHuntable, cUnitStateAlive, -1, 0, dropsiteLocation, distance + 2);
-                    int numWildCrops = getNumUnits(cUnitTypeWildCrops, cUnitStateAlive, -1, 0, dropsiteLocation, distance);
-                    if (ShowAiEcho == true) aiEcho("numHuntAnimals: "+numHuntAnimals);
-                    if (ShowAiEcho == true) aiEcho("numWildCrops: "+numWildCrops);
-                    if ((numHuntAnimals > 0) && (numWildCrops < 1))
-                        count = count + 1;
-                }
-            }
-        }
-    }
-    
     if (count < 1)  //we have no hunters
     {
         gHuntersExist = false;
@@ -815,476 +628,67 @@ rule getHuntingDogs
 }
 
 //==============================================================================
-rule getBowSaw
-    minInterval 15 //gets started in getHandaxe
-    inactive
-{
-    int techID = cTechBowSaw;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsEnableRule("getCarpenters");
-        xsDisableSelf();
-        return;
-    }
-    
-    if (ShowAiEcho == true) aiEcho("getBowSaw:");
-    
-    if (kbGetAge() < cAge2)
-    {
-        return;
-    }
-    
-    if (kbGetTechStatus(cTechHandAxe) < cTechStatusResearching)
-        return;
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-    
-    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetAge() < cAge3))
-            {
-                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-                xsSetRuleMinIntervalSelf(31);
-            }
-        }
-        return;
-    }
-    
-    int buildingType = cUnitTypeGranary;
-    if (cMyCulture == cCultureAtlantean)
-        buildingType = cUnitTypeGuild;
-    else if (cMyCulture == cCultureNorse)
-        buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
-        
-    int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
-    if (numResearchBuildings < 1)
-        return;
-    
-    if (kbGetAge() < cAge3)
-    {
-        if ((foodSupply < 250) || (goldSupply < 150))
-            return;
-    }
-    
-    static int count = 0;        
-    if (count < 1)
-    {
-        count = count + 1;
-        return;
-    }
-
-    //get BowSaw.
-    int bowSawPlanID=aiPlanCreate("getBowSaw", cPlanProgression);
-    if (bowSawPlanID != 0)
-    {
-        aiPlanSetVariableInt(bowSawPlanID, cProgressionPlanGoalTechID, 0, techID);
-        aiPlanSetDesiredPriority(bowSawPlanID, 95);
-        aiPlanSetEscrowID(bowSawPlanID, cEconomyEscrowID);
-        aiPlanSetActive(bowSawPlanID);
-        if (ShowAiEcho == true) aiEcho("getting BowSaw");
-        xsSetRuleMinIntervalSelf(25);
-    }
-}
-
+// getNextGathererUpgrade
+//
+// sets up a progression plan to research the next upgrade that benefits the given
+// resource.
 //==============================================================================
-rule getShaftMine
-    minInterval 15 //gets started in getPickaxe
-    inactive
+rule getNextGathererUpgrade
+   minInterval 16
+   inactive
 {
-    int techID = cTechShaftMine;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsEnableRule("getQuarry");
-        xsDisableSelf();
-        return;
-    }
-    
-    if (ShowAiEcho == true) aiEcho("getShaftMine:");
+	int gathererTypeID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer,0);
+	int prio = 25;
+	if ((gathererTypeID < 0) || (kbUnitCount(cMyID,cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAliveOrBuilding) < 2))
+	  return();
+	
+	for (i=0; < 3)
+   {
+	  int affectedUnitType=-1;
+	  if (i == cResourceGold)
+		 affectedUnitType=cUnitTypeGold;
+	  else if (i == cResourceWood)
+		 affectedUnitType=cUnitTypeWood;
+	  else
+	  {
+		 //If we're not farming yet, don't get anything.
+		 if (gFarming != true)
+			continue;
+		 if (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive) >= 0)   // Farms always first
+			affectedUnitType=cUnitTypeFarm;
+	  }
 
-    if (kbGetAge() < cAge2)
-    {
-        return;
-    }
-    
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    int numMainBaseGoldSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
-    int numGoldBaseSites = 0;
-    if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
-        numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
-    int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
-    if (numGoldSites < 1)
-    {
-        aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-        aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-        if (kbGetAge() > cAge3)
-        {
-            xsDisableSelf();
-        }
-        return;
-    }
-    
-    if (kbGetTechStatus(cTechPickaxe) < cTechStatusResearching)    
-        return;
+	  //Get the building that we drop this resource off at.
+	   int dropSiteFilterID=kbTechTreeGetDropsiteUnitIDByResource(i, 0);
+	  if (cMyCulture == cCultureAtlantean)
+		 dropSiteFilterID = cUnitTypeGuild;  // All econ techs at guild
+	   if (dropSiteFilterID < 0)
+		   continue;
 
-    float goldSupply = kbResourceGet(cResourceGold);
-    float woodSupply = kbResourceGet(cResourceWood);
-    float foodSupply = kbResourceGet(cResourceFood);
-    
-    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetAge() < cAge3))
-            {
-                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-                xsSetRuleMinIntervalSelf(25);
-            }
-        }
-        return;
-    }
- 
-    int buildingType = cUnitTypeGranary;
-    if (cMyCulture == cCultureAtlantean)
-        buildingType = cUnitTypeGuild;
-    else if (cMyCulture == cCultureNorse)
-        buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
-        
-    int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
-    if (numResearchBuildings < 1)
-        return;
-    
-    if (kbGetAge() < cAge3)
-    {
-        if ((foodSupply < 200) || (woodSupply < 250))
-            return;
-    }
-    
-    static int count = 0;        
-    if (count < 1)
-    {
-        count = count + 1;
-        return;
-    }
+	  //Don't do anything until you have a dropsite.
+	  if (findUnit(dropSiteFilterID) == -1)
+		 continue;
 
-    //get ShaftMine.
-    int shaftMinePlanID=aiPlanCreate("getShaftMine", cPlanProgression);
-    if (shaftMinePlanID != 0)
-    {
-        aiPlanSetVariableInt(shaftMinePlanID, cProgressionPlanGoalTechID, 0, techID);
-        aiPlanSetDesiredPriority(shaftMinePlanID, 95);
-        aiPlanSetEscrowID(shaftMinePlanID, cEconomyEscrowID);
-        aiPlanSetActive(shaftMinePlanID);
-        if (ShowAiEcho == true) aiEcho("getting ShaftMine");
-        xsSetRuleMinIntervalSelf(25);
-    }
-}
+	  //Get the cheapest thing.
+	   int upgradeTechID=kbTechTreeGetCheapestUnitUpgrade(gathererTypeID, cUpgradeTypeWorkRate, -1, dropSiteFilterID, false, affectedUnitType);
+	   if (upgradeTechID < 0)
+		   continue;
+	   //Dont make another plan if we already have one.
+	  if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, upgradeTechID) != -1)
+		 continue;
+       
+	  //Make plan to get this upgrade.
+	   int planID=aiPlanCreate("GathererUpgrade: " +kbGetTechName(upgradeTechID), cPlanProgression);
+	   if (planID < 0)
+		   continue;
 
-//==============================================================================
-rule getIrrigation
-    minInterval 19 //starts in cAge2, activated in getPlow
-    inactive
-{
-    int techID = cTechIrrigation;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsEnableRule("getFloodControl");
-        xsDisableSelf();
-        return;
-    }
-
-    static bool update = false;
-    if (update == false)
-    {
-        xsSetRuleMinIntervalSelf(19);
-        update = true;
-    }
-    
-    if (ShowAiEcho == true) aiEcho("getIrrigation:");
-    
-    if (kbGetAge() < cAge3)
-    {
-        return;
-    }
-    
-    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-        }
-        return;
-    }
-    
-    int buildingType = cUnitTypeGranary;
-    if (cMyCulture == cCultureAtlantean)
-        buildingType = cUnitTypeGuild;
-    else if (cMyCulture == cCultureNorse)
-        buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
-        
-    int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
-    if (numResearchBuildings < 1)
-        return;
-        
-    int numFarms = kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding);
-    if (numFarms < 1)
-        return;
-    
-    //get Irrigation.
-    int irrigationPlanID=aiPlanCreate("getIrrigation", cPlanProgression);
-    if (irrigationPlanID != 0)
-    {
-        aiPlanSetVariableInt(irrigationPlanID, cProgressionPlanGoalTechID, 0, techID);
-        aiPlanSetDesiredPriority(irrigationPlanID, 100);
-        aiPlanSetEscrowID(irrigationPlanID, cEconomyEscrowID);
-        aiPlanSetActive(irrigationPlanID);
-        if (ShowAiEcho == true) aiEcho("getting Irrigation");
-        xsSetRuleMinIntervalSelf(241);
-        update = false;
-    }
-}
-
-//==============================================================================
-rule getQuarry
-    minInterval 15 //gets started in getShaftMine
-    inactive
-{
-    int techID = cTechQuarry;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-    }
-    
-    if (ShowAiEcho == true) aiEcho("getQuarry:");
-    
-    if (kbGetAge() < cAge3)
-    {
-        return;
-    }
-        
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    int numMainBaseGoldSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
-    int numGoldBaseSites = 0;
-    if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
-        numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
-    int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
-    if (numGoldSites < 1)
-    {
-        aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-        aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-        if (kbGetAge() > cAge3)
-        {
-            xsDisableSelf();
-        }
-        return;
-    }
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-    float woodSupply = kbResourceGet(cResourceWood);
-    
-    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            if ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() < cAge4))
-            {
-                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-                xsSetRuleMinIntervalSelf(25);
-            }
-        }
-        return;
-    }
-    
-    int buildingType = cUnitTypeGranary;
-    if (cMyCulture == cCultureAtlantean)
-        buildingType = cUnitTypeGuild;
-    else if (cMyCulture == cCultureNorse)
-        buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
-        
-    int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
-    if (numResearchBuildings < 1)
-        return;
-    
-   if (kbGetAge() < cAge4)
-    {
-        if ((foodSupply < 250) || (woodSupply < 300))
-            return;
-    }
-    
-    static int count = 0;        
-    if (count < 2)
-    {
-        count = count + 1;
-        return;
-    }
-
-    //get Quarry.
-    int quarryPlanID=aiPlanCreate("getQuarry", cPlanProgression);
-    if (quarryPlanID != 0)
-    {
-        aiPlanSetVariableInt(quarryPlanID, cProgressionPlanGoalTechID, 0, techID);
-        aiPlanSetDesiredPriority(quarryPlanID, 95);
-        aiPlanSetEscrowID(quarryPlanID, cEconomyEscrowID);
-        aiPlanSetActive(quarryPlanID);
-        if (ShowAiEcho == true) aiEcho("getting Quarry");
-        xsSetRuleMinIntervalSelf(25);
-    }
-}
-
-//==============================================================================
-rule getCarpenters
-    minInterval 15 //gets started in getBowSaw
-    inactive
-{
-    int techID = cTechCarpenters;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-    }
-    
-    if (ShowAiEcho == true) aiEcho("getCarpenters:");
-    
-    if (kbGetAge() < cAge3)
-    {
-        return;
-    }
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-    
-    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            if ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() < cAge4))
-            {
-                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-                xsSetRuleMinIntervalSelf(25);
-            }
-        }
-        return;
-    }
-
-    int buildingType = cUnitTypeGranary;
-    if (cMyCulture == cCultureAtlantean)
-        buildingType = cUnitTypeGuild;
-    else if (cMyCulture == cCultureNorse)
-        buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
-        
-    int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
-    if (numResearchBuildings < 1)
-        return;
-    
-   if (kbGetAge() < cAge4)
-    {
-        if ((foodSupply < 350) || (goldSupply < 200))
-            return;
-    }
-    
-    static int count = 0;        
-    if (count < 2)
-    {
-        count = count + 1;
-        return;
-    }
-
-    //get Carpenters.
-    int carpentersPlanID=aiPlanCreate("getCarpenters", cPlanProgression);
-    if (carpentersPlanID != 0)
-    {
-        aiPlanSetVariableInt(carpentersPlanID, cProgressionPlanGoalTechID, 0, techID);
-        aiPlanSetDesiredPriority(carpentersPlanID, 90);
-        aiPlanSetEscrowID(carpentersPlanID, cEconomyEscrowID);
-        aiPlanSetActive(carpentersPlanID);
-        if (ShowAiEcho == true) aiEcho("getting Carpenters");
-        xsSetRuleMinIntervalSelf(25);
-    }
-}
-
-//==============================================================================
-rule getFloodControl
-    minInterval 19 //starts in cAge3, activated in getIrrigation
-    inactive
-{
-    int techID = cTechFloodControl;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-    }
-    
-    static bool update = false;
-    if (update == false)
-    {
-        xsSetRuleMinIntervalSelf(19);
-        update = true;
-    }
-    
-    if (ShowAiEcho == true) aiEcho("getFloodControl:");
-    
-    if (kbGetAge() < cAge4)
-    {
-        return;
-    }
-    
-    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-        }
-        return;
-    }
-
-    int buildingType = cUnitTypeGranary;
-    if (cMyCulture == cCultureAtlantean)
-        buildingType = cUnitTypeGuild;
-    else if (cMyCulture == cCultureNorse)
-        buildingType = cUnitTypeOxCart;
-    else if (cMyCulture == cCultureChinese)
-        buildingType = cUnitTypeStoragePit;			
-        
-    int numResearchBuildings = kbUnitCount(cMyID, buildingType, cUnitStateAlive);
-    if (numResearchBuildings < 1)
-        return;
-    
-    int numFarms = kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding);
-    if (numFarms < 1)
-        return;
-        
-    //get FloodControl.
-    int floodControlPlanID=aiPlanCreate("getFloodControl", cPlanProgression);
-    if (floodControlPlanID != 0)
-    {
-        aiPlanSetVariableInt(floodControlPlanID, cProgressionPlanGoalTechID, 0, techID);
-        aiPlanSetDesiredPriority(floodControlPlanID, 100);
-        aiPlanSetEscrowID(floodControlPlanID, cEconomyEscrowID);
-        aiPlanSetActive(floodControlPlanID);
-        if (ShowAiEcho == true) aiEcho("getting FloodControl");
-        xsSetRuleMinIntervalSelf(241);
-        update = false;
-    }
+	   aiPlanSetVariableInt(planID, cProgressionPlanGoalTechID, 0, upgradeTechID);
+	   if (affectedUnitType == cUnitTypeFarm)
+	   prio = 95;
+	   aiPlanSetDesiredPriority(planID, prio);
+	   aiPlanSetEscrowID(planID, cEconomyEscrowID);
+	   aiPlanSetActive(planID);
+   }
 }
 //==============================================================================
 rule getAmbassadors
@@ -2558,21 +1962,7 @@ rule getCoinage
         xsDisableSelf();
         return;
     }
-    
-    if (ShowAiEcho == true) aiEcho("getCoinage:");
 
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-        return;
-    
-    int tradeCartPUID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0);
-    int numTradeUnits = kbUnitCount(cMyID, tradeCartPUID, cUnitStateAlive);
-    if (numTradeUnits < 5)
-        return;
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    if (goldSupply < 400)
-        return;
-    
     if (kbGetTechStatus(techID) < cTechStatusResearching)
     {
         int tradeUpgradePlanID=aiPlanCreate("coinageUpgrade", cPlanResearch);

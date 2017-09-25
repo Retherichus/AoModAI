@@ -1773,7 +1773,7 @@ rule rGaiaForestPower
 		    int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 35.0);
-	if (NumTreesMB < 3)
+	if (NumTreesMB <= 5)
 	JustCastIt = true;
     static int count = 0;
     bool autoCast = aiPlanGetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0);
@@ -2176,25 +2176,12 @@ rule rYearOfTheGoat
 minInterval 15
 inactive
 {
-	vector position = kbGetTownLocation()+ vector(2,2,2);// Little bit off the town position
-	// Cast in archaic because we're rushing
-	if(cvRushBoomSlider>0.5)
-	{
+	    vector position = kbGetTownLocation()+ vector(2,2,2);// Little bit off the town position
 		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
 		xsDisableSelf();
-	}
-	else if(cvRushBoomSlider>0.0&&kbGetAge()>cAge1)
-	{
-		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
-		xsDisableSelf();
-	}
-	else if(kbGetAge()>cAge2)
-	{
-		aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
-		xsDisableSelf();
-	}
-	
 }
+	
+
 
 //==============================================================================
 // RULE rCastHeavyGP -- TARTARIAN

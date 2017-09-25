@@ -425,7 +425,7 @@ rule findVinlandsagaBase
         mainlandGroupID=kbFindAreaGroupByLocation(cAreaGroupTypeLand, 0.5, 0.5);  // Can fail if mountains at map center
     }
     float easyAmount = kbGetAmountValidResources(gVinlandsagaInitialBaseID, cResourceFood, cAIResourceSubTypeEasy, 45);
-    if ((mainlandGroupID < 0) || (xsGetTime() < 1.9*60*1000) && (easyAmount >= 50))
+    if ((mainlandGroupID < 0) || (xsGetTime() < 1.8*60*1000) && (easyAmount >= 50))
         return;
 
     if (ShowAiEcho == true) aiEcho("findVinlandsagaBase: Found the mainland, AGID="+mainlandGroupID+".");
@@ -630,10 +630,9 @@ rule transportAllUnits
 {
     if (ShowAiEcho == true) aiEcho("transportAllUnits:");    
     static int transportAllUnitsID=-1;
-    int num = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeLogicalTypeGarrisonOnBoats);
-    if ( num <= 0 )
+    int num = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeLogicalTypeGarrisonOnBoats, cUnitStateAlive);
+    if (num < 0)
         return;
-
 
     //Get our water transport type.
     int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
@@ -664,12 +663,14 @@ rule transportAllUnits
     goalAreaID = verifyVinlandsagaBase( goalAreaID );  // Make sure it borders water,or find one that does.
 
     
-    transportAllUnitsID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 100, gVinlandsagaInitialBaseID);
+    transportAllUnitsID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 88, gVinlandsagaInitialBaseID);
     if ( transportAllUnitsID >= 0 )
     {
         aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanReturnWhenDone, 0, false);
         aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 1, num, num);
         aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHero, 1, 1, 1);
+		if (cMyCulture == cCultureGreek)
+		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeScout, 1, 1, 1);
         aiPlanSetActive(transportAllUnitsID);
     }
 }
@@ -973,7 +974,8 @@ bool mapPreventsWalls() //some maps do not allow walls or it doesn't make sense 
         cRandomMapName == "the void" ||
         cRandomMapName == "daemonwood" ||
         cRandomMapName == "black forest" ||
-        cRandomMapName == "holy mountain" ||		
+        cRandomMapName == "holy mountain" ||
+        cvMapSubType == VINLANDSAGAMAP ||		
         cRandomMapName == "akIslandDom" )
     {
         return(true);

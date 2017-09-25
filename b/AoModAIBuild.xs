@@ -451,7 +451,7 @@ rule repairBuildings2
 
 //==============================================================================
 rule buildMonuments
-    minInterval 117 //starts in cAge2, cAge3, cAge4
+    minInterval 42 //starts in cAge2, cAge3, cAge4
     inactive
 {
     if (ShowAiEcho == true) aiEcho("buildMonuments:");
@@ -682,8 +682,10 @@ rule buildHouse
             aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, true);
             aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 100.0);
             aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
-            aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);			
-
+            aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);	
+            aiPlanSetVariableInt(planID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeBuilding); 
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 9);    
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitValue, 0, -5.0);   
             vector baseLocation = kbBaseGetLocation(cMyID, otherBaseID);
             aiPlanSetInitialPosition(planID, baseLocation);
             
@@ -869,7 +871,7 @@ rule buildSettlementsEarly  //age 1/2 handler
     if (cMyCulture == cCultureNorse)
         builderType = cUnitTypeAbstractInfantry;
         
-        createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
+        createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 85);
 }
 
 //==============================================================================
@@ -943,14 +945,17 @@ rule dockMonitor
     }
 
     int desiredDocks = 1;
-    if (cRandomMapName == "anatolia") 
+    if (cRandomMapName == "anatolia")
     {
         desiredDocks = 2;
         gDockBaseID = kbBaseGetMainID(cMyID);
+		
     }
+    if ((cvMapSubType == VINLANDSAGAMAP) && (findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeDock) < 0) && (kbGetAge() > cAge1))	
+    desiredDocks = 2;
     
     // everything ok. we have enough docks
-    if ((gTransportMap == false) && (numDocks >= desiredDocks))
+    if ((gTransportMap == false) && (numDocks >= desiredDocks) || (numDocks >= desiredDocks))
     {
         if (ShowAiEcho == true) aiEcho("gTransportMap == false and we have at least 1 dock, returning");
         return;
@@ -1000,7 +1005,7 @@ rule dockMonitor
         aiPlanAddUnitType(buildDock, builderType, 1, 1, 1);
         aiPlanSetEscrowID(buildDock, cEconomyEscrowID);
         aiPlanSetActive(buildDock);
-        xsSetRuleMinIntervalSelf(89);
+        xsSetRuleMinIntervalSelf(90);
     }
 }
 
@@ -1511,7 +1516,6 @@ rule mainBaseAreaWallTeam2
 	if (kbGetAge() > cAge1)
 	xsSetRuleMinIntervalSelf(23);
 	
-	
     float goldSupply = kbResourceGet(cResourceGold);
 
     //If we already have a build wall plan, don't make another one.
@@ -1776,7 +1780,7 @@ rule mainBaseAreaWallTeam2
 }
 
 //==============================================================================
-rule otherBaseRingWallTeam1
+rule otherBaseRingWallTeam1 // this covers Gold on other bases
     minInterval 19 //starts in cAge2
     inactive
 {
@@ -1971,6 +1975,90 @@ rule otherBaseRingWallTeam1
 }
 
 //==============================================================================
+int createCommonRingWallPlan(string WallPlanName = "BUG", int BaseID=-1, int radius=19)
+{
+    float otherBaseWallRadius = radius;
+    
+    int builderType = cUnitTypeAbstractVillager;
+    if (cMyCulture == cCultureNorse)
+        builderType = cUnitTypeAbstractInfantry;
+    int RingWallPlan = aiPlanCreate(""+WallPlanName, cPlanBuildWall);
+    if (RingWallPlan != -1)
+    {
+        aiPlanSetNumberVariableValues(RingWallPlan, cBuildWallPlanAreaIDs, 20, true);
+        int numAreasAdded = 0;
+
+        int mainArea = -1;
+        vector mainCenter = kbBaseGetLocation(cMyID, BaseID);
+        aiPlanSetInitialPosition(RingWallPlan, mainCenter);
+        
+        float mainX = xsVectorGetX(mainCenter);
+        float mainZ = xsVectorGetZ(mainCenter);
+        mainArea = kbAreaGetIDByPosition(mainCenter);
+        aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
+        numAreasAdded = numAreasAdded + 1;
+      
+        int firstRingCount = -1;      // How many areas are in first ring around main?
+        int firstRingIndex = -1;      // Which one are we on?
+        int firstRingID = -1;         // Actual ID of current 1st ring area
+        vector areaCenter = cInvalidVector;    // Center point of this area
+        float areaX = 0.0;
+        float dx = 0.0;
+        float areaZ = 0.0;
+        float dz = 0.0;
+        bool needToSave = false;
+
+        firstRingCount = kbAreaGetNumberBorderAreas(mainArea);
+ 
+        for (firstRingIndex = 0; < firstRingCount)      // Check each border area of the main area
+        {
+            needToSave = true;            // We'll save this unless we have a problem
+            firstRingID = kbAreaGetBorderAreaID(mainArea, firstRingIndex);
+            areaCenter = kbAreaGetCenter(firstRingID);
+            // Now, do the checks.
+            areaX = xsVectorGetX(areaCenter);
+            areaZ = xsVectorGetZ(areaCenter);
+            dx = mainX - areaX;
+            dz = mainZ - areaZ;
+            if ((dx > otherBaseWallRadius) || (dx < -1.0*otherBaseWallRadius)
+             || (dz > otherBaseWallRadius) || (dz < -1.0*otherBaseWallRadius))
+            {
+                needToSave = false;
+            }
+
+            // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
+            if (needToSave == true)
+            {
+                bool found = false;
+                for (j = 0; < numAreasAdded)
+                {
+                    if (aiPlanGetVariableInt(RingWallPlan, cBuildWallPlanAreaIDs, j) == firstRingID)
+                    {
+                        found = true;     // It's in there, don't add it
+                    }
+                }
+                if ((found == false) && (numAreasAdded < 20))  // add it
+                {
+                    aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanAreaIDs, numAreasAdded, firstRingID);
+                    numAreasAdded = numAreasAdded + 1;
+                }
+            }
+        }
+        // Set the true number of area variables, preserving existing values, then turn on the plan
+        aiPlanSetNumberVariableValues(RingWallPlan, cBuildWallPlanAreaIDs, numAreasAdded, false);
+
+        aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
+        aiPlanAddUnitType(RingWallPlan, builderType, 1, 1, 1);
+        aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanNumberOfGates, 0, 40);
+        aiPlanSetVariableFloat(RingWallPlan, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
+        aiPlanSetBaseID(RingWallPlan, BaseID);
+        aiPlanSetEscrowID(RingWallPlan, cMilitaryEscrowID);
+        aiPlanSetDesiredPriority(RingWallPlan, 100);
+        aiPlanSetActive(RingWallPlan, true);
+        return(RingWallPlan);		
+		}
+}
+//==============================================================================
 rule otherBase1RingWallTeam
     minInterval 11 //starts in cAge2, activated in otherBasesDefPlans rule
     inactive
@@ -2042,90 +2130,9 @@ rule otherBase1RingWallTeam
     
     if (goldSupply < 150)
         return;
-    
-    float otherBaseWallRadius = gOtherBaseWallRadius;
-    
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-        builderType = cUnitTypeAbstractInfantry;
-    
-    int otherBase1WallTeamPlanID = aiPlanCreate("otherBase1WallTeamPlanID", cPlanBuildWall);
-    if (otherBase1WallTeamPlanID != -1)
-    {
-        aiPlanSetNumberVariableValues(otherBase1WallTeamPlanID, cBuildWallPlanAreaIDs, 20, true);
-        int numAreasAdded = 0;
-
-        int mainArea = -1;
-        vector mainCenter = kbBaseGetLocation(cMyID, gOtherBase1ID);
-        aiPlanSetInitialPosition(otherBase1WallTeamPlanID, mainCenter);
-        
-        float mainX = xsVectorGetX(mainCenter);
-        float mainZ = xsVectorGetZ(mainCenter);
-        mainArea = kbAreaGetIDByPosition(mainCenter);
-        aiPlanSetVariableInt(otherBase1WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
-        numAreasAdded = numAreasAdded + 1;
-      
-        int firstRingCount = -1;      // How many areas are in first ring around main?
-        int firstRingIndex = -1;      // Which one are we on?
-        int firstRingID = -1;         // Actual ID of current 1st ring area
-        vector areaCenter = cInvalidVector;    // Center point of this area
-        float areaX = 0.0;
-        float dx = 0.0;
-        float areaZ = 0.0;
-        float dz = 0.0;
-        bool needToSave = false;
-
-        firstRingCount = kbAreaGetNumberBorderAreas(mainArea);
- 
-        for (firstRingIndex = 0; < firstRingCount)      // Check each border area of the main area
-        {
-            needToSave = true;            // We'll save this unless we have a problem
-            firstRingID = kbAreaGetBorderAreaID(mainArea, firstRingIndex);
-            areaCenter = kbAreaGetCenter(firstRingID);
-            // Now, do the checks.
-            areaX = xsVectorGetX(areaCenter);
-            areaZ = xsVectorGetZ(areaCenter);
-            dx = mainX - areaX;
-            dz = mainZ - areaZ;
-            if ((dx > otherBaseWallRadius) || (dx < -1.0*otherBaseWallRadius)
-             || (dz > otherBaseWallRadius) || (dz < -1.0*otherBaseWallRadius))
-            {
-                needToSave = false;
-            }
-            
-            // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
-            if (needToSave == true)
-            {
-                bool found =false;
-                for (j = 0; < numAreasAdded)
-                {
-                    if (aiPlanGetVariableInt(otherBase1WallTeamPlanID, cBuildWallPlanAreaIDs, j) == firstRingID)
-                    {
-                        found = true;     // It's in there, don't add it
-                    }
-                }
-                if ((found == false) && (numAreasAdded < 20))  // add it
-                {
-                    aiPlanSetVariableInt(otherBase1WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, firstRingID);
-                    numAreasAdded = numAreasAdded + 1;
-                }
-            }
-        }
-
-        // Set the true number of area variables, preserving existing values, then turn on the plan
-        aiPlanSetNumberVariableValues(otherBase1WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
-
-        aiPlanSetVariableInt(otherBase1WallTeamPlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-        aiPlanAddUnitType(otherBase1WallTeamPlanID, builderType, 1, 1, 1);
-        aiPlanSetVariableInt(otherBase1WallTeamPlanID, cBuildWallPlanNumberOfGates, 0, 40);
-        aiPlanSetVariableFloat(otherBase1WallTeamPlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
-        aiPlanSetBaseID(otherBase1WallTeamPlanID, gOtherBase1ID);
-        aiPlanSetEscrowID(otherBase1WallTeamPlanID, cMilitaryEscrowID);
-        aiPlanSetDesiredPriority(otherBase1WallTeamPlanID, 100);
-        aiPlanSetActive(otherBase1WallTeamPlanID, true);
-        gOtherBase1RingWallTeamPlanID = otherBase1WallTeamPlanID;
-        xsSetRuleMinIntervalSelf(83);
-    }
+	string Readable = "OtherBase1RingWallTeamPlan";
+	gOtherBase1RingWallTeamPlanID = createCommonRingWallPlan(Readable, gOtherBase1ID, gOtherBaseWallRadius);
+	xsSetRuleMinIntervalSelf(83);
 }
 
 //==============================================================================
@@ -2200,90 +2207,9 @@ rule otherBase2RingWallTeam
     
     if (goldSupply < 150)
         return;
-
-    float otherBaseWallRadius = gOtherBaseWallRadius;
-    
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-        builderType = cUnitTypeAbstractInfantry;
-    
-    int otherBase2WallTeamPlanID = aiPlanCreate("otherBase2WallTeamPlanID", cPlanBuildWall);
-    if (otherBase2WallTeamPlanID != -1)
-    {
-        aiPlanSetNumberVariableValues(otherBase2WallTeamPlanID, cBuildWallPlanAreaIDs, 20, true);
-        int numAreasAdded = 0;
-
-        int mainArea = -1;
-        vector mainCenter = kbBaseGetLocation(cMyID, gOtherBase2ID);
-        aiPlanSetInitialPosition(otherBase2WallTeamPlanID, mainCenter);
-        
-        float mainX = xsVectorGetX(mainCenter);
-        float mainZ = xsVectorGetZ(mainCenter);
-        mainArea = kbAreaGetIDByPosition(mainCenter);
-        aiPlanSetVariableInt(otherBase2WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
-        numAreasAdded = numAreasAdded + 1;
-      
-        int firstRingCount = -1;      // How many areas are in first ring around main?
-        int firstRingIndex = -1;      // Which one are we on?
-        int firstRingID = -1;         // Actual ID of current 1st ring area
-        vector areaCenter = cInvalidVector;    // Center point of this area
-        float areaX = 0.0;
-        float dx = 0.0;
-        float areaZ = 0.0;
-        float dz = 0.0;
-        bool needToSave = false;
-
-        firstRingCount = kbAreaGetNumberBorderAreas(mainArea);
- 
-        for (firstRingIndex = 0; < firstRingCount)      // Check each border area of the main area
-        {
-            needToSave = true;            // We'll save this unless we have a problem
-            firstRingID = kbAreaGetBorderAreaID(mainArea, firstRingIndex);
-            areaCenter = kbAreaGetCenter(firstRingID);
-            // Now, do the checks.
-            areaX = xsVectorGetX(areaCenter);
-            areaZ = xsVectorGetZ(areaCenter);
-            dx = mainX - areaX;
-            dz = mainZ - areaZ;
-            if ((dx > otherBaseWallRadius) || (dx < -1.0*otherBaseWallRadius)
-             || (dz > otherBaseWallRadius) || (dz < -1.0*otherBaseWallRadius))
-            {
-                needToSave = false;
-            }
-
-            // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
-            if (needToSave == true)
-            {
-                bool found =false;
-                for (j = 0; < numAreasAdded)
-                {
-                    if (aiPlanGetVariableInt(otherBase2WallTeamPlanID, cBuildWallPlanAreaIDs, j) == firstRingID)
-                    {
-                        found = true;     // It's in there, don't add it
-                    }
-                }
-                if ((found == false) && (numAreasAdded < 20))  // add it
-                {
-                    aiPlanSetVariableInt(otherBase2WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, firstRingID);
-                    numAreasAdded = numAreasAdded + 1;
-                }
-            }
-        }
-
-        // Set the true number of area variables, preserving existing values, then turn on the plan
-        aiPlanSetNumberVariableValues(otherBase2WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
-
-        aiPlanSetVariableInt(otherBase2WallTeamPlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-        aiPlanAddUnitType(otherBase2WallTeamPlanID, builderType, 1, 1, 1);
-        aiPlanSetVariableInt(otherBase2WallTeamPlanID, cBuildWallPlanNumberOfGates, 0, 40);
-        aiPlanSetVariableFloat(otherBase2WallTeamPlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
-        aiPlanSetBaseID(otherBase2WallTeamPlanID, gOtherBase2ID);
-        aiPlanSetEscrowID(otherBase2WallTeamPlanID, cMilitaryEscrowID);
-        aiPlanSetDesiredPriority(otherBase2WallTeamPlanID, 100);
-        aiPlanSetActive(otherBase2WallTeamPlanID, true);
-        gOtherBase2RingWallTeamPlanID = otherBase2WallTeamPlanID;
-        xsSetRuleMinIntervalSelf(83);
-    }
+    string Readable = "OtherBase2RingWallTeamPlan";
+    gOtherBase2RingWallTeamPlanID = createCommonRingWallPlan(Readable, gOtherBase2ID, gOtherBaseWallRadius);
+	xsSetRuleMinIntervalSelf(83);
 }
 
 //==============================================================================
@@ -2358,90 +2284,9 @@ rule otherBase3RingWallTeam
     
     if (goldSupply < 150)
         return;
-
-    float otherBaseWallRadius = gOtherBaseWallRadius;
-    
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-        builderType = cUnitTypeAbstractInfantry;
-    
-    int otherBase3WallTeamPlanID = aiPlanCreate("otherBase3WallTeamPlanID", cPlanBuildWall);
-    if (otherBase3WallTeamPlanID != -1)
-    {
-        aiPlanSetNumberVariableValues(otherBase3WallTeamPlanID, cBuildWallPlanAreaIDs, 20, true);
-        int numAreasAdded = 0;
-
-        int mainArea = -1;
-        vector mainCenter = kbBaseGetLocation(cMyID, gOtherBase3ID);
-        aiPlanSetInitialPosition(otherBase3WallTeamPlanID, mainCenter);
-        
-        float mainX = xsVectorGetX(mainCenter);
-        float mainZ = xsVectorGetZ(mainCenter);
-        mainArea = kbAreaGetIDByPosition(mainCenter);
-        aiPlanSetVariableInt(otherBase3WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
-        numAreasAdded = numAreasAdded + 1;
-      
-        int firstRingCount = -1;      // How many areas are in first ring around main?
-        int firstRingIndex = -1;      // Which one are we on?
-        int firstRingID = -1;         // Actual ID of current 1st ring area
-        vector areaCenter = cInvalidVector;    // Center point of this area
-        float areaX = 0.0;
-        float dx = 0.0;
-        float areaZ = 0.0;
-        float dz = 0.0;
-        bool needToSave = false;
-
-        firstRingCount = kbAreaGetNumberBorderAreas(mainArea);
- 
-        for (firstRingIndex = 0; < firstRingCount)      // Check each border area of the main area
-        {
-            needToSave = true;            // We'll save this unless we have a problem
-            firstRingID = kbAreaGetBorderAreaID(mainArea, firstRingIndex);
-            areaCenter = kbAreaGetCenter(firstRingID);
-            // Now, do the checks.
-            areaX = xsVectorGetX(areaCenter);
-            areaZ = xsVectorGetZ(areaCenter);
-            dx = mainX - areaX;
-            dz = mainZ - areaZ;
-            if ((dx > otherBaseWallRadius) || (dx < -1.0*otherBaseWallRadius)
-             || (dz > otherBaseWallRadius) || (dz < -1.0*otherBaseWallRadius))
-            {
-                needToSave = false;
-            }
-
-            // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
-            if (needToSave == true)
-            {
-                bool found =false;
-                for (j = 0; < numAreasAdded)
-                {
-                    if (aiPlanGetVariableInt(otherBase3WallTeamPlanID, cBuildWallPlanAreaIDs, j) == firstRingID)
-                    {
-                        found = true;     // It's in there, don't add it
-                    }
-                }
-                if ((found == false) && (numAreasAdded < 20))  // add it
-                {
-                    aiPlanSetVariableInt(otherBase3WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, firstRingID);
-                    numAreasAdded = numAreasAdded + 1;
-                }
-            }
-        }
-
-        // Set the true number of area variables, preserving existing values, then turn on the plan
-        aiPlanSetNumberVariableValues(otherBase3WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
-
-        aiPlanSetVariableInt(otherBase3WallTeamPlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-        aiPlanAddUnitType(otherBase3WallTeamPlanID, builderType, 1, 1, 1);
-        aiPlanSetVariableInt(otherBase3WallTeamPlanID, cBuildWallPlanNumberOfGates, 0, 40);
-        aiPlanSetVariableFloat(otherBase3WallTeamPlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
-        aiPlanSetBaseID(otherBase3WallTeamPlanID, gOtherBase3ID);
-        aiPlanSetEscrowID(otherBase3WallTeamPlanID, cMilitaryEscrowID);
-        aiPlanSetDesiredPriority(otherBase3WallTeamPlanID, 100);
-        aiPlanSetActive(otherBase3WallTeamPlanID, true);
-        gOtherBase3RingWallTeamPlanID = otherBase3WallTeamPlanID;
-        xsSetRuleMinIntervalSelf(83);
-    }
+	string Readable = "OtherBase3RingWallTeamPlan";
+    gOtherBase3RingWallTeamPlanID = createCommonRingWallPlan(Readable, gOtherBase3ID, gOtherBaseWallRadius);
+	xsSetRuleMinIntervalSelf(83);
 }
 
 //==============================================================================
@@ -2516,94 +2361,13 @@ rule otherBase4RingWallTeam
 
     if (goldSupply < 150)
         return;    
-
-    float otherBaseWallRadius = gOtherBaseWallRadius;
-    
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-        builderType = cUnitTypeAbstractInfantry;
-    
-    int otherBase4WallTeamPlanID = aiPlanCreate("otherBase4WallTeamPlanID", cPlanBuildWall);
-    if (otherBase4WallTeamPlanID != -1)
-    {
-        aiPlanSetNumberVariableValues(otherBase4WallTeamPlanID, cBuildWallPlanAreaIDs, 20, true);
-        int numAreasAdded = 0;
-
-        int mainArea = -1;
-        vector mainCenter = kbBaseGetLocation(cMyID, gOtherBase4ID);
-        aiPlanSetInitialPosition(otherBase4WallTeamPlanID, mainCenter);
-        
-        float mainX = xsVectorGetX(mainCenter);
-        float mainZ = xsVectorGetZ(mainCenter);
-        mainArea = kbAreaGetIDByPosition(mainCenter);
-        aiPlanSetVariableInt(otherBase4WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
-        numAreasAdded = numAreasAdded + 1;
-      
-        int firstRingCount = -1;      // How many areas are in first ring around main?
-        int firstRingIndex = -1;      // Which one are we on?
-        int firstRingID = -1;         // Actual ID of current 1st ring area
-        vector areaCenter = cInvalidVector;    // Center point of this area
-        float areaX = 0.0;
-        float dx = 0.0;
-        float areaZ = 0.0;
-        float dz = 0.0;
-        bool needToSave = false;
-
-        firstRingCount = kbAreaGetNumberBorderAreas(mainArea);
- 
-        for (firstRingIndex = 0; < firstRingCount)      // Check each border area of the main area
-        {
-            needToSave = true;            // We'll save this unless we have a problem
-            firstRingID = kbAreaGetBorderAreaID(mainArea, firstRingIndex);
-            areaCenter = kbAreaGetCenter(firstRingID);
-            // Now, do the checks.
-            areaX = xsVectorGetX(areaCenter);
-            areaZ = xsVectorGetZ(areaCenter);
-            dx = mainX - areaX;
-            dz = mainZ - areaZ;
-            if ((dx > otherBaseWallRadius) || (dx < -1.0*otherBaseWallRadius)
-             || (dz > otherBaseWallRadius) || (dz < -1.0*otherBaseWallRadius))
-            {
-                needToSave = false;
-            }
-
-            // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
-            if (needToSave == true)
-            {
-                bool found = false;
-                for (j = 0; < numAreasAdded)
-                {
-                    if (aiPlanGetVariableInt(otherBase4WallTeamPlanID, cBuildWallPlanAreaIDs, j) == firstRingID)
-                    {
-                        found = true;     // It's in there, don't add it
-                    }
-                }
-                if ((found == false) && (numAreasAdded < 20))  // add it
-                {
-                    aiPlanSetVariableInt(otherBase4WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, firstRingID);
-                    numAreasAdded = numAreasAdded + 1;
-                }
-            }
-        }
-        // Set the true number of area variables, preserving existing values, then turn on the plan
-        aiPlanSetNumberVariableValues(otherBase4WallTeamPlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
-
-        aiPlanSetVariableInt(otherBase4WallTeamPlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-        aiPlanAddUnitType(otherBase4WallTeamPlanID, builderType, 1, 1, 1);
-        aiPlanSetVariableInt(otherBase4WallTeamPlanID, cBuildWallPlanNumberOfGates, 0, 40);
-        aiPlanSetVariableFloat(otherBase4WallTeamPlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
-        aiPlanSetBaseID(otherBase4WallTeamPlanID, gOtherBase4ID);
-        aiPlanSetEscrowID(otherBase4WallTeamPlanID, cMilitaryEscrowID);
-        aiPlanSetDesiredPriority(otherBase4WallTeamPlanID, 100);
-        aiPlanSetActive(otherBase4WallTeamPlanID, true);
-        gOtherBase4RingWallTeamPlanID = otherBase4WallTeamPlanID;
-        xsSetRuleMinIntervalSelf(83);
-    }
+	string Readable = "OtherBase4RingWallTeamPlan";
+    gOtherBase4RingWallTeamPlanID = createCommonRingWallPlan(Readable, gOtherBase4ID, gOtherBaseWallRadius);
+	xsSetRuleMinIntervalSelf(83);
 }
 
 //==============================================================================
 rule buildSkyPassages
-//    minInterval 28 //starts in cAge1
     minInterval 137 //starts in cAge1
     inactive
 {
@@ -2629,10 +2393,7 @@ rule buildSkyPassages
         aiPlanAddUnitType(planID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
         aiPlanSetBaseID(planID, kbBaseGetMainID(cMyID));
         aiPlanSetActive(planID);
-
-        return;  // Don't start second until first is done
     }
-// Removed buid at enemy base for now..
 }
 
 //==============================================================================
@@ -2733,10 +2494,6 @@ rule buildFortress
                 return;
             
             float buffer = 40.0;
-            if (cRandomMapName == "jotunheim")
-                buffer = 40.0;
-            
-
             float woodAmountInR20 = kbGetAmountValidResources(otherBaseID, cResourceWood, cAIResourceSubTypeEasy, 20.0);
             
 
@@ -2997,7 +2754,6 @@ rule buildTowerAtOtherBase
         aiPlanSetDesiredPriority(buildTowerAtOtherBasePlanID, 100);
         aiPlanSetVariableBool(buildTowerAtOtherBasePlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
         aiPlanSetVariableFloat(buildTowerAtOtherBasePlanID, cBuildPlanRandomBPValue, 0, 0.99);
-        
         aiPlanSetVariableVector(buildTowerAtOtherBasePlanID, cBuildPlanCenterPosition, 0, otherBaseLocation);
         aiPlanSetVariableFloat(buildTowerAtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 13.0);
         aiPlanAddUnitType(buildTowerAtOtherBasePlanID, builderType, 1, 1, 1);
@@ -3021,7 +2777,7 @@ rule buildBuildingsAtOtherBase
  
     float woodSupply = kbResourceGet(cResourceWood);
     float goldSupply = kbResourceGet(cResourceGold);
-    if ((woodSupply < 200) || (goldSupply < 120))
+    if ((woodSupply < 250) || (goldSupply < 200))
         return;
     
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -3056,7 +2812,7 @@ rule buildBuildingsAtOtherBase
 
     //return if we already have a building1 at the other base
     int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
-    if (cMyCulture == cCultureEgyptian)
+    if ((cMyCulture == cCultureEgyptian)|| (cMyCulture == cCultureNorse))
     {
         if (numBuilding1NearBase > 1)
             return;
@@ -3073,8 +2829,6 @@ rule buildBuildingsAtOtherBase
                 else 
                 building1ID = cUnitTypeArcheryRange;
 	    }
-        if (cMyCulture == cCultureNorse)
-        building1ID = cUnitTypeLonghouse;
         if (cMyCulture == cCultureAtlantean)
         building1ID = cUnitTypeBarracksAtlantean;
         if (cMyCulture == cCultureChinese)
@@ -3086,14 +2840,12 @@ rule buildBuildingsAtOtherBase
          numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
         }
     }
+    if (numBuilding1NearBase > 0)
+    return;		
 	}
-        if (numBuilding1NearBase > 0)
-		return;	
+
     
     float buffer = 20.0;
-    if (cRandomMapName == "jotunheim")
-        buffer = 40.0;
-    
     float woodAmountInR20 = kbGetAmountValidResources(otherBaseID, cResourceWood, cAIResourceSubTypeEasy, 20.0);
     
 
@@ -3298,7 +3050,7 @@ rule buildMirrorTower
 //==============================================================================
 rule buildInitialTemple //and rebuild it if destroyed
     inactive
-    minInterval 41 //starts in cAge1
+    minInterval 30 //starts in cAge1
 {
     if (ShowAiEcho == true) aiEcho("buildInitialTemple:");
     
@@ -3313,7 +3065,7 @@ rule buildInitialTemple //and rebuild it if destroyed
         return;
     }
     
-    if (xsGetTime() < 1*60*1000)
+    if (xsGetTime() < 2*60*1000)
         return;
 
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -3484,7 +3236,6 @@ rule buildArmory
 //==============================================================================
 rule fixUnfinishedWalls
     inactive
-//    minInterval 77 //starts in cAge2
     minInterval 83 //starts in cAge2
 {
     if (ShowAiEcho == true) aiEcho("fixUnfinishedWalls:");
@@ -3805,7 +3556,6 @@ rule destroyUnnecessaryDropsites
 }
 //==============================================================================
 rule findMySettlementsBeingBuilt
-//    minInterval 16 //starts in cAge2
     minInterval 479 //starts in cAge1, is set to 7 after 8 minutes
     inactive
 {
@@ -3873,7 +3623,6 @@ rule findMySettlementsBeingBuilt
 
 //==============================================================================
 rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
-//    minInterval 53 //starts in cAge2
     minInterval 59 //starts in cAge2
     inactive
 {    
@@ -4014,7 +3763,6 @@ rule rebuildDropsites   //rebuilds dropsites near gold mines and trees
 
 //==============================================================================
 rule buildGoldMineTower
-//    minInterval 33 //starts in cAge2
     minInterval 47 //starts in cAge2
     inactive
 {
@@ -4309,9 +4057,9 @@ rule buildMBTower
     if (buildMBTowerPlanID >= 0)
     {
         if (success == true)
-        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 16);
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 18);
         else
-        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 50.0);	
+        aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanCenterPositionDistance, 0, 30.0);	
         aiPlanSetInitialPosition(buildMBTowerPlanID, mainBaseLocation);
         aiPlanSetVariableInt(buildMBTowerPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeTower);
         aiPlanSetDesiredPriority(buildMBTowerPlanID, 100);
@@ -4565,13 +4313,9 @@ rule makeExtraMarket    //If it takes more than 5 minutes to place our trade mar
     inactive
     minInterval 37 //starts in cAge3, activated in tradeWithCaravans
 {
-
-    if (kbGetAge() < cAge3 && cMyCiv == cCivNuwa)
-	return;
-	
     xsSetRuleMinIntervalSelf(37);
     static int ruleStartTime = -1;
-    if (ShowAiEcho == true) aiEcho("*!*!*!*!*!*makeExtraMarket:");
+    if (ShowAiEcho == true) aiEcho("makeExtraMarket:");
     if (ruleStartTime == -1)
         ruleStartTime = xsGetTime();
     
@@ -4685,22 +4429,19 @@ rule buildManyBuildings
 	return;
    }
   
-   int numberOfArcheryRange=kbUnitCount(cMyID, cUnitTypeArcheryRange, cUnitStateAlive);
-   int numberOfBarracks=kbUnitCount(cMyID, cUnitTypeAcademy, cUnitStateAlive);
-   int numberOfStables=kbUnitCount(cMyID, cUnitTypeStable, cUnitStateAlive);
-   int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAlive);
+   int MilBuildings=kbUnitCount(cMyID, cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAliveOrBuilding);
+   int numberOfFortresses=kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
    int numberSettlements=kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
 
-   if ((numberOfFortresses < 1) || (numberSettlements < 2) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 8*60*1000) || (kbGetAge() < 2) || (currentWood < 1000))
+   if ((numberOfFortresses < 1) || (numberSettlements < 2) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 8*60*1000) || (kbGetAge() < cAge3) || (currentWood < 1000))
       return;
 
- if (numberOfArcheryRange+numberOfBarracks+numberOfStables < 34)
+ if (MilBuildings < 34)
  {
    int planID=aiPlanCreate("Build More Buildings", cPlanBuild);
    if (planID >= 0)
    {
       int randSelect=aiRandInt(3);
-
       if (randSelect == 0)
 	      aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeArcheryRange);
       else if (randSelect == 1)
@@ -4920,6 +4661,41 @@ inactive
     return;
     int alliedBaseUnitID = -1;
 	int MBalliedBaseUnitID = -1;
+    
+	//If we already have a build wall plan, don't make another one.
+    int wallPlanID = aiPlanGetIDByTypeAndVariableType(cPlanBuildWall, cBuildWallPlanWallType, cBuildWallPlanWallTypeArea, true);
+    int activeWallPlans = aiPlanGetNumber(cPlanBuildWall, -1, true);
+    float goldSupply = kbResourceGet(cResourceGold);
+    if (wallPlanID >= 0)
+    {
+        for (i = 0; < activeWallPlans)
+        {
+            int wallPlanIndexID = aiPlanGetIDByIndex(cPlanBuildWall, -1, true, i);
+            if (wallPlanIndexID == WallAllyPlanID)
+            {
+                static int WallAllyStartTime = -1;
+                if (WallAllyStartTime < 0)
+                    WallAllyStartTime = xsGetTime();
+                
+                if (goldSupply < 50)
+                {
+                    aiPlanDestroy(wallPlanIndexID);
+                    WallAllyStartTime = -1;
+                    xsSetRuleMinIntervalSelf(20);
+                    return;
+                }
+                //destroy the plan if it has been active for more than 12 minutes
+                if ((xsGetTime() > (WallAllyStartTime + 12*60*1000)))
+                {
+                    aiPlanDestroy(wallPlanIndexID);
+                    WallAllyStartTime = -1;
+                    xsSetRuleMinIntervalSelf(30);
+                    return;
+                }
+                return;
+            }
+        }
+    }	
 	
 	int Villagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
 	if (cMyCulture == cCultureAtlantean)
@@ -4982,44 +4758,10 @@ inactive
 	  MBalliedBaseUnitID = getMainBaseUnitIDForPlayer(actualPlayerID);
       vector otherBaseLocation = kbUnitGetPosition(alliedBaseUnitID);
 	}
-			float goldSupply = kbResourceGet(cResourceGold);
 			if ((kbIsPlayerHuman(actualIndex) == false) || (alliedBaseUnitID == MBalliedBaseUnitID) || (goldSupply < 160))
 			return;
 
-    //If we already have a build wall plan, don't make another one.
-    int wallPlanID = aiPlanGetIDByTypeAndVariableType(cPlanBuildWall, cBuildWallPlanWallType, cBuildWallPlanWallTypeArea, true);
-    int activeWallPlans = aiPlanGetNumber(cPlanBuildWall, -1, true);
-
-    if (wallPlanID >= 0)
-    {
-        for (i = 0; < activeWallPlans)
-        {
-            int wallPlanIndexID = aiPlanGetIDByIndex(cPlanBuildWall, -1, true, i);
-            if (wallPlanIndexID == WallAllyPlanID)
-            {
-                static int WallAllyStartTime = -1;
-                if (WallAllyStartTime < 0)
-                    WallAllyStartTime = xsGetTime();
-                
-                if (goldSupply < 50)
-                {
-                    aiPlanDestroy(wallPlanIndexID);
-                    WallAllyStartTime = -1;
-                    xsSetRuleMinIntervalSelf(20);
-                    return;
-                }
-                //destroy the plan if it has been active for more than 12 minutes
-                if ((xsGetTime() > (WallAllyStartTime + 12*60*1000)))
-                {
-                    aiPlanDestroy(wallPlanIndexID);
-                    WallAllyStartTime = -1;
-                    xsSetRuleMinIntervalSelf(30);
-                    return;
-                }
-                return;
-            }
-        }
-    }
+  
 	
     int radius = 18;
     int builderType = cUnitTypeAbstractVillager;
@@ -5136,8 +4878,6 @@ rule BunkerUpWonderTower
     minInterval 18 
     inactive
 {	
-
-
     static int gBunkerUpWonder1PlanID=-1;
     static vector WonderPlace = cInvalidVector;
 	
@@ -5366,4 +5106,4 @@ rule rebuildSiegeCamp
         aiPlanSetActive(RebuildSiegeCamp);
         xsSetRuleMinIntervalSelf(60);
     }
-}
+}	

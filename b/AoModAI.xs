@@ -27,7 +27,6 @@ extern bool gTransportMap=false;          // Set true if transports are needed o
 //Housing & PopCap.
 extern int gHouseBuildLimit=-1;
 extern int gHouseAvailablePopRebuild=10;     // Build a house when pop is within this amount of the current pop limit
-//extern int gBuildersPerHouse=1;
 extern int gHardEconomyPopCap=-1;            // Sets an absolute upper limit on the number of villagers maintained in the updateEM rules
 extern int gEarlySettlementTarget = 2;       // How many age 1/2 settlements do we want?
 
@@ -36,7 +35,6 @@ extern int gEarlySettlementTarget = 2;       // How many age 1/2 settlements do 
 extern int   gGatherGoalPlanID=-1;
 extern int   gCivPopPlanID=-1;
 extern int   gNumBoatsToMaintain=6;       // Target number of fishing boats
-extern int   gAgeToStartFarming=2;        // Obsolete
 //extern bool  gAgeCapHouses=false;
 extern bool	 gFarming=false;              // Set true when a farming plan is created, used to forecast farm resource needs.
 extern bool  gFishing=false;              // Set true when a fishing plan is created, used to forecast fish boat wood demand
@@ -161,7 +159,7 @@ extern int gBackAreaID = -1;
 extern int gHouseAreaID = -1;
 extern bool gResetWallPlans = false;
 
-extern float gMainBaseAreaWallRadius = 30;
+extern float gMainBaseAreaWallRadius = 26;
 extern float gSecondaryMainBaseAreaWallRadius = 42;
 
 extern int gMainBaseAreaWallTeam1PlanID = -1;
@@ -196,10 +194,6 @@ extern int gHero1MaintainPlan = -1;
 extern int gHero2MaintainPlan = -1;
 extern int gHero3MaintainPlan = -1;
 extern int gHero4MaintainPlan = -1;
-
-extern int gNumUnitType1ToTrain = 2;
-extern int gNumUnitType2ToTrain = 2;
-extern int gNumUnitType3ToTrain = 2;
 
 extern int gEnemySettlementAttPlanID = -1;
 extern int gEnemySettlementAttPlanTargetUnitID = -1;
@@ -291,6 +285,7 @@ mutable void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVec
 include "AoModAIBasics.xs";
 
 // Placeholder Reth
+mutable void initRethlAge1() {}
 include "AoModAiExtra.xs";
 //==============================================================================
 
@@ -498,18 +493,30 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
     float foodSupply = kbResourceGet(cResourceFood);
     float favorSupply = kbResourceGet(cResourceFavor);
     static int count = 0;
-    
+	static int countB = 0;
+	int Dropsite = cUnitTypeEarlyFoodDropsite;
+	int ReserveAmount = 150;
+	if (cMyCulture == cCultureAtlantean)
+	{
+	Dropsite = cUnitTypeGuild;
+	ReserveAmount = 125;
+    }
+	
     int mainBaseUnitID = getMainBaseUnitIDForPlayer(cMyID);
 	
     if (kbGetAge() > cAge1)
     {
-        if (foodSupply < 90)
+        if ((foodSupply < ReserveAmount) || (cMyCulture == cCultureAtlantean) && (kbCanAffordUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionGatherer,0), cEconomyEscrowID) == false))
         {
+		    if (foodSupply < ReserveAmount) // atlanteans need special treatment
             kbEscrowFlush(cMilitaryEscrowID, cResourceFood, true);
             if (ShowAiEcho == true) aiEcho("Flushing military food escrow");
-            if (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAlive) > 0)
+			if ((cMyCulture == cCultureAtlantean) && (woodSupply < 50))
+			kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
+
+            if ((kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAlive) > 0) && (foodSupply < ReserveAmount))
             {
-                if ((aiGetMarketBuyCost(cResourceFood) < goldSupply) && (count > 0))
+                if ((aiGetMarketBuyCost(cResourceFood) < goldSupply) && (count > 0) && (foodSupply < 90))
                 {
                     aiBuyResourceOnMarket(cResourceFood);
                     if (ShowAiEcho == true) aiEcho("Food supply below 90, buying food.");
@@ -518,10 +525,22 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 else
                     count = count + 1;
             }
+            if ((kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAlive) > 0) && (woodSupply < 25) (cMyCulture == cCultureAtlantean) && (kbEscrowGetAmount(cEconomyEscrowID, cResourceWood) < 25))
+            {
+                if ((aiGetMarketBuyCost(cResourceWood) < goldSupply) && (countB > 0) && (woodSupply < 25))
+                {
+                    aiBuyResourceOnMarket(cResourceWood);
+                    if (ShowAiEcho == true) aiEcho("Wood supply below 25, buying Wood.");
+                    countB = 0;
+                }
+                else
+                    countB = countB + 1;
+            }			
         }
         else
         {
             count = 0;
+			countB = 0;
         }
     }
     
@@ -535,12 +554,10 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         {
             if ((woodSupply > 50) && (goldSupply > 100))
             {
-                kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
-                kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
+                aiTaskUnitResearch(findUnit(Dropsite), cTechPlow);
                 if (ShowAiEcho == true) aiEcho("Flushing military wood and gold escrow");
             }
-        }
-		
+        }	
         if ((foodSupply > 800) && (goldSupply > 500) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
         {
             aiTaskUnitResearch(mainBaseUnitID, gAge3MinorGod);
@@ -551,12 +568,13 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, cTechWatchTower, true) >= 0) && (numTowers > 0))
         {
             if ((woodSupply > 200) && (goldSupply > 100))
-            aiTaskUnitResearch(mainBaseUnitID, findUnit(cUnitTypeTower));
+            aiTaskUnitResearch(findUnit(cUnitTypeTower), cTechWatchTower);
         }
-        
-        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < gEarlySettlementTarget))
+        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && 
+		(aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, cUnitTypeSettlementLevel1, true) > 0) && (xsGetTime() < 16*60*1000) &&
+		(kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < gEarlySettlementTarget))
         {
-            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) && (foodSupply < 560) || (cMyCulture == cCultureEgyptian) && (goldSupply > 350) && (foodSupply < 560))
+            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) && (foodSupply < 560) || (cMyCulture == cCultureEgyptian) && (goldSupply > 400) && (foodSupply < 560))
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
@@ -564,50 +582,36 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
                 if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
-        }
+        }		
     }
     else if (kbGetAge() == cAge3)
     {
-        if ((cMyCulture == cCultureGreek) && (gAge3MinorGod == cTechAge3Apollo) && (kbGetTechStatus(cTechTempleofHealing) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, cTechTempleofHealing, true) >= 0))
-        {
-            if ((goldSupply > 150) && (favorSupply > 20))
-            {
-                kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
-                kbEscrowFlush(cEconomyEscrowID, cResourceFavor, true);
-            }
-        }
-        
         if ((kbGetTechStatus(cTechIrrigation) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechIrrigation, true) >= 0))
         {
             if ((woodSupply > 150) && (goldSupply > 250))
             {
-                kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
-                kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
+                aiTaskUnitResearch(findUnit(Dropsite), cTechIrrigation);
                 if (ShowAiEcho == true) aiEcho("Flushing military wood and gold escrow");
             }
         }
         
         if ((kbGetTechStatus(cTechFortifyTownCenter) < cTechStatusResearching) && (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, cTechFortifyTownCenter, true) >= 0))
         {
-            if ((woodSupply > 400) && (goldSupply > 400))
-            {
-                if (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0)
-                {
-                    kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
-                    kbEscrowFlush(cEconomyEscrowID, cResourceGold, true);
-                    if (ShowAiEcho == true) aiEcho("Flushing economy wood and gold escrow");
-                }
-                else
+            if ((woodSupply > 400) && (goldSupply > 400) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0))
                 {
                     aiTaskUnitResearch(mainBaseUnitID, cTechFortifyTownCenter);
                     if (ShowAiEcho == true) aiEcho("tasking research of tech ID"+cTechFortifyTownCenter);
                 }
-            }
-        }
-        
-        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 3))
+        }	
+        if ((foodSupply > 1000) && (goldSupply > 1000) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) && (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAlive) > 0))
         {
-            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) && (foodSupply > 200) || (cMyCulture == cCultureEgyptian) && (goldSupply > 360) && (foodSupply > 250))
+            aiTaskUnitResearch(mainBaseUnitID, gAge4MinorGod);
+            if (ShowAiEcho == true) aiEcho("tasking research of tech ID"+gAge4MinorGod);
+        }
+        if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 3) &&
+		(aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, cUnitTypeSettlementLevel1, true) > 0))
+        {
+            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) && (foodSupply > 200) || (cMyCulture == cCultureEgyptian) && (goldSupply > 400) && (foodSupply > 250))
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
@@ -615,13 +619,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
                 if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
-        }
-		
-        if ((foodSupply > 1000) && (goldSupply > 1000) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) && (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAlive) > 0))
-        {
-            aiTaskUnitResearch(mainBaseUnitID, gAge4MinorGod);
-            if (ShowAiEcho == true) aiEcho("tasking research of tech ID"+gAge4MinorGod);
-        }
+        }		
     }
     else if (kbGetAge() > cAge3)
     {
@@ -639,9 +637,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
         {
             if ((woodSupply > 250) && (goldSupply > 350))
             {
-                kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
-                kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
-                if (ShowAiEcho == true) aiEcho("Flushing military wood and gold escrow");
+                aiTaskUnitResearch(findUnit(Dropsite), cTechFloodControl);
             }
         }
         
@@ -653,10 +649,9 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 if (ShowAiEcho == true) aiEcho("tasking research of tech ID"+cTechFortifyTownCenter);
             }
         }
-        
         if ((aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true) > 0) && (kbUnitCount(0, cUnitTypeAbstractSettlement) > 0))
         {
-            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) || (cMyCulture == cCultureEgyptian) && (goldSupply > 360) && (foodSupply > 250))
+            if ((cMyCulture != cCultureEgyptian) && (woodSupply > 350) && (goldSupply > 350) || (cMyCulture == cCultureEgyptian) && (goldSupply > 450) && (foodSupply > 250))
             {
                 kbEscrowFlush(cEconomyEscrowID, cResourceWood, true);
                 kbEscrowFlush(cMilitaryEscrowID, cResourceWood, true);
@@ -664,7 +659,7 @@ rule checkEscrow    //Verify that escrow totals and real inventory are in sync
                 kbEscrowFlush(cMilitaryEscrowID, cResourceGold, true);
                 if (ShowAiEcho == true) aiEcho("Flushing wood and gold escrow");
             }
-        }
+        }		
   }
 }
 
@@ -700,8 +695,8 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
             milPopDelta = milPopDelta / (2.0 + cvMilitaryEconSlider);
             milPop = milPop + (milPop * milPopDelta);
         }
-            if (milPop < 26) 
-                milPop = 26;
+            if (milPop < 30) 
+                milPop = 30;
             if (gAgeReduceMil == true)
 	        milPop = eMaxMilPop;		
     }
@@ -769,10 +764,6 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
     if (numMarkets > 0)
     {
         int tradeCount = numTradeUnits;
-        if ((kbGetAge() == cAge3) && (tradeCount < 7))
-            tradeCount = 7;
-        else if ((kbGetAge() > cAge3) && (tradeCount < 15))
-            tradeCount = 15;
         if ((aiGetGameMode() == cGameModeLightning) && (tradeCount > 5))
             tradeCount = 5;
         vilPop = vilPop - tradeCount;     // Vils = total-trade
@@ -840,9 +831,7 @@ void updateEM(int econPop=-1, int milPop=-1, float econPercentage=0.5,
 	createCivPopPlan();
 	}
 	}
-	
     aiPlanSetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0, vilPop);
-
 }
 
 //==============================================================================
@@ -856,34 +845,31 @@ rule updateEMAge1       // i.e. cAge1
    {
       if (aiGetWorldDifficulty() == cDifficultyEasy)
       {
-         civPopTarget = 20;
+         civPopTarget = 21;
          milPopTarget = 10;
          if (cMyCulture == cCultureAtlantean)
             civPopTarget = 27;   // Make up for oracles
       }
       else if (aiGetWorldDifficulty() == cDifficultyModerate)
       {
-         civPopTarget = 20;
-         if (cMyCulture == cCultureAtlantean)
          civPopTarget = 21;
          milPopTarget = 30;
       }
       else if (aiGetWorldDifficulty() == cDifficultyHard)
       {
 
-		 civPopTarget = 20;
-         if (cMyCulture == cCultureAtlantean)
-         civPopTarget = 21; 
+		 civPopTarget = 21;
          milPopTarget = 60;
       }
       else
       {
-		 civPopTarget = 20;
-         if (cMyCulture == cCultureAtlantean)
-         civPopTarget = 21; 		 
+		 civPopTarget = 21;		 
          milPopTarget = 80;
       }
    }
+   if (cMyCulture == cCultureAtlantean)
+   civPopTarget = 25;
+   
    //All econ in the first age.
    updateEM(civPopTarget, milPopTarget, 1.0, 0.2, 1.0, 1.0, 1.0, 1.0);
 }
@@ -937,21 +923,15 @@ rule updateEMAge2
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
 	
-	if ((xsGetTime() > 13*60*1000) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge2))
+	if ((xsGetTime() > 14*60*1000) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
 	{
-	if (econEscrow < 0.55)
-	econEscrow = 0.55;
+	if (econEscrow < 0.40)
+	econEscrow = 0.40;
 	}
 	float foodEscrow = econEscrow;
     float woodEscrow = econEscrow;
 	float goldEscrow = econEscrow;
-
-    if (foodEscrow < 0.20)
-	foodEscrow = 0.20;
-    if ((woodEscrow < 0.20) && (cMyCulture != cCultureEgyptian))
-	woodEscrow = 0.20;	
-    if ((goldEscrow < 0.20) && (cMyCulture == cCultureEgyptian))
-	goldEscrow = 0.20;		
+		
 
     //More military in second age
     updateEM(civPopTarget, milPopTarget, econPercent, 0.2, foodEscrow, woodEscrow, goldEscrow, econEscrow);
@@ -1020,7 +1000,11 @@ rule updateEMAge3
 
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
-
+	if ((xsGetTime() > 22*60*1000) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching))
+	{
+	if (econEscrow < 0.35)
+	econEscrow = 0.35;
+	}
     //More military in second age
     updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, econEscrow, econEscrow, econEscrow);
 }
@@ -1098,10 +1082,10 @@ rule updateEMAge4
 
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
-	if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
+	if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (gTransportMap == false))
 	{
-	if (econEscrow < 0.55)
-	econEscrow = 0.5;
+	if (econEscrow < 0.20)
+	econEscrow = 0.20;
     }	
 
     //More military in second age
@@ -1223,9 +1207,9 @@ rule updatePrices   // This rule constantly compares actual supply vs. forecast,
                     aiBuyResourceOnMarket(cResourceFood);
                 }
             }
-            if (kbResourceGet(cResourceWood) < 1000)
+            if (kbResourceGet(cResourceWood) < 800)
             {
-                if (kbResourceGet(cResourceGold) > 2700)
+                if (kbResourceGet(cResourceGold) > 1800)
                 {
                     for (i = 0; < 4)
                     {
@@ -1320,8 +1304,6 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     float favorSupply = kbResourceGet(cResourceFavor);
 
     float foodMultiplier = 1.2;      // Because food is so much slower to gather, inflate need
-	if ((ResInflate == true) && (foodSupply > 2200))
-	foodMultiplier = 1.0;
 	
     gFoodForecast = gFoodForecast * foodMultiplier;
 
@@ -1456,7 +1438,9 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     float desiredGoldUnits = desiredGoldRatio * civPopTotal;
     float desiredWoodUnits = desiredWoodRatio * civPopTotal;
     float desiredFoodUnits = desiredFoodRatio * civPopTotal;
-
+    
+	if (kbGetAge() > cAge3)
+	numTradeCarts = numTradeCarts * 1.25;
     float neededGoldGatherers = desiredGoldUnits - numTradeCarts;
     int mainBaseID = kbBaseGetMainID(cMyID);
     int numMainBaseGoldSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy, 85.0);
@@ -1528,13 +1512,13 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (goldAssignment > lastGoldAssignment)
         {
-            goldAssignment = lastGoldAssignment + 0.04;
-            if (goldAssignment > 0.45)
-                goldAssignment = 0.45;
+            goldAssignment = lastGoldAssignment + 0.03;
+            if (goldAssignment > 0.50)
+                goldAssignment = 0.50;
         }
         else if (goldAssignment < lastGoldAssignment)
         {
-            goldAssignment = lastGoldAssignment - 0.04;
+            goldAssignment = lastGoldAssignment - 0.03;
             if (goldAssignment < 0.05)
                 goldAssignment = 0.05;
         }
@@ -1543,13 +1527,13 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (woodAssignment > lastWoodAssignment)
         {
-            woodAssignment = lastWoodAssignment + 0.04;
-            if (woodAssignment > 0.45)
-                woodAssignment = 0.45;
+            woodAssignment = lastWoodAssignment + 0.03;
+            if (woodAssignment > 0.55)
+                woodAssignment = 0.55;
         }
         else if (woodAssignment < lastWoodAssignment)
         {
-            woodAssignment = lastWoodAssignment - 0.04;
+            woodAssignment = lastWoodAssignment - 0.03;
             if (woodAssignment < 0.05)
                 woodAssignment = 0.05;
         }
@@ -1558,16 +1542,11 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     {
         if (foodAssignment > lastFoodAssignment)
         {
-            foodAssignment = lastFoodAssignment + 0.05;
-            if ((foodAssignment > 0.65) && (kbGetAge() > cAge1))
-            {
-                if (foodOverride == false)
-                    foodAssignment = 0.65;
-            }
+            foodAssignment = lastFoodAssignment + 0.03;
         }
         else if (foodAssignment < lastFoodAssignment)
         {
-            foodAssignment = lastFoodAssignment - 0.04;
+            foodAssignment = lastFoodAssignment - 0.03;
 			if (foodAssignment < 0.25)
                 foodAssignment = 0.25;
         }
@@ -1642,7 +1621,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 	 intGold = intGold / 3;
 	 }
      if (ShowAiEcho == true) aiEcho(">>> "+intGather+" villagers:  "+"Food "+intFood+", Wood "+intWood+", Gold "+intGold+"  (Fish "+intFish+", Trade "+intTrade+") <<<");
-     aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
+     if (ShowAiEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
 
 }
 
@@ -1677,17 +1656,17 @@ void setMilitaryUnitCostForecast(void)
 	if (kbGetAge() == cAge2)
 	{
 		upID = gRushUPID;
-		totalAmount = 600;
+		totalAmount = 850;
 	}
 	if (kbGetAge() == cAge3)
 	{
 		upID = gLateUPID;
-		totalAmount = 1400;
+		totalAmount = 2500;
 	}
 	if (kbGetAge() >= cAge4)
 	{
 		upID = gLateUPID;
-		totalAmount = 3600;
+		totalAmount = 4000;
 	}
 
    int origGold = gGoldForecast;
@@ -1754,7 +1733,7 @@ void setMilitaryUnitCostForecast(void)
 
 //==============================================================================
 rule econForecastAge4		// Rule activates when age 4 research begins
-    minInterval 21
+    minInterval 20
     inactive
 {	
     static int ageStartTime = -1;
@@ -1904,7 +1883,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
 
 //==============================================================================
 rule econForecastAge3		// Rule activates when age3 research begins, turns off when age 4 research begins
-    minInterval 18
+    minInterval 9
     inactive
 {
     static int ageStartTime = -1;
@@ -1992,8 +1971,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
         if (woodSupply < 500)
             gWoodForecast = gWoodForecast + (500 - woodSupply);
     }
-    
-    
+       
     // Market
     if (kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding) < 1)
     addUnitForecast(cUnitTypeMarket, 1);
@@ -2065,7 +2043,7 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 
 //==============================================================================
 rule econForecastAge2		// Rule activates when age 2 research begins, turns off when age 3 research begins
-    minInterval 9
+    minInterval 6
     inactive
 {
     static int ageStartTime = -1;
@@ -2143,22 +2121,13 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
     if ((kbUnitCount(cMyID, Armory, cUnitStateAliveOrBuilding) < 1) && (cMyCulture != cCultureEgyptian))
     addUnitForecast(Armory, 1);
     
-    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 5*60*1000))
+    if ((ageStartTime != -1) && (xsGetTime() - ageStartTime > 4.5*60*1000))
     {
         addTechForecast(gAge3MinorGod);
-        if (woodSupply < 250)
-            gWoodForecast = gWoodForecast + (250 - woodSupply);
-    }
-    else
-    {
-        if (goldSupply < 300)
-            gGoldForecast = gGoldForecast + (300 - goldSupply);
-        if (foodSupply < 300)
-            gFoodForecast = gFoodForecast + (300 - foodSupply);
         if (woodSupply < 300)
             gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
-	
+
     // Watchtower
     if ((cMyCulture != cCultureEgyptian) && (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching))
     addTechForecast(cTechWatchTower);
@@ -2187,44 +2156,24 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 		 temp = 4;
 	addUnitForecast(aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanUnitType, 0), temp);
 
-    if (gFarming == true)
-	{
 		float foodGatherersWanted = aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood);   // Percent food gatherers
 		foodGatherersWanted = foodGatherersWanted * kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive); // Actual count
 		temp = foodGatherersWanted - kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding);
 		if (temp < 0)
 			temp = 0;
-	  if (temp > 8)
-		 temp = 8;  
-
+	    if (temp > 8)
+		    temp = 8;  
 		if (temp > 0)
-		 addUnitForecast(cUnitTypeFarm, temp);
-	}   
+		 addUnitForecast(cUnitTypeFarm, temp);  
     
     // military buildings
-	if (cMyCulture == cCultureGreek)
+    if (kbUnitCount(cMyID, cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAliveOrBuilding) < 3)
 	{
-		gWoodForecast = gWoodForecast + 300;
-	}
-	if (cMyCulture == cCultureNorse)
-	{
-		gWoodForecast = gWoodForecast + 300;
-	}
 	if (cMyCulture == cCultureEgyptian)
-	{
 		gGoldForecast = gGoldForecast + 300;
-	}
-   if (cMyCulture == cCultureAtlantean)
-    {
-		gWoodForecast = gWoodForecast + 200;
-		gGoldForecast = gGoldForecast + 100;
+    else
+	    gWoodForecast = gWoodForecast + 300;
     }
-   if (cMyCulture == cCultureChinese)
-    {
-		gWoodForecast = gWoodForecast + 200;
-		gGoldForecast = gGoldForecast + 100;
-	}
-    
     if (gTransportMap == true)
     {
         if (woodSupply < 300)
@@ -2242,22 +2191,6 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
       }		
     }
 	setMilitaryUnitCostForecast(); // add units before scaling down
-	if (cMyCulture == cCultureEgyptian)
-	gWoodForecast = gWoodForecast * 0.7;
-    if ((gWoodForecast > 800) && ((xsGetTime() > (15*60*1000))))
-	gWoodForecast = 800;
-	
-
-    if (woodSupply > 900)
-        gWoodForecast = gWoodForecast * 0.5;
-    else if (woodSupply > 800)
-        gWoodForecast = gWoodForecast * 0.6;
-    else if (woodSupply > 700)
-        gWoodForecast = gWoodForecast * 0.7;
-    else if (woodSupply > 600)
-        gWoodForecast = gWoodForecast * 0.8;
-    else if (woodSupply > 500)
-        gWoodForecast = gWoodForecast * 0.9;
 
     if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
@@ -2265,7 +2198,7 @@ rule econForecastAge2		// Rule activates when age 2 research begins, turns off w
 
 //==============================================================================
 rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in setEarlyEcon rule, ending when next age upgrade starts
-    minInterval 7
+    minInterval 4
     inactive
 {
     int age = kbGetAge();
@@ -2273,7 +2206,6 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     {
         xsDisableSelf();
         xsEnableRule("econForecastAge2");
-		gSuperboom = false;
         return;
     }
 	int mainBaseUnitID = findUnit(cUnitTypeAbstractSettlement, cUnitStateAlive);
@@ -2291,63 +2223,26 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     // If we've made it here, we're in age 1 (cAge1), we've been in the age at least 2 minutes,
     // and we haven't started the age 2 upgrade.  Let's see what we need.
 	
-    gGoldForecast = 150.0;
-    gWoodForecast = 200.0;
-    gFoodForecast = 700.0;
-
-	if (RethFishEco == true && gWaterMap == true && ConfirmFish == true	&& xsGetTime() < eFishTimer*1*1000)
-	{
-	gSuperboom=false;
-	gFoodForecast = eFBoomFood+.0;
-	gGoldForecast = eFBoomGold+.0;
-	gWoodForecast = eFBoomWood+.0;
-	if (ShowAiEcho == true) aiEcho("Phase 2: Going wild on wood");
-		
-}	
-
-if (xsGetTime() > eFishTimer*1*1000 && RethFishEco == true && ConfirmFish == true)
-    {	
-    gSuperboom=true;
-	RethFishEco = false;
-	if (ShowAiEcho == true) aiEcho("Phase 3: RethFishEco is disabled");
-    }
-	
-	if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000)
-{
-	gFoodForecast = eBoomFood+.0;
-	gGoldForecast = eBoomGold+.0;
-	gWoodForecast = eBoomWood+.0;
-}
-
-if (gSuperboom == true && xsGetTime() < eBoomTimer*60*1000 && cMyCulture == cCultureEgyptian)
-{
-	gFoodForecast = eBoomFood+.0;
-	gGoldForecast = egBoomGold+.0;
-	gWoodForecast = egBoomWood+.0;
-}
-	
-    float goldSupply = kbResourceGet(cResourceGold);
-    float woodSupply = kbResourceGet(cResourceWood);
-    float foodSupply = kbResourceGet(cResourceFood);
+	gFoodForecast = 600.0;
+    gGoldForecast = 100.0;
+    gWoodForecast = 250.0;
     
-    if ((woodSupply < 300) && (cMyCulture != cCultureEgyptian))
-        gWoodForecast = gWoodForecast + (300 - woodSupply);
-
-    if ((gFarming == true) && (cMyCulture == cCultureEgyptian))
+	if (cMyCulture == cCultureEgyptian)
     {
-        if (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) < 18)
-        {
-            if (goldSupply < 300)
-                gGoldForecast = gGoldForecast + (300 - goldSupply);
-        }
+	gFoodForecast = 600.0;
+    gGoldForecast = 300.0;
+    gWoodForecast = 100.0;
     }
-    
+	
+    float woodSupply = kbResourceGet(cResourceWood);
+    if ((gFarming == true) && (cMyCulture == cCultureEgyptian) && (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAliveOrBuilding) < 10))
+        addUnitForecast(cUnitTypeFarm, 3); 
+   
     if (gFishing == true)
     {
-        if (woodSupply < 200)
-            gWoodForecast = gWoodForecast + (200 - woodSupply);
+        if (woodSupply < 300)
+            gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
-
     if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
 }
@@ -2426,7 +2321,6 @@ void initEgyptian(void)
             aiPlanSetVariableInt(gEmpowerPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeGranary);
             aiPlanSetDesiredPriority(gEmpowerPlanID, 91);
 			aiPlanSetActive(gEmpowerPlanID);
-			
         }
 
 	
@@ -3211,7 +3105,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else if (upRand == 1)
                 {
@@ -3220,7 +3113,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else
                 {
@@ -3229,7 +3121,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 break;			
         }
@@ -3243,7 +3134,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else if (upRand == 1)
                 {
@@ -3261,7 +3151,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 break;			
         }
@@ -3275,7 +3164,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.2);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else if (upRand == 1)
                 {
@@ -3284,7 +3172,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.7);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 else
                 {
@@ -3293,7 +3180,6 @@ int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.5);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
                     kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.2);
-					kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.15);
                 }
                 break;			
         }
@@ -3467,7 +3353,8 @@ void init(void)
             break;
         }		
     }
-    
+    //My stuff
+	initRethlAge1();
 	//Map Specific
     initMapSpecific();
 	//Naval
@@ -3555,7 +3442,6 @@ void init(void)
     {
         gBuildWalls = false;
         gBuildWallsAtMainBase = false;
-
     }
 	
 
@@ -3608,7 +3494,7 @@ void init(void)
     if (mapPreventsRush() == true)
         rushCount = 0;  
 
-    if ((gBuildWallsAtMainBase == true) && (rushCount > 0))
+    if (rushCount >= 0)
     {  
         // Knock up to 40 pop slots off plan
          if (rushSize > 80)
@@ -3617,7 +3503,6 @@ void init(void)
          rushSize = rushSize/2;
     }
 
-    
     int numTypes = 3;
 
     // Finally, adjust rushSize to the per-wave number we need
@@ -3627,25 +3512,14 @@ void init(void)
         rushSize = rushSize / rushCount;
     }
 
-    if (rushSize > 50)
-        rushSize = 50;
+    if (rushSize > 45)
+        rushSize = 45;
 
-    if ((rushCount > 0) && (rushSize <= 25))
-        rushSize = 25;    // anything less isn't worth sending
+    if (rushSize < 25)
+        rushSize = 25;  // Give unitpicker something to do...
 
-    if (rushSize < 10)
-        rushSize = 10;  // Give unitpicker something to do...
 
-    if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureNorse))
-    {
-
-            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2, false);  // 2 buildings if egyptian or norse
-    }    
-    else
-    {
-            gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 1, false); // Rush with rushSize pop slots of two types, 1 buildings, do guess enemy unit type
-    }
-
+    gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 2, false); // Rush with rushSize pop slots of two types, 2 buildings
 
     if (ShowAiEcho == true) aiEcho("Setting rush unit picker for "+rushCount+" rushes with "+rushSize+" pop slots used.");
 
@@ -3704,16 +3578,16 @@ void init(void)
 	    kbUnitPickSetPreferenceWeight(gRushUPID, 2.0);
 	    kbUnitPickSetCostWeight(gRushUPID, 7.0);
 	    kbUnitPickSetCombatEfficiencyWeight(gRushUPID, 4.0);
-		kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMythUnit, 0.0);
+		//kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMythUnit, 0.0);
         kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 3, 1, true);
 		
 		if (cMyCulture == cCultureGreek)
         {
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeToxotes, 1.0);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHoplite, 0.3);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.2);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHoplite, 0.5);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.3);
 		 if (cMyCiv == cCivPoseidon)
-		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.3);	 
+		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHippikon, 0.5);	 
         }
         if (cMyCulture == cCultureEgyptian)
         {
@@ -3733,15 +3607,14 @@ void init(void)
         if (cMyCulture == cCultureAtlantean)
         {
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeJavelinCavalry, 1.0);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSwordsman, 0.5);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSwordsman, 0.8);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMaceman, 0.1);
 		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeChieroballista, 0.0);
-		 kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 2, 1, true);
         }
         if (cMyCulture == cCultureChinese)
         {
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeChuKoNu, 1.0);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.5);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.7);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHalberdier, 0.4);
         }		
 		
@@ -3753,7 +3626,8 @@ void init(void)
             if (gRushGoalID > 0)
             {
                 //Go for hitpoint upgrade first.
-                aiPlanSetVariableInt(gRushGoalID, cGoalPlanUpgradeFilterType, 0, cUpgradeTypeHitpoints);               
+                aiPlanSetVariableInt(gRushGoalID, cGoalPlanUpgradeFilterType, 0, cUpgradeTypeHitpoints);      
+                aGoalID = gRushGoalID;				
             }
         }
         else
@@ -3766,6 +3640,7 @@ void init(void)
 				  aiPlanSetVariableInt(gIdleAttackGID, cGoalPlanUpgradeFilterType, 0, cUpgradeTypeHitpoints);
                 //Reset the rushUPID down to 3 unit type and 1 building.
                 kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 3, 1, true);
+				aGoalID = gIdleAttackGID;	
             }
         }
     }
@@ -3795,7 +3670,7 @@ void init(void)
     {
         minPop=40+aiRandInt(20);
         maxPop=70;
-        if (aiGetWorldDifficulty() > cDifficultyModerate)
+        if (aiGetWorldDifficulty() > cDifficultyHard)
             maxPop = 90;
 
         //If we're on KOTH, make the attack groups smaller.
@@ -3807,15 +3682,10 @@ void init(void)
         
         if (ShowAiEcho == true) aiEcho("gLateUP minPop: "+minPop+", maxPop: "+maxPop);
         
-        if ( aiGetGameMode() != cGameModeDeathmatch )
-        {
-            if (gTransportMap == true)
-                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings, false);    // Min: 40-59, max 70 pop slots
-            else
-                gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, gNumberBuildings+1, false);    // Min: 40-59, max 70 pop slots
-        }
+        if (aiGetGameMode() != cGameModeDeathmatch)
+            gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, gNumberBuildings, false);    // Min: 40-59, max 70 pop slots
         else  // Double buildings in DM
-            gLateUPID=initUnitPicker("Late", 4, -1, -1, minPop, maxPop, 2*gNumberBuildings+2, false);    // Min: 40-59, max 70 pop slots
+            gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, 2*gNumberBuildings, false);    // Min: 40-59, max 70 pop slots
     }
     
     int lateAttackAge = 2;
@@ -3883,7 +3753,7 @@ void init(void)
         //Standard RB setup.
         aiPlanSetNumberVariableValues(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, 5, true);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHunt, 0);
-		if ((cMyCulture == cCultureAtlantean) || (aiGetGameMode() == cGameModeDeathmatch))
+		if (aiGetGameMode() == cGameModeDeathmatch)
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 0);
 		else aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy, 1);
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHuntAggressive, 0);
@@ -4070,7 +3940,7 @@ void age2Handler(int age=1)
     xsEnableRule("baseAttackTracker");
     
     xsEnableRule("otherBasesDefPlans");
-     
+    xsEnableRule("getNextGathererUpgrade"); 
     
     //activate ObeliskClearingPlan if there is an Egyptian enemy,
     //enable the hesperides rule if there's an Oranos or Gaia player
@@ -4093,9 +3963,6 @@ void age2Handler(int age=1)
         }			
         
     }
-	
-	
-	
     
     if (hesperidesPower == true)
         xsEnableRule("hesperides");
@@ -4143,7 +4010,6 @@ void age2Handler(int age=1)
     if ((gTransportMap == true) && (gMaintainWaterXPortPlanID < 0) || (cvRandomMapName == "king of the hill"))
     {
         gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 2, false, -1);
-        //aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 50);
     }
 
     //Init our myth unit rule.
@@ -4179,90 +4045,6 @@ void age2Handler(int age=1)
     //Greek.
     if (cMyCulture == cCultureGreek)
     {
-        //Force an archery range to go down.
-        int archeryRangePlanID=aiPlanCreate("build ArcheryRange", cPlanBuild);
-        if (archeryRangePlanID >= 0)
-        {
-            aiPlanSetVariableInt(archeryRangePlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeArcheryRange);
-            aiPlanSetVariableBool(archeryRangePlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(archeryRangePlanID, cBuildPlanRandomBPValue, 0, 0.0);
-   
-            fx = fzOrig * (-21);
-            fz = fxOrig * 21;
-
-            frontVector = xsVectorSetX(frontVector, fx);
-            frontVector = xsVectorSetZ(frontVector, fz);
-            frontVector = xsVectorSetY(frontVector, 0.0);
-            location = origLocation + frontVector;
-
-            aiPlanSetVariableVector(archeryRangePlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(archeryRangePlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(archeryRangePlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(archeryRangePlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
-
-            aiPlanSetDesiredPriority(archeryRangePlanID, 100);
-            aiPlanAddUnitType(archeryRangePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-            aiPlanSetEscrowID(archeryRangePlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(archeryRangePlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(archeryRangePlanID);
-        }
-        
-        //Force a stable to go down            
-        int stablePlanID=aiPlanCreate("build Stable", cPlanBuild);
-        if (stablePlanID >= 0)
-        {
-            aiPlanSetVariableInt(stablePlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeStable);
-            aiPlanSetVariableBool(stablePlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(stablePlanID, cBuildPlanRandomBPValue, 0, 0.0);
-            
-            bx = bx * 24;
-            bz = bz * 24;
-
-            backVector = xsVectorSetX(backVector, bx);
-            backVector = xsVectorSetZ(backVector, bz);
-            backVector = xsVectorSetY(backVector, 0.0);
-            location = origLocation + backVector;
-
-            aiPlanSetVariableVector(stablePlanID, cBuildPlanInfluencePosition, 0, location);
-
-            aiPlanSetVariableFloat(stablePlanID, cBuildPlanInfluencePositionDistance, 0, 12.0);
-            aiPlanSetVariableFloat(stablePlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
-
-            aiPlanSetDesiredPriority(stablePlanID, 100);
-            aiPlanAddUnitType(stablePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-            aiPlanSetEscrowID(stablePlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(stablePlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(stablePlanID);
-        }
-        
-        //Force an academy to go down.
-        int academyPlanID=aiPlanCreate("build Academy", cPlanBuild);
-        if (academyPlanID >= 0)
-        {
-            aiPlanSetVariableInt(academyPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeAcademy);
-            aiPlanSetVariableBool(academyPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(academyPlanID, cBuildPlanRandomBPValue, 0, 0.0);
-
-            fx = fzOrig * 21;
-            fz = fxOrig * (-21);
-
-            frontVector = xsVectorSetX(frontVector, fx);
-            frontVector = xsVectorSetZ(frontVector, fz);
-            frontVector = xsVectorSetY(frontVector, 0.0);
-            location = origLocation + frontVector;
-
-            aiPlanSetVariableVector(academyPlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(academyPlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(academyPlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(academyPlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
-
-            aiPlanSetDesiredPriority(academyPlanID, 100);
-            aiPlanAddUnitType(academyPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-            aiPlanSetEscrowID(academyPlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(academyPlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(academyPlanID);
-        }
-
         //Create our hero maintain plans.  These do first and second age heroes.
         if (cMyCiv == cCivZeus)
         {
@@ -4303,67 +4085,11 @@ void age2Handler(int age=1)
     //Egyptian.
     else if (cMyCulture == cCultureEgyptian)
     {
-        //Force barracks #1 to go down.
-        int barracks1PlanID=aiPlanCreate("Barracks1", cPlanBuild);
-        if (barracks1PlanID >= 0)
-        {
-            aiPlanSetVariableInt(barracks1PlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeBarracks);
-            aiPlanSetVariableBool(barracks1PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(barracks1PlanID, cBuildPlanRandomBPValue, 0, 0.0);
-
-            fx = fzOrig * (-21);
-            fz = fxOrig * 21;
-
-            frontVector = xsVectorSetX(frontVector, fx);
-            frontVector = xsVectorSetZ(frontVector, fz);
-            frontVector = xsVectorSetY(frontVector, 0.0);
-            location = origLocation + frontVector;
-
-            aiPlanSetVariableVector(barracks1PlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(barracks1PlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(barracks1PlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(barracks1PlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
-
-            aiPlanSetDesiredPriority(barracks1PlanID, 100);
-            aiPlanAddUnitType(barracks1PlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-            aiPlanSetEscrowID(barracks1PlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(barracks1PlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(barracks1PlanID);
-        }
-        
-        //Force barracks #2 to go down.
-        int barracks2PlanID=aiPlanCreate("Barracks2", cPlanBuild);
-        if (barracks2PlanID >= 0)
-        {
-            aiPlanSetVariableInt(barracks2PlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeBarracks);
-            aiPlanSetVariableBool(barracks2PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(barracks2PlanID, cBuildPlanRandomBPValue, 0, 0.0);
-         
-            fx = fzOrig * 21;
-            fz = fxOrig * (-21);
-
-            frontVector = xsVectorSetX(frontVector, fx);
-            frontVector = xsVectorSetZ(frontVector, fz);
-            frontVector = xsVectorSetY(frontVector, 0.0);
-            location = origLocation + frontVector;
-
-            aiPlanSetVariableVector(barracks2PlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(barracks2PlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(barracks2PlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(barracks2PlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
-
-            aiPlanSetDesiredPriority(barracks2PlanID, 100);
-            aiPlanAddUnitType(barracks2PlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-            aiPlanSetEscrowID(barracks2PlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(barracks2PlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(barracks2PlanID);
-        }
-        
         //Always want 4 priests
         if (cMyCiv != cCivRa)
             gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypePriest, 4, false, kbBaseGetMainID(cMyID));
 	
-        //Move our pharaoh empower to a generic "dropsite"
+        //Move our pharaoh empower to a "dropsite"
         if (gEmpowerPlanID > -1)
             aiPlanSetVariableInt(gEmpowerPlanID, cEmpowerPlanTargetTypeID, 0, cUnitTypeDropsite);
 
@@ -4403,62 +4129,6 @@ void age2Handler(int age=1)
         gHero1MaintainPlan = createSimpleMaintainPlan(cUnitTypeHeroNorse, 3, false, kbBaseGetMainID(cMyID));
         aiPlanSetDesiredPriority(gHero1MaintainPlan, 100);
 
-        //Force longhouse #1 to go down.
-        int longhouse1PlanID=aiPlanCreate("NorseBuildLonghouse1", cPlanBuild);
-        if (longhouse1PlanID >= 0)
-        {
-            aiPlanSetVariableInt(longhouse1PlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeLonghouse);
-            aiPlanSetVariableBool(longhouse1PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(longhouse1PlanID, cBuildPlanRandomBPValue, 0, 0.0);
-
-            fx = fzOrig * (-21);
-            fz = fxOrig * 21;
-
-            frontVector = xsVectorSetX(frontVector, fx);
-            frontVector = xsVectorSetZ(frontVector, fz);
-            frontVector = xsVectorSetY(frontVector, 0.0);
-            location = origLocation + frontVector;
-
-            aiPlanSetVariableVector(longhouse1PlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(longhouse1PlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(longhouse1PlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(longhouse1PlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
-
-            aiPlanSetDesiredPriority(longhouse1PlanID, 100);
-            aiPlanAddUnitType(longhouse1PlanID, cUnitTypeAbstractInfantry, 1, 1, 1);
-            aiPlanSetEscrowID(longhouse1PlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(longhouse1PlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(longhouse1PlanID);
-        }
-
-        //Force longhouse #2 to go down.
-        int longhouse2PlanID=aiPlanCreate("NorseBuildLonghouse2", cPlanBuild);
-        if (longhouse2PlanID >= 0)
-        {
-            aiPlanSetVariableInt(longhouse2PlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeLonghouse);
-            aiPlanSetVariableBool(longhouse2PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(longhouse2PlanID, cBuildPlanRandomBPValue, 0, 0.0);
-
-            fx = fzOrig * 21;
-            fz = fxOrig * (-21);
-
-            frontVector = xsVectorSetX(frontVector, fx);
-            frontVector = xsVectorSetZ(frontVector, fz);
-            frontVector = xsVectorSetY(frontVector, 0.0);
-            location = origLocation + frontVector;
-
-            aiPlanSetVariableVector(longhouse2PlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(longhouse2PlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(longhouse2PlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(longhouse2PlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
-
-            aiPlanSetDesiredPriority(longhouse2PlanID, 100);
-            aiPlanAddUnitType(longhouse2PlanID, cUnitTypeAbstractInfantry, 1, 1, 1);
-            aiPlanSetEscrowID(longhouse2PlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(longhouse2PlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(longhouse2PlanID);
-        }
-
         //Odin has ravens -> destroy unnecessary scout plans
         if (cMyCiv == cCivOdin)
         {
@@ -4467,79 +4137,45 @@ void age2Handler(int age=1)
 
         }
     }
-    else if (cMyCulture == cCultureAtlantean)
+
+    if (cMyCiv == cCivOuranos)
     {
-        //Force Atlantean barracks to go down.
-        int atlanteanBarracksPlanID=aiPlanCreate("AtlanteanBarracks", cPlanBuild);
-        if (atlanteanBarracksPlanID >= 0)
-        {
-            aiPlanSetVariableInt(atlanteanBarracksPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeBarracksAtlantean);
-            aiPlanSetVariableBool(atlanteanBarracksPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(atlanteanBarracksPlanID, cBuildPlanRandomBPValue, 0, 0.0);
-
-            fx = fzOrig * (-21);
-            fz = fxOrig * 21;
-
-            frontVector = xsVectorSetX(frontVector, fx);
-            frontVector = xsVectorSetZ(frontVector, fz);
-            frontVector = xsVectorSetY(frontVector, 0.0);
-            location = origLocation + frontVector;
-
-            aiPlanSetVariableVector(atlanteanBarracksPlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(atlanteanBarracksPlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(atlanteanBarracksPlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(atlanteanBarracksPlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
-
-            aiPlanSetDesiredPriority(atlanteanBarracksPlanID, 100);
-            aiPlanAddUnitType(atlanteanBarracksPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-            aiPlanSetEscrowID(atlanteanBarracksPlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(atlanteanBarracksPlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(atlanteanBarracksPlanID);
-        }
-
-        //Force Atlantean counter barracks to go down.
-        int atlanteanCounterBarracksPlanID=aiPlanCreate("AtlanteanCounterBarracks", cPlanBuild);
-        if (atlanteanCounterBarracksPlanID >= 0)
-        {
-            aiPlanSetVariableInt(atlanteanCounterBarracksPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeCounterBuilding);
-            aiPlanSetVariableBool(atlanteanCounterBarracksPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(atlanteanCounterBarracksPlanID, cBuildPlanRandomBPValue, 0, 0.0);
-          
-            fx = fzOrig * 21;
-            fz = fxOrig * (-21);
-
-            frontVector = xsVectorSetX(frontVector, fx);
-            frontVector = xsVectorSetZ(frontVector, fz);
-            frontVector = xsVectorSetY(frontVector, 0.0);
-            location = origLocation + frontVector;
-
-            aiPlanSetVariableVector(atlanteanCounterBarracksPlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(atlanteanCounterBarracksPlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(atlanteanCounterBarracksPlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(atlanteanCounterBarracksPlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
-
-            aiPlanSetDesiredPriority(atlanteanCounterBarracksPlanID, 100);
-            aiPlanAddUnitType(atlanteanCounterBarracksPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-            aiPlanSetEscrowID(atlanteanCounterBarracksPlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(atlanteanCounterBarracksPlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(atlanteanCounterBarracksPlanID);
-        }
-        
-        if (cMyCiv == cCivOuranos)
-        {
-            //Enable the getSafePassage rule
-            xsEnableRule("getSafePassage");
-        }
+      //Enable the getSafePassage rule
+      xsEnableRule("getSafePassage");
     }
-    else if (cMyCulture == cCultureChinese)
-    {
-        //Force Chinese Stables to go down.
-        int ChineseStablesPlanID=aiPlanCreate("ChineseStables", cPlanBuild);
-        if (ChineseStablesPlanID >= 0)
+    
+	   //Mil buildings
+       int BuilderType = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0);
+	   int BuildingType1 = cUnitTypeAcademy;
+	   int BuildingType2 = cUnitTypeArcheryRange;
+	   if (cMyCulture == cCultureEgyptian)
+	   {
+	   BuildingType1 = cUnitTypeBarracks;
+	   BuildingType2 = cUnitTypeBarracks;
+	   }
+	   if (cMyCulture == cCultureNorse)
+	   {
+	   BuildingType1 = cUnitTypeLonghouse;
+	   BuildingType2 = cUnitTypeLonghouse;
+	   }	   
+	   if (cMyCulture == cCultureAtlantean)
+	   {
+	   BuildingType1 = cUnitTypeBarracksAtlantean;
+	   BuildingType2 = cUnitTypeCounterBuilding;
+	   }
+	   if (cMyCulture == cCultureChinese)
+	   {
+	   BuildingType1 = cUnitTypeBarracksChinese;
+	   BuildingType2 = cUnitTypeStableChinese;
+	   }	   
+
+	   //Force barracks #1 to go down.
+        int barracks1PlanID=aiPlanCreate("Barracks 1", cPlanBuild);
+        if (barracks1PlanID >= 0)
         {
-            aiPlanSetVariableInt(ChineseStablesPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeStableChinese);
-            aiPlanSetVariableBool(ChineseStablesPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(ChineseStablesPlanID, cBuildPlanRandomBPValue, 0, 0.0);
+            aiPlanSetVariableInt(barracks1PlanID, cBuildPlanBuildingTypeID, 0, BuildingType1);
+            aiPlanSetVariableBool(barracks1PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
+            aiPlanSetVariableFloat(barracks1PlanID, cBuildPlanRandomBPValue, 0, 0.0);
 
             fx = fzOrig * (-21);
             fz = fxOrig * 21;
@@ -4549,26 +4185,26 @@ void age2Handler(int age=1)
             frontVector = xsVectorSetY(frontVector, 0.0);
             location = origLocation + frontVector;
 
-            aiPlanSetVariableVector(ChineseStablesPlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(ChineseStablesPlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(ChineseStablesPlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(ChineseStablesPlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
+            aiPlanSetVariableVector(barracks1PlanID, cBuildPlanInfluencePosition, 0, location);
+            aiPlanSetVariableFloat(barracks1PlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
+            aiPlanSetVariableFloat(barracks1PlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
+            aiPlanSetVariableFloat(barracks1PlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
 
-            aiPlanSetDesiredPriority(ChineseStablesPlanID, 100);
-            aiPlanAddUnitType(ChineseStablesPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-            aiPlanSetEscrowID(ChineseStablesPlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(ChineseStablesPlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(ChineseStablesPlanID);
+            aiPlanSetDesiredPriority(barracks1PlanID, 100);
+            aiPlanAddUnitType(barracks1PlanID, BuilderType, 1, 1, 1);
+            aiPlanSetEscrowID(barracks1PlanID, cMilitaryEscrowID);
+            aiPlanSetBaseID(barracks1PlanID, kbBaseGetMainID(cMyID));
+            aiPlanSetActive(barracks1PlanID);
         }
 
-        //Force Chinese War Academy to go down.
-        int WarAcademyPlanID=aiPlanCreate("WarAcademy", cPlanBuild);
-        if (WarAcademyPlanID >= 0)
+        //Force barracks #2 to go down.
+        int barracks2PlanID=aiPlanCreate("Barracks 2", cPlanBuild);
+        if (barracks2PlanID >= 0)
         {
-            aiPlanSetVariableInt(WarAcademyPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeAcademy);
-            aiPlanSetVariableBool(WarAcademyPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-            aiPlanSetVariableFloat(WarAcademyPlanID, cBuildPlanRandomBPValue, 0, 0.0);
-          
+            aiPlanSetVariableInt(barracks2PlanID, cBuildPlanBuildingTypeID, 0, BuildingType2);
+            aiPlanSetVariableBool(barracks2PlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
+            aiPlanSetVariableFloat(barracks2PlanID, cBuildPlanRandomBPValue, 0, 0.0);
+         
             fx = fzOrig * 21;
             fz = fxOrig * (-21);
 
@@ -4577,18 +4213,17 @@ void age2Handler(int age=1)
             frontVector = xsVectorSetY(frontVector, 0.0);
             location = origLocation + frontVector;
 
-            aiPlanSetVariableVector(WarAcademyPlanID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(WarAcademyPlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-            aiPlanSetVariableFloat(WarAcademyPlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
-            aiPlanSetVariableFloat(WarAcademyPlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
+            aiPlanSetVariableVector(barracks2PlanID, cBuildPlanInfluencePosition, 0, location);
+            aiPlanSetVariableFloat(barracks2PlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
+            aiPlanSetVariableFloat(barracks2PlanID, cBuildPlanInfluencePositionDistance, 0, 10.0);
+            aiPlanSetVariableFloat(barracks2PlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
 
-            aiPlanSetDesiredPriority(WarAcademyPlanID, 100);
-            aiPlanAddUnitType(WarAcademyPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-            aiPlanSetEscrowID(WarAcademyPlanID, cMilitaryEscrowID);
-            aiPlanSetBaseID(WarAcademyPlanID, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(WarAcademyPlanID);
-        }
-    }	
+            aiPlanSetDesiredPriority(barracks2PlanID, 100);
+            aiPlanAddUnitType(barracks2PlanID, BuilderType, 1, 1, 1);
+            aiPlanSetEscrowID(barracks2PlanID, cMilitaryEscrowID);
+            aiPlanSetBaseID(barracks2PlanID, kbBaseGetMainID(cMyID));
+            aiPlanSetActive(barracks2PlanID);
+        }	
 
     //Build walls if we should.
     if (gBuildWalls == true)
@@ -4649,12 +4284,13 @@ void age2Handler(int age=1)
         {
             xsEnableRuleGroup("mediumEgyptian");
         }
-        else if (cMyCulture == cCultureNorse)
+        else if (cMyCulture == cCultureAtlantean)
         {
             xsEnableRule("getMediumCavalry");
             xsEnableRule("getMediumInfantry");
-        }
-        else if (cMyCulture == cCultureAtlantean)
+			xsEnableRule("getMediumArchers");
+        }			
+        else 
         {
             xsEnableRule("getMediumCavalry");
             xsEnableRule("getMediumInfantry");
@@ -4778,7 +4414,7 @@ void age3Handler(int age=2)
    
     // Build a fortress/palace/whatever...or 4 in DM
     int buildingType = MyFortress;
-    int numBuilders = -1;
+    int numBuilders = 1;
     switch(cMyCulture)
     {
         case cCultureGreek:
@@ -4878,7 +4514,7 @@ void age3Handler(int age=2)
         {
             xsEnableRuleGroup("mediumEgyptian");
         }
-        else if (cMyCulture == cCultureNorse)
+        else if ((cMyCulture == cCultureNorse) || (cMyCulture == cCultureChinese))
         {
             xsEnableRule("getMediumCavalry");
             xsEnableRule("getMediumInfantry");
@@ -4888,12 +4524,7 @@ void age3Handler(int age=2)
             xsEnableRule("getMediumCavalry");
             xsEnableRule("getMediumInfantry");
 			xsEnableRule("getMediumArchers");
-        }
-        else if (cMyCulture == cCultureChinese)
-        {
-            xsEnableRule("getMediumCavalry");
-            xsEnableRule("getMediumInfantry");
-        }		
+        }	
     }
 }
 
@@ -5051,11 +4682,8 @@ rule ShouldIResign
 	if ((cMyCulture == cCultureNorse) && (IhaveAllies == true))
 	 {
 		 int NorseBuilders=kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive);
-		 int NorseLonghouse=kbUnitCount(cMyID, cUnitTypeLonghouse, cUnitStateAlive);
-		 int NorseFortress=kbUnitCount(cMyID, cUnitTypeHillFort, cUnitStateAlive);
-		 int NorseTemple=kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAlive);
-		 int NorseTotalMilBuildings=NorseLonghouse+NorseFortress+NorseTemple; 
-		 if ((NorseBuilders > 0) || (NorseTotalMilBuildings > 0 && kbGetPopCap() > 0))
+		 int NorseTotalMilBuildings=kbUnitCount(cMyID, cUnitTypeLogicalTypeBuildingsThatTrainMilitary,  cUnitStateAlive);
+		 if ((NorseBuilders > 0) || (NorseTotalMilBuildings > 0) && (kbGetPopCap() > 0))
 		 return;
 		 }
       
@@ -5252,7 +4880,6 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
     if (numberFound > 0)
     {
         gWaterMap=true;
-		ConfirmFish=true;
         //Tell the AI what kind of map we are on.
         aiSetWaterMap(gWaterMap);
 
