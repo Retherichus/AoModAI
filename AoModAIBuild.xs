@@ -920,7 +920,7 @@ rule dockMonitor
         return;
     }
 	
-    if ((gTransportMap == false) && (xsGetTime() < 10*60*1000))
+    if ((gTransportMap == false) && (xsGetTime() < 10*60*1000) || (cvMapSubType == VINLANDSAGAMAP) && (gFishPlanID == -1))
         return;
 	
     int randomBase = findUnit(cUnitTypeAbstractSettlement);
@@ -1157,17 +1157,6 @@ rule mainBaseAreaWallTeam1
     }
 	if (myVillagers < MinVil)
 	return;
-    
-/*
-    New area-based walling.  The concept is to get a list of appropriate areas, pass them to the walling plan,
-    and have it build a wall around the convex hull defined by that area list.  To do this, I take this approach.
-    1) Define a 'radius', which is the length of a square zone that we want to enclose.
-    2) Add the center area to the list.
-    3) For each area within 2 layers of that center area, include it if its in the same area group and
-        a) its center is within that area, or
-        b) it is a gold area, or
-        c) it is a settlement area.
-*/
 
     int builderType = cUnitTypeAbstractVillager;
     if (cMyCulture == cCultureNorse)

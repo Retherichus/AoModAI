@@ -4834,7 +4834,7 @@ rule findFish   //We don't know if this is a water map...if you see fish, it is.
 	
 		  // Disable early fishing for Nomad & Highland, to later be enabled.
 		
-		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") ||(cRandomMapName == "vinlandsaga") ||(cRandomMapName == "team migration") ||(NoFishing == true))
+		  if ((cRandomMapName == "highland") || (cRandomMapName == "nomad") ||(NoFishing == true) || (cvMapSubType == VINLANDSAGAMAP))
 		  {
 		  if (ShowAiEcho == true) aiEcho("FindFish disabled, map forced this.");
 		  xsDisableSelf();

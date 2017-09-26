@@ -93,8 +93,6 @@ rule updateWoodBreakdown
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
 	int desiredWoodPlans = 1 + (woodGathererCount/12);
-	if (cMyCulture == cCultureAtlantean)
-	desiredWoodPlans = 1 + (woodGathererCount/5);
 
 	if (xsGetTime() < 10*60*1000)
     desiredWoodPlans = 1;
@@ -279,8 +277,7 @@ rule updateGoldBreakdown
     int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 
 	int desiredGoldPlans = 1 + (goldGathererCount/12);
-	if (cMyCulture == cCultureAtlantean)
-	desiredGoldPlans = 1 + (goldGathererCount/4);
+
 	
 	if (desiredGoldPlans >= 2)
 	desiredGoldPlans = 2;
