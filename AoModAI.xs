@@ -919,7 +919,7 @@ rule updateEMAge2
     econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);   // Adjust econ up or mil down by econAdjust amount, whichever is smaller
     econEscrow = econPercent;
 	
-	if ((xsGetTime() > 14*60*1000) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+	if ((xsGetTime() > 13*60*1000) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
 	{
 	if (econEscrow < 0.40)
 	econEscrow = 0.40;
@@ -998,8 +998,8 @@ rule updateEMAge3
     econEscrow = econPercent;
 	if ((xsGetTime() > 22*60*1000) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching))
 	{
-	if (econEscrow < 0.35)
-	econEscrow = 0.35;
+	if (econEscrow < 0.38)
+	econEscrow = 0.38;
 	}
     //More military in second age
     updateEM(civPopTarget, milPopTarget, econPercent, 0.2, econEscrow, econEscrow, econEscrow, econEscrow);
@@ -1504,8 +1504,8 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         if (goldAssignment > lastGoldAssignment)
         {
             goldAssignment = lastGoldAssignment + 0.03;
-            if (goldAssignment > 0.50)
-                goldAssignment = 0.50;
+            if (goldAssignment > 0.45)
+                goldAssignment = 0.45;
         }
         else if (goldAssignment < lastGoldAssignment)
         {
@@ -1519,8 +1519,8 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         if (woodAssignment > lastWoodAssignment)
         {
             woodAssignment = lastWoodAssignment + 0.03;
-            if (woodAssignment > 0.55)
-                woodAssignment = 0.55;
+            if (woodAssignment > 0.45)
+                woodAssignment = 0.45;
         }
         else if (woodAssignment < lastWoodAssignment)
         {
@@ -1534,6 +1534,11 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
         if (foodAssignment > lastFoodAssignment)
         {
             foodAssignment = lastFoodAssignment + 0.03;
+            if ((foodAssignment > 0.65) && (kbGetAge() > cAge1))
+            {
+                if (foodOverride == false)
+                    foodAssignment = 0.65;
+            }
         }
         else if (foodAssignment < lastFoodAssignment)
         {
@@ -1853,20 +1858,7 @@ rule econForecastAge4		// Rule activates when age 4 research begins
         if (woodSupply < 300)
             gWoodForecast = gWoodForecast + (300 - woodSupply);
     }
-    if (cMyCulture == cCultureEgyptian)
-	gWoodForecast = gWoodForecast * 0.5;
 	setMilitaryUnitCostForecast(); // add units before scaling down
-	
-    if (woodSupply > 1700)
-        gWoodForecast = gWoodForecast * 0.5;
-    else if (woodSupply > 1600)
-        gWoodForecast = gWoodForecast * 0.6;
-    else if (woodSupply > 1500)
-        gWoodForecast = gWoodForecast * 0.7;
-    else if (woodSupply > 1400)
-        gWoodForecast = gWoodForecast * 0.8;
-    else if (woodSupply > 1300)
-        gWoodForecast = gWoodForecast * 0.9;	
     
     if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
@@ -2025,8 +2017,6 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
       }		
     }
 	setMilitaryUnitCostForecast(); // add units before scaling down
-    if (cMyCulture == cCultureEgyptian)
-	gWoodForecast = gWoodForecast * 0.8;
 	
     if (ShowAiEcoEcho == true) aiEcho("Our current forecast:  Gold "+gGoldForecast+", wood "+gWoodForecast+", food "+gFoodForecast+".");
     updateGathererRatios();
@@ -2034,10 +2024,14 @@ rule econForecastAge3		// Rule activates when age3 research begins, turns off wh
 
 //==============================================================================
 rule econForecastAge2		// Rule activates when age 2 research begins, turns off when age 3 research begins
-    minInterval 6
+    minInterval 1
     inactive
 {
     static int ageStartTime = -1;
+	static int Count = 0;
+	Count = Count + 1;
+	if (Count >= 10)
+	xsSetRuleMinIntervalSelf(6);
     int temp = 0;
     if (kbGetTechStatus(gAge3MinorGod) >= cTechStatusResearching) 	// On our way to age 3, hand off...
     {
@@ -2220,8 +2214,8 @@ rule econForecastAge1		// Rule active for mid age 1 (cAge1), gets started in set
     // and we haven't started the age 2 upgrade.  Let's see what we need.
 	
 	gFoodForecast = 600.0;
-    gGoldForecast = 100.0;
-    gWoodForecast = 250.0;
+    gGoldForecast = 200.0;
+    gWoodForecast = 260.0;
     
 	if (cMyCulture == cCultureEgyptian)
     {
@@ -3571,10 +3565,11 @@ void init(void)
     if (gRushUPID >= 0)
     {
         //Reset a few of the UP parms.
-	    kbUnitPickSetPreferenceWeight(gRushUPID, 2.0);
-	    kbUnitPickSetCostWeight(gRushUPID, 7.0);
-	    kbUnitPickSetCombatEfficiencyWeight(gRushUPID, 4.0);
-		//kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMythUnit, 0.0);
+	    kbUnitPickSetPreferenceWeight(gRushUPID, 1.0);
+	    kbUnitPickSetCostWeight(gRushUPID, 0.5);
+	    kbUnitPickSetCombatEfficiencyWeight(gRushUPID, 2.6);   
+        kbUnitPickSetAttackUnitType(gRushUPID, cUnitTypeLogicalTypeLandMilitary);
+        kbUnitPickSetGoalCombatEfficiencyType(gRushUPID, cUnitTypeLogicalTypeLandMilitary);
         kbUnitPickSetDesiredNumberUnitTypes(gRushUPID, 3, 1, true);
 		
 		if (cMyCulture == cCultureGreek)
@@ -3603,7 +3598,7 @@ void init(void)
         if (cMyCulture == cCultureAtlantean)
         {
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeJavelinCavalry, 1.0);
-         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSwordsman, 0.8);
+         kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeSwordsman, 1.0);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeMaceman, 0.1);
 		 kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeChieroballista, 0.0);
         }
@@ -3613,6 +3608,7 @@ void init(void)
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeScoutChinese, 0.7);
          kbUnitPickSetPreferenceFactor(gRushUPID, cUnitTypeHalberdier, 0.4);
         }		
+
 		
         //Create the rush goal if we're rushing.
         if (rushCount > 0)  // Deleted conditions that suppress rushing if we're walling or towering...OK to do some of each.

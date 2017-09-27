@@ -10,7 +10,7 @@
 
 //==============================================================================
 rule updateWoodBreakdown
-    minInterval 10
+    minInterval 12
     inactive
 {   
     if (ShowAiEcho == true) aiEcho("updateWoodBreakdown: ");
@@ -93,6 +93,8 @@ rule updateWoodBreakdown
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
 
 	int desiredWoodPlans = 1 + (woodGathererCount/12);
+	if (cMyCulture == cCultureAtlantean)
+	desiredWoodPlans = 1 + (woodGathererCount/6);
 
 	if (xsGetTime() < 10*60*1000)
     desiredWoodPlans = 1;
@@ -185,7 +187,7 @@ rule updateWoodBreakdown
 
 //==============================================================================
 rule updateGoldBreakdown
-    minInterval 11
+    minInterval 13
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateGoldBreakdown: ");
@@ -221,14 +223,10 @@ rule updateGoldBreakdown
         numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
     int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
     int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy, 65);
-	bool reducedGoldGathererCount = false;
 	if ((cMyCulture != cCultureAtlantean) || (cMyCulture == cCultureAtlantean) && (gathererCount >= 5))
 	{
            if ((goldGathererCount <= 0) && (closeMainBaseSites > 0) && (kbGetAge() < cAge3)) //always some units on gold.
-		   {
-           goldGathererCount = 1;
-		   reducedGoldGathererCount = true;
-           }
+           goldGathererCount = 1; 
 	}  
    
 //Test
@@ -268,7 +266,7 @@ rule updateGoldBreakdown
 
     //Count of sites.
     int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
-
+	int numberInitialMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy, 45);
     int numberGoldBaseSites = 0;
     if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
         numberGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
@@ -277,18 +275,20 @@ rule updateGoldBreakdown
     int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 
 	int desiredGoldPlans = 1 + (goldGathererCount/12);
+	if (cMyCulture == cCultureAtlantean)
+	desiredGoldPlans = 1 + (goldGathererCount/6);	
 
 	
 	if (desiredGoldPlans >= 2)
 	desiredGoldPlans = 2;
 
-   if (xsGetTime() < 11*60*1000)
+   if ((xsGetTime() < 10*60*1000) || (xsGetTime() < 13*60*1000) && (numberInitialMainBaseSites >= 1))
       desiredGoldPlans = 1;
         
     if (goldGathererCount < desiredGoldPlans)
         desiredGoldPlans = goldGathererCount;
 
-    if ((desiredGoldPlans < numGoldPlans) && (reducedGoldGathererCount == false))
+    if (desiredGoldPlans < numGoldPlans)
         desiredGoldPlans = numGoldPlans;    // Try to preserve existing plans
 
     if (ShowAiEcho == true) aiEcho("desiredGoldPlans: "+desiredGoldPlans);
@@ -670,7 +670,7 @@ rule updateFoodBreakdown
     int numEasyResourceSpotsInR70 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 70.0);
     int numResourceSpotsInR70 = numAggrResourceSpotsInR70 + numEasyResourceSpotsInR70;
 	
-    if  ((aiGetGameMode() == cGameModeLightning) || (aiGetGameMode() == cGameModeDeathmatch) || (xsGetTime() > 9*60*1000))
+    if  ((aiGetGameMode() == cGameModeLightning) || (aiGetGameMode() == cGameModeDeathmatch) || (xsGetTime() > 8*60*1000))
         totalAmount = 200; 
 		
     if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)))   // can build farms
@@ -1274,6 +1274,9 @@ void econAge2Handler(int age=1)
 
     if ( (aiGetGameMode() == cGameModeDeathmatch) || (aiGetGameMode() == cGameModeLightning) )  // Add an emergency armory
     {
+	int Armory = cUnitTypeArmory;
+    if (cMyCiv == cCivThor)
+    Armory = cUnitTypeDwarfFoundry;
         if (cMyCulture == cCultureAtlantean)
         {
             createSimpleBuildPlan(cUnitTypeArmory, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 2);
@@ -1281,7 +1284,7 @@ void econAge2Handler(int age=1)
         }
         else
         {
-            createSimpleBuildPlan(cUnitTypeArmory, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 3);
+            createSimpleBuildPlan(Armory, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 3);
             createSimpleBuildPlan(cUnitTypeHouse, 6, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 2);
         }
     }
