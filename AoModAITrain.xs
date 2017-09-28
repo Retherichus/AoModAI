@@ -321,7 +321,7 @@ rule trainMercs
 
 //==============================================================================
 rule trainMythUnit
-    minInterval 25 //starts in cAge2
+    minInterval 30 //starts in cAge2
     inactive
 {
     if (ShowAiEcho == true) aiEcho("trainMythUnit:");
@@ -352,25 +352,27 @@ rule trainMythUnit
         numNonMilitaryMythUnits = numNonMilitaryMythUnits + kbUnitCount(cMyID, cUnitTypeFlyingMedic, cUnitStateAlive);
     int numMilitaryMythUnits = numMythUnits - numNonMilitaryMythUnits;
 
-    if (numMilitaryMythUnits > 0)
+    if ((numMilitaryMythUnits > 0) || (favorSupply < 40))
     {
         if ((kbGetTechStatus(cTechSecretsoftheTitans) >= cTechStatusResearching) && (favorSupply < 35) || (TitanAvailable == false) && (favorSupply < 35))
         {
             return;
         }
-        else if ((kbGetAge() < cAge4) && (favorSupply < 30))
+        else if ((kbGetAge() < cAge4) && (favorSupply < 55))
         {
             return;
         }
-        else if ((favorSupply < 50) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (TitanAvailable == true))
+        else if ((favorSupply < 75) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (TitanAvailable == true))
         {
             return;
         }
     }
 
-    if (numMilitaryMythUnits >= 8)
+    if (numMilitaryMythUnits > 6)
+    {
+        //if (ShowAiEcho == true) aiEcho("trainMythUnit: returning as numMilitaryMythUnits > 6");
         return;
-   
+    }
 
     static int planID = -1;
 
@@ -379,7 +381,7 @@ rule trainMythUnit
     int age4MythUnitID = -1;
     
     int number = -1;
-    if (kbGetAge() >= cAge4)
+    if (kbGetAge() > cAge4)
         number = 3;
     else
         number = kbGetAge();

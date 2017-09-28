@@ -1031,8 +1031,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 void initGodPowers(void)    //initialize the god power module
 {
     if (ShowAiEcho == true) aiEcho("GP Init.");
-	if ((cMyCiv == cCivGaia) && (gTransportMap == false))
-	xsSetRuleMinInterval("rAge1FindGP", 1);
     xsEnableRule("rAge1FindGP");
 }
 
@@ -1729,19 +1727,21 @@ void releaseTownDefenseGP()
 
 //==============================================================================
 rule rGaiaForestPower
-    minInterval 1 //starts in cAge1
+    minInterval 25 //starts in cAge1
     inactive
 {
     if (ShowAiEcho == true) aiEcho("rGaiaForestPower:");    
-    xsSetRuleMinIntervalSelf(25);
+
     if (gGaiaForestPlanID == -1)
     {
         xsDisableSelf();
         return;
     }
     bool JustCastIt = false;
-
-    int mainBaseID = kbBaseGetMainID(cMyID);
+    //Don't cast it too early?
+    if (xsGetTime() < 1*20*1000)
+        return;
+		    int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 35.0);
 	if (NumTreesMB <= 5)

@@ -920,7 +920,7 @@ rule dockMonitor
         return;
     }
 	
-    if ((gTransportMap == false) && (xsGetTime() < 10*60*1000) || (cvMapSubType == VINLANDSAGAMAP) && (gFishPlanID == -1))
+    if ((gTransportMap == false) && (xsGetTime() < 10*60*1000))
         return;
 	
     int randomBase = findUnit(cUnitTypeAbstractSettlement);
@@ -1157,6 +1157,17 @@ rule mainBaseAreaWallTeam1
     }
 	if (myVillagers < MinVil)
 	return;
+    
+/*
+    New area-based walling.  The concept is to get a list of appropriate areas, pass them to the walling plan,
+    and have it build a wall around the convex hull defined by that area list.  To do this, I take this approach.
+    1) Define a 'radius', which is the length of a square zone that we want to enclose.
+    2) Add the center area to the list.
+    3) For each area within 2 layers of that center area, include it if its in the same area group and
+        a) its center is within that area, or
+        b) it is a gold area, or
+        c) it is a settlement area.
+*/
 
     int builderType = cUnitTypeAbstractVillager;
     if (cMyCulture == cCultureNorse)
@@ -2424,91 +2435,7 @@ rule buildSkyPassages
         aiPlanAddUnitType(planID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
         aiPlanSetBaseID(planID, kbBaseGetMainID(cMyID));
         aiPlanSetActive(planID);
-		return;
-   }
-   if (gTransportMap == true)
-   return;
-
-   // Local base is covered, now let's check near our Most Hated Player's TC
-   static int nearestMhpTCQueryID = -1;
-   if (nearestMhpTCQueryID < 0)
-   {
-	  nearestMhpTCQueryID = kbUnitQueryCreate("MostHatedPlayerTC");
-   }
-   kbUnitQuerySetPlayerID(nearestMhpTCQueryID, aiGetMostHatedPlayerID());
-   kbUnitQuerySetUnitType(nearestMhpTCQueryID, cUnitTypeAbstractSettlement);
-   kbUnitQuerySetState(nearestMhpTCQueryID, cUnitStateAliveOrBuilding);
-   kbUnitQuerySetPosition(nearestMhpTCQueryID, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-   kbUnitQuerySetAscendingSort(nearestMhpTCQueryID, true);
-
-   kbUnitQueryResetResults(nearestMhpTCQueryID);
-   int numTCs = kbUnitQueryExecute(nearestMhpTCQueryID);
-   if (numTCs < 1)
-	  return;  // No enemy TCs
-   int enemyTC = kbUnitQueryGetResult(nearestMhpTCQueryID, aiRandInt(numTCs));   // ID of enemy TC we want to search, random selection
-   vector enemyTCvec = kbUnitGetPosition(enemyTC);
-
-   // We now know the nearest enemyTC, let's look for a sky passage near there
-   static int skyPassageQueryID = -1;
-   if (skyPassageQueryID < 0)
-   {
-	  skyPassageQueryID = kbUnitQueryCreate("RemoteSkyPassage");
-	  kbUnitQuerySetPlayerID(skyPassageQueryID, cMyID);
-	  kbUnitQuerySetUnitType(skyPassageQueryID, cUnitTypeSkyPassage);
-	  kbUnitQuerySetState(skyPassageQueryID, cUnitStateAliveOrBuilding);
-	  kbUnitQuerySetMaximumDistance(skyPassageQueryID, 80.0);
-   }
-   kbUnitQuerySetPosition(skyPassageQueryID, enemyTCvec);
-   kbUnitQueryResetResults(skyPassageQueryID);
-   if (kbUnitQueryExecute(skyPassageQueryID) < 1)
-   {  // None found, we need one...and we don't have an active plan.
-	  // First, pick a center location on our side of the enemy TC
-	  vector offset = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)) - enemyTCvec;
-	  offset = xsVectorNormalize(offset);
-	  vector target = enemyTCvec + (offset * 60.0);
-
-	  // Now, check if that's on ground, and just give up if it isn't
-	  // Figure out if it's on our enemy's areaGroup.  If not, step 5% closer until it is.
-	  int enemyAreaGroup = -1;
-	  int testAreaGroup = -1;
-	  testAreaGroup = kbAreaGroupGetIDByPosition(target);
-	  enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
-
-	  int i = -1;
-
-	  vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
-	  bool success = false;
-
-	  for (i=0; <18)	// Keep testing until areaGroups match
-	  {
-		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
-		 if (testAreaGroup == enemyAreaGroup)
-		 {
-			success = true;
-			break;
-		 }
-		 else
-		 {
-
-			target = target + towardEnemy;   // Try a bit closer
-		 }
-	  }
-	  if (success == false)
-	  return;  
-
-	   int remotePlanID=aiPlanCreate("BuildRemoteSkyPassage", cPlanBuild);
-	  if (remotePlanID < 0)
-		 return;
-	  aiPlanSetVariableInt(remotePlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeSkyPassage);
-	  aiPlanSetVariableInt(remotePlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(target));
-	   aiPlanSetVariableInt(remotePlanID, cBuildPlanNumAreaBorderLayers, 0, 1);
-	  aiPlanSetDesiredPriority(remotePlanID, 70);
-	  aiPlanSetMilitary(remotePlanID, true);
-	  aiPlanSetEconomy(remotePlanID, false);
-	  aiPlanSetEscrowID(remotePlanID, cMilitaryEscrowID);
-	  aiPlanAddUnitType(remotePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-	  aiPlanSetActive(remotePlanID);
-   }
+    }
 }
 
 //==============================================================================
@@ -5222,105 +5149,3 @@ rule rebuildSiegeCamp
         xsSetRuleMinIntervalSelf(60);
     }
 }	
-
-//==============================================================================
-rule buildForwardFortress
-    minInterval 55 //starts in cAge3
-    inactive
-{
-    int Building = MyFortress;
-	
-	if (kbUnitCount(cMyID, Building, cUnitStateAliveOrBuilding) >= 10)
-	Building = cUnitTypeTower;
-	int ActivePlans = findPlanByString("BUILDFORWARDFORTRESS", cPlanBuild, -1, true);
-    if ((ActivePlans >= 2) || (kbResourceGet(cResourceGold) < 600) ||
-	(kbResourceGet(cResourceWood) < 500) && (cMyCulture != cCultureEgyptian) || (kbResourceGet(cResourceFood) < 500) || (kbResourceGet(cResourceFavor) < 15) ||
-	(Building == cUnitTypeTower) && (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 20))
-        return;  // Quit if we're already building one or not enough resources
-
-   if (gTransportMap == true)
-   {
-   xsDisableSelf();
-   return;
-   }
-   xsSetRuleMinIntervalSelf(55);
-   if ((kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceWood) > 500) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture != cCultureEgyptian) ||
-   (kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture == cCultureEgyptian))
-   xsSetRuleMinIntervalSelf(15);
-   static int nearestMhpTCQueryID = -1;
-   if (nearestMhpTCQueryID < 0)
-   nearestMhpTCQueryID = kbUnitQueryCreate("MostHatedPlayerTC");
-  
-   kbUnitQuerySetPlayerID(nearestMhpTCQueryID, aiGetMostHatedPlayerID());
-   kbUnitQuerySetUnitType(nearestMhpTCQueryID, cUnitTypeAbstractSettlement);
-   kbUnitQuerySetState(nearestMhpTCQueryID, cUnitStateAliveOrBuilding);
-   kbUnitQuerySetPosition(nearestMhpTCQueryID, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-   kbUnitQuerySetAscendingSort(nearestMhpTCQueryID, true);
-
-   kbUnitQueryResetResults(nearestMhpTCQueryID);
-   int numTCs = kbUnitQueryExecute(nearestMhpTCQueryID);
-   if (numTCs < 1)
-	  return;  // No enemy TCs
-   int enemyTC = kbUnitQueryGetResult(nearestMhpTCQueryID, aiRandInt(numTCs));
-   vector enemyTCvec = kbUnitGetPosition(enemyTC);
-
-   static int skyPassageQueryID = -1;
-   if (skyPassageQueryID < 0)
-   {
-	  skyPassageQueryID = kbUnitQueryCreate("RemoteSkyPassage");
-	  kbUnitQuerySetPlayerID(skyPassageQueryID, cMyID);
-	  kbUnitQuerySetUnitType(skyPassageQueryID, Building);
-	  kbUnitQuerySetState(skyPassageQueryID, cUnitStateAliveOrBuilding);
-	  kbUnitQuerySetMaximumDistance(skyPassageQueryID, 80.0);
-   }
-   kbUnitQuerySetPosition(skyPassageQueryID, enemyTCvec);
-   kbUnitQueryResetResults(skyPassageQueryID);
-   if (kbUnitQueryExecute(skyPassageQueryID) < 2)
-   {
-	  vector offset = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)) - enemyTCvec;
-	  offset = xsVectorNormalize(offset);
-	  vector target = enemyTCvec + (offset * 60.0);
-
-	  int enemyAreaGroup = -1;
-	  int testAreaGroup = -1;
-	  testAreaGroup = kbAreaGroupGetIDByPosition(target);
-	  enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
-
-	  int i = -1;
-
-	  vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
-	  bool success = false;
-
-	  for (i=0; <18)	// Keep testing until areaGroups match
-	  {
-		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
-		 if (testAreaGroup == enemyAreaGroup)
-		 {
-			success = true;
-			break;
-		 }
-		 else
-		 {
-
-			target = target + towardEnemy;   // Try a bit closer
-		 }
-	  }
-	  if (success == false)
-	  return;
-	  
-	  int remotePlanID=aiPlanCreate("BUILDFORWARDFORTRESS", cPlanBuild);
-	  if (remotePlanID < 0)
-		 return;
-	  aiPlanSetVariableInt(remotePlanID, cBuildPlanBuildingTypeID, 0, Building);
-	  aiPlanSetVariableInt(remotePlanID, cBuildPlanMaxRetries, 0, 10);
-	  aiPlanSetVariableInt(remotePlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(target));
-	  aiPlanSetVariableFloat(remotePlanID, cBuildPlanRandomBPValue, 0, 0.99);
-	  aiPlanSetVariableInt(remotePlanID, cBuildPlanNumAreaBorderLayers, 0, 1);
-	  aiPlanSetDesiredPriority(remotePlanID, 80);
-	  aiPlanSetEscrowID(remotePlanID, cMilitaryEscrowID);
-	  if (cMyCulture == cCultureAtlantean)
-	  aiPlanAddUnitType(remotePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-	  else aiPlanAddUnitType(remotePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 2, 3, 3);
-	  aiPlanSetActive(remotePlanID);
-   }
-}
