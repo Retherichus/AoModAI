@@ -284,7 +284,7 @@ void initMapSpecific()
 		House = cUnitTypeManor;
    		createSimpleBuildPlan(House, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1); 
         aiSetAllowAutoDropsites(false);
-        aiSetAllowBuildings(true);
+        aiSetAllowBuildings(false);
 
         // Move the transport toward map center to find continent quickly.
         int transportID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0));
@@ -425,7 +425,7 @@ rule findVinlandsagaBase
         mainlandGroupID=kbFindAreaGroupByLocation(cAreaGroupTypeLand, 0.5, 0.5);  // Can fail if mountains at map center
     }
     float easyAmount = kbGetAmountValidResources(gVinlandsagaInitialBaseID, cResourceFood, cAIResourceSubTypeEasy, 45);
-    if ((mainlandGroupID < 0) || (xsGetTime() < 1.8*60*1000) && (easyAmount >= 50))
+    if ((mainlandGroupID < 0) || (xsGetTime() < 1*60*1000) && (easyAmount >= 50) && (aiGetGameMode() != cGameModeDeathmatch))
         return;
 
     if (ShowAiEcho == true) aiEcho("findVinlandsagaBase: Found the mainland, AGID="+mainlandGroupID+".");
@@ -504,7 +504,7 @@ rule vinlandsagaEnableFishing
     //Reset the results.
     kbUnitQueryResetResults(wdQueryID);
     //Run the query.  If we don't have anything, skip.
-    if (kbUnitQueryExecute(wdQueryID) <= 0)
+    if ((kbUnitQueryExecute(wdQueryID) <= 0) && (aiGetGameMode() != cGameModeDeathmatch))
         return;
 
     if ( cvMapSubType == WATERNOMADMAP )
@@ -602,7 +602,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
             aiPlanAddUnitType(planID, gLandScout, 1, 1, 1);
             if (cMyCulture == cCultureNorse)
                 aiPlanAddUnitType(planID, cUnitTypeOxCart, 0, 1, 4);
-            aiPlanAddUnitType(planID, cUnitTypeHerdable, 0, 2, 2);
+            aiPlanAddUnitType(planID, cUnitTypeHerdable, 0, 1, 1);
 			aiPlanSetVariableBool(planID, cTransportPlanReturnWhenDone, 0, false);
         }
         if (ShowAiEcho == true) aiEcho("Transport plan ID is "+planID);
@@ -626,12 +626,13 @@ void vinlandsagaBaseCallback(int parm1=-1)
 //==============================================================================
 rule transportAllUnits
     inactive
-    minInterval 5 //starts in cAge1
+    minInterval 20 //starts in cAge1
 {
     if (ShowAiEcho == true) aiEcho("transportAllUnits:");    
     static int transportAllUnitsID=-1;
     int num = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeLogicalTypeGarrisonOnBoats, cUnitStateAlive);
-    if (num < 0)
+	
+    if (num < 1)
         return;
 
     //Get our water transport type.
@@ -657,7 +658,7 @@ rule transportAllUnits
 	    }
     }		
 
-    if ((aiPlanGetIDByTypeAndVariableType(cPlanTransport) >= 0) || (numTransport < 1))
+    if (numTransport < 1)
         return;
     int goalAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
     goalAreaID = verifyVinlandsagaBase( goalAreaID );  // Make sure it borders water,or find one that does.
@@ -666,11 +667,17 @@ rule transportAllUnits
     transportAllUnitsID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 88, gVinlandsagaInitialBaseID);
     if ( transportAllUnitsID >= 0 )
     {
-        aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanReturnWhenDone, 0, false);
-        aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 1, num, num);
+        aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanReturnWhenDone, 0, true);
+		aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanMaximizeXportMovement, 0, true);
+		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeAbstractVillager, 0, 0, num);
+        aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 0, 0, 2);
+		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHerdable, 2, 2, 2);
+		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHumanSoldier, 1, num, num);
         aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHero, 1, 1, 1);
 		if (cMyCulture == cCultureGreek)
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeScout, 1, 1, 1);
+		if (cMyCulture == cCultureNorse)
+		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeOxCart, 1, 1, 1);		
         aiPlanSetActive(transportAllUnitsID);
     }
 }

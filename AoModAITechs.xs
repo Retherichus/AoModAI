@@ -2372,7 +2372,10 @@ rule getSecretsOfTheTitan
     {
         aiPlanSetVariableInt(titanPID, cProgressionPlanGoalTechID, 0, techID);
         aiPlanSetDesiredPriority(titanPID, 100);
-        aiPlanSetEscrowID(titanPID, cMilitaryEscrowID);
+		if (gTransportMap == false)
+        aiPlanSetEscrowID(titanPID, cEconomyEscrowID);
+		else 
+		aiPlanSetEscrowID(titanPID, cMilitaryEscrowID);
         aiPlanSetActive(titanPID);
         if (ShowAiEcho == true) aiEcho("getting secrets of the titans");
         xsDisableSelf();

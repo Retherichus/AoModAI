@@ -1914,16 +1914,19 @@ int findPlanByString(string autoName = "BUG", int iPlanType = -1, int iState = -
     if (iPlanID < 0) 
 	{
         int iNumberOfPlans = aiPlanGetNumber(iPlanType, iState, true);
-
+        int Number = 0;
         for (i = 0; < iNumberOfPlans) 
 		{
             int iCurrentPlan = aiPlanGetIDByIndex(iPlanType, iState, true, i);
-
             if (aiPlanGetName(iCurrentPlan) == (autoName + ":" + iCurrentPlan)) 
 			{
                 iPlanID = iCurrentPlan;
 				if (ReturnNumbers == true)
-				iPlanID = iNumberOfPlans;
+				{
+				Number = Number+1;
+				iPlanID = Number;
+				}
+				if (ReturnNumbers == false)
                 break;
             }
         }

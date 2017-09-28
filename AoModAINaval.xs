@@ -48,7 +48,8 @@ void navalAge2Handler(int age=1)
     
     if ((cRandomMapName == "anatolia") // TODO: maybe on (cRandomMapName == "highlands") too?
      || (cRandomMapName == "mediterranean")
-     || (cRandomMapName == "king of the hill")	 
+     || (cRandomMapName == "king of the hill")
+     || (cRandomMapName == "sea of worms") 
 	 || (cRandomMapName == "midgard"))
         xsEnableRule("NavalGoalMonitor");
 }
@@ -69,64 +70,6 @@ void navalAge4Handler(int age=3)
 {
     if (ShowAiEcho == true) aiEcho("Naval Age "+age+".");
 }
-
-//==============================================================================
-int initNavalUnitPicker(string name="BUG", int minShips=5,
-   int maxShips=20, int numberBuildings=1, bool bWantSiegeShips=false)
-{
-    if (ShowAiEcho == true) aiEcho("initNavalUnitPicker:");
-    
-    //Create it.
-    int upID=kbUnitPickCreate(name);
-    if (upID < 0)
-        return(-1);
-
-    //Default init.
-    kbUnitPickResetAll(upID);
-    //0 Part Preference, 1 Parts CE, 0 Parts Cost.
-    kbUnitPickSetPreferenceWeight(upID, 1.0);
-    kbUnitPickSetCombatEfficiencyWeight(upID, 2.0);
-    kbUnitPickSetCostWeight(upID, 1.0);
-    kbUnitPickSetMinimumNumberUnits(upID, minShips);
-    kbUnitPickSetMaximumNumberUnits(upID, maxShips);
-    kbUnitPickSetAttackUnitType(upID, cUnitTypeLogicalTypeNavalMilitary);
-    kbUnitPickSetGoalCombatEfficiencyType(upID, cUnitTypeLogicalTypeNavalMilitary);
-    kbUnitPickSetMovementType(upID, cMovementTypeWater);
-
-    //Desired number units types, buildings.
-    kbUnitPickSetDesiredNumberUnitTypes(upID, 3, numberBuildings, false);
-
-
-    //Do the preference work now.
-    int choice = aiRandInt(2);
-    if ( bWantSiegeShips == false )
-    {
-        if ( choice == 0 )
-        {
-            kbUnitPickSetPreferenceFactor(upID, cUnitTypeArcherShip, 0.3);
-            kbUnitPickSetPreferenceFactor(upID, cUnitTypeHammerShip, 0.3);
-            kbUnitPickSetPreferenceFactor(upID, cUnitTypeSiegeShip, 0.0);
-            kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.4);
-        }
-        else
-        {
-            kbUnitPickSetPreferenceFactor(upID, cUnitTypeArcherShip, 0.5);
-            kbUnitPickSetPreferenceFactor(upID, cUnitTypeHammerShip, 0.3);
-            kbUnitPickSetPreferenceFactor(upID, cUnitTypeSiegeShip, 0.0);
-            kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.2);
-        }
-    }
-    else
-    {
-        kbUnitPickSetPreferenceFactor(upID, cUnitTypeArcherShip, 0.2);
-        kbUnitPickSetPreferenceFactor(upID, cUnitTypeHammerShip, 0.2);
-        kbUnitPickSetPreferenceFactor(upID, cUnitTypeSiegeShip, 0.6);
-    }
-
-    //Done.
-    return(upID);
-}
-
 //==============================================================================
 rule findOtherSettlements
     minInterval 40 //starts in cAge3
