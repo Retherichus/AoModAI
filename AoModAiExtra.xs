@@ -534,13 +534,28 @@ rule ActivateRethOverridesAge3
 				aiPlanSetActive(CPlanID);
             }
         }		
-	
 		
 	    if (cMyCulture == cCultureEgyptian)
-        xsEnableRule("rebuildSiegeCamp");		
-		
-		xsDisableSelf();
-           
+        xsEnableRule("rebuildSiegeCamp");
+        
+		if (aiGetWorldDifficulty() != cDifficultyEasy)
+		{
+		int MyCata = -1;
+		if (cMyCulture == cCultureGreek)
+		MyCata = cUnitTypePetrobolos;
+		if (cMyCulture == cCultureEgyptian)
+		MyCata = cUnitTypeCatapult;
+		if (cMyCulture == cCultureNorse)
+		MyCata = cUnitTypeBallista;
+		if (cMyCulture == cCultureAtlantean)
+		MyCata = cUnitTypeOnager;
+		if (cMyCulture == cCultureChinese)
+		MyCata = cUnitTypeSittingTiger;
+		if (MyCata != -1)
+        createSimpleMaintainPlan(MyCata, 4, false, kbBaseGetMainID(cMyID));
+        xsEnableRule("buildForwardFortress");		
+		}
+		xsDisableSelf();  
     }
 }
 
