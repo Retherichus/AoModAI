@@ -5229,13 +5229,17 @@ rule buildForwardFortress
     inactive
 {
     int Building = MyFortress;
-	
-	if (kbUnitCount(cMyID, Building, cUnitStateAliveOrBuilding) >= 10)
+	int Rand = aiRandInt(2);
+	if (Rand == 1)
+	Building = cUnitTypeTower;
+	if (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 20)
+	Building = MyFortress;
+	else if (kbUnitCount(cMyID, MyFortress, cUnitStateAliveOrBuilding) >= 10)
 	Building = cUnitTypeTower;
 	int ActivePlans = findPlanByString("Buildforwardfortress", cPlanBuild, -1, true);
     if ((ActivePlans >= 2) || (kbResourceGet(cResourceGold) < 600) ||
 	(kbResourceGet(cResourceWood) < 500) && (cMyCulture != cCultureEgyptian) || (kbResourceGet(cResourceFood) < 500) || (kbResourceGet(cResourceFavor) < 15) ||
-	(Building == cUnitTypeTower) && (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 20))
+	(Building == cUnitTypeTower) && (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 20) || (Building == MyFortress) && (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 10))
         return;  // Quit if we're already building one or not enough resources
 
    if (gTransportMap == true)
@@ -5269,7 +5273,7 @@ rule buildForwardFortress
    {
 	  skyPassageQueryID = kbUnitQueryCreate("RemoteSkyPassage");
 	  kbUnitQuerySetPlayerID(skyPassageQueryID, cMyID);
-	  kbUnitQuerySetUnitType(skyPassageQueryID, Building);
+	  kbUnitQuerySetUnitType(skyPassageQueryID, cUnitTypeBuildingsThatShoot);
 	  kbUnitQuerySetState(skyPassageQueryID, cUnitStateAliveOrBuilding);
 	  kbUnitQuerySetMaximumDistance(skyPassageQueryID, 80.0);
    }
@@ -5285,7 +5289,7 @@ rule buildForwardFortress
 	  int testAreaGroup = -1;
 	  testAreaGroup = kbAreaGroupGetIDByPosition(target);
 	  enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
-
+      int NumEnemy = 0;
 	  int i = -1;
 
 	  vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
@@ -5294,7 +5298,8 @@ rule buildForwardFortress
 	  for (i=0; <18)	// Keep testing until areaGroups match
 	  {
 		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
-		 if (testAreaGroup == enemyAreaGroup)
+		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 22.0, true);
+		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy <= 0))
 		 {
 			success = true;
 			break;
