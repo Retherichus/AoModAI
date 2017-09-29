@@ -534,28 +534,13 @@ rule ActivateRethOverridesAge3
 				aiPlanSetActive(CPlanID);
             }
         }		
+	
 		
 	    if (cMyCulture == cCultureEgyptian)
-        xsEnableRule("rebuildSiegeCamp");
-        
-		if (aiGetWorldDifficulty() != cDifficultyEasy)
-		{
-		int MyCata = -1;
-		if (cMyCulture == cCultureGreek)
-		MyCata = cUnitTypePetrobolos;
-		if (cMyCulture == cCultureEgyptian)
-		MyCata = cUnitTypeCatapult;
-		if (cMyCulture == cCultureNorse)
-		MyCata = cUnitTypeBallista;
-		if (cMyCulture == cCultureAtlantean)
-		MyCata = cUnitTypeOnager;
-		if (cMyCulture == cCultureChinese)
-		MyCata = cUnitTypeSittingTiger;
-		if (MyCata != -1)
-        createSimpleMaintainPlan(MyCata, 4, false, kbBaseGetMainID(cMyID));
-        xsEnableRule("buildForwardFortress");		
-		}
-		xsDisableSelf();  
+        xsEnableRule("rebuildSiegeCamp");		
+		
+		xsDisableSelf();
+           
     }
 }
 
@@ -2797,21 +2782,6 @@ inactive
       xsDisableSelf();	  
 }
 
-//==============================================================================
-rule FishBoatMonitor  
-minInterval 10
-inactive
-{
-      int Ship = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish,0);
-      int IdleFishingShips = getNumUnits(Ship, cUnitStateAlive, cActionIdle, cMyID);
-      int Training = aiPlanGetVariableInt(gFishPlanID, cFishPlanNumberInTraining, 0);
-      if ((kbResourceGet(cResourceWood) < 150) && (kbGetAge() == cAge1) || (kbResourceGet(cResourceWood) < 75) && (kbGetAge() > cAge1) || (IdleFishingShips >= 3))
-	  {
-	  if (Training == 0)
-      aiPlanSetVariableBool(gFishPlanID, cFishPlanAutoTrainBoats, 0, false);
-	  }
-	  else aiPlanSetVariableBool(gFishPlanID, cFishPlanAutoTrainBoats, 0, true);
-}
 //Testing ground
 
 rule TEST  

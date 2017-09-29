@@ -10,7 +10,7 @@
 
 //==============================================================================
 rule updateWoodBreakdown
-    minInterval 12
+    minInterval 10
     inactive
 {   
     if (ShowAiEcho == true) aiEcho("updateWoodBreakdown: ");
@@ -187,7 +187,7 @@ rule updateWoodBreakdown
 
 //==============================================================================
 rule updateGoldBreakdown
-    minInterval 13
+    minInterval 11
     inactive
 {
     if (ShowAiEcho == true) aiEcho("updateGoldBreakdown: ");
@@ -223,10 +223,14 @@ rule updateGoldBreakdown
         numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
     int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
     int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy, 65);
+	bool reducedGoldGathererCount = false;
 	if ((cMyCulture != cCultureAtlantean) || (cMyCulture == cCultureAtlantean) && (gathererCount >= 5))
 	{
            if ((goldGathererCount <= 0) && (closeMainBaseSites > 0) && (kbGetAge() < cAge3)) //always some units on gold.
-           goldGathererCount = 1; 
+		   {
+           goldGathererCount = 1;
+		   reducedGoldGathererCount = true;
+           }
 	}  
    
 //Test
@@ -282,13 +286,13 @@ rule updateGoldBreakdown
 	if (desiredGoldPlans >= 2)
 	desiredGoldPlans = 2;
 
-   if ((xsGetTime() < 10*60*1000) || (xsGetTime() < 13*60*1000) && (numberInitialMainBaseSites >= 1))
+   if ((xsGetTime() < 11*60*1000) || (xsGetTime() < 16*60*1000) && (numberInitialMainBaseSites >= 1))
       desiredGoldPlans = 1;
         
     if (goldGathererCount < desiredGoldPlans)
         desiredGoldPlans = goldGathererCount;
 
-    if (desiredGoldPlans < numGoldPlans)
+    if ((desiredGoldPlans < numGoldPlans) && (reducedGoldGathererCount == false))
         desiredGoldPlans = numGoldPlans;    // Try to preserve existing plans
 
     if (ShowAiEcho == true) aiEcho("desiredGoldPlans: "+desiredGoldPlans);
@@ -670,7 +674,7 @@ rule updateFoodBreakdown
     int numEasyResourceSpotsInR70 = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeEasy, 70.0);
     int numResourceSpotsInR70 = numAggrResourceSpotsInR70 + numEasyResourceSpotsInR70;
 	
-    if  ((aiGetGameMode() == cGameModeLightning) || (aiGetGameMode() == cGameModeDeathmatch) || (xsGetTime() > 8*60*1000))
+    if  ((aiGetGameMode() == cGameModeLightning) || (aiGetGameMode() == cGameModeDeathmatch) || (xsGetTime() > 9*60*1000))
         totalAmount = 200; 
 		
     if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)))   // can build farms
@@ -1156,12 +1160,11 @@ rule relocateFarming
         int numFarmPlans=aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeFarm);
         aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, numFarmPlans, 90, 1.0, gFarmBaseID);
 
-        if (cvMapSubType != VINLANDSAGAMAP)
+        if (gTransportMap == false)
         {
             // update mainbase
             // should work now
             changeMainBase(unit);
-			aiEcho("I'm in trouble.. new Mainbase ID: "+unit);
         }
     }
     else
@@ -1275,9 +1278,6 @@ void econAge2Handler(int age=1)
 
     if ( (aiGetGameMode() == cGameModeDeathmatch) || (aiGetGameMode() == cGameModeLightning) )  // Add an emergency armory
     {
-	int Armory = cUnitTypeArmory;
-    if (cMyCiv == cCivThor)
-    Armory = cUnitTypeDwarfFoundry;
         if (cMyCulture == cCultureAtlantean)
         {
             createSimpleBuildPlan(cUnitTypeArmory, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 2);
@@ -1285,7 +1285,7 @@ void econAge2Handler(int age=1)
         }
         else
         {
-            createSimpleBuildPlan(Armory, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 3);
+            createSimpleBuildPlan(cUnitTypeArmory, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 3);
             createSimpleBuildPlan(cUnitTypeHouse, 6, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 2);
         }
     }
@@ -1409,20 +1409,10 @@ void econAge4Handler(int age=0)
 
 
     // Set escrow caps tighter
-	if ((TitanAvailable == true) && (gTransportMap == false))
-	{
-	kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 1000.0);
-    kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 1000.0);     
-    kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 1000.0);    
-	kbEscrowSetCap( cEconomyEscrowID, cResourceFavor, 60.0);
-	}
-	else 
-	{
 	kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 300.0);    
     kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 300.0);    
     kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 300.0);    
     kbEscrowSetCap( cEconomyEscrowID, cResourceFavor, 30.0);
-	}
 
     kbEscrowSetCap( cMilitaryEscrowID, cResourceFood, 300.0);
     kbEscrowSetCap( cMilitaryEscrowID, cResourceWood, 300.0);   
@@ -1639,7 +1629,7 @@ rule fishing
     int fishPlanID = aiPlanCreate("FishPlan", cPlanFish);
     if (fishPlanID >= 0)
     {
-        aiPlanSetDesiredPriority(fishPlanID, 52);
+        aiPlanSetDesiredPriority(fishPlanID, 42);
         aiPlanSetVariableVector(fishPlanID, cFishPlanLandPoint, 0, mainBaseLocation);
         aiPlanSetVariableVector(fishPlanID, cFishPlanWaterPoint, 0, kbAreaGetCenter(areaID));
         aiPlanSetVariableBool(fishPlanID, cFishPlanAutoTrainBoats, 0, true);
@@ -1649,7 +1639,6 @@ rule fishing
         gFishing = true;
         aiPlanSetActive(fishPlanID);
         gFishPlanID = fishPlanID;
-		xsEnableRule("FishBoatMonitor");
     }
     aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeFish, 1);
 
