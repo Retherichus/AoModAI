@@ -1079,7 +1079,6 @@ rule IHateSiege
 		int NumBSelf = getNumUnits(cUnitTypeBuilding, cUnitStateAlive, -1, cMyID, Location, 36.0);
 		int NumBAllies = getNumUnitsByRel(cUnitTypeBuilding, cUnitStateAlive, -1, cPlayerRelationAlly, Location, 36.0, true);
 		int Combined = NumBSelf + NumBAllies;
-
 		if ((Combined > 0) && (equal(Location, cInvalidVector) == false))
 		aiTaskUnitWork(kbUnitQueryGetResult(unitQueryID, i), enemyUnitIDTemp);
 	   }
@@ -1246,9 +1245,7 @@ rule IHateMonks
    if (unitQueryID != -1)
    {
 		kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-		if (cMyCulture == cCultureNorse)
-		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeLogicalTypeLandMilitary);
-		else kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractArcher);
+		kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractArcher);
 		kbUnitQuerySetMaximumDistance(unitQueryID, 20);
 	        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
    }

@@ -2473,7 +2473,8 @@ rule buildSkyPassages
 	  int testAreaGroup = -1;
 	  testAreaGroup = kbAreaGroupGetIDByPosition(target);
 	  enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
-
+      int NumEnemy = -1;
+	  
 	  int i = -1;
 
 	  vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
@@ -2482,7 +2483,8 @@ rule buildSkyPassages
 	  for (i=0; <18)	// Keep testing until areaGroups match
 	  {
 		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
-		 if (testAreaGroup == enemyAreaGroup)
+		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 23.0, false);
+		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0))
 		 {
 			success = true;
 			break;
@@ -5225,32 +5227,37 @@ rule rebuildSiegeCamp
 
 //==============================================================================
 rule buildForwardFortress
-    minInterval 55 //starts in cAge3
+    minInterval 60 //starts in cAge3
     inactive
 {
+    if (gTransportMap == true)
+    {
+    xsDisableSelf();
+    return;
+    }
+	
     int Building = MyFortress;
 	int Rand = aiRandInt(2);
+	if ((cMyCulture == cCultureAtlantean) && (kbGetTechStatus(cTechAge4Helios) == cTechStatusActive))
+	Rand = aiRandInt(3);
 	if (Rand == 1)
 	Building = cUnitTypeTower;
 	if (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 20)
 	Building = MyFortress;
-	else if (kbUnitCount(cMyID, MyFortress, cUnitStateAliveOrBuilding) >= 10)
+	if (kbUnitCount(cMyID, MyFortress, cUnitStateAliveOrBuilding) >= 10)
 	Building = cUnitTypeTower;
+	if ((Rand == 2) && (kbUnitCount(cMyID, cUnitTypeTowerMirror, cUnitStateAliveOrBuilding) < 10))
+	Building = cUnitTypeTowerMirror;	
 	int ActivePlans = findPlanByString("Buildforwardfortress", cPlanBuild, -1, true);
     if ((ActivePlans >= 2) || (kbResourceGet(cResourceGold) < 600) ||
 	(kbResourceGet(cResourceWood) < 500) && (cMyCulture != cCultureEgyptian) || (kbResourceGet(cResourceFood) < 500) || (kbResourceGet(cResourceFavor) < 15) ||
-	(Building == cUnitTypeTower) && (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 20) || (Building == MyFortress) && (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 10))
+	(Building == cUnitTypeTower) && (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 20) || (Building == MyFortress) && (kbUnitCount(cMyID, MyFortress, cUnitStateAliveOrBuilding) >= 10))
         return;  // Quit if we're already building one or not enough resources
 
-   if (gTransportMap == true)
-   {
-   xsDisableSelf();
-   return;
-   }
-   xsSetRuleMinIntervalSelf(55);
+   xsSetRuleMinIntervalSelf(60);
    if ((kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceWood) > 500) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture != cCultureEgyptian) ||
    (kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture == cCultureEgyptian))
-   xsSetRuleMinIntervalSelf(15);
+   xsSetRuleMinIntervalSelf(22);
    static int nearestMhpTCQueryID = -1;
    if (nearestMhpTCQueryID < 0)
    nearestMhpTCQueryID = kbUnitQueryCreate("MostHatedPlayerTC");
@@ -5289,7 +5296,7 @@ rule buildForwardFortress
 	  int testAreaGroup = -1;
 	  testAreaGroup = kbAreaGroupGetIDByPosition(target);
 	  enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
-      int NumEnemy = 0;
+      int NumEnemy = -1;
 	  int i = -1;
 
 	  vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
@@ -5298,18 +5305,18 @@ rule buildForwardFortress
 	  for (i=0; <18)	// Keep testing until areaGroups match
 	  {
 		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
-		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 22.0, true);
-		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy <= 0))
+		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 26.0, false);
+		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0))
 		 {
 			success = true;
 			break;
 		 }
 		 else
 		 {
-
 			target = target + towardEnemy;   // Try a bit closer
 		 }
 	  }
+	  
 	  if (success == false)
 	  return;
 	  
@@ -5317,7 +5324,7 @@ rule buildForwardFortress
 	  if (remotePlanID < 0)
 		 return;
 	  aiPlanSetVariableInt(remotePlanID, cBuildPlanBuildingTypeID, 0, Building);
-	  aiPlanSetVariableInt(remotePlanID, cBuildPlanMaxRetries, 0, 10);
+	  aiPlanSetVariableInt(remotePlanID, cBuildPlanMaxRetries, 0, 3);
 	  aiPlanSetVariableInt(remotePlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(target));
 	  aiPlanSetVariableFloat(remotePlanID, cBuildPlanRandomBPValue, 0, 0.99);
 	  aiPlanSetVariableInt(remotePlanID, cBuildPlanNumAreaBorderLayers, 0, 1);
