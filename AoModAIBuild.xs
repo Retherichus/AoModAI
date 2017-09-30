@@ -1579,17 +1579,6 @@ rule mainBaseAreaWallTeam2
     if ((goldSupply < 50) || (myVillagers < MinVil))
         return;
         
-/*
-    New area-based walling.  The concept is to get a list of appropriate areas, pass them to the walling plan,
-    and have it build a wall around the convex hull defined by that area list.  To do this, I take this approach.
-    1) Define a 'radius', which is the length of a square zone that we want to enclose.
-    2) Add the center area to the list.
-    3) For each area within 2 layers of that center area, include it if its in the same area group and
-        a) its center is within that area, or
-        b) it is a gold area, or
-        c) it is a settlement area.
-*/
-
     int builderType = cUnitTypeAbstractVillager;
     if (cMyCulture == cCultureNorse)
         builderType = cUnitTypeAbstractInfantry;
@@ -2475,16 +2464,13 @@ rule buildSkyPassages
 	  enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
       int NumEnemy = -1;
 	  
-	  int i = -1;
-
 	  vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
 	  bool success = false;
 
 	  for (i=0; <18)	// Keep testing until areaGroups match
 	  {
 		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
-		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 23.0, false);
-		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0))
+		 if (testAreaGroup == enemyAreaGroup)
 		 {
 			success = true;
 			break;
@@ -2495,7 +2481,8 @@ rule buildSkyPassages
 			target = target + towardEnemy;   // Try a bit closer
 		 }
 	  }
-	  if (success == false)
+	  NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 26.0, false);
+	  if ((success == false) || (NumEnemy != 0))
 	  return;  
 
 	   int remotePlanID=aiPlanCreate("BuildRemoteSkyPassage", cPlanBuild);
@@ -5297,7 +5284,6 @@ rule buildForwardFortress
 	  testAreaGroup = kbAreaGroupGetIDByPosition(target);
 	  enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
       int NumEnemy = -1;
-	  int i = -1;
 
 	  vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
 	  bool success = false;
@@ -5305,8 +5291,7 @@ rule buildForwardFortress
 	  for (i=0; <18)	// Keep testing until areaGroups match
 	  {
 		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
-		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 26.0, false);
-		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0))
+		 if (testAreaGroup == enemyAreaGroup)
 		 {
 			success = true;
 			break;
@@ -5316,8 +5301,8 @@ rule buildForwardFortress
 			target = target + towardEnemy;   // Try a bit closer
 		 }
 	  }
-	  
-	  if (success == false)
+	  NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 26.0, false);
+	  if ((success == false) || (NumEnemy != 0))
 	  return;
 	  
 	  int remotePlanID=aiPlanCreate("Buildforwardfortress", cPlanBuild);
