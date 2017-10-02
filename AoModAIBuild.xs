@@ -2419,37 +2419,12 @@ rule buildSkyPassages
    return;
 
    // Local base is covered, now let's check near our Most Hated Player's TC
-   static int nearestMhpTCQueryID = -1;
-   if (nearestMhpTCQueryID < 0)
-   {
-	  nearestMhpTCQueryID = kbUnitQueryCreate("MostHatedPlayerTC");
-   }
-   kbUnitQuerySetPlayerID(nearestMhpTCQueryID, aiGetMostHatedPlayerID());
-   kbUnitQuerySetUnitType(nearestMhpTCQueryID, cUnitTypeAbstractSettlement);
-   kbUnitQuerySetState(nearestMhpTCQueryID, cUnitStateAliveOrBuilding);
-   kbUnitQuerySetPosition(nearestMhpTCQueryID, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-   kbUnitQuerySetAscendingSort(nearestMhpTCQueryID, true);
-
-   kbUnitQueryResetResults(nearestMhpTCQueryID);
-   int numTCs = kbUnitQueryExecute(nearestMhpTCQueryID);
-   if (numTCs < 1)
-	  return;  // No enemy TCs
-   int enemyTC = kbUnitQueryGetResult(nearestMhpTCQueryID, aiRandInt(numTCs));   // ID of enemy TC we want to search, random selection
-   vector enemyTCvec = kbUnitGetPosition(enemyTC);
-
-   // We now know the nearest enemyTC, let's look for a sky passage near there
-   static int skyPassageQueryID = -1;
-   if (skyPassageQueryID < 0)
-   {
-	  skyPassageQueryID = kbUnitQueryCreate("RemoteSkyPassage");
-	  kbUnitQuerySetPlayerID(skyPassageQueryID, cMyID);
-	  kbUnitQuerySetUnitType(skyPassageQueryID, cUnitTypeSkyPassage);
-	  kbUnitQuerySetState(skyPassageQueryID, cUnitStateAliveOrBuilding);
-	  kbUnitQuerySetMaximumDistance(skyPassageQueryID, 80.0);
-   }
-   kbUnitQuerySetPosition(skyPassageQueryID, enemyTCvec);
-   kbUnitQueryResetResults(skyPassageQueryID);
-   if (kbUnitQueryExecute(skyPassageQueryID) < 1)
+   int MHPTC = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
+   if (MHPTC < 0)
+   return;
+   vector enemyTCvec = kbUnitGetPosition(MHPTC);
+   int NumSelf = getNumUnits(cUnitTypeSkyPassage, cUnitStateAliveOrBuilding, -1, cMyID, enemyTCvec, 80.0);
+   if (NumSelf < 1)
    {  // None found, we need one...and we don't have an active plan.
 	  // First, pick a center location on our side of the enemy TC
 	  vector offset = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)) - enemyTCvec;
@@ -5245,35 +5220,12 @@ rule buildForwardFortress
    if ((kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceWood) > 500) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture != cCultureEgyptian) ||
    (kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture == cCultureEgyptian))
    xsSetRuleMinIntervalSelf(22);
-   static int nearestMhpTCQueryID = -1;
-   if (nearestMhpTCQueryID < 0)
-   nearestMhpTCQueryID = kbUnitQueryCreate("MostHatedPlayerTC");
-  
-   kbUnitQuerySetPlayerID(nearestMhpTCQueryID, aiGetMostHatedPlayerID());
-   kbUnitQuerySetUnitType(nearestMhpTCQueryID, cUnitTypeAbstractSettlement);
-   kbUnitQuerySetState(nearestMhpTCQueryID, cUnitStateAliveOrBuilding);
-   kbUnitQuerySetPosition(nearestMhpTCQueryID, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-   kbUnitQuerySetAscendingSort(nearestMhpTCQueryID, true);
-
-   kbUnitQueryResetResults(nearestMhpTCQueryID);
-   int numTCs = kbUnitQueryExecute(nearestMhpTCQueryID);
-   if (numTCs < 1)
-	  return;  // No enemy TCs
-   int enemyTC = kbUnitQueryGetResult(nearestMhpTCQueryID, aiRandInt(numTCs));
-   vector enemyTCvec = kbUnitGetPosition(enemyTC);
-
-   static int skyPassageQueryID = -1;
-   if (skyPassageQueryID < 0)
-   {
-	  skyPassageQueryID = kbUnitQueryCreate("RemoteSkyPassage");
-	  kbUnitQuerySetPlayerID(skyPassageQueryID, cMyID);
-	  kbUnitQuerySetUnitType(skyPassageQueryID, cUnitTypeBuildingsThatShoot);
-	  kbUnitQuerySetState(skyPassageQueryID, cUnitStateAliveOrBuilding);
-	  kbUnitQuerySetMaximumDistance(skyPassageQueryID, 80.0);
-   }
-   kbUnitQuerySetPosition(skyPassageQueryID, enemyTCvec);
-   kbUnitQueryResetResults(skyPassageQueryID);
-   if (kbUnitQueryExecute(skyPassageQueryID) < 2)
+   int MHPTC = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
+   if (MHPTC < 0)
+   return;
+   vector enemyTCvec = kbUnitGetPosition(MHPTC);
+   int NumSelf = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, enemyTCvec, 80.0);
+   if (NumSelf < 2)
    {
 	  vector offset = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)) - enemyTCvec;
 	  offset = xsVectorNormalize(offset);
@@ -5291,7 +5243,7 @@ rule buildForwardFortress
 	  for (i=0; <18)	// Keep testing until areaGroups match
 	  {
 		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
-		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 26.0, false);
+		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 24.0, false);
 		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0))
 		 {
 			success = true;

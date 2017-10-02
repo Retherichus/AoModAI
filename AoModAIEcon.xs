@@ -266,7 +266,6 @@ rule updateGoldBreakdown
 
     //Count of sites.
     int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
-	int numberInitialMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy, 45);
     int numberGoldBaseSites = 0;
     if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
         numberGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
@@ -278,12 +277,8 @@ rule updateGoldBreakdown
 	if (cMyCulture == cCultureAtlantean)
 	desiredGoldPlans = 1 + (goldGathererCount/6);	
 
-	
 	if (desiredGoldPlans >= 2)
 	desiredGoldPlans = 2;
-
-   if ((xsGetTime() < 10*60*1000) || (xsGetTime() < 13*60*1000) && (numberInitialMainBaseSites >= 1))
-      desiredGoldPlans = 1;
         
     if (goldGathererCount < desiredGoldPlans)
         desiredGoldPlans = goldGathererCount;
@@ -468,29 +463,9 @@ rule updateFoodBreakdown
     
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 
-    int desiredFarmers = 24;
+    int desiredFarmers = 20;
     if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 9;		
-	
-    // Up it a little bit as our civ population raises.	
-    int NumVillagers = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID);
-	if ((kbGetAge() > cAge2) || (xsGetTime() > 10*60*1000))
-	{
-	desiredFarmers = desiredFarmers+NumVillagers*0.10;
-	if ((ShowAiEcho == true) || (ShowAiEcoEcho == true)) aiEcho("Desired farms: "+desiredFarmers+"");	
-    }
-	
-	//titan override
-    if (aiGetWorldDifficulty() == cDifficultyNightmare)
-    {  
-    desiredFarmers = 20;
-	 if (cMyCulture == cCultureAtlantean) //override for Atlantean
-        desiredFarmers = 7;
-	}
-		if ((cMyCulture != cCultureAtlantean) && (desiredFarmers >= 28))
-	    desiredFarmers = 28;
-	    if ((cMyCulture == cCultureAtlantean) && (desiredFarmers >= 12)) //override for Atlantean
-        desiredFarmers = 12;
+        desiredFarmers = 10;		
 	
     if ((foodGathererCount > desiredFarmers + (numSettlements - 1)) && (numFarmsNearMainBase >= desiredFarmers))
     {

@@ -4,7 +4,7 @@
 
 //==============================================================================
 rule maintainTradeUnits
-    minInterval 29 //starts in cAge3
+    minInterval 16 //starts in cAge3
     inactive
 {
     if (ShowAiEcho == true) aiEcho("maintainTradeUnits:");
