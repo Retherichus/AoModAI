@@ -2241,7 +2241,7 @@ inactive
 	TargetTitanGate = true;
 	else TargetSettlement = true;
 	
-	if (xsGetTime() > 100*60*1000) // Let it go..
+	if (xsGetTime() > 100*45*1000) // Let it go..
 	{
 	TargetTitanGate = false;
 	TargetSettlement = true;

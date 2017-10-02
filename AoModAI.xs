@@ -1043,7 +1043,7 @@ rule updateEMAge4
 	  }
       else
       {
-      civPopTarget = 45; 
+      civPopTarget = 51; 
       if (gGlutRatio > 1.0)
          civPopTarget = civPopTarget / gGlutRatio;
       if ( (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000) )
@@ -1092,7 +1092,7 @@ rule updateEMAge4
 rule updatePrices   // This rule constantly compares actual supply vs. forecast, updates AICost 
                     // values (internal resource prices), and buys/sells at the market as appropriate
     active
-    minInterval 11 //starts in cAge1
+    minInterval 6 //starts in cAge1
 {
     // check for valid forecasts, exit if not ready
     if (((gGoldForecast + gWoodForecast + gFoodForecast) < 100) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 10*60*1000))
