@@ -488,13 +488,15 @@ rule getEarthenWall
     }
 
     if (ShowAiEcho == true) aiEcho("getEarhernWall:");
-
-
     
     if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
         return;
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-        return;	
+	{
+	if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
+	aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
+    return;
+    }		
     
     if (kbGetTechStatus(techID) == cTechStatusAvailable)
     {
@@ -528,7 +530,11 @@ rule getGreatWall
     }
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-        return;
+	{
+	if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
+	aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
+    return;
+    }
     
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     if (numFortresses < 1)

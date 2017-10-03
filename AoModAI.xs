@@ -46,7 +46,7 @@ extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age hand
 
 
 // Trade globals
-extern int gMaxTradeCarts = 20;           // Max trade carts
+extern int gMaxTradeCarts = 21;           // Max trade carts
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -4240,8 +4240,7 @@ void age2Handler(int age=1)
         //start up the wall upgrades.
         xsEnableRule("getStoneWall");
         
-       
-	   if (cMyCulture == cCultureNorse)
+	    if (cMyCulture == cCultureNorse)
         {
             //enable the norseInfantryBuild rule
             xsEnableRule("norseInfantryBuild");

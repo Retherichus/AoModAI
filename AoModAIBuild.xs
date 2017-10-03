@@ -2420,11 +2420,10 @@ rule buildSkyPassages
 
    // Local base is covered, now let's check near our Most Hated Player's TC
    int MHPTC = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
-   if (MHPTC < 0)
-   return;
+   int NumSelf = 1;
    vector enemyTCvec = kbUnitGetPosition(MHPTC);
-   int NumSelf = getNumUnits(cUnitTypeSkyPassage, cUnitStateAliveOrBuilding, -1, cMyID, enemyTCvec, 80.0);
-   if (NumSelf < 1)
+   
+   if (MHPTC > 0)
    {  // None found, we need one...and we don't have an active plan.
 	  // First, pick a center location on our side of the enemy TC
 	  vector offset = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)) - enemyTCvec;
@@ -2446,7 +2445,8 @@ rule buildSkyPassages
 	  {
 		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
 		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 23.0, false);
-		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0))
+		 NumSelf = getNumUnits(cUnitTypeSkyPassage, cUnitStateAliveOrBuilding, -1, cMyID, target, 100.0);
+		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0) && (NumSelf < 1))
 		 {
 			success = true;
 			break;
@@ -5221,11 +5221,10 @@ rule buildForwardFortress
    (kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture == cCultureEgyptian))
    xsSetRuleMinIntervalSelf(22);
    int MHPTC = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
-   if (MHPTC < 0)
-   return;
+   int NumSelf = 2;
    vector enemyTCvec = kbUnitGetPosition(MHPTC);
-   int NumSelf = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, enemyTCvec, 80.0);
-   if (NumSelf < 2)
+   
+   if (MHPTC > 0)
    {
 	  vector offset = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)) - enemyTCvec;
 	  offset = xsVectorNormalize(offset);
@@ -5244,7 +5243,8 @@ rule buildForwardFortress
 	  {
 		 testAreaGroup = kbAreaGroupGetIDByPosition(target);
 		 NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 24.0, false);
-		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0))
+		 NumSelf = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, target, 100.0);
+		 if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0) && (NumSelf < 2))
 		 {
 			success = true;
 			break;

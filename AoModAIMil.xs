@@ -569,7 +569,7 @@ rule monitorAttPlans
                     }
                     
                     // Check to see if the gather phase is taking too long and just launch the attack if so.
-                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 15*1000) && (aiPlanGetState(attackPlanID) == cPlanStateGather))
+                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 10*1000) && (aiPlanGetState(attackPlanID) == cPlanStateGather))
                     {
                         if ((numEnemyMilUnitsNearMBInR70 > 10) || (numEnemyMilUnitsNearDefBInR40 > 6))
                         {
@@ -691,7 +691,7 @@ rule monitorAttPlans
                         aiPlanSetDesiredPriority(attackPlanID, 50);
                     }
                     
-                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 15*1000) && (aiPlanGetState(attackPlanID) == cPlanStateGather))
+                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 10*1000) && (aiPlanGetState(attackPlanID) == cPlanStateGather))
                     {
                         if ((numEnemyMilUnitsNearMBInR85 > 6) || (numEnemyMilUnitsNearDefBInR50 > 6))
                         {
@@ -890,7 +890,7 @@ rule monitorAttPlans
                         aiPlanSetDesiredPriority(attackPlanID, 50);
                     }
                     
-                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 15*1000) && (aiPlanGetState(attackPlanID) == cPlanStateGather))
+                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 10*1000) && (aiPlanGetState(attackPlanID) == cPlanStateGather))
                     {
                         if ((numEnemyMilUnitsNearMBInR85 > 14) || (numEnemyMilUnitsNearDefBInR50 > 14))
                         {

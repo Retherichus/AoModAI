@@ -325,31 +325,26 @@ void initRethlAge2(void)
     {	
 	xsEnableRule("getFocus");
     }
+	
+	if (cMyCulture == cCultureChinese)
+	{
+	xsEnableRule("getEarthenWall");
+    xsEnableRule("buildGarden");
+	xsEnableRule("ChooseGardenResource");
 	if (cMyCiv == cCivNuwa)
     {	
-	xsEnableRule("getAcupuncture");
-	xsEnableRule("getEarthenWall");
-	xsEnableRule("buildGarden");
-	xsEnableRule("ChooseGardenResource");	
+	xsEnableRule("getAcupuncture");	
 	xsEnableRule("sendIdleTradeUnitsToRandomBase");
 	xsEnableRule("tradeWithCaravans");
 	xsEnableRule("maintainTradeUnits");
-    }	
+    }
 	if (cMyCiv == cCivFuxi)
-    {	
-	xsEnableRule("getDomestication");
-	xsEnableRule("getEarthenWall");
-	xsEnableRule("buildGarden");
-	xsEnableRule("ChooseGardenResource");	
-    }	
+	xsEnableRule("getDomestication");	
 	if (cMyCiv == cCivShennong)
-    {	
 	xsEnableRule("getWheelbarrow");
-	xsEnableRule("getEarthenWall");
-	xsEnableRule("buildGarden");
-	xsEnableRule("ChooseGardenResource");
-    }		
-	   if ((cRandomMapName == "highland") || (cRandomMapName == "nomad"))
+    }	
+	
+	if ((cRandomMapName == "highland") || (cRandomMapName == "nomad"))
 	{
 	gWaterMap=true;
 	xsEnableRule("fishing");

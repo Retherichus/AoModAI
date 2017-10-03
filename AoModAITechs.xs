@@ -1147,6 +1147,9 @@ rule getStoneWall
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
                 xsSetRuleMinIntervalSelf(37);
             }
+			else
+	        if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
+	        aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);			
         }
         return;
     }
@@ -1201,7 +1204,11 @@ rule getFortifiedWall
     }
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-        return;
+	{
+	if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
+	aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
+    return;
+    }		
     
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     if (numFortresses < 1)
@@ -1254,7 +1261,11 @@ rule getCitadelWall
         return;
     }
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-        return;
+	{
+	if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
+	aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
+    return;
+    }		
     
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -1290,7 +1301,11 @@ rule getBronzeWall
     if (ShowAiEcho == true) aiEcho("getBronzeWall:");
 
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-        return;
+	{
+	if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
+	aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
+    return;
+    }		
     
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
@@ -1342,7 +1357,11 @@ rule getIronWall
         return;
     }
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-        return;
+	{
+	if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
+	aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
+    return;
+    }		
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     if (numFortresses < 1)
         return;
@@ -1391,7 +1410,11 @@ rule getOreichalkosWall
         return;
     }
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-        return;
+	{
+	if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
+	aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
+    return;
+    }		
     
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
