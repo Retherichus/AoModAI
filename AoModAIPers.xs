@@ -15,8 +15,11 @@ void persDecidePersonality(void)
 
 // This AI randomly chooses from one of the six other personalities, and sets the 
 // variables accordingly.
-    int choice = -1;
-    choice = aiRandInt(6);     // 0..5
+    int choice = Personality;
+	if (Personality == -1)
+	choice = aiRandInt(6);
+	else
+    choice = Personality;     // 0..5
     
 //Test start TODO: disable this part once the AI works as espected
 // choice = 1;

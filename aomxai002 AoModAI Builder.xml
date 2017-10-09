@@ -1,6 +1,6 @@
 <AI>
-   <script>AoModAI</script>
-   <name>AoMod AI</name>
+   <script>AoModAIBuilder</script>
+   <name>AoMod AI (Builder)</name>
    <playerNames>
       <name>Imhotep<culture>Egyptian</culture></name>
       <name>Miw-sher<culture>Egyptian</culture></name>
