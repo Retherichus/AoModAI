@@ -27,40 +27,40 @@ void preInitMap()
 {
     if (ShowAiEcho == true) aiEcho("preInitMap:");    
     if (cvRandomMapName == "None")
-        cvRandomMapName = cRandomMapName; 
+	cvRandomMapName = cRandomMapName; 
     int transport = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
     // Decide if we have a water map.
     if ((cRandomMapName == "archipelago") ||
-      (cRandomMapName == "shimo archipelago") ||
-      (cRandomMapName == "river nile") ||
-      (cRandomMapName == "vinlandsaga") ||
-      (cRandomMapName == "alternate-vinlandsaga") ||
-      (cRandomMapName == "islands") ||
-      (cRandomMapName == "akislanddom") || // this doesn't make much sense of course
-      (cRandomMapName == "team migration") ||
-      (cRandomMapName == "artic islands") ||
-      (cRandomMapName == "crimson isles") ||
-      (cRandomMapName == "black sea") ||
-      (cRandomMapName == "treasure island") || // we need water transports here to get to the center island, therefore island map
-      (cRandomMapName == "delta du nil") ||    
-      (cRandomMapName == "amazonas") ||    
-      (cRandomMapName == "iceland") ||    
-      (cRandomMapName == "aegean sea") ||    
-      (cRandomMapName == "aegean sea 2") ||    
-      (cRandomMapName == "mystere isle") ||    
-      (cRandomMapName == "nomad rivers") ||
-      (cRandomMapName == "shipwrecked") ||
-      (cRandomMapName == "great britain") ||
-      (cRandomMapName == "beach battles") ||
-      (cRandomMapName == "beach battles tt") ||
-      (cRandomMapName == "red sea migration") ||
-      (cRandomMapName == "tos_northamerica-v1") ||    
-      (cRandomMapName == "tos_northamerica") ||    
-      (cRandomMapName == "tos_northamerica-v1-1") ||  
-      (cRandomMapName == "Yellow River") || 	  
-      (cRandomMapName == "vesuvius-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||
-      (cRandomMapName == "river styx") ||  	  
-	  (cRandomMapName == "black sea"))
+	(cRandomMapName == "shimo archipelago") ||
+	(cRandomMapName == "river nile") ||
+	(cRandomMapName == "vinlandsaga") ||
+	(cRandomMapName == "alternate-vinlandsaga") ||
+	(cRandomMapName == "islands") ||
+	(cRandomMapName == "akislanddom") || // this doesn't make much sense of course
+	(cRandomMapName == "team migration") ||
+	(cRandomMapName == "artic islands") ||
+	(cRandomMapName == "crimson isles") ||
+	(cRandomMapName == "black sea") ||
+	(cRandomMapName == "treasure island") || // we need water transports here to get to the center island, therefore island map
+	(cRandomMapName == "delta du nil") ||    
+	(cRandomMapName == "amazonas") ||    
+	(cRandomMapName == "iceland") ||    
+	(cRandomMapName == "aegean sea") ||    
+	(cRandomMapName == "aegean sea 2") ||    
+	(cRandomMapName == "mystere isle") ||    
+	(cRandomMapName == "nomad rivers") ||
+	(cRandomMapName == "shipwrecked") ||
+	(cRandomMapName == "great britain") ||
+	(cRandomMapName == "beach battles") ||
+	(cRandomMapName == "beach battles tt") ||
+	(cRandomMapName == "red sea migration") ||
+	(cRandomMapName == "tos_northamerica-v1") ||    
+	(cRandomMapName == "tos_northamerica") ||    
+	(cRandomMapName == "tos_northamerica-v1-1") ||  
+	(cRandomMapName == "Yellow River") || 	  
+	(cRandomMapName == "vesuvius-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||
+	(cRandomMapName == "river styx") ||  	  
+	(cRandomMapName == "black sea"))
     {
         // on these maps, the players are on different islands.
         // we therefore have to consider water transport
@@ -68,33 +68,33 @@ void preInitMap()
         gTransportMap = true;
         gWaterMap = true;
         xsEnableRule("fishing");
-    }
+	}
     else if ((cRandomMapName == "mediterranean") ||
-      (cRandomMapName == "alternate-mediterranean") ||
-      (cRandomMapName == "shimo mediterranean") ||
-      (cRandomMapName == "anatolia") ||
-      (cRandomMapName == "alternate-anatolia") ||
-      (cRandomMapName == "scandinavia") ||
-      (cRandomMapName == "dried up sea") ||
-      (cRandomMapName == "tos_mediterranean-v1") ||
-      (cRandomMapName == "monkey isle") ||
-      (cRandomMapName == "morovia") ||
-      (cRandomMapName == "midgard") ||
-      (cRandomMapName == "alternate-midgard") ||
-      (cRandomMapName == "stronghold-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||    
-      (cRandomMapName == "shimo midgard") ||
-      (cRandomMapName == "volcanic island") ||
-      (cRandomMapName == "vesuvius-v1") ||
-      (cRandomMapName == "nomad") ||
-      (cRandomMapName == "rock island") ||
-      (cRandomMapName == "coastal_v1-0") ||
-      (cRandomMapName == "winter athina v2") ||
-      (cRandomMapName == "british columbia") ||
-      (cRandomMapName == "riverland") ||
-      (cRandomMapName == "alternate-sea-of-worms") ||
-	  (cRandomMapName == "king of the hill") ||	
-      (cRandomMapName == "sea of worms") ||
-	  (cRandomMapName == "basin"))
+	(cRandomMapName == "alternate-mediterranean") ||
+	(cRandomMapName == "shimo mediterranean") ||
+	(cRandomMapName == "anatolia") ||
+	(cRandomMapName == "alternate-anatolia") ||
+	(cRandomMapName == "scandinavia") ||
+	(cRandomMapName == "dried up sea") ||
+	(cRandomMapName == "tos_mediterranean-v1") ||
+	(cRandomMapName == "monkey isle") ||
+	(cRandomMapName == "morovia") ||
+	(cRandomMapName == "midgard") ||
+	(cRandomMapName == "alternate-midgard") ||
+	(cRandomMapName == "stronghold-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||    
+	(cRandomMapName == "shimo midgard") ||
+	(cRandomMapName == "volcanic island") ||
+	(cRandomMapName == "vesuvius-v1") ||
+	(cRandomMapName == "nomad") ||
+	(cRandomMapName == "rock island") ||
+	(cRandomMapName == "coastal_v1-0") ||
+	(cRandomMapName == "winter athina v2") ||
+	(cRandomMapName == "british columbia") ||
+	(cRandomMapName == "riverland") ||
+	(cRandomMapName == "alternate-sea-of-worms") ||
+	(cRandomMapName == "king of the hill") ||	
+	(cRandomMapName == "sea of worms") ||
+	(cRandomMapName == "basin"))
     {
         // these maps contain water, which we can use to fish for example.
         // but all players are connected by land. This means that we are able
@@ -102,75 +102,75 @@ void preInitMap()
         gWaterMap = true;
         gTransportMap=false;
         xsEnableRule("fishing");
-    }
+	}
     else if ((cRandomMapName == "alfheim") ||
-      (cRandomMapName == "alternate-alfheim") ||
-      (cRandomMapName == "shimo alfheim") ||
-      (cRandomMapName == "vanaheim") ||
-      (cRandomMapName == "manaheim") ||
-      (cRandomMapName == "island chain") || // do not try to fish here
-      (cRandomMapName == "savannah") ||
-      (cRandomMapName == "alternate-savannah") ||
-      (cRandomMapName == "farmland") ||
-      (cRandomMapName == "stronghold-v1") ||
-      (cRandomMapName == "shimo savannah") ||
-      (cRandomMapName == "monkey valley") ||
-      (cRandomMapName == "valley of kings") ||
-      (cRandomMapName == "alternate-valley-of-kings") ||
-      (cRandomMapName == "mythland") ||
-      (cRandomMapName == "gold rush") ||
-      (cRandomMapName == "highland") ||
-      (cRandomMapName == "highlands") ||
-      (cRandomMapName == "alternate-highland") ||
-      (cRandomMapName == "highlandsxp") ||
-      (cRandomMapName == "iceworld") ||
-      (cRandomMapName == "land nomad") ||
-      (cRandomMapName == "green arabia new") ||
-      (cRandomMapName == "misty mountain") ||
-      (cRandomMapName == "black forest") ||
-      (cRandomMapName == "dark forest") ||
-      (cRandomMapName == "monticello") ||
-      (cRandomMapName == "sudan") ||
-      (cRandomMapName == "alpine") ||
-      (cRandomMapName == "lost woods") ||
-      (cRandomMapName == "daemonwood") ||
-      (cRandomMapName == "mountain king") ||
-      (cRandomMapName == "battle ground") ||
-      (cRandomMapName == "alexandria") ||
-      (cRandomMapName == "alexandriax2") ||
-      (cRandomMapName == "arabia") ||
-      (cRandomMapName == "acropolis") ||
-	  (cRandomMapName == "team acropolis") ||
-      (cRandomMapName == "alternate-acropolis") ||
-      (cRandomMapName == "oasis") ||
-      (cRandomMapName == "alternate-oasis") ||
-      (cRandomMapName == "jotunheim") ||
-      (cRandomMapName == "alternate-jotunheim") ||
-      (cRandomMapName == "macedonia") ||
-      (cRandomMapName == "erebus") ||
-      (cRandomMapName == "aral lake") ||
-      (cRandomMapName == "tos_middleearth-v1") ||
-      (cRandomMapName == "watering hole") ||
-      (cRandomMapName == "stronghold") ||
-      (cRandomMapName == "marsh") ||
-      (cRandomMapName == "alternate-marsh") ||
-      (cRandomMapName == "megalopolis") ||
-	  (cRandomMapName == "Megaopolis") ||
-      (cRandomMapName == "alternate-megalopolis") ||
-      (cRandomMapName == "tundra") ||
-      (cRandomMapName == "alternate-tundra") ||
-      (cRandomMapName == "torangia") ||
-      (cRandomMapName == "fire void") ||
-      (cRandomMapName == "primrose path") ||
-      (cRandomMapName == "norwegian forest") ||
-      (cRandomMapName == "criss cross") ||
-      (cRandomMapName == "mountain pass 0-5") ||
-      (cRandomMapName == "rocky mountains") ||
-      (cRandomMapName == "cherimoya") ||
-      (cRandomMapName == "ghost lake") ||
-      (cRandomMapName == "green desert") || 
-	  (cRandomMapName == "Deep Jungle") || // Not guaranteed to have a pool generated nearby, and fishing in an enemy pool is a bad idea!
-      (cRandomMapName == "sudden death")) // imho: does'nt make much sense to fish here
+	(cRandomMapName == "alternate-alfheim") ||
+	(cRandomMapName == "shimo alfheim") ||
+	(cRandomMapName == "vanaheim") ||
+	(cRandomMapName == "manaheim") ||
+	(cRandomMapName == "island chain") || // do not try to fish here
+	(cRandomMapName == "savannah") ||
+	(cRandomMapName == "alternate-savannah") ||
+	(cRandomMapName == "farmland") ||
+	(cRandomMapName == "stronghold-v1") ||
+	(cRandomMapName == "shimo savannah") ||
+	(cRandomMapName == "monkey valley") ||
+	(cRandomMapName == "valley of kings") ||
+	(cRandomMapName == "alternate-valley-of-kings") ||
+	(cRandomMapName == "mythland") ||
+	(cRandomMapName == "gold rush") ||
+	(cRandomMapName == "highland") ||
+	(cRandomMapName == "highlands") ||
+	(cRandomMapName == "alternate-highland") ||
+	(cRandomMapName == "highlandsxp") ||
+	(cRandomMapName == "iceworld") ||
+	(cRandomMapName == "land nomad") ||
+	(cRandomMapName == "green arabia new") ||
+	(cRandomMapName == "misty mountain") ||
+	(cRandomMapName == "black forest") ||
+	(cRandomMapName == "dark forest") ||
+	(cRandomMapName == "monticello") ||
+	(cRandomMapName == "sudan") ||
+	(cRandomMapName == "alpine") ||
+	(cRandomMapName == "lost woods") ||
+	(cRandomMapName == "daemonwood") ||
+	(cRandomMapName == "mountain king") ||
+	(cRandomMapName == "battle ground") ||
+	(cRandomMapName == "alexandria") ||
+	(cRandomMapName == "alexandriax2") ||
+	(cRandomMapName == "arabia") ||
+	(cRandomMapName == "acropolis") ||
+	(cRandomMapName == "team acropolis") ||
+	(cRandomMapName == "alternate-acropolis") ||
+	(cRandomMapName == "oasis") ||
+	(cRandomMapName == "alternate-oasis") ||
+	(cRandomMapName == "jotunheim") ||
+	(cRandomMapName == "alternate-jotunheim") ||
+	(cRandomMapName == "macedonia") ||
+	(cRandomMapName == "erebus") ||
+	(cRandomMapName == "aral lake") ||
+	(cRandomMapName == "tos_middleearth-v1") ||
+	(cRandomMapName == "watering hole") ||
+	(cRandomMapName == "stronghold") ||
+	(cRandomMapName == "marsh") ||
+	(cRandomMapName == "alternate-marsh") ||
+	(cRandomMapName == "megalopolis") ||
+	(cRandomMapName == "Megaopolis") ||
+	(cRandomMapName == "alternate-megalopolis") ||
+	(cRandomMapName == "tundra") ||
+	(cRandomMapName == "alternate-tundra") ||
+	(cRandomMapName == "torangia") ||
+	(cRandomMapName == "fire void") ||
+	(cRandomMapName == "primrose path") ||
+	(cRandomMapName == "norwegian forest") ||
+	(cRandomMapName == "criss cross") ||
+	(cRandomMapName == "mountain pass 0-5") ||
+	(cRandomMapName == "rocky mountains") ||
+	(cRandomMapName == "cherimoya") ||
+	(cRandomMapName == "ghost lake") ||
+	(cRandomMapName == "green desert") || 
+	(cRandomMapName == "Deep Jungle") || // Not guaranteed to have a pool generated nearby, and fishing in an enemy pool is a bad idea!
+	(cRandomMapName == "sudden death")) // imho: does'nt make much sense to fish here
     {
         gWaterMap=false;
         gTransportMap=false;
@@ -178,60 +178,60 @@ void preInitMap()
         xsDisableRule("findFish"); 
         xsDisableRule("fishing");
 		NoFishing = true;
-    }
+	}
     else
     // king of the hill
     // the unknown
     {
         if (ShowAiEcho == true) aiEcho("This is an unknown map.");
         xsEnableRule("findFish");
-    }
-
+	}
+	
     // find out what subtype the map is of
     if ( cRandomMapName == "gold rush" ||
-        cRandomMapName == "king of the hill" ||
-        cRandomMapName == "treasure island" )
+	cRandomMapName == "king of the hill" ||
+	cRandomMapName == "treasure island" )
     {
         cvMapSubType = KOTHMAP;
-    }
+	}
     else if ( cRandomMapName == "shimo archipelago" ||
-             cRandomMapName == "shimo alfheim" ||
-             cRandomMapName == "shimo mediterranean" ||
-             cRandomMapName == "shimo savannah" ||
-             cRandomMapName == "shimo midgard" )
+	cRandomMapName == "shimo alfheim" ||
+	cRandomMapName == "shimo mediterranean" ||
+	cRandomMapName == "shimo savannah" ||
+	cRandomMapName == "shimo midgard" )
     {
         cvMapSubType = SHIMOMAP;
-    }
+	}
     else if ( cRandomMapName == "vinlandsaga" ||
-             cRandomMapName == "team migration" ||
-             cRandomMapName == "alternate-vinlandsaga" ||
-             cRandomMapName == "mystere isle" ||
-             (cRandomMapName == "vesuvius-v1" &&
-              kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) )
+	cRandomMapName == "team migration" ||
+	cRandomMapName == "alternate-vinlandsaga" ||
+	cRandomMapName == "mystere isle" ||
+	(cRandomMapName == "vesuvius-v1" &&
+	kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) )
     {
         cvMapSubType = VINLANDSAGAMAP;
-    }
+	}
     else if ( cRandomMapName == "nomad" ||
-             cRandomMapName == "nomad rivers" ||
-			 cRandomMapName == "EPH Nomadic Arabia" ||
-             cRandomMapName == "land nomad")
+	cRandomMapName == "nomad rivers" ||
+	cRandomMapName == "EPH Nomadic Arabia" ||
+	cRandomMapName == "land nomad")
     {
         cvMapSubType = NOMADMAP;
-    }
+	}
     else if ( cRandomMapName == "tos_northamerica-v1" ||
-             (cRandomMapName == "tos_northamerica") ||    
-             (cRandomMapName == "tos_northamerica-v1-1") ||    
-             cRandomMapName == "great britain")
+	(cRandomMapName == "tos_northamerica") ||    
+	(cRandomMapName == "tos_northamerica-v1-1") ||    
+	cRandomMapName == "great britain")
     {
         cvMapSubType = WATERNOMADMAP;
-    }
+	}
 	
 	if (cvRandomMapName == "Transport Scenario")
     {
         gTransportMap = true;
         gWaterMap = true;
         xsEnableRule("fishing"); // force builds the dock.
-    }	
+	}	
 	
 	if (cvRandomMapName == "Migration Scenario")
     {
@@ -239,9 +239,9 @@ void preInitMap()
         gWaterMap = true;
 		cvMapSubType = VINLANDSAGAMAP;
         xsEnableRule("fishing"); // force builds the dock.
-    }		
+	}		
 	
-
+	
 	
     //Tell the AI what kind of map we are on.
     aiSetWaterMap(gTransportMap == true);
@@ -251,7 +251,7 @@ void preInitMap()
 void initMapSpecific()
 {
     if (ShowAiEcho == true) aiEcho("initMapSpecific:");
-
+	
     // various map overrides
     if ( cRandomMapName == "farmland" )
     {
@@ -261,18 +261,17 @@ void initMapSpecific()
             aiPlanAddUnitType(plan, cUnitTypeForkboy, 1, 1, 1);
             aiPlanSetDesiredPriority(plan, 10);
             if ( cMyCulture == cCultureEgyptian )
-                aiPlanSetVariableBool(plan, cExplorePlanDoLoops, 0, true);
+			aiPlanSetVariableBool(plan, cExplorePlanDoLoops, 0, true);
             else
-                aiPlanSetVariableBool(plan, cExplorePlanDoLoops, 0, false);
+			aiPlanSetVariableBool(plan, cExplorePlanDoLoops, 0, false);
             aiPlanSetActive(plan, true);
             aiPlanSetEscrowID(plan, cEconomyEscrowID);
-        }
-    }
+		}
+	}
     else if ((cvRandomMapName == "erebus") || (cvRandomMapName == "river styx"))
     {
         aiSetMinNumberNeedForGatheringAggressvies(1);
-        kbBaseSetMaximumResourceDistance(cMyID, kbBaseGetMainID(cMyID), 85.0);
-    }
+	}
     //Vinlandsaga.
     else if (cvMapSubType == VINLANDSAGAMAP)
     {
@@ -285,7 +284,7 @@ void initMapSpecific()
    		createSimpleBuildPlan(House, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1); 
         aiSetAllowAutoDropsites(false);
         aiSetAllowBuildings(false);
-
+		
         // Move the transport toward map center to find continent quickly.
         int transportID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0));
         vector nearCenter = kbGetMapCenter();
@@ -300,12 +299,12 @@ void initMapSpecific()
         aiSetPauseAllAgeUpgrades(true);
 		gHuntingDogsASAP = false;
 		IsRunHuntingDogs = true;
-    }
+	}
     //Nomad.
     else if (cvMapSubType == NOMADMAP)
     {
         xsEnableRule("nomadSearchMode");
-    }
+	}
     //Make a scout plan to find the plenty vault
     else if (cvMapSubType == KOTHMAP)
     {
@@ -318,12 +317,18 @@ void initMapSpecific()
         int numberFound = kbUnitQueryExecute(KOTHunitQueryID);
         gKOTHPlentyUnitID = kbUnitQueryGetResult(KOTHunitQueryID, 0);
         kbSetForwardBasePosition(kbUnitGetPosition(gKOTHPlentyUnitID));
-        KOTHGlobal = kbUnitGetPosition(gKOTHPlentyUnitID);
         if (gKOTHPlentyUnitID != -1)
-            xsEnableRule("getKingOfTheHillVault");
-            
+	    KOTHGlobal = kbUnitGetPosition(gKOTHPlentyUnitID);
+		int numfish = kbUnitCount(0, cUnitTypeFish, cUnitStateAlive);
+		if (numfish >= 1)
+		{
+			KoTHWaterVersion = true;
+			if (ShowAiEcho == true) aiEcho("Water version of KOTH detected.");
+			KOTHBASE = kbBaseCreate(cMyID, "KOTH BASE", KOTHGlobal, 5.0);		   
+		}
+		xsEnableRule("getKingOfTheHillVault");
         xsEnableRule("findFish");
-    }
+	}
     //Water Nomad (this is sorta mixture between nomad and vinlandsaga)
     else if (cvMapSubType == WATERNOMADMAP)
     {
@@ -341,12 +346,12 @@ void initMapSpecific()
         {
             if (ShowAiEcho == true) aiEcho("adding unit "+i);
             kbBaseAddUnit(cMyID, base, kbUnitQueryGetResult(query, i));
-        }
+		}
         gVinlandsagaInitialBaseID=kbBaseGetMainID(cMyID);
         if (ShowAiEcho == true) aiEcho("Initial Base="+gVinlandsagaInitialBaseID);
-
+		
         int transportPUID=cUnitTypeTransport;
-
+		
         // Move the transport toward map center to find continent quickly.
         gTransportUnit = findUnit(transportPUID);
         nearCenter = kbGetMapCenter();
@@ -355,22 +360,22 @@ void initMapSpecific()
         aiTaskUnitMove(gTransportUnit, nearCenter);
         if (ShowAiEcho == true) aiEcho("Sending transport "+gTransportUnit+" to near map center at "+nearCenter);
         xsEnableRule("vinlandsagaFailsafe");  // In case something prevents transport from reaching, turn on the explore plan.
-
+		
         //Enable the rule that looks for the mainland.
         xsEnableRule("findVinlandsagaBase");
         //Turn off auto dropsite building.
         if ( cMyCulture != cCultureEgyptian )
-            aiSetAllowAutoDropsites(false);
+		aiSetAllowAutoDropsites(false);
         // turn off all buildings
         aiSetAllowBuildings(false);
         // turn off housebuilding rule
         xsDisableRule("buildHouse");
-
+		
         //Turn off fishing.
         xsDisableRule("fishing");
         //Pause the age upgrades.
         aiSetPauseAllAgeUpgrades(true);
-    }
+	}
     else if ( cvMapSubType == SHIMOMAP )
     {
         gShimoKingID = findUnit(gShimoKingUnitTypeID);
@@ -381,16 +386,16 @@ void initMapSpecific()
             // create defend plan?
             // enable Rule to make king flee, if necessary!
             int myFortress=findUnit(cUnitTypeAbstractFortress);
-        }
+		}
         else
-            if (ShowAiEcho == true) aiEcho("Assumed Shimo map, but did not find king :-(");
-    }
+		if (ShowAiEcho == true) aiEcho("Assumed Shimo map, but did not find king :-(");
+	}
 }
 
 //==============================================================================
 rule findVinlandsagaBase
-    minInterval 4 //starts in cAge1
-    inactive
+minInterval 4 //starts in cAge1
+inactive
 {
     if (ShowAiEcho == true) aiEcho("findVinlandsagaBase:");
     //Save our initial base ID.
@@ -399,11 +404,11 @@ rule findVinlandsagaBase
 	static bool RunOnce = false;
 	if ((cMyCulture == cCultureEgyptian) && (RunOnce == false))
 	{
-	RunOnce = true;
-	int Pharaoh=findUnit(cUnitTypePharaoh, cUnitStateAlive, -1, cMyID);
-	int TC=findUnit(cUnitTypeDropsite, cUnitStateAliveOrBuilding, -1, cMyID);
-	if ((Pharaoh != -1) && (TC != -1))
-	aiTaskUnitWork(Pharaoh, TC);
+		RunOnce = true;
+		int Pharaoh=findUnit(cUnitTypePharaoh, cUnitStateAlive, -1, cMyID);
+		int TC=findUnit(cUnitTypeDropsite, cUnitStateAliveOrBuilding, -1, cMyID);
+		if ((Pharaoh != -1) && (TC != -1))
+		aiTaskUnitWork(Pharaoh, TC);
 	}
     
 	//Get our initial location.
@@ -411,30 +416,30 @@ rule findVinlandsagaBase
     //Find the mainland area group.
     int mainlandGroupID=-1;
     if ((cRandomMapName == "vinlandsaga") ||
-        (cRandomMapName == "vesuvius-v1") ||
-        (cRandomMapName == "alternate-vinlandsaga") ||
-        (cRandomMapName == "great britain") ||
-        (cRandomMapName == "tos_northamerica") ||    
-        (cRandomMapName == "tos_northamerica-v1-1") ||    
-        (cRandomMapName == "tos_northamerica-v1"))
+	(cRandomMapName == "vesuvius-v1") ||
+	(cRandomMapName == "alternate-vinlandsaga") ||
+	(cRandomMapName == "great britain") ||
+	(cRandomMapName == "tos_northamerica") ||    
+	(cRandomMapName == "tos_northamerica-v1-1") ||    
+	(cRandomMapName == "tos_northamerica-v1"))
     {
         mainlandGroupID=kbFindAreaGroup(cAreaGroupTypeLand, 3.0, kbAreaGetIDByPosition(location));
-    }
+	}
     else
     {
         mainlandGroupID=kbFindAreaGroupByLocation(cAreaGroupTypeLand, 0.5, 0.5);  // Can fail if mountains at map center
-    }
+	}
     float easyAmount = kbGetAmountValidResources(gVinlandsagaInitialBaseID, cResourceFood, cAIResourceSubTypeEasy, 45);
     if ((mainlandGroupID < 0) || (xsGetTime() < 1*60*1000) && (easyAmount >= 50) && (aiGetGameMode() != cGameModeDeathmatch))
-        return;
-
+	return;
+	
     if (ShowAiEcho == true) aiEcho("findVinlandsagaBase: Found the mainland, AGID="+mainlandGroupID+".");
-
+	
     // stop the transport right away
     int transportID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0));
     if (ShowAiEcho == true) aiEcho("Stopping transport "+transportID);
     aiTaskUnitMove(transportID, kbUnitGetPosition(transportID));
-
+	
     //Create the mainland base.
     int mainlandBaseGID=createBaseGoal("Mainland Base", cGoalPlanGoalTypeMainBase, -1, 1, 0, -1, kbBaseGetMainID(cMyID));
     if (mainlandBaseGID >= 0)
@@ -444,20 +449,20 @@ rule findVinlandsagaBase
         //Create the callback goal.
         int callbackGID=createCallbackGoal("Vinlandsaga Base Callback", "vinlandsagaBaseCallback", 1, 0, -1, false);
         if (callbackGID >= 0)
-            aiPlanSetVariableInt(mainlandBaseGID, cGoalPlanDoneGoal, 0, callbackGID);
-    }
-
+		aiPlanSetVariableInt(mainlandBaseGID, cGoalPlanDoneGoal, 0, callbackGID);
+	}
+	
     //Done.
     xsDisableSelf();
 }  
 
 //==============================================================================
 rule vinlandsagaFailsafe
-    minInterval 60 //starts in cAge1
-    inactive
+minInterval 60 //starts in cAge1
+inactive
 {
     if (ShowAiEcho == true) aiEcho("vinlandsagaFailsafe:");
-
+	
     //Make a plan to explore with the initial transport.
     gVinlandsagaTransportExplorePlanID=aiPlanCreate("Vinlandsaga Transport Explore", cPlanExplore);
     if (ShowAiEcho == true) aiEcho("Transport explore plan: "+gVinlandsagaTransportExplorePlanID);
@@ -468,17 +473,17 @@ rule vinlandsagaFailsafe
         aiPlanSetVariableBool(gVinlandsagaTransportExplorePlanID, cExplorePlanDoLoops, 0, false);
         aiPlanSetActive(gVinlandsagaTransportExplorePlanID);
         aiPlanSetEscrowID(gVinlandsagaTransportExplorePlanID);
-    }
+	}
     xsDisableSelf();
 }
 
 //==============================================================================
 rule vinlandsagaEnableFishing
-    minInterval 10 //starts in cAge1
-    inactive
+minInterval 10 //starts in cAge1
+inactive
 {
     if (ShowAiEcho == true) aiEcho("vinlandsagaEnableFishing:");    
-
+	
     //See how many wood dropsites we have.
     static int wdQueryID=-1;
     //If we don't have a query ID, create it.
@@ -487,32 +492,32 @@ rule vinlandsagaEnableFishing
         wdQueryID=kbUnitQueryCreate("Wood Dropsite Query");
         //If we still don't have one, bail.
         if (wdQueryID < 0)
-            return;
+		return;
         //Else, setup the query data.
         kbUnitQuerySetPlayerID(wdQueryID, cMyID);
         if (cMyCulture == cCultureGreek)
-            kbUnitQuerySetUnitType(wdQueryID, cUnitTypeStorehouse);
-        if (cMyCulture == cCultureChinese)
-            kbUnitQuerySetUnitType(wdQueryID, cUnitTypeStoragePit);			
+		kbUnitQuerySetUnitType(wdQueryID, cUnitTypeStorehouse);
+        else if (cMyCulture == cCultureChinese)
+		kbUnitQuerySetUnitType(wdQueryID, cUnitTypeStoragePit);			
         else if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureAtlantean))
-            kbUnitQuerySetUnitType(wdQueryID, cUnitTypeAbstractVillager);
+		kbUnitQuerySetUnitType(wdQueryID, cUnitTypeAbstractVillager);
         else if (cMyCulture == cCultureNorse)
-            kbUnitQuerySetUnitType(wdQueryID, cUnitTypeLogicalTypeLandMilitary);
+		kbUnitQuerySetUnitType(wdQueryID, cUnitTypeLogicalTypeLandMilitary);
         kbUnitQuerySetAreaGroupID(wdQueryID, kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) );
         kbUnitQuerySetState(wdQueryID, cUnitStateAliveOrBuilding);
-    }
+	}
     //Reset the results.
     kbUnitQueryResetResults(wdQueryID);
     //Run the query.  If we don't have anything, skip.
     if ((kbUnitQueryExecute(wdQueryID) <= 0) && (aiGetGameMode() != cGameModeDeathmatch))
-        return;
-
+	return;
+	
     if ( cvMapSubType == WATERNOMADMAP )
     {
         if ( findUnit(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) < 0 )
-            return;
-    }
-
+		return;
+	}
+	
     //Enable the rule.
     xsEnableRule("fishing");
     //Unpause the age upgrades.
@@ -520,11 +525,6 @@ rule vinlandsagaEnableFishing
     //Unpause the pause kicker.
     xsEnableRule("unPauseAge2");
     xsSetRuleMinInterval("unPauseAge2", 15);
-
-    //Create a simple plan to maintain X Ulfsarks (since we didn't do this as part of initNorse).
-    //createSimpleMaintainPlan(cUnitTypeUlfsark, gMaintainNumberLandScouts+1, true, kbBaseGetMainID(cMyID));
-
-    //Disable us.
     xsDisableSelf();
 }  
 
@@ -533,13 +533,13 @@ rule vinlandsagaEnableFishing
 void vinlandsagaBaseCallback(int parm1=-1)
 {
     if (ShowAiEcho == true) aiEcho("VinlandsagaBaseCallback:");
-
+	
     //Get our water transport type.
     int transportPUID=cUnitTypeTransport;
     //Get our main base.  This needs to be different than our initial base.
     if (kbBaseGetMainID(cMyID) == gVinlandsagaInitialBaseID)
-        return;
-
+	return;
+	
     //Kill the transport explore plan.
     aiPlanDestroy(gVinlandsagaTransportExplorePlanID);
     xsDisableRule("vinlandsagaFailsafe");
@@ -557,17 +557,17 @@ void vinlandsagaBaseCallback(int parm1=-1)
         {
             aiPlanSetVariableBool(gLandExplorePlanID, cExplorePlanDoLoops, 0, false);
             aiPlanSetVariableBool(gLandExplorePlanID, cExplorePlanCanBuildLOSProto, 0, true);
-        }
+		}
         aiPlanSetActive(gLandExplorePlanID);
-    }
-
+	}
+	
     //Get our start area ID.
     int startAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, gVinlandsagaInitialBaseID));
     //Get our goal area ID.
     int goalAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-
+	
     goalAreaID = verifyVinlandsagaBase( goalAreaID );  // Make sure it borders water,or find one that does.
-
+	
     int planID=-1;
     if ( cvMapSubType == WATERNOMADMAP )
     {
@@ -579,12 +579,12 @@ void vinlandsagaBaseCallback(int parm1=-1)
             aiPlanAddUnitType(planID, cUnitTypeUnit, num, num, num);
             aiPlanAddUnitType(planID, cUnitTypeHero, 1, 1, 1);
             aiPlanSetActive(planID);
-        }
-
+		}
+		
         //Enable the rule that looks for a settlement.
         xsEnableRule("nomadSearchMode");
         xsEnableRule("transportAllUnits");
-    }
+	}
     else
     {
         //Create the scout/villager xport plan.  If it works, add the unit type(s).
@@ -592,52 +592,53 @@ void vinlandsagaBaseCallback(int parm1=-1)
         if (planID >= 0)
         {
             if (cMyCulture == cCultureAtlantean)
-                aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, 0, 3, 3);         
+			aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, 0, 3, 3);         
             else
-                aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, 0, 5, 5);
-
+			aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, 0, 5, 5);
+			
             aiPlanAddUnitType(planID, cUnitTypeLogicalTypeGarrisonOnBoats, 0, 1, 8);
 			aiPlanAddUnitType(planID, cUnitTypeHero, 1, 1, 1);
 			if (cMyCiv != cCivOdin)
             aiPlanAddUnitType(planID, gLandScout, 1, 1, 1);
             if (cMyCulture == cCultureNorse)
-                aiPlanAddUnitType(planID, cUnitTypeOxCart, 0, 1, 4);
+			aiPlanAddUnitType(planID, cUnitTypeOxCart, 0, 1, 4);
             aiPlanAddUnitType(planID, cUnitTypeHerdable, 0, 1, 1);
 			aiPlanSetVariableBool(planID, cTransportPlanReturnWhenDone, 0, false);
-        }
+		}
         if (ShowAiEcho == true) aiEcho("Transport plan ID is "+planID);
-    }
-
+	}
+	
     //change the farming baseID
     gFarmBaseID=kbBaseGetMainID(cMyID);
-
+	
     //Allow auto dropsites again.
     aiSetAllowAutoDropsites(true);
     aiSetAllowBuildings(true);
-
+	
     xsDisableRule("setEarlyEcon");
     xsEnableRule("econForecastAge1");
 	xsEnableRule("transportAllUnits");
-
+	
     //Enable the rule that will eventually enable fishing and other stuff.
     xsEnableRule("vinlandsagaEnableFishing");
 }
 
 //==============================================================================
 rule transportAllUnits
-    inactive
-    minInterval 20 //starts in cAge1
+inactive
+minInterval 20 //starts in cAge1
 {
     if (ShowAiEcho == true) aiEcho("transportAllUnits:");    
     static int transportAllUnitsID=-1;
     int num = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeLogicalTypeGarrisonOnBoats, cUnitStateAlive);
 	
     if (num < 1)
-        return;
-
+	return;
+	
     //Get our water transport type.
-    int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+    int transportPUID= cUnitTypeTransport;
 	int numTransport = kbUnitCount(cMyID, transportPUID, cUnitStateAlive);
+
     //Get our start area ID.
     int startAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, gVinlandsagaInitialBaseID));
     //Get our goal area ID.
@@ -648,26 +649,24 @@ rule transportAllUnits
         {
             int TransportPlanID = aiPlanGetIDByIndex(cPlanTransport, -1, true, i);
             if (TransportPlanID == -1)
-                continue;
+			continue;
 		    if (TransportPlanID == transportAllUnitsID)	
 		    {
-		    if (numTransport < 1)
-		    aiPlanDestroy(transportAllUnitsID);
-	        return; 
-		   }
-	    }
-    }		
-
+				if (numTransport < 1)
+				aiPlanDestroy(transportAllUnitsID);
+				return; 
+			}
+		}
+	}		
+	
     if (numTransport < 1)
-        return;
+	return;
     int goalAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-    goalAreaID = verifyVinlandsagaBase( goalAreaID );  // Make sure it borders water,or find one that does.
-
-    
+	
     transportAllUnitsID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 88, gVinlandsagaInitialBaseID);
     if ( transportAllUnitsID >= 0 )
     {
-        aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanReturnWhenDone, 0, true);
+        aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanReturnWhenDone, 0, false);
 		aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanMaximizeXportMovement, 0, true);
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeAbstractVillager, 0, 0, num);
         aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 0, 0, 2);
@@ -677,17 +676,18 @@ rule transportAllUnits
 		if (cMyCulture == cCultureGreek)
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeScout, 1, 1, 1);
 		if (cMyCulture == cCultureNorse)
-		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeOxCart, 1, 1, 1);		
+		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeOxCart, 1, 1, 1);
+	    aiPlanAddUnitType(transportAllUnitsID, cUnitTypeFlyingUnit, 0, 0, 0);
         aiPlanSetActive(transportAllUnitsID);
-    }
+	}
 }
 //==============================================================================
 rule nomadSearchMode
-    inactive
-    minInterval 1 //starts in cAge1
+inactive
+minInterval 1 //starts in cAge1
 {
     if (ShowAiEcho == true) aiEcho("nomadSearchMode:");
-
+	
     //Make plans to explore with the initial villagers and goats.
     gNomadExplorePlanID1=aiPlanCreate("Nomad Explore 1", cPlanExplore);
     if (gNomadExplorePlanID1 >= 0)
@@ -697,7 +697,7 @@ rule nomadSearchMode
         aiPlanSetVariableBool(gNomadExplorePlanID1, cExplorePlanDoLoops, 0, false);
         aiPlanSetActive(gNomadExplorePlanID1);
         aiPlanSetEscrowID(gNomadExplorePlanID1);
-    }
+	}
     gNomadExplorePlanID2=aiPlanCreate("Nomad Explore 2", cPlanExplore);
     if (gNomadExplorePlanID2 >= 0)
     {
@@ -706,7 +706,7 @@ rule nomadSearchMode
         aiPlanSetVariableBool(gNomadExplorePlanID2, cExplorePlanDoLoops, 0, false);
         aiPlanSetActive(gNomadExplorePlanID2);
         aiPlanSetEscrowID(gNomadExplorePlanID2);
-    }
+	}
     gNomadExplorePlanID3=aiPlanCreate("Nomad Explore 3", cPlanExplore);
     if (gNomadExplorePlanID3 >= 0)
     {
@@ -715,17 +715,17 @@ rule nomadSearchMode
         aiPlanSetVariableBool(gNomadExplorePlanID3, cExplorePlanDoLoops, 0, false);
         aiPlanSetActive(gNomadExplorePlanID3);
         aiPlanSetEscrowID(gNomadExplorePlanID3);
-    }      
-
+	}      
+	
     //Turn off fishing.
     xsDisableRule("fishing");
     //Turn off buildhouse.
     xsDisableRule("buildHouse");
     //Pause the age upgrades.
     aiSetPauseAllAgeUpgrades(true);
-
+	
     xsDisableRule("earlySettlementTracker");  // Normal settlement-building rule
-
+	
     xsEnableRule("nomadBuildMode");
     xsDisableSelf();
     if (ShowAiEcho == true) aiEcho("Enabling nomadBuildMode");
@@ -733,11 +733,11 @@ rule nomadSearchMode
 
 //==============================================================================
 rule nomadBuildMode        // Go to build mode when a suitable settlement is found
-    inactive
-    minInterval 1 //starts in cAge1
+inactive
+minInterval 1 //starts in cAge1
 {
-     if (ShowAiEcho == true) aiEcho("nomadBuildMode:");
-
+	if (ShowAiEcho == true) aiEcho("nomadBuildMode:");
+	
     int count = -1;   // How many settlements found?
     static int settlementQuery = -1;    // All gaia settlements
     if (settlementQuery < 0)
@@ -746,8 +746,8 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
         kbUnitQuerySetPlayerID(settlementQuery, 0);
         kbUnitQuerySetUnitType(settlementQuery, cUnitTypeAbstractSettlement);
 		kbUnitQuerySetSeeableOnly(settlementQuery, true);
-    }
-
+	}
+	
     static int builderQuery = -1;      // All builders within 20 meters of a gaia settlement
     if (builderQuery < 0)
     {
@@ -760,19 +760,19 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
 		else 
         kbUnitQuerySetMaximumDistance(builderQuery, 30.0);
         kbUnitQuerySetAscendingSort(builderQuery, true);
-    }  
-
+	}  
+	
     kbUnitQueryResetResults(settlementQuery);
     count = kbUnitQueryExecute(settlementQuery);
     if (count < 1)
-        return;     // No settlements seen, give up
-
+	return;     // No settlements seen, give up
+	
     // Settlements seen, check if you have a builder close by
     if (ShowAiEcho == true) aiEcho("Found "+count+" settlements.");
     int i = -1;
     int settlement = -1;
     int foundSettlement = -1;
-
+	
     for (i=0; < count)
     {
         settlement = kbUnitQueryGetResult(settlementQuery, i);
@@ -784,14 +784,14 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
             foundSettlement = settlement;
             if (ShowAiEcho == true) aiEcho("        Builder found, we'll use "+settlement);
             break;
-        }
+		}
         if (ShowAiEcho == true) aiEcho("        No builders nearby.");
-    }
-   
+	}
+	
     // If we found a usable settlement, build on it.  Otherwise, keep this rule active
     if (foundSettlement < 0)
-        return;
-   
+	return;
+	
     // We have one, let's use it and monitor for completion
     
     if (ShowAiEcho == true) aiEcho("Making main base.");
@@ -814,15 +814,15 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
         kbBaseSetSettlement(cMyID, newBaseID, true);
         //Set the main-ness of the base.
         kbBaseSetMain(cMyID, newBaseID, true);
-    }
-
+	}
+	
     if (ShowAiEcho == true) aiEcho("Main base is "+newBaseID+" "+kbBaseGetMainID(cMyID));
-
+	
     if (ShowAiEcho == true) aiEcho("Creating simple build plan");
-
+	
     gNomadSettlementBuildPlanID=aiPlanCreate("Nomad settlement build", cPlanBuild);
     if (gNomadSettlementBuildPlanID < 0)
-        return;
+	return;
     //Puid.
     aiPlanSetVariableInt(gNomadSettlementBuildPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeSettlementLevel1);
     //Priority.
@@ -841,13 +841,13 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
     aiPlanSetVariableVector(gNomadSettlementBuildPlanID, cBuildPlanSettlementPlacementPoint, 0, kbUnitGetPosition(foundSettlement));
     //Go.
     aiPlanSetActive(gNomadSettlementBuildPlanID);
-
-
+	
+	
     if (ShowAiEcho == true) aiEcho("Killing explore plans.");
     aiPlanDestroy(gNomadExplorePlanID1);
     aiPlanDestroy(gNomadExplorePlanID2);
     aiPlanDestroy(gNomadExplorePlanID3);
-
+	
     xsEnableRule("nomadMonitor");
     xsDisableSelf();
     if (ShowAiEcho == true) aiEcho("Activating nomad monitor rule");
@@ -855,14 +855,14 @@ rule nomadBuildMode        // Go to build mode when a suitable settlement is fou
 
 //==============================================================================
 rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on normal function.  If goal fails, restart.
-    inactive
-    minInterval 1 //starts in cAge1
+inactive
+minInterval 1 //starts in cAge1
 {
     if (ShowAiEcho == true) aiEcho("nomadMonitor:");
-
+	
     if ( (aiPlanGetState(gNomadSettlementBuildPlanID) >= 0) && (aiPlanGetState(gNomadSettlementBuildPlanID) != cPlanStateDone) )
-        return;     // Plan exists, is not finished
-
+	return;     // Plan exists, is not finished
+	
     // plan is done or died.  Check if we have a settlement
     if (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding) > 0) // AliveOrBuilding in case state isn't updated instantly
     {  // We have a settlement, go normal
@@ -871,10 +871,10 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
         xsEnableRule("earlySettlementTracker");
         //Turn on fishing.
         if ( cvMapSubType == WATERNOMADMAP )
-            xsEnableRule("fishing");      
+		xsEnableRule("fishing");      
         //Turn on buildhouse.
         xsEnableRule("buildHouse");
-
+		
         int tc = findUnit(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
         if ( tc >= 0)   
         {
@@ -898,12 +898,12 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
             aiRemoveResourceBreakdown(cResourceFood, cAIResourceSubTypeHunt, -1);
             aiRemoveResourceBreakdown(cResourceFavor, cAIResourceSubTypeEasy, -1);
             aiSetResourceBreakdown( cResourceFavor, cAIResourceSubTypeEasy, 0, 48, 0.00, kbBaseGetMainID(cMyID));
-
+			
             if ( kbUnitGetBaseID(tc) != oldMainBase )
             {
                 kbBaseDestroy(cMyID, oldMainBase);
                 kbBaseSetMain(cMyID, kbUnitGetBaseID(tc),true);
-            }
+			}
             if (ShowAiEcho == true) aiEcho("TC is in base "+kbUnitGetBaseID(tc));
             if (ShowAiEcho == true) aiEcho("New main base is "+kbBaseGetMainID(cMyID));
             vector front = cInvalidVector;
@@ -920,16 +920,16 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
                 aiPlanSetBaseID(gHerdPlanID, kbBaseGetMainID(cMyID));
                 aiPlanSetVariableInt(gHerdPlanID, cHerdPlanBuildingID, 0, tc);
                 aiPlanSetActive(gHerdPlanID);
-            }
+			}
             aiSetResourceBreakdown( cResourceFavor, cAIResourceSubTypeEasy, 0, 48, 0.00, kbBaseGetMainID(cMyID));
             updateFoodBreakdown();
-        }
-
-
+		}
+		
+		
         // Fix god power plan for age 1
         aiPlanSetBaseID(gAge1GodPowerPlanID, kbBaseGetMainID(cMyID));
-
-
+		
+		
         // force the temple soon
         createSimpleBuildPlan(cUnitTypeTemple, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1);
         //Unpause the age upgrades.
@@ -937,14 +937,14 @@ rule nomadMonitor    // Watch the build goal.  When a settlement is up, turn on 
         //Unpause the pause kicker.
         xsEnableRule("unPauseAge2");
         xsSetRuleMinInterval("unPauseAge2", 15);
-
-    }
+		
+	}
     else
     {  // No settlement, restart chain
         if (ShowAiEcho == true) aiEcho("No settlement exists, restart nomad chain.");
         xsEnableRule("nomadSearchMode");
         xsDisableSelf();
-    }
+	}
 }
 
 
@@ -955,40 +955,39 @@ bool mapPreventsRush()  //TODO: this are not all maps that prevent rushes.
     if (ShowAiEcho == true) aiEcho("mapPreventsRush:");
     
     if ((cRandomMapName == "vinlandsaga") ||
-      (cRandomMapName == "river nile") ||
-      (cRandomMapName == "alternate-vinlandsaga") ||
-      (cRandomMapName == "amazonas") ||
-      (cRandomMapName == "team migration") ||
-      (cRandomMapName == "archipelago") ||
-      (cRandomMapName == "black sea"))
+	(cRandomMapName == "river nile") ||
+	(cRandomMapName == "alternate-vinlandsaga") ||
+	(cRandomMapName == "amazonas") ||
+	(cRandomMapName == "team migration") ||
+	(cRandomMapName == "archipelago") ||
+	(cRandomMapName == "black sea"))
     {
         return(true);
-    }
+	}
     else   
-        return(false);
+	return(false);
 }
 
 //==============================================================================
 bool mapPreventsWalls() //some maps do not allow walls or it doesn't make sense to build walls there
 {
-    if ( 
-        cRandomMapName == "acropolis" ||
-        cRandomMapName == "alternate-acropolis" ||
-        cRandomMapName == "stronghold-v1" ||
-        cRandomMapName == "torangia" ||
-        cRandomMapName == "amazonas" ||
-        cRandomMapName == "fire void" ||
-        cRandomMapName == "the void" ||
-        cRandomMapName == "daemonwood" ||
-        cRandomMapName == "black forest" ||
-        cRandomMapName == "holy mountain" ||
-        cvMapSubType == VINLANDSAGAMAP ||		
-        cRandomMapName == "akIslandDom" )
+    if (cRandomMapName == "acropolis" ||
+	cRandomMapName == "alternate-acropolis" ||
+	cRandomMapName == "stronghold-v1" ||
+	cRandomMapName == "torangia" ||
+	cRandomMapName == "amazonas" ||
+	cRandomMapName == "fire void" ||
+	cRandomMapName == "the void" ||
+	cRandomMapName == "daemonwood" ||
+	cRandomMapName == "black forest" ||
+	cRandomMapName == "holy mountain" ||
+	cvMapSubType == VINLANDSAGAMAP ||		
+	cRandomMapName == "akIslandDom" )
     {
         return(true);
-    }
+	}
     else
-        return(false);
+	return(false);
 }
 
 //==============================================================================
@@ -997,11 +996,11 @@ bool mapPreventsHousesAtTowers()
     if (ShowAiEcho == true) aiEcho("mapPreventsHousesAtTowers:");
     
     if ( cRandomMapName == "amazonas" ||
-        cRandomMapName == "acropolis" ||
-        cRandomMapName == "alternate-acropolis" )
-        return(true);
+	cRandomMapName == "acropolis" ||
+	cRandomMapName == "alternate-acropolis" )
+	return(true);
     else
-        return(false);
+	return(false);
 }
 
 //==============================================================================
@@ -1010,11 +1009,11 @@ bool mapRestrictsMarketAttack()
     if (ShowAiEcho == true) aiEcho("mapRestrictsMarketAttack:");
     
     if ((cRandomMapName == "highland")
-     || (cRandomMapName == "watering hole") //TODO: Test if this is really better!
-     || (cRandomMapName == "jotunheim"))
+	|| (cRandomMapName == "watering hole") //TODO: Test if this is really better!
+	|| (cRandomMapName == "jotunheim"))
     {
         return(true);
-    }
+	}
     else
-        return(false);
+	return(false);
 }

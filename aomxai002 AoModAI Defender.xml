@@ -1,6 +1,6 @@
 <AI>
-   <script>AoModAIRandom</script>
-   <name>AoMod AI (Random)</name>
+   <script>AoModAIDefender</script>
+   <name>AoMod AI (Defender)</name>
    <playerNames>
       <name>Imhotep<culture>Egyptian</culture></name>
       <name>Miw-sher<culture>Egyptian</culture></name>
@@ -76,7 +76,7 @@
       <name>Cteatus<culture>Greek</culture></name>
       <name>Autolycus<culture>Greek</culture></name>
       <name>Cratippus<culture>Greek</culture></name>
-	  <name>Ash Ketchum<culture>Greek</culture></name>
+	  <name>Seychelle Delgado<culture>Greek</culture></name>
       <name>Gudberd<culture>Norse</culture></name>
       <name>Aric<culture>Norse</culture></name>
       <name>Wodin<culture>Norse</culture></name>

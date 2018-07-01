@@ -1,2 +1,2 @@
-extern int Personality = 1;
+extern int Personality = 8;
 include "AoModAI.xs";
