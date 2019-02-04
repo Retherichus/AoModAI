@@ -569,12 +569,10 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 1);
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
         aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, cMyID);
-		
         aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelUnit);
 		
-        //-- kill the empower plan and relic gather plans.
-        aiPlanDestroy(gEmpowerPlanID);
-        aiPlanDestroy(gRelicGatherPlanID);
+		if (gGatherRelicType == cUnitTypePharaoh)
+		aiPlanDestroy(gRelicGatherPlanID);
 		
         return (true);  
 	}
@@ -606,7 +604,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableInt(planID, cGodPowerPlanQueryID, 0, queryID);
         aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, cMyID);
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 14);
-		
 		
         return (true);  
 	}
@@ -995,7 +992,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	// Or actually destroy the plan and use painful manual casting
 	if(powerProtoID == cPowerTsunami)
 	{
-		// disabled
+		xsEnableRule("Tsunami");
 		return (false);  
 	}
 	
@@ -1330,7 +1327,7 @@ inactive
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     int numGoldMinesNearMBInR85 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 85.0);
     //Are we in the third age yet? If not cast it only if there are no gold mines in range
-    if ((kbGetAge() < cAge3) && (numGoldMinesNearMBInR85 > 0))
+    if ((kbGetAge() <= cAge3) && (numGoldMinesNearMBInR85 > 0))
 	return;
 	
     aiPlanSetVariableBool(gDwarvenMinePlanID, cGodPowerPlanAutoCast, 0, true);
@@ -1723,10 +1720,11 @@ void releaseTownDefenseGP()
 
 //==============================================================================
 rule rGaiaForestPower
-minInterval 1 //starts in cAge1
+minInterval 35 //starts in cAge1
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rGaiaForestPower:");    
+    if (ShowAiEcho == true) aiEcho("rGaiaForestPower:"); 
+	static bool FirstRun = false;	
     xsSetRuleMinIntervalSelf(109);
     if (gGaiaForestPlanID == -1)
     {
@@ -1734,11 +1732,10 @@ inactive
         return;
 	}
     bool JustCastIt = false;
-	
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 35.0);
-	if (NumTreesMB <= 10)
+	if (NumTreesMB <= 20)
 	JustCastIt = true;
     static int count = 0;
     bool autoCast = aiPlanGetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0);
@@ -1970,6 +1967,8 @@ bool canAffordSpeedUpConstruction(int queryID = -1, int index = -1, int escrowID
 	int wood  = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceWood );
 	int food  = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceFood );
 	int favor = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceFavor);
+	if (kbGetAge() < cAge2)
+	return(false);
 	if(kbEscrowGetAmount(escrowID, cResourceGold)<gold)
 	{
 		return(false);
@@ -2067,73 +2066,32 @@ inactive
 // - No enemy army nearby otherwise they get killed, resurrected and killed again
 //==============================================================================
 rule rRecreation
-minInterval 15
+minInterval 10
 inactive
 {
-	static int deadQuery = -1;
-	static int deadNearbyQuery = -1;
-	static int enemyQuery = -1;
-	float enemyRange = 20.0;
-	int numRequired  = 1;// Early we want every villager to be alive
-	if(kbGetAge()==cAge2)
+	int numRequired = 1;
+	if (kbGetAge() == cAge2)
+	numRequired = 2;
+	else if (kbGetAge() > cAge2)
+	numRequired = 3;
+	int NumDead = kbUnitCount(cMyID, cUnitTypeVillagerChineseDeadReplacement, cUnitStateAlive);
+	if (NumDead < 1)
+	return;
+	
+	for (i=0; < NumDead)
 	{
-		xsSetRuleMinIntervalSelf(10);// Less important
-		numRequired = 2;
-	}
-	if(kbGetAge()>cAge2)
-	{
-		xsSetRuleMinIntervalSelf(10);
-		numRequired = 3;
-	}
-	// Set up queries
-	if(deadQuery == -1)
-	{
-		deadQuery = kbUnitQueryCreate("Dead Villager Query");
-		kbUnitQuerySetPlayerID(deadQuery, cMyID);
-		kbUnitQuerySetUnitType(deadQuery, cUnitTypeVillagerChineseDeadReplacement);
-		kbUnitQuerySetState(deadQuery, cUnitStateAny);
-	}
-	kbUnitQueryResetResults(deadQuery);
-	if(deadNearbyQuery == -1)
-	{
-		deadNearbyQuery = kbUnitQueryCreate("Dead Nearby Villager Query");
-		kbUnitQuerySetPlayerID(deadNearbyQuery, cMyID);
-		kbUnitQuerySetUnitType(deadNearbyQuery, cUnitTypeVillagerChineseDeadReplacement);
-		kbUnitQuerySetState(deadNearbyQuery, cUnitStateAny);
-	}
-	int numDead = kbUnitQueryExecute(deadQuery);
-	if(enemyQuery == -1)
-	{
-		enemyQuery = kbUnitQueryCreate("Enemy Army Query");
-		kbUnitQuerySetPlayerID(enemyQuery, cMyID);
-		kbUnitQuerySetPlayerRelation(enemyQuery, cPlayerRelationEnemy);
-		kbUnitQuerySetUnitType(enemyQuery, cUnitTypeMilitary);
-		kbUnitQuerySetState(enemyQuery, cUnitStateAlive);
-	}
-	// Loop through all the dead villagers we found
-	for(i=0;<numDead)
-	{
-		vector position = kbUnitGetPosition(kbUnitQueryGetResult(deadQuery,i));
-		kbUnitQueryResetResults(enemyQuery);
-		kbUnitQuerySetPosition(enemyQuery,position);
-		kbUnitQuerySetMaximumDistance(enemyQuery,enemyRange);
-		// Check for enemies
-		if(kbUnitQueryExecute(enemyQuery)==0)
+		int unitID = findUnitByIndex(cUnitTypeVillagerChineseDeadReplacement, i, cUnitStateAlive);	
+		vector unitLoc = kbUnitGetPosition(unitID);
+		int OtherDead = getNumUnits(cUnitTypeVillagerChineseDeadReplacement, cUnitStateAlive, -1, cMyID, unitLoc, 10.0);
+		int NearbyEnemy = getNumUnitsByRel(cUnitTypeMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 20.0, true);
+		if ((OtherDead >= numRequired) && (NearbyEnemy < 1))
 		{
-			// We want atleast 2 dead villagers
-			kbUnitQueryResetResults(deadNearbyQuery);
-			kbUnitQuerySetPosition(deadNearbyQuery,position);
-			kbUnitQuerySetMaximumDistance(deadNearbyQuery,10);// GP range
-			if(kbUnitQueryExecute(deadNearbyQuery)>1)
+			if(aiCastGodPowerAtPosition(cTechRecreation,unitLoc))
 			{
-				// 2 villagers to be revived lets go!
-				if(aiCastGodPowerAtPosition(cTechRecreation,position))
-				{
-					// Did we make it? Kill the rule if so
-					xsDisableSelf();
-				}
+				xsDisableSelf();
+				break;
 			}
-		}
+		}	
 	}
 }
 //==============================================================================
@@ -2154,7 +2112,7 @@ inactive
 	int Vills = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAliveOrBuilding);
 	int vilPopTarget = aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0);
 	
-	if ((kbResourceGet(cResourceWood) > 150) && (kbResourceGet(cResourceFood) > 300) && (kbResourceGet(cResourceGold) > 200) && (MilInTraining >= 3) && (kbGetPop() <= kbGetPopCap() - 20) 
+	if ((kbResourceGet(cResourceWood) > 150) && (kbResourceGet(cResourceFood) > 300) && (kbResourceGet(cResourceGold) > 200) && (MilInTraining >= 3) && (kbGetPop() <= kbGetPopCap() - 30) 
 	|| (Vills < vilPopTarget * 0.6) && (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive) >= 1) && (kbResourceGet(cResourceFood) > 150))
 	{
 		aiPlanSetVariableBool(gExaminationID, cGodPowerPlanAutoCast, 0, true);
@@ -2166,67 +2124,37 @@ inactive
 // RULE rCastHeavyGP -- TARTARIAN
 //==============================================================================
 rule rCastHeavyGP
-minInterval 8
+minInterval 14
 inactive
 {
-	static int settleQuery=-1;
-	static int fortressQuery=-1;
-	static int farmQuery=-1;
-	static int CastAttempt=0;
-    int TartGate = kbUnitCount(cMyID, cUnitTypeTartarianGate, cUnitStateAlive);
-	if (TartGate > 1)
+	static int CastAttempt = 0;
+    int TartGate = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
+	if ((TartGate > 1) || (CastAttempt > 5))
 	{
 		xsDisableSelf();
 		return;
 	}
 	
-	if(settleQuery < 0)
+	int NumSettle = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationEnemy);
+	for (i=0; < NumSettle)
 	{
-		settleQuery=kbUnitQueryCreate("Enemy Settle Query");
-		configQueryRelation(settleQuery, cUnitTypeAbstractSettlement, -1, cUnitStateAlive, cPlayerRelationEnemy);
-	}
-	
-	if(fortressQuery < 0)
-	fortressQuery=kbUnitQueryCreate("Fortress Query");
-	if(farmQuery < 0)
-	farmQuery=kbUnitQueryCreate("Farm Query");
-	
-	kbUnitQueryResetResults(settleQuery);
-	int numSettles=kbUnitQueryExecute(settleQuery);
-	for(i=0; <numSettles)
-	{
-		vector loc=kbUnitGetPosition(kbUnitQueryGetResult(settleQuery, i));
-		kbUnitQueryResetData(fortressQuery);
-		kbUnitQueryResetData(farmQuery);
-		configQueryRelation(fortressQuery, cUnitTypeAbstractFortress, -1, cUnitStateAlive, cPlayerRelationEnemy, loc, false, 40.0);
-		configQueryRelation(farmQuery, cUnitTypeFarm, -1, cUnitStateAlive, cPlayerRelationEnemy, loc, false, 30.0);
-		
-		kbUnitQueryResetResults(fortressQuery);
-		kbUnitQueryResetResults(farmQuery);
-		int numForts=kbUnitQueryExecute(fortressQuery);
-		int numFarms=kbUnitQueryExecute(farmQuery);
-		if( (numFarms > 0) && (numForts > 0) )
+		int unitID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive);
+		vector unitLoc = kbUnitGetPosition(unitID);
+		int numFarms = getNumUnitsByRel(cUnitTypeFarm, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 35.0, true);
+		int numForts = getNumUnitsByRel(cUnitTypeAbstractFortress, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 40.0, true);
+		if ((numFarms > 4) && (numForts > 0) && (unitID != -1))
 		{
-			if(gHeavyGPTech == cTechTartarianGate)
-			{
-				loc=kbUnitGetPosition(kbUnitQueryGetResult(fortressQuery, i));
-			}
-			
-			if(kbLocationVisible(loc) == true)
+	        int Target = findUnitByRel(cUnitTypeAbstractFortress, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 40, true);
+	        vector loc = kbUnitGetPosition(Target);
+			if ((kbLocationVisible(loc) == true) && (Target != -1))
 			{
 				if(aiCastGodPowerAtPosition(gHeavyGPTech,loc) == true)
 				{
-					kbUnitQueryDestroy(settleQuery);
-					kbUnitQueryDestroy(fortressQuery);
-					kbUnitQueryDestroy(farmQuery);
-					aiPlanDestroy(gHeavyGPPlan);
 					CastAttempt = CastAttempt+1;
-					if (CastAttempt > 5)
-					xsDisableSelf();
-					return;
+					break;
 				}
-			}
-		}
+			}		
+		}	
 	}
 }
 
@@ -2270,7 +2198,6 @@ inactive
 		eUnitID = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
 		eLocation = kbUnitGetPosition(eUnitID);
 		int NumEnemyFarms = getNumUnits(cUnitTypeFarm, cUnitStateAliveOrBuilding, 0, enemyPlayerID, eLocation, 35.0);
-		//aiEcho("FARMS "+NumEnemyFarms+"");
 		if (NumEnemyFarms < 5)
 		return;	
 	}
@@ -2302,5 +2229,41 @@ inactive
 				return;
 			}
 		}
+	}
+}
+
+rule Tsunami  
+minInterval 16
+inactive
+{
+	static int CastAttempt = 0;
+    int HatedPlayer = aiGetMostHatedPlayerID();
+	int SettlementID = getMainBaseUnitIDForPlayer(HatedPlayer);
+	if (SettlementID == -1)
+	return;
+    vector TownLocation = kbUnitGetPosition(SettlementID); // uses main TC
+	int Houses = findUnit(cUnitTypeLogicalTypeHouses, cUnitStateAlive, -1, HatedPlayer, TownLocation, 50, true);
+	if (Houses != -1)
+	{
+		vector HouseLocation = kbUnitGetPosition(Houses);
+		int HousesThere = getNumUnits(cUnitTypeLogicalTypeHouses, cUnitStateAlive, -1, HatedPlayer, HouseLocation, 20);
+		if (HousesThere > 2)
+		{
+			vector offset = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)) - HouseLocation;
+			offset = xsVectorNormalize(offset);
+			vector target = HouseLocation + (offset * 60.0);
+			vector startPosition = target;
+		    int Distance = xsVectorLength(target - HouseLocation);
+			if ((Distance < 125) && (kbLocationVisible(target) == true) && (equal(target, cInvalidVector) == false))
+			{
+				vector finalPosition = TownLocation - (TownLocation-startPosition)*2;
+				if(aiCastGodPowerAtPositionFacingPosition(cTechTsunami,startPosition,finalPosition))
+                CastAttempt = CastAttempt + 1;
+				
+				if (CastAttempt > 3)
+				xsDisableSelf();
+			}
+		}
+		
 	}
 }

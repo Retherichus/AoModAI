@@ -4,7 +4,7 @@
 
 //==============================================================================
 rule maintainTradeUnits
-minInterval 16 //starts in cAge3
+minInterval 8 //starts in cAge3
 inactive
 {
     if (ShowAiEcho == true) aiEcho("maintainTradeUnits:");
@@ -14,11 +14,16 @@ inactive
 	return;
 
     int tradeCartPUID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0);
-    int numTradeUnits = kbUnitCount(cMyID, tradeCartPUID, cUnitStateAlive);
+    int numTradeUnits = kbUnitCount(cMyID, tradeCartPUID, cUnitStateAliveOrBuilding);
     float foodSupply = kbResourceGet(cResourceFood);
     
 	int NumTcs = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
     int mainBaseID = kbBaseGetMainID(cMyID);
+	vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+	vector MarketLoc = kbUnitGetPosition(gTradeMarketUnitID);
+	if ((gTransportMap == true) && (kbAreaGroupGetIDByPosition(MarketLoc) != kbAreaGroupGetIDByPosition(mainBaseLocation)))
+	return;
+
     int activeTrainPlans = aiPlanGetNumber(cPlanTrain, -1, true);
     if (activeTrainPlans > 0)
     {
@@ -57,21 +62,21 @@ inactive
 	} 
 	
 	int numIdleTrade = getNumUnits(tradeCartPUID, cUnitStateAlive, cActionIdle, cMyID);
-	if ((NumTcs < 1) || (numIdleTrade > 3) || (cMyCiv == cCivNuwa) && (kbGetAge() < cAge3) && (numTradeUnits >=5)) // don't train caravans if you have no TC or if too many are idle.
+	if ((NumTcs < 1) || (numIdleTrade > 3) || (cMyCiv == cCivNuwa) && (kbGetAge() < cAge3) && (numTradeUnits >=3)) // don't train caravans if you have no TC or if too many are idle.
     return;
     int tradeTargetPop = gMaxTradeCarts;
-   	if (aiGetWorldDifficulty() == cDifficultyNightmare)
+   	if ((aiGetWorldDifficulty() == cDifficultyNightmare) || (kbGetAge() < cAge4) && (xsGetTime() < 30*60*1000))
     tradeTargetPop = gTitanTradeCarts;	
     if ((cvMaxTradePop >= 0) && (tradeTargetPop > cvMaxTradePop))    // Stay under control variable limit
 	tradeTargetPop = cvMaxTradePop;
     int unitTypeToTrain = -1;
     
-    if (NumTcs >=5)
+    if (NumTcs >=4)
 	NumTcs = 5;
 	if ((aiGetWorldDifficulty() == cDifficultyNightmare) && (NumTcs >= 2))
 	NumTcs = 2;
 	
-    if ((NumTcs > 1) || (IhaveAllies == true) || (foodSupply > 1500))
+    if ((NumTcs > 1) && (IhaveAllies == true) || (kbGetAge() > cAge3) && (foodSupply > 1500))
 	tradeTargetPop = tradeTargetPop + 1 + NumTcs;
     
     static bool firstRun = true;
@@ -83,7 +88,7 @@ inactive
 		unitTypeToTrain = tradeCartPUID;
         else
         {
-			if  (foodSupply > 200)
+			if (foodSupply > 200)
 			unitTypeToTrain = tradeCartPUID;
 		}
 	}
@@ -101,12 +106,20 @@ inactive
     aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanUnitType, 0, unitTypeToTrain);
     if (firstRun == true)
     {
-        aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 5);
+        if ((cMyCiv == cCivNuwa) && (kbGetAge() < cAge3))
+        aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 2);
+	    else
+		aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 5);
         firstRun = false;
         aiTaskUnitTrain(gTradeMarketUnitID, unitTypeToTrain);
 	}
     else
+	{
+    if (numTradeUnits < tradeTargetPop - 3)
 	aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 2);
+	else
+	aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 1);
+	}
     
     aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanFrequency, 0, 10);    
     aiPlanSetBaseID(trainTradeUnitPlanID, mainBaseID);
@@ -120,80 +133,29 @@ inactive
 
 //==============================================================================
 rule maintainAirScouts
-minInterval 67 //starts in cAge1
+minInterval 54 //starts in cAge1
 inactive
 {        
     if (ShowAiEcho == true) aiEcho("maintainAirScouts:");
-    
+    static int AirScoutMaintain = -1;
     int numTemples = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAlive);
-    if (numTemples < 1)
+    if ((numTemples < 1) || (kbGetAge() < cAge2))
 	return;
 	
     float foodSupply = kbResourceGet(cResourceFood);
-    
-    if ((kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) && (foodSupply < 500))
-	return;
-	
-    int numAirScouts = kbUnitCount(cMyID, gAirScout, cUnitStateAlive);
-    
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    int activeTrainPlans = aiPlanGetNumber(cPlanTrain, -1, true);
-    if (activeTrainPlans > 0)
-    {
-        for (i = 0; < activeTrainPlans)
-        {
-            int trainPlanIndexID = aiPlanGetIDByIndex(cPlanTrain, -1, true, i);
-            if ((gAirScout == aiPlanGetVariableInt(trainPlanIndexID, cTrainPlanUnitType, 0)) && (aiPlanGetBaseID(trainPlanIndexID) == mainBaseID))
-            {
-                static bool alreadyInAge3 = false;
-                if ((kbGetAge() == cAge3) && (alreadyInAge3 == false))
-                {
-                    aiPlanDestroy(trainPlanIndexID);
-                    alreadyInAge3 = true;
-				}
-                
-                if (kbGetAge() > cAge2)
-                {
-                    if (foodSupply > 400)
-                    {
-                        aiPlanSetVariableInt(trainPlanIndexID, cTrainPlanNumberToMaintain, 0, 1);
-					}
-                    else if (foodSupply > 200)
-                    {
-                        aiPlanSetVariableInt(trainPlanIndexID, cTrainPlanNumberToMaintain, 0, 1);
-					}
-                    else
-                    {
-                        aiPlanDestroy(trainPlanIndexID);
-					}
-				}
-                return;
-			}
-		}
+	if (AirScoutMaintain == -1)
+	{
+		AirScoutMaintain = createSimpleMaintainPlan(gAirScout, 1, true, kbBaseGetMainID(cMyID));
+		aiPlanSetDesiredPriority(AirScoutMaintain, 51);
 	}
 	
-    int unitTypeToTrain = -1;
-    
-    if (numAirScouts < 1)
-    {
-        if (foodSupply > 200)
-        unitTypeToTrain = gAirScout;	
+	if (AirScoutMaintain != -1)
+	{
+		if (foodSupply > 150)
+		aiPlanSetVariableInt(AirScoutMaintain, cTrainPlanNumberToMaintain, 0, 1);
+		else
+		aiPlanSetVariableInt(AirScoutMaintain, cTrainPlanNumberToMaintain, 0, 0);
 	}
-    
-    if (unitTypeToTrain == -1)
-    return;
-	
-    int trainAirScoutPlanID = aiPlanCreate("air scout maintain", cPlanTrain);
-    if (trainAirScoutPlanID < 0)
-	return;
-	
-    aiPlanSetEconomy(trainAirScoutPlanID, true);
-    aiPlanSetVariableInt(trainAirScoutPlanID, cTrainPlanNumberToMaintain, 0, 1);
-    aiPlanSetVariableInt(trainAirScoutPlanID, cTrainPlanFrequency, 0, 15);
-    aiPlanSetBaseID(trainAirScoutPlanID, mainBaseID);
-    aiPlanSetDesiredPriority(trainAirScoutPlanID, 100);
-    aiPlanSetActive(trainAirScoutPlanID);
-    if (ShowAiEcho == true) aiEcho("Training an air scout: "+kbGetProtoUnitName(unitTypeToTrain)+" at main base: "+mainBaseID);
 }
 
 //==============================================================================
@@ -205,7 +167,7 @@ minInterval 15 //starts in cAge1
 	
     if (gUlfsarkMaintainPlanID >= 0)
 	return;  // already exists
-    gUlfsarkMaintainPlanID = createSimpleMaintainPlan(cUnitTypeUlfsark, gMaintainNumberLandScouts, true, kbBaseGetMainID(cMyID));
+    gUlfsarkMaintainPlanID = createSimpleMaintainPlan(cUnitTypeUlfsark, 1, true, kbBaseGetMainID(cMyID));
     aiPlanSetDesiredPriority(gUlfsarkMaintainPlanID, 98); // Outrank civPopPlanID for villagers
     xsDisableSelf();
 }
@@ -517,27 +479,12 @@ inactive
 	return;
 	
     aiPlanSetMilitary(planID, true);
+	aiPlanSetBaseID(planID, mainBaseID);
     aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, puid);
-    if ((cMyCulture == cCultureAtlantean) && (puid == age2MythUnitID) && (puid != cUnitTypeFlyingMedic))
-    {
-        aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 2);
-        aiPlanSetVariableInt(planID, cTrainPlanFrequency, 0, 30);
-	}
-    else if (puid == age4MythUnitID)
-    {
-        aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 3);
-	}
+    if (puid == age4MythUnitID)
+    aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 3);
 	else
-	{
-		aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 2);
-	}
-	
-    if (mainBaseID >= 0)
-    {
-        aiPlanSetBaseID(planID, mainBaseID);
-        vector militaryGatherPoint = getMainBaseMilitaryGatherPoint();
-        aiPlanSetVariableVector(planID, cTrainPlanGatherPoint, 0, militaryGatherPoint);
-	}
+    aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 2);
     aiPlanSetDesiredPriority(planID, 100);
     aiPlanSetActive(planID);
 }
@@ -669,6 +616,8 @@ inactive
 				if (siegeWeaponBuildingIDNearMBInR60 != -1)
 				{
 					//Try to train a siege weapon via aiTaskUnitTrain
+					aiTaskUnitTrain(siegeWeaponBuildingIDNearMBInR60, siegeUnitType1);
+					if ((goldSupply > 700) && (woodSupply > 700) && (kbGetAge() >= cAge4)) // add an extra one
 					aiTaskUnitTrain(siegeWeaponBuildingIDNearMBInR60, siegeUnitType1);
 					if (ShowAiEcho == true) aiEcho("Trying to train a siege weapon: "+siegeUnitType1+" at siegeWeaponBuildingIDNearMBInR60: "+siegeWeaponBuildingIDNearMBInR60);
 				}
@@ -825,7 +774,7 @@ inactive
 
 //==============================================================================
 rule makeAtlanteanHeroes
-minInterval 37 //starts in cAge1
+minInterval 20 //starts in cAge1
 inactive
 {
     if (ShowAiEcho == true) aiEcho("makeAtlanteanHeroes:");
@@ -839,7 +788,7 @@ inactive
     float goldSupply = kbResourceGet(cResourceGold);
     float favorSupply = kbResourceGet(cResourceFavor);
     
-    if ((favorSupply < 4) || (woodSupply < 120) || (foodSupply < 150) || (goldSupply < 120))
+    if ((favorSupply < 10) || (woodSupply < 120) || (foodSupply < 150) || (goldSupply < 120))
     {
         return;
 	}
@@ -899,11 +848,11 @@ inactive
         return;
 	}
     
-    if ((numHeroes >= 2) && (numHeroes <= currentPop / 15))
+    if ((numHeroes >= 1) && (numHeroes <= currentPop / 15))
     {
-        if (numHeroes <= 4)
+        if (numHeroes <= 3)
         {
-            if ((favorSupply < 20) || ((woodSupply < 150) || (foodSupply < 150) || (goldSupply < 150)))
+            if ((favorSupply < 20) || ((woodSupply < 200) || (foodSupply < 200) || (goldSupply < 200)))
             {
                 if (ShowAiEcho == true) aiEcho("not enough resources, returning");
                 return;
@@ -911,7 +860,7 @@ inactive
 		}
         else
         {
-            if ((favorSupply < 30) || ((woodSupply < 350) || (foodSupply < 350) || (goldSupply < 350)))
+            if ((favorSupply < 60) || ((woodSupply < 350) || (foodSupply < 350) || (goldSupply < 350)))
             {
                 if (ShowAiEcho == true) aiEcho("not enough resources, returning");
                 return;
@@ -1007,75 +956,4 @@ inactive
         aiTaskUnitTransform(unitIDToUse);
         if (ShowAiEcho == true) aiEcho("Attempting to transform unit with ID:"+unitIDToUse+" to a hero");
 	}
-    else
-    {
-        if (gDefendPlanID != -1)
-        {
-            aiPlanSetDesiredPriority(gDefendPlanID, 35);
-            xsEnableRule("makeAtlanteanHeroesFallBack");
-            if (ShowAiEcho == true) aiEcho("enabling the makeAtlanteanHeroesFallBack rule");
-		}
-	}
-    
-}
-
-//==============================================================================
-rule makeAtlanteanHeroesFallBack
-minInterval 10 //gets started in makeAtlanteanHeroes rule
-inactive
-{
-    if (ShowAiEcho == true) aiEcho("makeAtlanteanHeroesFallBack:");
-    
-    if (gDefendPlanID != -1)
-    {
-        int numHumanSoldiersInDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeHumanSoldier);
-        if (ShowAiEcho == true) aiEcho("numHumanSoldiersInDefendPlan: "+numHumanSoldiersInDefendPlan);
-        if (numHumanSoldiersInDefendPlan > 0)
-        {
-            int planToUse = gDefendPlanID;
-            int numUnitsInPlan = aiPlanGetNumberUnits(planToUse, cUnitTypeUnit);
-            if (ShowAiEcho == true) aiEcho("numUnitsInPlan: "+numUnitsInPlan);
-            if (numUnitsInPlan > 0)
-            {
-                int unitIDToUse = -1;
-                int min = 0;
-                int max = 9;
-                if (numUnitsInPlan > max)
-				min = numUnitsInPlan - max;
-                for (i = numUnitsInPlan - 1; >= min)
-                {
-                    if (ShowAiEcho == true) aiEcho("i = "+i);
-                    int unitID = aiPlanGetUnitByIndex(planToUse, i);
-                    if (unitID != -1)
-                    {
-                        if (kbUnitIsType(unitID, cUnitTypeHumanSoldier) == true)
-                        {
-                            if (ShowAiEcho == true) aiEcho("unitID: "+unitID+" is a cUnitTypeHumanSoldier");
-                            if ((kbUnitIsType(unitID, cUnitTypeMaceman) == false) && (kbUnitIsType(unitID, cUnitTypeTridentSoldier) == false))
-                            {
-                                if (ShowAiEcho == true) aiEcho("unitID: "+unitID+" is NOT a cUnitTypeMaceman and NOT a cUnitTypeTridentSoldier");
-                                if (kbUnitGetHealth(unitID) > 0.9)
-                                {
-                                    unitIDToUse = unitID;
-                                    break;
-								}
-							}
-						}
-                        else
-                        {
-                            if (ShowAiEcho == true) aiEcho("unitID: "+unitID+" is NOT a cUnitTypeHumanSoldier");
-						}
-					}
-				}
-				
-                if ((unitIDToUse != -1) && (kbUnitIsType(unitIDToUse, cUnitTypeOracleScout) == false))
-                {
-                    aiTaskUnitTransform(unitIDToUse);
-                    if (ShowAiEcho == true) aiEcho("Attempting to transform unit with ID:"+unitIDToUse+" to a hero");
-				}
-			}
-		}
-	}
-    aiPlanSetDesiredPriority(gDefendPlanID, 20);
-    xsDisableSelf();  
 }

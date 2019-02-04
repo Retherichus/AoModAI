@@ -29,81 +29,8 @@ void preInitMap()
     if (cvRandomMapName == "None")
 	cvRandomMapName = cRandomMapName; 
     int transport = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
-    // Decide if we have a water map.
-    if ((cRandomMapName == "archipelago") ||
-	(cRandomMapName == "shimo archipelago") ||
-	(cRandomMapName == "river nile") ||
-	(cRandomMapName == "vinlandsaga") ||
-	(cRandomMapName == "alternate-vinlandsaga") ||
-	(cRandomMapName == "islands") ||
-	(cRandomMapName == "akislanddom") || // this doesn't make much sense of course
-	(cRandomMapName == "team migration") ||
-	(cRandomMapName == "artic islands") ||
-	(cRandomMapName == "crimson isles") ||
-	(cRandomMapName == "black sea") ||
-	(cRandomMapName == "treasure island") || // we need water transports here to get to the center island, therefore island map
-	(cRandomMapName == "delta du nil") ||    
-	(cRandomMapName == "amazonas") ||    
-	(cRandomMapName == "iceland") ||    
-	(cRandomMapName == "aegean sea") ||    
-	(cRandomMapName == "aegean sea 2") ||    
-	(cRandomMapName == "mystere isle") ||    
-	(cRandomMapName == "nomad rivers") ||
-	(cRandomMapName == "shipwrecked") ||
-	(cRandomMapName == "great britain") ||
-	(cRandomMapName == "beach battles") ||
-	(cRandomMapName == "beach battles tt") ||
-	(cRandomMapName == "red sea migration") ||
-	(cRandomMapName == "tos_northamerica-v1") ||    
-	(cRandomMapName == "tos_northamerica") ||    
-	(cRandomMapName == "tos_northamerica-v1-1") ||  
-	(cRandomMapName == "Yellow River") || 	  
-	(cRandomMapName == "vesuvius-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||
-	(cRandomMapName == "river styx") ||  	  
-	(cRandomMapName == "black sea"))
-    {
-        // on these maps, the players are on different islands.
-        // we therefore have to consider water transport
-        // and we won't be able to raid
-        gTransportMap = true;
-        gWaterMap = true;
-        xsEnableRule("fishing");
-	}
-    else if ((cRandomMapName == "mediterranean") ||
-	(cRandomMapName == "alternate-mediterranean") ||
-	(cRandomMapName == "shimo mediterranean") ||
-	(cRandomMapName == "anatolia") ||
-	(cRandomMapName == "alternate-anatolia") ||
-	(cRandomMapName == "scandinavia") ||
-	(cRandomMapName == "dried up sea") ||
-	(cRandomMapName == "tos_mediterranean-v1") ||
-	(cRandomMapName == "monkey isle") ||
-	(cRandomMapName == "morovia") ||
-	(cRandomMapName == "midgard") ||
-	(cRandomMapName == "alternate-midgard") ||
-	(cRandomMapName == "stronghold-v1" && kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) ||    
-	(cRandomMapName == "shimo midgard") ||
-	(cRandomMapName == "volcanic island") ||
-	(cRandomMapName == "vesuvius-v1") ||
-	(cRandomMapName == "nomad") ||
-	(cRandomMapName == "rock island") ||
-	(cRandomMapName == "coastal_v1-0") ||
-	(cRandomMapName == "winter athina v2") ||
-	(cRandomMapName == "british columbia") ||
-	(cRandomMapName == "riverland") ||
-	(cRandomMapName == "alternate-sea-of-worms") ||
-	(cRandomMapName == "king of the hill") ||	
-	(cRandomMapName == "sea of worms") ||
-	(cRandomMapName == "basin"))
-    {
-        // these maps contain water, which we can use to fish for example.
-        // but all players are connected by land. This means that we are able
-        // to rush/raid. We will not consider water transport on such maps. 
-        gWaterMap = true;
-        gTransportMap=false;
-        xsEnableRule("fishing");
-	}
-    else if ((cRandomMapName == "alfheim") ||
+
+    if ((cRandomMapName == "alfheim") ||
 	(cRandomMapName == "alternate-alfheim") ||
 	(cRandomMapName == "shimo alfheim") ||
 	(cRandomMapName == "vanaheim") ||
@@ -180,15 +107,31 @@ void preInitMap()
 		NoFishing = true;
 	}
     else
-    // king of the hill
-    // the unknown
+	// auto detect
     {
         if (ShowAiEcho == true) aiEcho("This is an unknown map.");
         xsEnableRule("findFish");
-	}
-	
+	    int WaterOnMap = kbAreaGetClosetArea(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)), cAreaTypeWater);
+        if (WaterOnMap != -1)
+        {
+		    for (k = 1; < cNumberPlayers)
+	        {
+		        int fMainBaseUnitID = getMainBaseUnitIDForPlayer(k);
+		        int targetSettlementID = fMainBaseUnitID;
+		        vector targetSettlementPos = kbUnitGetPosition(targetSettlementID); // uses main TC
+		        if ((targetSettlementID != -1) && (kbAreaGroupGetIDByPosition(targetSettlementPos) != kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)))) 
+				|| (kbUnitCount(cMyID, transport, cUnitStateAlive) > 0))
+		        {
+	                gTransportMap = true;
+			    	if (ShowAiEcho == true) aiEcho("Transport is needed, because player "+k+" is on a different island!");
+			        break;
+		        }
+	        }	        
+
+	    }		
+	}	
     // find out what subtype the map is of
-    if ( cRandomMapName == "gold rush" ||
+    if (cRandomMapName == "gold rush" ||
 	cRandomMapName == "king of the hill" ||
 	cRandomMapName == "treasure island" )
     {
@@ -240,9 +183,6 @@ void preInitMap()
 		cvMapSubType = VINLANDSAGAMAP;
         xsEnableRule("fishing"); // force builds the dock.
 	}		
-	
-	
-	
     //Tell the AI what kind of map we are on.
     aiSetWaterMap(gTransportMap == true);
 }
@@ -283,6 +223,9 @@ void initMapSpecific()
 		House = cUnitTypeManor;
    		createSimpleBuildPlan(House, 1, 100, false, true, cEconomyEscrowID, kbBaseGetMainID(cMyID), 1); 
         aiSetAllowAutoDropsites(false);
+		if (aiGetGameMode() == cGameModeDeathmatch)
+		aiSetAllowBuildings(true);
+	    else
         aiSetAllowBuildings(false);
 		
         // Move the transport toward map center to find continent quickly.
@@ -296,6 +239,7 @@ void initMapSpecific()
         //Turn off fishing.
         xsDisableRule("fishing");
         //Pause the age upgrades.
+		if (aiGetGameMode() != cGameModeDeathmatch)
         aiSetPauseAllAgeUpgrades(true);
 		gHuntingDogsASAP = false;
 		IsRunHuntingDogs = true;
@@ -312,6 +256,7 @@ void initMapSpecific()
         int KOTHunitQueryID = kbUnitQueryCreate("findPlentyVault");
         kbUnitQuerySetPlayerRelation(KOTHunitQueryID, cPlayerRelationAny);
         kbUnitQuerySetUnitType(KOTHunitQueryID, cUnitTypePlentyVaultKOTH);
+		kbUnitQuerySetSeeableOnly(KOTHunitQueryID, false);
         kbUnitQuerySetState(KOTHunitQueryID, cUnitStateAny);
         kbUnitQueryResetResults(KOTHunitQueryID);
         int numberFound = kbUnitQueryExecute(KOTHunitQueryID);
@@ -319,12 +264,11 @@ void initMapSpecific()
         kbSetForwardBasePosition(kbUnitGetPosition(gKOTHPlentyUnitID));
         if (gKOTHPlentyUnitID != -1)
 	    KOTHGlobal = kbUnitGetPosition(gKOTHPlentyUnitID);
-		int numfish = kbUnitCount(0, cUnitTypeFish, cUnitStateAlive);
-		if (numfish >= 1)
+		if (kbAreaGroupGetIDByPosition(KOTHGlobal) != kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))))
 		{
 			KoTHWaterVersion = true;
 			if (ShowAiEcho == true) aiEcho("Water version of KOTH detected.");
-			KOTHBASE = kbBaseCreate(cMyID, "KOTH BASE", KOTHGlobal, 5.0);		   
+			KOTHBASE = kbBaseCreate(cMyID, "KOTH BASE", KOTHGlobal, 5.0);
 		}
 		xsEnableRule("getKingOfTheHillVault");
         xsEnableRule("findFish");
@@ -394,7 +338,7 @@ void initMapSpecific()
 
 //==============================================================================
 rule findVinlandsagaBase
-minInterval 4 //starts in cAge1
+minInterval 1 //starts in cAge1
 inactive
 {
     if (ShowAiEcho == true) aiEcho("findVinlandsagaBase:");
@@ -451,7 +395,6 @@ inactive
         if (callbackGID >= 0)
 		aiPlanSetVariableInt(mainlandBaseGID, cGoalPlanDoneGoal, 0, callbackGID);
 	}
-	
     //Done.
     xsDisableSelf();
 }  
@@ -533,7 +476,6 @@ inactive
 void vinlandsagaBaseCallback(int parm1=-1)
 {
     if (ShowAiEcho == true) aiEcho("VinlandsagaBaseCallback:");
-	
     //Get our water transport type.
     int transportPUID=cUnitTypeTransport;
     //Get our main base.  This needs to be different than our initial base.
@@ -567,7 +509,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
     int goalAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
 	
     goalAreaID = verifyVinlandsagaBase( goalAreaID );  // Make sure it borders water,or find one that does.
-	
+    MigrationAreaID = goalAreaID;
     int planID=-1;
     if ( cvMapSubType == WATERNOMADMAP )
     {
@@ -601,9 +543,10 @@ void vinlandsagaBaseCallback(int parm1=-1)
 			if (cMyCiv != cCivOdin)
             aiPlanAddUnitType(planID, gLandScout, 1, 1, 1);
             if (cMyCulture == cCultureNorse)
-			aiPlanAddUnitType(planID, cUnitTypeOxCart, 0, 1, 4);
-            aiPlanAddUnitType(planID, cUnitTypeHerdable, 0, 1, 1);
+			aiPlanAddUnitType(planID, cUnitTypeOxCart, 1, 1, 4);
+            aiPlanAddUnitType(planID, cUnitTypeHerdable, 0, 0, 0);
 			aiPlanSetVariableBool(planID, cTransportPlanReturnWhenDone, 0, false);
+			aiPlanSetActive(planID);
 		}
         if (ShowAiEcho == true) aiEcho("Transport plan ID is "+planID);
 	}
@@ -628,15 +571,17 @@ rule transportAllUnits
 inactive
 minInterval 20 //starts in cAge1
 {
-    if (ShowAiEcho == true) aiEcho("transportAllUnits:");    
     static int transportAllUnitsID=-1;
     int num = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeLogicalTypeGarrisonOnBoats, cUnitStateAlive);
-	
+	int Herd = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeHerdable, cUnitStateAlive);
+	if (Herd <= 0)
+	Herd = 0;
+	num = num - Herd;
     if (num < 1)
 	return;
 	
     //Get our water transport type.
-    int transportPUID= cUnitTypeTransport;
+    int transportPUID = cUnitTypeTransport;
 	int numTransport = kbUnitCount(cMyID, transportPUID, cUnitStateAlive);
 
     //Get our start area ID.
@@ -661,23 +606,25 @@ minInterval 20 //starts in cAge1
 	
     if (numTransport < 1)
 	return;
-    int goalAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-	
+    int goalAreaID = MigrationAreaID;
+	if (goalAreaID == -1)
+	goalAreaID = kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
+
     transportAllUnitsID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 88, gVinlandsagaInitialBaseID);
     if ( transportAllUnitsID >= 0 )
     {
-        aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanReturnWhenDone, 0, false);
+        aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanReturnWhenDone, 0, true);
 		aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanMaximizeXportMovement, 0, true);
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeAbstractVillager, 0, 0, num);
-        aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 0, 0, 2);
-		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHerdable, 2, 2, 2);
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHumanSoldier, 1, num, num);
         aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHero, 1, 1, 1);
 		if (cMyCulture == cCultureGreek)
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeScout, 1, 1, 1);
 		if (cMyCulture == cCultureNorse)
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeOxCart, 1, 1, 1);
+        aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 0, 0, 2);	
 	    aiPlanAddUnitType(transportAllUnitsID, cUnitTypeFlyingUnit, 0, 0, 0);
+		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHerdable, 0, 0, 0);		
         aiPlanSetActive(transportAllUnitsID);
 	}
 }
@@ -692,7 +639,7 @@ minInterval 1 //starts in cAge1
     gNomadExplorePlanID1=aiPlanCreate("Nomad Explore 1", cPlanExplore);
     if (gNomadExplorePlanID1 >= 0)
     {
-        aiPlanAddUnitType(gNomadExplorePlanID1, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+        aiPlanAddUnitType(gNomadExplorePlanID1, cBuilderType, 1, 1, 1);
         aiPlanSetDesiredPriority(gNomadExplorePlanID1, 90);
         aiPlanSetVariableBool(gNomadExplorePlanID1, cExplorePlanDoLoops, 0, false);
         aiPlanSetActive(gNomadExplorePlanID1);
@@ -701,7 +648,7 @@ minInterval 1 //starts in cAge1
     gNomadExplorePlanID2=aiPlanCreate("Nomad Explore 2", cPlanExplore);
     if (gNomadExplorePlanID2 >= 0)
     {
-        aiPlanAddUnitType(gNomadExplorePlanID2, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+        aiPlanAddUnitType(gNomadExplorePlanID2, cBuilderType, 1, 1, 1);
         aiPlanSetDesiredPriority(gNomadExplorePlanID2, 90);
         aiPlanSetVariableBool(gNomadExplorePlanID2, cExplorePlanDoLoops, 0, false);
         aiPlanSetActive(gNomadExplorePlanID2);
@@ -710,7 +657,7 @@ minInterval 1 //starts in cAge1
     gNomadExplorePlanID3=aiPlanCreate("Nomad Explore 3", cPlanExplore);
     if (gNomadExplorePlanID3 >= 0)
     {
-        aiPlanAddUnitType(gNomadExplorePlanID3, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 2, 2);   // Grab last Egyptian
+        aiPlanAddUnitType(gNomadExplorePlanID3, cBuilderType, 1, 2, 2);   // Grab last Egyptian
         aiPlanSetDesiredPriority(gNomadExplorePlanID3, 90);
         aiPlanSetVariableBool(gNomadExplorePlanID3, cExplorePlanDoLoops, 0, false);
         aiPlanSetActive(gNomadExplorePlanID3);
@@ -753,7 +700,7 @@ minInterval 1 //starts in cAge1
     {
         builderQuery = kbUnitQueryCreate("Nomad Builder");
         kbUnitQuerySetPlayerID(builderQuery, cMyID);
-        kbUnitQuerySetUnitType(builderQuery, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0));
+        kbUnitQuerySetUnitType(builderQuery, cBuilderType);
         kbUnitQuerySetState(builderQuery, cUnitStateAlive);
 		if (cMyCiv == cCivOuranos)
 	    kbUnitQuerySetMaximumDistance(builderQuery, 90.0);

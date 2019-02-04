@@ -87,8 +87,6 @@ void progressAge2Handler(int age=1)
 {
     if (ShowAiEcho == true) aiEcho("Progress Age "+age+".");
     xsEnableRule("age2Progress");
-    if (cMyCulture == cCultureEgyptian)
-	xsEnableRule("buildMonuments");
 }
 
 //==============================================================================
@@ -96,21 +94,17 @@ void progressAge3Handler(int age=2)
 {
     if (ShowAiEcho == true) aiEcho("Progress Age "+age+".");
     xsEnableRule("age3Progress");
-    if (cMyCulture == cCultureEgyptian)
-	xsEnableRule("buildMonuments");
 }
 
 //==============================================================================
 void progressAge4Handler(int age=3)
 {
     if (ShowAiEcho == true) aiEcho("Progress Age "+age+".");
-    if (cMyCulture == cCultureEgyptian)
-	xsEnableRule("buildMonuments");
 }
 
 //==============================================================================
 rule unPauseAge2
-minInterval 185 //starts in cAge1
+minInterval 180 //starts in cAge1
 inactive
 {
     if (ShowAiEcho == true) aiEcho("unPauseAge2:");

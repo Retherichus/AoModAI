@@ -163,6 +163,7 @@ extern bool DestroyTransportPlan = false;
 extern bool DestroyHTransportPlan = false;
 extern int rExploreIsland = -1;
 extern int MyFortress = cUnitTypeAbstractFortress;
+extern int cBuilderType = cUnitTypeAbstractVillager;
 //==============================================================================
 bool equal(vector left=cInvalidVector, vector right=cInvalidVector) //true if the given vectors are equal
 {
@@ -182,7 +183,6 @@ bool equal(vector left=cInvalidVector, vector right=cInvalidVector) //true if th
 	
 	return(false);
 }
-
 // *****************************************************************************
 // configQuery
 //
@@ -275,7 +275,33 @@ vector center = cInvalidVector, bool sort = false, float radius = -1, bool seeab
     
     return(true);
 }
-
+//==============================================================================
+int NumUnitsOnAreaGroupByRel(bool Player = false, int AreaGroupID = -1, int UnitID = -1, int PlayerIDOrRelation = cPlayerRelationSelf, int iState = cUnitStateAlive, int Action = cActionAny) 
+{
+    static int AreaUnitQuery = -1;
+    if (AreaUnitQuery < 0) 
+	{
+        AreaUnitQuery = kbUnitQueryCreate("AreaGroupQuery");
+        if (AreaUnitQuery < 0)
+		return(-1);
+	}
+	if (Player == false)
+	{
+	    kbUnitQuerySetPlayerRelation(AreaUnitQuery, PlayerIDOrRelation);
+        kbUnitQuerySetPlayerID(AreaUnitQuery, -1);
+	}
+    else
+	{
+        kbUnitQuerySetPlayerID(AreaUnitQuery, PlayerIDOrRelation);	
+        kbUnitQuerySetPlayerRelation(AreaUnitQuery, -1);
+	}
+    kbUnitQuerySetUnitType(AreaUnitQuery, UnitID);
+    kbUnitQueryResetResults(AreaUnitQuery);
+    kbUnitQuerySetState(AreaUnitQuery, iState);
+    kbUnitQuerySetAreaGroupID(AreaUnitQuery, AreaGroupID);
+    kbUnitQueryResetResults(AreaUnitQuery);
+    return(kbUnitQueryExecute(AreaUnitQuery));
+}
 //==============================================================================
 bool isOnMyIsland(vector there=cInvalidVector)
 {
@@ -869,45 +895,6 @@ int minAge=-1, int maxAge=-1, bool autoUpdate=false)
 }
 
 //==============================================================================
-int createBuildBuildingGoal(string name="BUG", int buildingTypeID=-1, int repeat=-1,
-int minAge=-1, int maxAge=-1, int baseID=-1, int numberUnits=1, int builderUnitTypeID=-1,
-bool autoUpdate=true, int pri=90, int buildingPlacementID = -1)
-{
-    if (ShowAiEcho == true) aiEcho("CreateBuildBuildingGoal:  Name="+name+", BuildingType="+kbGetUnitTypeName(buildingTypeID)+".");
-	
-    //Create the goal.
-    int goalID=aiPlanCreate(name, cPlanGoal);
-    if (goalID < 0)
-	return(-1);
-	
-    //Goal Type.
-    aiPlanSetVariableInt(goalID, cGoalPlanGoalType, 0, cGoalPlanGoalTypeBuilding);
-    //Base ID.
-    aiPlanSetBaseID(goalID, baseID);
-    //Auto update.
-    aiPlanSetVariableBool(goalID, cGoalPlanAutoUpdateState, 0, autoUpdate);
-    //Building Type ID.
-    aiPlanSetVariableInt(goalID, cGoalPlanBuildingTypeID, 0, buildingTypeID);
-    //Building Placement ID.
-    aiPlanSetVariableInt(goalID, cGoalPlanBuildingPlacementID, 0, buildingPlacementID);
-    //Set the builder parms.
-    aiPlanSetVariableInt(goalID, cGoalPlanMinUnitNumber, 0, 1);
-    aiPlanSetVariableInt(goalID, cGoalPlanMaxUnitNumber, 0, numberUnits);
-    aiPlanSetVariableInt(goalID, cGoalPlanUnitTypeID, 0, builderUnitTypeID);
-	
-    //Priority.
-    aiPlanSetDesiredPriority(goalID, pri);
-    //Ages.
-    aiPlanSetVariableInt(goalID, cGoalPlanMinAge, 0, minAge);
-    aiPlanSetVariableInt(goalID, cGoalPlanMaxAge, 0, maxAge);
-    //Repeat.
-    aiPlanSetVariableInt(goalID, cGoalPlanRepeat, 0, repeat);
-	
-    //Done.
-    return(goalID);
-}
-
-//==============================================================================
 int createBuildSettlementGoal(string name="BUG", int minAge=-1, int maxAge=-1, int baseID=-1, int numberUnits=1, int builderUnitTypeID=-1,
 bool autoUpdate=true, int pri=100)
 {
@@ -1039,9 +1026,8 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
     int baseID=-1;
     int startAreaID=-1;
     static int builderQuery=-1;
-    int builderTypeID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0);
-	int NumBuilder = getNumUnits(builderTypeID, cUnitStateAlive, -1, cMyID, where, 35.0);	
-    if (( builderTypeID < 0 ) || (NumBuilder > 0))
+	int NumBuilder = NumUnitsOnAreaGroupByRel(false, kbAreaGroupGetIDByPosition(where), cBuilderType);
+    if ((cBuilderType < 0 ) || (NumBuilder > 0))
 	return;
 	
     int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
@@ -1049,11 +1035,8 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
 	return;
     
 	baseID = kbBaseGetMainID(cMyID);
-    
-	
     vector baseLoc = kbBaseGetLocation(cMyID, baseID); 
     startAreaID = kbAreaGetIDByPosition(baseLoc);
-	
 	
     int remoteSettlementTransportPlan=createTransportPlan("Remote Settlement Transport", startAreaID, kbAreaGetIDByPosition(where),
 	false, transportPUID, 80, baseID);
@@ -1062,7 +1045,7 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
 	int NumBuilders = 2;
 	if (cMyCulture == cCultureAtlantean)
 	NumBuilders = 1;
-    aiPlanAddUnitType( remoteSettlementTransportPlan, builderTypeID, NumBuilders, NumBuilders, NumBuilders);
+    aiPlanAddUnitType(remoteSettlementTransportPlan, cBuilderType, NumBuilders, NumBuilders, NumBuilders);
 	
     //Done with transport plan. build a settlement now!
     
@@ -1075,7 +1058,7 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
     aiPlanSetDesiredPriority(planID, 100);
     aiPlanSetEconomy(planID, true);
     aiPlanSetEscrowID(planID, cEconomyEscrowID);
-    aiPlanAddUnitType(planID, builderTypeID, NumBuilders, NumBuilders, NumBuilders);
+    aiPlanAddUnitType(planID, cBuilderType, NumBuilders, NumBuilders, NumBuilders);
     aiPlanSetInitialPosition(planID, where);
     aiPlanSetVariableVector(planID, cBuildPlanSettlementPlacementPoint, 0, where);
 	aiPlanSetActive(planID);
@@ -1086,70 +1069,28 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
 	if (rExploreIsland == -1)
 	{
 		rExploreIsland=aiPlanCreate("Explore there..", cPlanExplore); 
-		aiPlanAddUnitType(rExploreIsland, builderTypeID, 0, 0, NumBuilders);
+		aiPlanAddUnitType(rExploreIsland, cBuilderType, 0, 0, NumBuilders);
 		aiPlanSetInitialPosition(rExploreIsland, where);
 		aiPlanAddWaypoint(rExploreIsland, where);
 		aiPlanSetVariableBool(rExploreIsland, cExplorePlanDoLoops, 0, false);
 		aiPlanSetVariableBool(rExploreIsland, cExplorePlanReExploreAreas,0, false);
-		aiPlanSetVariableVector(rExploreIsland, cExplorePlanQuitWhenPointIsVisiblePt, 0, where);
-		aiPlanSetVariableBool(rExploreIsland, cExplorePlanQuitWhenPointIsVisible,0, true);
-		aiPlanSetDesiredPriority(rExploreIsland, 1);
+		if (cMyCulture == cCultureNorse)
+		{	
+            aiPlanSetVariableVector(rExploreIsland, cExplorePlanQuitWhenPointIsVisiblePt, 0, where);
+			aiPlanSetVariableBool(rExploreIsland, cExplorePlanQuitWhenPointIsVisible,0, true);
+		}
+		aiPlanSetDesiredPriority(rExploreIsland, 3);
 		aiPlanSetActive(rExploreIsland);
 	}
 	
-}
-
-//==============================================================================
-bool findASettlement()  //Will find an unclaimed settlement
-{
-    static int unitQueryID=-1;
-    //Create the query if we don't have it yet.
-    if (unitQueryID < 0)
-	unitQueryID=kbUnitQueryCreate("getAnUnClaimedSettlements");
-	
-    //Define a query to get all matching units.
-    if (unitQueryID != -1)
-    {
-        kbUnitQuerySetPlayerID(unitQueryID, 0);
-        kbUnitQuerySetUnitType(unitQueryID, cUnitTypeSettlement);
-        kbUnitQuerySetState(unitQueryID, cUnitStateAny);
-	}
-    else
-	return(false);
-	
-    kbUnitQueryResetResults(unitQueryID);
-    int numberFound=kbUnitQueryExecute(unitQueryID);
-    if (numberFound > 0)
-	return(true);
-    return(false);
 }
 //==============================================================================
 void setTownLocation(void)
 {
     if (ShowAiEcho == true) aiEcho("setTownLocation:");    
-    
-    static int tcQueryID=-1;
-    //If we don't have a query ID, create it.
-    if (tcQueryID < 0)
-    {
-        tcQueryID=kbUnitQueryCreate("TownLocationQuery");
-        //If we still don't have one, bail.
-        if (tcQueryID < 0)
-		return;
-        //Else, setup the query data.
-        kbUnitQuerySetPlayerID(tcQueryID, cMyID);
-        kbUnitQuerySetUnitType(tcQueryID, cUnitTypeAbstractSettlement);
-        kbUnitQuerySetState(tcQueryID, cUnitStateAlive);
-	}
-	
-    //Reset the results.
-    kbUnitQueryResetResults(tcQueryID);
-    //Run the query.  Be dumb and just take the first TC for now.
-    if (kbUnitQueryExecute(tcQueryID) > 0)
-    {
-        int tcID=kbUnitQueryGetResult(tcQueryID, 0);
-        kbSetTownLocation(kbUnitGetPosition(tcID));
-	}
+    int TC = findUnit(cUnitTypeAbstractSettlement);
+    if (TC != -1)
+    kbSetTownLocation(kbUnitGetPosition(TC));
 }
 
 //==============================================================================
@@ -1214,7 +1155,7 @@ bool military=false, bool economy=true, int escrowID=-1, int baseID=-1, int numb
         //Escrow.
         aiPlanSetEscrowID(planID, escrowID);
         //Builders.
-        aiPlanAddUnitType(planID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), numberBuilders, numberBuilders, numberBuilders);
+        aiPlanAddUnitType(planID, cBuilderType, numberBuilders, numberBuilders, numberBuilders);
         //Base ID.
         aiPlanSetBaseID(planID, baseID);
 		if (puid != cUnitTypeFarm)
@@ -1782,94 +1723,8 @@ void taskMilUnitTrainAtBase(int baseID = -1)
         if (ShowAiEcho == true) aiEcho("a unit with puid: "+puid+" is already being trained near baseID: "+baseID);
 	}
 }
-
-//==============================================================================
-int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
-{
-    if (ShowAiEcho == true) aiEcho("newResourceBase:");
-	int Villagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
-    if (cMyCulture == cCultureAtlantean)
-    Villagers = Villagers * 2;
-    if (Villagers < 14)
-	return(-1);
-
-    int queryUnitID=cUnitTypeGold;
-    if (resourceID==cResourceWood)
-	queryUnitID=cUnitTypeTree;
-	
-    static int resourceQueryID=-1;
-    if (resourceQueryID < 0)
-	resourceQueryID=kbUnitQueryCreate("Resource Query");
-    configQuery(resourceQueryID, queryUnitID, -1, cUnitStateAlive, 0, kbBaseGetLocation(cMyID, kbBaseGetMain(cMyID)), true);
-    kbUnitQueryResetResults(resourceQueryID);
-    int numResults = kbUnitQueryExecute(resourceQueryID);
-	
-    if (numResults <= 0)
-    return(-1);
-	
-    vector there = kbUnitGetPosition(kbUnitQueryGetResult(resourceQueryID, 0));
-	
-    if ( isOnMyIsland(there) )
-    return(-1);
-	
-    if (resourceID==cResourceGold)
-    {
-        static vector gTransportToGoldPos = cInvalidVector;
-        if (equal(gTransportToGoldPos, there))
-        return(-1);
-	}
-    else if (resourceID==cResourceWood)
-    {
-        static vector gTransportToWoodPos = cInvalidVector;
-        if (equal(gTransportToWoodPos, there))
-		return(-1);	
-	}
-    int startBaseID = -1;
-    if ( oldResourceBase >= 0 )
-	startBaseID = oldResourceBase;
-    else
-	startBaseID = kbBaseGetMainID(cMyID);
-    vector here=kbBaseGetLocation(cMyID, startBaseID);
-    int startAreaID=kbAreaGetIDByPosition(here);
-	
-    int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
-    if (transportPUID < 0)
-    return(-1);
-
-    int resourceTransportPlan = -1;
-    resourceTransportPlan=createTransportPlan("Remote Resource Transport", startAreaID, kbAreaGetIDByPosition(there), false, transportPUID, 80, startBaseID);
-	
-    int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
-    int numVills = 0.5 + aiGetResourceGathererPercentage(resourceID, cRGPActual) * gathererCount;
-    aiPlanAddUnitType(resourceTransportPlan, cUnitTypeAbstractVillager, numVills, numVills, numVills);
-    if ( cMyCulture == cCultureNorse )
-	aiPlanAddUnitType( resourceTransportPlan, cUnitTypeOxCart, 1, 1, 1 );
-	
-    aiPlanSetRequiresAllNeedUnits( resourceTransportPlan, true );
-    aiPlanSetActive(resourceTransportPlan);
-	
-    if (resourceID==cResourceGold)
-	gTransportToGoldPos = there;
-    else
-	gTransportToWoodPos = there;
-	
-    string basename="";
-    if (resourceID==cResourceGold)
-	basename="Gold Base"+kbBaseGetNextID();
-    else
-	basename="Wood Base"+kbBaseGetNextID();
-	
-    int newBaseID=kbBaseCreate(cMyID, basename, there, 40.0);
-    if (newBaseID > -1)
-    {
-        kbBaseSetEconomy(cMyID, newBaseID, true);
-        kbBaseSetMaximumResourceDistance(cMyID, newBaseID, gMaximumBaseResourceDistance);
-	}
-    return(newBaseID);
-}
-
-//==============================================================================
-// findPlanByString - borrowed from "Notonecta"
+ 
+// borrowed from "Notonecta" ):
 //==============================================================================
 int findPlanByString(string autoName = "BUG", int iPlanType = -1, int iState = -1, bool ReturnNumbers = false) 
 {
@@ -1896,6 +1751,34 @@ int findPlanByString(string autoName = "BUG", int iPlanType = -1, int iState = -
 	}
     return(iPlanID);
 }
+//------------------------------------------------------------------------
+int findClosestUnitTypeByLoc(int Relevance = cPlayerRelationEnemy, int UnitType = -1, vector loc = cInvalidVector, int radius = -1, bool seeable = true) 
+{
+    static int findTargets = -1;
+    if (findTargets < 0) 
+	{
+        findTargets = kbUnitQueryCreate("Closest Target query");
+        if (findTargets < 0)
+		return(-1);
+	}
+    // configure the query, each time again.
+	if (radius <= 0)
+	radius = 10000;
+    kbUnitQuerySetPlayerRelation(findTargets, Relevance);
+	kbUnitQuerySetSeeableOnly(findTargets, seeable);
+	kbUnitQuerySetAscendingSort(findTargets, true);
+    kbUnitQuerySetUnitType(findTargets, UnitType);
+    kbUnitQuerySetState(findTargets, cUnitStateAlive);
+	kbUnitQuerySetMaximumDistance(findTargets, radius);
+	kbUnitQuerySetPosition(findTargets, loc);
+    kbUnitQueryResetResults(findTargets);
+
+    int Run = kbUnitQueryExecute(findTargets);
+    int CurrentCandidate = kbUnitQueryGetResult(findTargets, 0);
+    return(CurrentCandidate);
+}
+// Thank you, "Artifical Zoo"!. .I hope you don't mind me using your stuff. :)
+
 //==============================================================================
 bool AgingUp() 
 {
@@ -2020,23 +1903,27 @@ int createDefOrAttackPlan(string Name = "INVALID", bool DefendPlan = true, int E
 			aiPlanSetInitialPosition(PlanID, GetMilGatherOrBase(false));
 			if (GatherRange != -1)
 			aiPlanSetVariableFloat(PlanID, cAttackPlanGatherDistance, 0, GatherRange);
-			aiPlanSetVariableInt(PlanID, cAttackPlanRefreshFrequency, 0, 6); 
+			aiPlanSetVariableInt(PlanID, cAttackPlanRefreshFrequency, 0, 10); 
 			aiPlanSetUnitStance(PlanID, cUnitStanceDefensive);
+			aiPlanSetAllowUnderAttackResponse(PlanID, true);
 			
 			aiPlanSetVariableInt(PlanID, cAttackPlanRetreatMode, 0, cAttackPlanRetreatModeNone);
 			aiPlanSetVariableInt(PlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
+			aiPlanSetVariableBool(PlanID, cAttackPlanMoveAttack, 0, true);
 			aiPlanSetRequiresAllNeedUnits(PlanID, false);
             if (aiRandInt(2) < 1)
 	        aiPlanSetVariableBool(PlanID, cAttackPlanAutoUseGPs, 0, false);
             else
 	        aiPlanSetVariableBool(PlanID, cAttackPlanAutoUseGPs, 0, true);			
 			
-			aiPlanSetNumberVariableValues(PlanID, cAttackPlanTargetTypeID, 2, true);    
+			aiPlanSetNumberVariableValues(PlanID, cAttackPlanTargetTypeID, 2, true);
             aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 0, cUnitTypeUnit);
             aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 1, cUnitTypeBuilding);
-			
 			if (Prio != -1)
 			aiPlanSetDesiredPriority(PlanID, Prio);
+			
+			if (BaseID != -1)
+			aiPlanSetBaseID(PlanID, BaseID);		
 			
 			if (Activated == true)
 			aiPlanSetActive(PlanID);
@@ -2053,13 +1940,6 @@ bool IsTechActive(int TechID = -1)
     return(false);
 }
 //==============================================================================
-bool EcoUpgDone() 
-{
-	if ((IsTechActive(cTechFloodControl) == true) && (IsTechActive(cTechQuarry) == true) && (IsTechActive(cTechCarpenters) == true))
-    return(true);
-	return(false);
-}
-//==============================================================================
 //createSimpleResearchPlan
 //==============================================================================
 int createSimpleResearchPlan(int techID=-1, int buildingID=-1, int escrowID=cRootEscrowID, int pri = 50, bool progress = false, bool Override = false)
@@ -2067,9 +1947,9 @@ int createSimpleResearchPlan(int techID=-1, int buildingID=-1, int escrowID=cRoo
     
 	string ReadableTech = kbGetTechName(techID);
 	
-	if ((IsTechActive(techID) == true) || (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0) && (Override == false))
+	if ((IsTechActive(techID) == true) || (kbGetTechStatus(techID) < cTechStatusAvailable) || (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0) && (Override == false))
 	{
-		if (ShowAiEcho == true) aiEcho("Failed to create a simple research plan for ''"+ReadableTech+"'', already active or researching?");
+		if (ShowAiEcho == true) aiEcho("Failed to create a simple research plan for ''"+ReadableTech+"'', already active, not available or researching?");
 		return(-1);
 	}
 	int planID = -1;
@@ -2134,8 +2014,7 @@ bool ReadyToAttack()
     bool Ready = false;
 	
 	// Try not to be too aggressive if we're lagging behind.
-    if ((xsGetTime() > 15*60*1000) && (kbGetAge() < cAge3) || 
-	(ShouldIAgeUp() == true) && (kbGetAge() == cAge3) && (kbResourceGet(cResourceFood) < 200) && (kbResourceGet(cResourceGold) < 200))
+    if ((xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2) || (kbGetAge() == cAge2) && (ShouldIAgeUp() == true))
 	return(Ready);
 	
 	// AoModAI
@@ -2152,7 +2031,96 @@ bool ReadyToAttack()
 	targetPop = kbUnitPickGetMinimumPop(upID);  
     int numMilUnitsInDefPlans = AvailableUnitsFromDefPlans();   
 	//
-	if ((numMilUnitsInDefPlans*3 > targetPop) || (currentPop >= currentPopCap*0.80))
+	if ((numMilUnitsInDefPlans*3 > targetPop) || (currentPop >= currentPopCap*0.80) && (kbResourceGet(cResourceFood) > 200) || (kbGetAge() == cAge2) && (gRushAttackCount < gRushCount)) 
 	Ready = true;	
     return(Ready);
+}
+
+//==============================================================================
+int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
+{
+    if (ShowAiEcho == true) aiEcho("newResourceBase:");
+	int Villagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
+    if (cMyCulture == cCultureAtlantean)
+    Villagers = Villagers * 2;
+    if ((Villagers < 14) || (findPlanByString("Remote Resource Transport", cPlanTransport) != -1))
+	return(-1);
+
+    int queryUnitID=cUnitTypeGold;
+    if (resourceID==cResourceWood)
+	queryUnitID=cUnitTypeTree;
+	
+    static int resourceQueryID=-1;
+    if (resourceQueryID < 0)
+	resourceQueryID=kbUnitQueryCreate("Resource Query");
+    configQuery(resourceQueryID, queryUnitID, -1, cUnitStateAlive, 0, kbBaseGetLocation(cMyID, kbBaseGetMain(cMyID)), true);
+    kbUnitQueryResetResults(resourceQueryID);
+    int numResults = kbUnitQueryExecute(resourceQueryID);
+	
+    if (numResults <= 0)
+    return(-1);
+	
+    vector there = kbUnitGetPosition(kbUnitQueryGetResult(resourceQueryID, 0));
+	
+    if ( isOnMyIsland(there) )
+    return(-1);
+	
+    if (resourceID==cResourceGold)
+    {
+        static vector gTransportToGoldPos = cInvalidVector;
+        if (equal(gTransportToGoldPos, there))
+        return(-1);
+	}
+    else if (resourceID==cResourceWood)
+    {
+        static vector gTransportToWoodPos = cInvalidVector;
+        if (equal(gTransportToWoodPos, there))
+		return(-1);	
+	}
+    int startBaseID = -1;
+    if ( oldResourceBase >= 0 )
+	startBaseID = oldResourceBase;
+    else
+	startBaseID = kbBaseGetMainID(cMyID);
+    vector here=kbBaseGetLocation(cMyID, startBaseID);
+    int startAreaID=kbAreaGetIDByPosition(here);
+	
+    int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+    if ((transportPUID < 0) || (kbUnitCount(cMyID, transportPUID, cUnitStateAlive) < 1))
+    return(-1);
+
+    int resourceTransportPlan = -1;
+    resourceTransportPlan=createTransportPlan("Remote Resource Transport", startAreaID, kbAreaGetIDByPosition(there), false, transportPUID, 80, startBaseID);
+	
+    int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
+    int numVills = 0.5 + aiGetResourceGathererPercentage(resourceID, cRGPActual) * gathererCount;
+	if ((cMyCulture == cCultureAtlantean) && (numVills > 3))
+	numVills = 3;
+    else if (numVills > 12)
+	numVills = 12;	
+    aiPlanAddUnitType(resourceTransportPlan, cUnitTypeAbstractVillager, numVills, numVills, numVills);
+    if ( cMyCulture == cCultureNorse )
+	aiPlanAddUnitType( resourceTransportPlan, cUnitTypeOxCart, 1, 1, 1 );
+	
+    aiPlanSetRequiresAllNeedUnits( resourceTransportPlan, true );
+    aiPlanSetActive(resourceTransportPlan);
+	
+    if (resourceID==cResourceGold)
+	gTransportToGoldPos = there;
+    else
+	gTransportToWoodPos = there;
+	
+    string basename="";
+    if (resourceID==cResourceGold)
+	basename="Gold Base"+kbBaseGetNextID();
+    else
+	basename="Wood Base"+kbBaseGetNextID();
+	
+    int newBaseID=kbBaseCreate(cMyID, basename, there, 40.0);
+    if (newBaseID > -1)
+    {
+        kbBaseSetEconomy(cMyID, newBaseID, true);
+        kbBaseSetMaximumResourceDistance(cMyID, newBaseID, gMaximumBaseResourceDistance);
+	}
+    return(newBaseID);
 }

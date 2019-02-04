@@ -9,62 +9,27 @@ minInterval 6 //starts in cAge2
 inactive
 {
     if (ShowAiEcho == true) aiEcho("norseInfantryBuild:");
-    
-    int count=-1;
-    static int unitQueryID=-1;
-    static int buildingQueryID=-1;
-	
-    //If we don't have the query yet, create one.
-    if (unitQueryID < 0)
-    unitQueryID=kbUnitQueryCreate("Idle Infantry Query");
-	
-    //Define a query to get all matching units
-    if (unitQueryID != -1)
-    {
-        kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-        kbUnitQuerySetActionType(unitQueryID, cActionIdle);
-	}
-	
-    //If we don't have the query yet, create one.
-    if (buildingQueryID < 0)
-	buildingQueryID=kbUnitQueryCreate("Under Construction Query");
-	
-    //Define a query to get all matching units
-    if (buildingQueryID != -1)
-    {
-        kbUnitQuerySetPlayerID(buildingQueryID, cMyID);
-        kbUnitQuerySetState(buildingQueryID, cUnitStateBuilding);
-	}
-	
     int planIDToAddUnit=aiPlanGetIDByTypeAndVariableType(cPlanBuild, -1, -1);
-    //aiEcho("planIDToAddUnit: "+planIDToAddUnit+"");
     if ((planIDToAddUnit < 0) || (aiPlanGetVariableInt(planIDToAddUnit, cBuildPlanBuildingTypeID, 0) == cUnitTypeFarm))
 	return;
-	
-    kbUnitQueryResetResults(unitQueryID);
-    kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractInfantry);
-    int numberFound=kbUnitQueryExecute(unitQueryID);
     
     //keep at least one unit in the plan
-    if (numberFound < 1)
-	numberFound = 1;
+	int InfFound = getNumUnits(cUnitTypeAbstractInfantry, cUnitStateAlive, cActionIdle, cMyID);
+    if (InfFound < 1)
+	InfFound = 1;
     
     //don't put in too many infantry units
-    if (numberFound > 5)
-	numberFound = 5;
-	
-    aiPlanAddUnitType(planIDToAddUnit, cUnitTypeAbstractInfantry, numberFound, numberFound, numberFound);
-	
-    kbUnitQueryResetResults(unitQueryID);
-    kbUnitQuerySetUnitType(unitQueryID, cUnitTypeHero);
-    numberFound=kbUnitQueryExecute(unitQueryID);
+    if (InfFound > 5)
+	InfFound = 5;
+    aiPlanAddUnitType(planIDToAddUnit, cUnitTypeAbstractInfantry, InfFound, InfFound, InfFound);
     
-    //don't put in too many heroes
-    if (numberFound > 3)
-	numberFound = 3;
-	
-    aiPlanAddUnitType(planIDToAddUnit, cUnitTypeHero, numberFound, numberFound, numberFound);
+	int HeroFound = getNumUnits(cUnitTypeHero, cUnitStateAlive, cActionIdle, cMyID);
+	if (HeroFound < 1)
+	return; 
+
+    if (HeroFound > 3)
+	HeroFound = 3;
+    aiPlanAddUnitType(planIDToAddUnit, cUnitTypeHero, HeroFound, HeroFound, HeroFound);
 }
 
 //==============================================================================
@@ -73,38 +38,10 @@ minInterval 10 //starts in cAge5
 inactive
 {
     if (ShowAiEcho == true) aiEcho("repairTitanGate:");
-    int buildingID = -1;
-	
-    // Find the Titan Gate..
-    static int tgQueryID=-1;
-    //If we don't have a query ID, create it.
-    if (tgQueryID < 0)
-    {
-        tgQueryID=kbUnitQueryCreate("TitanGateQuery");
-        //If we still don't have one, bail.
-        if (tgQueryID < 0)
-        {
-            xsDisableSelf();
-            return;
-		}
-        //Else, setup the query data.
-        kbUnitQuerySetPlayerID(tgQueryID, cMyID);
-        kbUnitQuerySetUnitType(tgQueryID, cUnitTypeTitanGate);
-        kbUnitQuerySetState(tgQueryID, cUnitStateBuilding);
-	}
-	
-    int numBuilders = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);      // Used to set fractions we use for the titan gate
-    if (cMyCulture == cCultureNorse)
-	numBuilders = numBuilders / 1.4; // fake it.. since Norse sometimes prefer Cavalry, which leaves very few actual "builders" otherwise.
-	int MinWanted = numBuilders / 3;
-	if (MinWanted < 8)
-	MinWanted = 8;
-	
-    //Reset the results.
-    kbUnitQueryResetResults(tgQueryID);
-    //Run the query.  
-    if (kbUnitQueryExecute(tgQueryID) > 0)
-	buildingID = kbUnitQueryGetResult(tgQueryID, 0);
+    int buildingID = findUnit(cUnitTypeTitanGate, cUnitStateBuilding);
+	int MinWanted = 8;
+	if (cMyCulture == cCultureAtlantean)
+	MinWanted = MinWanted / 2;
 	
     if (buildingID >= 0)
     {
@@ -118,20 +55,15 @@ inactive
         //Create the plan.
         int planID=aiPlanCreate("BuildTitanGate", cPlanRepair);
         if (planID < 0)
-        {
-            xsDisableSelf();
-            return;
-		}
+        return;
 		
         aiPlanSetDesiredPriority(planID, 100);
         aiPlanSetBaseID(planID, kbBaseGetMainID(cMyID));
         aiPlanSetVariableInt(planID, cRepairPlanTargetID, 0, buildingID);
         aiPlanSetInitialPosition(planID, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
-        if (cMyCulture != cCultureNorse)
-		aiPlanAddUnitType(planID, cUnitTypeAbstractVillager, MinWanted, numBuilders/2, (numBuilders*2)/3);
-        else
-		aiPlanAddUnitType(planID, cUnitTypeAbstractInfantry, MinWanted, numBuilders/2, (numBuilders*2)/3);
+		aiPlanAddUnitType(planID, cBuilderType, MinWanted, MinWanted*2, MinWanted*3);
         aiPlanSetVariableBool(planID, cRepairPlanIsTitanGate, 0, true);
+		aiPlanSetRequiresAllNeedUnits(planID, true);
         aiPlanSetActive(planID);
 		//new test
         xsEnableRule("tacticalTitan");
@@ -209,10 +141,7 @@ inactive
 		}
 	}
     
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-    int numBuilders = kbUnitCount(cMyID, builderType, cUnitStateAlive);
+    int numBuilders = kbUnitCount(cMyID, cBuilderType, cUnitStateAlive);
     int requiredBuilders = 10;
     if (cMyCulture == cCultureAtlantean)
 	requiredBuilders = 4;
@@ -281,15 +210,15 @@ inactive
 		aiPlanSetVariableBool(planID, cRepairPlanIsTitanGate, 0, true);   //makes sure that the plan doesn't get destroyed
         
         if ((cMyCulture == cCultureAtlantean) || (numBuilders < 30))
-		aiPlanAddUnitType(planID, builderType, 1, 1, 1);
+		aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
         else
         {
             if ((kbUnitIsType(buildingID, cUnitTypeAbstractFortress) == true) || (kbUnitIsType(buildingID, cUnitTypeAbstractSettlement) == true))
             {
-                aiPlanAddUnitType(planID, builderType, 1, 2, 3);
+                aiPlanAddUnitType(planID, cBuilderType, 1, 2, 3);
 			}
             else
-			aiPlanAddUnitType(planID, builderType, 1, 1, 1);
+			aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
 		}
 		
         aiPlanSetDesiredPriority(planID, 100);
@@ -362,11 +291,8 @@ inactive
 			}
 		}
 	}
-    
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-    int numBuilders = kbUnitCount(cMyID, builderType, cUnitStateAlive);
+	
+    int numBuilders = kbUnitCount(cMyID, cBuilderType, cUnitStateAlive);
     int requiredBuilders = 16;
     if (cMyCulture == cCultureAtlantean)
 	requiredBuilders = 6;
@@ -435,15 +361,15 @@ inactive
 		aiPlanSetVariableBool(planID, cRepairPlanIsTitanGate, 0, true);   //makes sure that the plan doesn't get destroyed
         
         if ((cMyCulture == cCultureAtlantean) || (numBuilders < 30))
-		aiPlanAddUnitType(planID, builderType, 1, 1, 1);
+		aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
         else
         {
             if ((kbUnitIsType(buildingID, cUnitTypeAbstractFortress) == true) || (kbUnitIsType(buildingID, cUnitTypeAbstractSettlement) == true))
             {
-                aiPlanAddUnitType(planID, builderType, 1, 2,3);
+                aiPlanAddUnitType(planID, cBuilderType, 1, 2,3);
 			}
             else
-			aiPlanAddUnitType(planID, builderType, 1, 1, 1);
+			aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
 		}
         
         aiPlanSetDesiredPriority(planID, 100);
@@ -459,87 +385,50 @@ inactive
 {
     if (ShowAiEcho == true) aiEcho("buildMonuments:");
 	
-    static int lastQty = 0;
-	
     int targetNum = -1;
     float scratch = 0.0;
     scratch = (-1.0 * cvRushBoomSlider) + 1.0;  //  0 for extreme rush, 2 for extreme boom
     scratch = (scratch * 1.5) + 0.5;      // 0.5 to 3.5
     targetNum = kbGetAge() + scratch;              // 0 for extreme rush, 3 for extreme boom, +1 in cAge2, 2 in cAge3, +3 in cAge4
-    if ( kbGetAge() == cAge4 )
+    if (kbGetAge() >= cAge4)
 	targetNum = 5;
-    if ( targetNum > 5 )
+    if (targetNum > 5)
 	targetNum = 5;
-	
-    if (cMyCiv == cCivIsis)
-    {
-        for (i=0;<targetNum)
-        {
-            vector loc=calcMonumentPos(i);
+	for (i=0;<targetNum)
+	{
+		int unitTypeID=-1;
+		if (i==0)
+		unitTypeID=cUnitTypeMonument;
+		else if (i==1)
+		unitTypeID=cUnitTypeMonument2;
+		else if (i==2)
+		unitTypeID=cUnitTypeMonument3;
+		else if (i==3)
+		unitTypeID=cUnitTypeMonument4;
+		else if (i==4)
+		unitTypeID=cUnitTypeMonument5;
+		
+		if ((kbUnitCount(cMyID, unitTypeID, cUnitStateAliveOrBuilding) > 0) || (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, unitTypeID, true) >= 0))
+		continue;
+		
+		int monumentPlanID=aiPlanCreate("IsisBuildMonument"+i, cPlanBuild);
+		if (monumentPlanID >= 0)
+		{
+	        vector loc=calcMonumentPos(i);
+			aiPlanSetVariableInt(monumentPlanID, cBuildPlanBuildingTypeID, 0, unitTypeID);
+			aiPlanSetVariableVector(monumentPlanID, cBuildPlanInfluencePosition, 0, loc);
+			aiPlanSetVariableFloat(monumentPlanID, cBuildPlanInfluencePositionDistance, 0, 20.0);
+			aiPlanSetVariableFloat(monumentPlanID, cBuildPlanInfluencePositionValue, 0, 100.0);
+			aiPlanSetVariableInt(monumentPlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(loc));
+			aiPlanSetVariableInt(monumentPlanID, cBuildPlanNumAreaBorderLayers, 0, 2);
 			
-            int unitTypeID=-1;
-            if (i==0)
-			unitTypeID=cUnitTypeMonument;
-            else if (i==1)
-			unitTypeID=cUnitTypeMonument2;
-            else if (i==2)
-			unitTypeID=cUnitTypeMonument3;
-            else if (i==3)
-			unitTypeID=cUnitTypeMonument4;
-            else if (i==4)
-			unitTypeID=cUnitTypeMonument5;
-			
-            if ((kbUnitCount(cMyID, unitTypeID, cUnitStateAliveOrBuilding) > 0) || (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, unitTypeID, true) >= 0))
-			continue;
-			
-            int monumentPlanID=aiPlanCreate("IsisBuildMonument"+i, cPlanBuild);
-            if (monumentPlanID >= 0)
-            {
-                aiPlanSetVariableInt(monumentPlanID, cBuildPlanBuildingTypeID, 0, unitTypeID);
-				
-                aiPlanSetVariableVector(monumentPlanID, cBuildPlanInfluencePosition, 0, loc);
-                aiPlanSetVariableFloat(monumentPlanID, cBuildPlanInfluencePositionDistance, 0, 20.0);
-                aiPlanSetVariableFloat(monumentPlanID, cBuildPlanInfluencePositionValue, 0, 100.0);
-                aiPlanSetVariableInt(monumentPlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(loc));
-                aiPlanSetVariableInt(monumentPlanID, cBuildPlanNumAreaBorderLayers, 0, 2);
-				
-                aiPlanSetDesiredPriority(monumentPlanID, 35);
-                aiPlanAddUnitType(monumentPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-                aiPlanSetEscrowID(monumentPlanID, cEconomyEscrowID);
-                aiPlanSetBaseID(monumentPlanID, kbBaseGetMainID(cMyID));
-                aiPlanSetActive(monumentPlanID);
-			}
+			aiPlanSetDesiredPriority(monumentPlanID, 35);
+			aiPlanAddUnitType(monumentPlanID, cBuilderType, 1, 1, 1);
+			aiPlanSetEscrowID(monumentPlanID, cEconomyEscrowID);
+			aiPlanSetBaseID(monumentPlanID, kbBaseGetMainID(cMyID));
+			aiPlanSetActive(monumentPlanID);
 		}
 	}
-    else
-    {
-        //Create the plan to build the monuments.
-        int pid=aiPlanCreate("Monuments "+kbGetAge(), cPlanProgression);
-        if (pid >= 0)
-        { 
-            aiPlanSetNumberVariableValues(pid, cProgressionPlanGoalUnitID, targetNum, true);
-            if (lastQty <= 0)
-			aiPlanSetVariableInt(pid, cProgressionPlanGoalUnitID, 0, cUnitTypeMonument);
-            if ( (targetNum > 1) && (lastQty <= 4) )
-			aiPlanSetVariableInt(pid, cProgressionPlanGoalUnitID, 1, cUnitTypeMonument2);
-            if ( (targetNum > 2) && (lastQty <= 4) )
-			aiPlanSetVariableInt(pid, cProgressionPlanGoalUnitID, 2, cUnitTypeMonument3);
-            if ( (targetNum > 3) && (lastQty <= 4) )
-			aiPlanSetVariableInt(pid, cProgressionPlanGoalUnitID, 3, cUnitTypeMonument4);
-            if ( (targetNum > 4) && (lastQty <= 4) )
-			aiPlanSetVariableInt(pid, cProgressionPlanGoalUnitID, 4, cUnitTypeMonument5);
-            aiPlanSetVariableBool(pid, cProgressionPlanRunInParallel, 0, false);
-            aiPlanSetDesiredPriority(pid, 35);
-            aiPlanSetEscrowID(pid, cEconomyEscrowID);
-            aiPlanSetBaseID(pid, kbBaseGetMainID(cMyID));
-            aiPlanSetActive(pid);
-			
-            lastQty = targetNum;
-		}
-	}
-	
-    //Go away now.
-    xsDisableSelf();
 }
 
 //==============================================================================
@@ -548,15 +437,17 @@ minInterval 11 //starts in cAge1
 inactive
 {
     if (ShowAiEcho == true) aiEcho("buildHouse:");
-    
     static int unitQueryID=-1;
 	
     int houseProtoID = cUnitTypeHouse;
     if (cMyCulture == cCultureAtlantean)
 	houseProtoID = cUnitTypeManor;
-	
+	bool skip = false;
+	if ((cMyCulture == cCultureNorse) && (kbUnitCount(cMyID, cUnitTypeLogicalTypeHouses, cUnitStateAliveOrBuilding) < 1) && (kbGetAge() == cAge1))
+	skip = true;
+
     //Don't build another house if we've got at least gHouseAvailablePopRebuild open pop slots.
-    if (kbGetPop()+gHouseAvailablePopRebuild < kbGetPopCap())
+    if ((kbGetPop()+gHouseAvailablePopRebuild < kbGetPopCap()) && (skip == false))
 	return;
 	
 	
@@ -624,13 +515,7 @@ inactive
     if (planID >= 0)
     {
         aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, houseProtoID);
-		
-        int builderTypeID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0);
-        if (cMyCulture == cCultureNorse)
-		builderTypeID = cUnitTypeAbstractInfantry;   // Exact match for land scout, so build plan can steal scout
-        
-		aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
-		
+		aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
 		// Added a little override as this rule didn't seem to work properly. // Reth.
 		
 		if ((findNumUnitsInBase(cMyID, kbBaseGetMain(cMyID), cUnitTypeTower) > 0)
@@ -751,11 +636,12 @@ inactive
 
 //==============================================================================
 rule buildSettlements
-minInterval 10 //starts in cAge3
+minInterval 7 //starts in cAge3
 inactive
 {
     if (ShowAiEcho == true) aiEcho("buildSettlements:");
 	
+	xsSetRuleMinIntervalSelf(7+aiRandInt(6));
     //Figure out if we have any active BuildSettlements.
     int numberBuildSettlementGoals=aiGoalGetNumber(cGoalPlanGoalTypeBuildSettlement, cPlanStateWorking, true);
     int numberSettlements = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cMyID);
@@ -771,7 +657,7 @@ inactive
 	
     if (numberBuildSettlementGoals >= MaxInProgress)	// Allow 2 in progress, no more
 	return;
-    if (findASettlement() == false)
+    if (kbUnitCount(0, cUnitTypeSettlement, cUnitStateAny) < 1)
 	return;
 	
 	//If we're on Easy and we have 3 settlements, go away.
@@ -781,7 +667,7 @@ inactive
 		return;
 	}
     
-	if (kbGetAge() <= cAge2)
+	if ((kbGetAge() <= cAge2) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
     { 
 		if (numberSettlementsPlanned >= gEarlySettlementTarget)
         return;     // We have or are building all we want
@@ -792,10 +678,6 @@ inactive
     int numBuilders = 3;
     if (cMyCulture == cCultureAtlantean)
 	numBuilders = 1;
-	
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
 	
 	// Increase NumBuilders if conditions are met
 	int MoreBuildersAvailable = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID);
@@ -811,12 +693,12 @@ inactive
 	}
 	
     //Else, do it.
-    createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, builderType, true, 100);
+    createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, cBuilderType, true, 100);
 }
 //==============================================================================
 vector calcDockPos(int which=-1)
 {
-    vector basePos = kbBaseGetLocation(cMyID, gDockBaseID);
+    vector basePos = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
     vector towardCenter = kbGetMapCenter()- basePos;
     vector dockPos = cInvalidVector;
     float q = _atan2(xsVectorGetZ(towardCenter), xsVectorGetX(towardCenter));
@@ -836,11 +718,17 @@ vector calcDockPos(int which=-1)
     towardCenter = xsVectorSetX(towardCenter, x);
     towardCenter = xsVectorSetZ(towardCenter, z);
     int areaID = -1;
-	
+	if (gFishPlanID != -1)
+	{
+        vector WaterVector = aiPlanGetVariableVector(gFishPlanID, cFishPlanWaterPoint, 0);
+		int FishArea = kbAreaGetIDByPosition(WaterVector);
+	    if (kbAreaGetType(FishArea) == cAreaTypeWater)
+		return(WaterVector);
+	}
     for (i=0; < 10)
     {
         dockPos = dockPos+towardCenter;
-        areaID = kbAreaGetIDByPosition(dockPos);
+        areaID = kbAreaGetClosetArea(dockPos, cAreaTypeWater);
         if (kbAreaGetType(areaID) == cAreaTypeWater)
         {
             dockPos = kbAreaGetCenter(areaID);
@@ -857,51 +745,31 @@ minInterval 89 //starts in cAge1
 {
     if (ShowAiEcho == true) aiEcho("dockMonitor:");
     
-    if (gWaterMap == false)
+    if ((gWaterMap == false) || (cRandomMapName == "Old Atlantis"))
     {
         xsDisableSelf();
         return;
 	}
 	
-    if ((gTransportMap == false) && (xsGetTime() < 10*60*1000) || (cvMapSubType == VINLANDSAGAMAP) && (gFishPlanID == -1))
+    if (( kbGetAge() < cAge3) && (xsGetTime() < 10*60*1000))
 	return;
-	
-    int randomBase = findUnit(cUnitTypeAbstractSettlement);
-    if (randomBase < 0)
-	return;
-    else
-    {
-        gDockBaseID = kbUnitGetBaseID(randomBase);
-        if (ShowAiEcho == true) aiEcho("gDockBaseID is #"+gDockBaseID);
-	}
 	
     int numDocks = kbUnitCount(cMyID, cUnitTypeDock, cUnitStateAliveOrBuilding);
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
-    if (numDocks < numSettlements)
-    {
-        if (ShowAiEcho == true) aiEcho("we have less docks than settlements, setting minInterval to 23");
-        xsSetRuleMinIntervalSelf(23);
-	}
 	
-    int desiredDocks = 1;
-    if (cRandomMapName == "anatolia")
-    {
-        desiredDocks = 2;
-        gDockBaseID = kbBaseGetMainID(cMyID);
+    int desiredDocks = 2;
+	if ((gNavalUPID == -1) && (gFishPlanID != -1))
+	desiredDocks = 1;
 		
-	}
-    if ((cvMapSubType == VINLANDSAGAMAP) && (findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeDock) < 0) && (kbGetAge() > cAge1))	
-    desiredDocks = 2;
-    
     // everything ok. we have enough docks
-    if ((gTransportMap == false) && (numDocks >= desiredDocks) || (numDocks >= desiredDocks))
+    if ((gTransportMap == false) && (numDocks >= desiredDocks))
     {
         if (ShowAiEcho == true) aiEcho("gTransportMap == false and we have at least 1 dock, returning");
         return;
 	}
 	
     if (((numDocks >= kbGetAge()+1) && (numDocks >= numSettlements))
-	|| (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, cUnitTypeDock) >= 0))
+	|| (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, cUnitTypeDock) >= 0) || (numDocks >= 3))
     {
         if (ShowAiEcho == true) aiEcho("(numDocks >= kbGetAge()+1 AND numDocks >= numSettlements) or another dockplan already active, returning");
         return;
@@ -928,23 +796,18 @@ minInterval 89 //starts in cAge1
 	
     if (ShowAiEcho == true) aiEcho("dockPos x="+xsVectorGetX(dockPos)+" z="+xsVectorGetZ(dockPos));
 	
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-	
     int buildDock = aiPlanCreate("BuildDock", cPlanBuild);
     if (buildDock >= 0)
     {
-        if (ShowAiEcho == true) aiEcho("dockMonitor: Building dock at base #"+gDockBaseID);
         //BP Type and Priority.
         aiPlanSetVariableInt(buildDock, cBuildPlanBuildingTypeID, 0, cUnitTypeDock);
         aiPlanSetDesiredPriority(buildDock, 100);
-        aiPlanSetVariableVector(buildDock, cBuildPlanDockPlacementPoint, 0, kbBaseGetLocation(cMyID, gDockBaseID));
+        aiPlanSetVariableVector(buildDock, cBuildPlanDockPlacementPoint, 0, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
         aiPlanSetVariableVector(buildDock, cBuildPlanDockPlacementPoint, 1, dockPos);
-        aiPlanAddUnitType(buildDock, builderType, 1, 1, 1);
+        aiPlanAddUnitType(buildDock, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(buildDock, cEconomyEscrowID);
+        aiPlanSetBaseID(buildDock, kbBaseGetMainID(cMyID));	   	
         aiPlanSetActive(buildDock);
-        xsSetRuleMinIntervalSelf(89);
 	}
 }
 
@@ -969,11 +832,13 @@ inactive       //  Activated on reaching age 4 if game isn't conquest
 	return;
 	
     aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeWonder);
-	
     aiPlanSetVariableInt(planID, cBuildPlanAreaID, 0, targetArea);
     aiPlanSetVariableInt(planID, cBuildPlanNumAreaBorderLayers, 0, 2);
+	if (wonderBPID != -1)
+	aiPlanSetVariableInt(planID, cBuildPlanBuildingPlacementID, 0, wonderBPID); 
+    wonderBPID = -1;
 	
-    aiPlanSetDesiredPriority(planID, 99);
+    aiPlanSetDesiredPriority(planID, 100);
 	
     //Mil vs. Econ.
     aiPlanSetMilitary(planID, false);
@@ -981,15 +846,17 @@ inactive       //  Activated on reaching age 4 if game isn't conquest
 	
     //Escrow.
     aiPlanSetEscrowID(planID, cEconomyEscrowID);
-	
-    int builderUnit = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderUnit = cUnitTypeAbstractInfantry;
 
-    int builderCount = 2 + kbUnitCount(cMyID, builderUnit, cUnitStateAlive);
+    int builderCount = 2 + kbUnitCount(cMyID, cBuilderType, cUnitStateAlive);
+	if (builderCount > 18)
+	builderCount = 18;
+    else if (builderCount < 10)
+	builderCount = 10;
+    if (cMyCulture == cCultureAtlantean)
+	builderCount = builderCount / 2;	
 	
     //Builders.
-    aiPlanAddUnitType(planID, builderUnit, (2*builderCount)/3, builderCount, (3*builderCount)/2);   // Two thirds, all, or 150%...in case new builders are created.
+    aiPlanAddUnitType(planID, cBuilderType, builderCount, builderCount, builderCount);   // Two thirds, all, or 150%...in case new builders are created.
 	
     //Base ID.
     aiPlanSetBaseID(planID, kbBaseGetMainID(cMyID));
@@ -1089,7 +956,7 @@ inactive
     
     if ((alreadyStarted == false) && (kbGetAge() < cAge2))
     {
-        if ((goldSupply < 50) && (kbGetAge() < cAge2) || (goldSupply < 100) && (cMyCulture == cCultureAtlantean))
+        if ((goldSupply < 50) && (kbGetAge() < cAge2) || (goldSupply < 300) && (cMyCulture == cCultureAtlantean))
 		return;
 	}
     else
@@ -1099,10 +966,6 @@ inactive
 	}
 	if (myVillagers < MinVil)
 	return;
-	
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
     
     int mainBaseAreaWallTeam1PlanID = aiPlanCreate("mainBaseAreaWallTeam1PlanID", cPlanBuildWall);
     if (mainBaseAreaWallTeam1PlanID != -1)
@@ -1419,7 +1282,7 @@ inactive
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
 		
         aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-        aiPlanAddUnitType(mainBaseAreaWallTeam1PlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(mainBaseAreaWallTeam1PlanID, cBuilderType, 1, 1, 1);
         aiPlanSetVariableInt(mainBaseAreaWallTeam1PlanID, cBuildWallPlanNumberOfGates, 0, 50);
         aiPlanSetVariableFloat(mainBaseAreaWallTeam1PlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
         aiPlanSetBaseID(mainBaseAreaWallTeam1PlanID, mainBaseID);
@@ -1440,7 +1303,7 @@ minInterval 5 //starts in cAge2,  activated in mainBaseAreaWallTeam1 rule
 inactive
 {
     if (ShowAiEcho == true) aiEcho("mainBaseAreaWallTeam2:");
-	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000) || (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) && (cMyCulture != cCultureNorse))
+	if ((mRusher == true) && (kbGetAge() < cAge3) && (xsGetTime() < 15*60*1000) || (kbGetAge() < cAge2))
 	return;
     
 	if (kbGetAge() > cAge1)
@@ -1515,10 +1378,6 @@ inactive
 	
     if ((goldSupply < 150) || (myVillagers < MinVil))
 	return;
-	
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
     
     int mainBaseAreaWallTeam2PlanID = aiPlanCreate("mainBaseAreaWallTeam2PlanID", cPlanBuildWall);
     if (mainBaseAreaWallTeam2PlanID != -1)
@@ -1690,7 +1549,7 @@ inactive
         aiPlanSetNumberVariableValues(mainBaseAreaWallTeam2PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
 		
         aiPlanSetVariableInt(mainBaseAreaWallTeam2PlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-        aiPlanAddUnitType(mainBaseAreaWallTeam2PlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(mainBaseAreaWallTeam2PlanID, cBuilderType, 1, 1, 1);
         aiPlanSetVariableInt(mainBaseAreaWallTeam2PlanID, cBuildWallPlanNumberOfGates, 0, 50);
         aiPlanSetVariableFloat(mainBaseAreaWallTeam2PlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
         aiPlanSetBaseID(mainBaseAreaWallTeam2PlanID, mainBaseID);
@@ -1730,9 +1589,9 @@ inactive
 	if (aiGetWorldDifficulty() < cDifficultyNightmare)
 	gOtherBaseWallRadius = 19;
 	
-	int MinVil = 10;
+	int MinVil = 12;
 	if (cMyCulture == cCultureAtlantean)
-	MinVil = 3;
+	MinVil = 4;
 	if (cMyCulture == cCultureNorse)
 	MinVil = 0;	//fake it	
 	int myVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);		
@@ -1794,15 +1653,11 @@ inactive
 		}
 	}
     
-    if ((goldSupply < 200) || (myVillagers < MinVil))
+    if ((goldSupply < 300) || (myVillagers < MinVil))
 	return;
 	
     float otherBaseWallRadius = gOtherBaseWallRadius;
-    
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-    
+	
     int otherBaseWallTeam1PlanID = aiPlanCreate("otherBaseWallTeam1PlanID", cPlanBuildWall);
     if (otherBaseWallTeam1PlanID != -1)
     {
@@ -1893,7 +1748,7 @@ inactive
         aiPlanSetNumberVariableValues(otherBaseWallTeam1PlanID, cBuildWallPlanAreaIDs, numAreasAdded, false);
 		
         aiPlanSetVariableInt(otherBaseWallTeam1PlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-        aiPlanAddUnitType(otherBaseWallTeam1PlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(otherBaseWallTeam1PlanID, cBuilderType, 1, 1, 1);
         aiPlanSetVariableInt(otherBaseWallTeam1PlanID, cBuildWallPlanNumberOfGates, 0, 40);
         aiPlanSetVariableFloat(otherBaseWallTeam1PlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
         aiPlanSetBaseID(otherBaseWallTeam1PlanID, otherBaseID);
@@ -1909,10 +1764,6 @@ inactive
 int createCommonRingWallPlan(string WallPlanName = "BUG", int BaseID=-1, int radius=19)
 {
     float otherBaseWallRadius = radius;
-    
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
     int RingWallPlan = aiPlanCreate(""+WallPlanName, cPlanBuildWall);
     if (RingWallPlan != -1)
     {
@@ -1979,7 +1830,7 @@ int createCommonRingWallPlan(string WallPlanName = "BUG", int BaseID=-1, int rad
         aiPlanSetNumberVariableValues(RingWallPlan, cBuildWallPlanAreaIDs, numAreasAdded, false);
 		
         aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
-        aiPlanAddUnitType(RingWallPlan, builderType, 1, 1, 1);
+        aiPlanAddUnitType(RingWallPlan, cBuilderType, 1, 1, 1);
         aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanNumberOfGates, 0, 40);
         aiPlanSetVariableFloat(RingWallPlan, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
         aiPlanSetBaseID(RingWallPlan, BaseID);
@@ -2001,9 +1852,9 @@ inactive
     
 	if (aiGetWorldDifficulty() < cDifficultyNightmare)
 	gOtherBaseWallRadius = 19;
-	int MinVil = 10;
+	int MinVil = 12;
 	if (cMyCulture == cCultureAtlantean)
-	MinVil = 3;
+	MinVil = 4;
 	if (cMyCulture == cCultureNorse)
 	MinVil = 0;	//fake it	
 	int myVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);			
@@ -2022,7 +1873,7 @@ inactive
                 if (otherBase1RingWallTeamStartTime < 0)
 				otherBase1RingWallTeamStartTime = xsGetTime();
                 
-                if ((goldSupply < 100) || (myVillagers < MinVil))
+                if ((goldSupply < 120) || (myVillagers < MinVil))
                 {
                     aiPlanDestroy(wallPlanIndexID);
                     otherBase1RingWallTeamStartTime = -1;
@@ -2064,7 +1915,7 @@ inactive
 		}
 	}
     
-    if ((goldSupply < 150) || (myVillagers < MinVil))
+    if ((goldSupply < 300) || (myVillagers < MinVil))
 	return;
 	string Readable = "OtherBase1RingWallTeamPlan";
 	gOtherBase1RingWallTeamPlanID = createCommonRingWallPlan(Readable, gOtherBase1ID, gOtherBaseWallRadius);
@@ -2084,9 +1935,9 @@ inactive
     if (aiGetWorldDifficulty() < cDifficultyNightmare)
 	gOtherBaseWallRadius = 19;
 	
-	int MinVil = 10;
+	int MinVil = 12;
 	if (cMyCulture == cCultureAtlantean)
-	MinVil = 3;
+	MinVil = 4;
 	if (cMyCulture == cCultureNorse)
 	MinVil = 0;	//fake it	
 	int myVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);			
@@ -2106,7 +1957,7 @@ inactive
                 if (otherBase2RingWallTeamStartTime < 0)
 				otherBase2RingWallTeamStartTime = xsGetTime();
                 
-                if ((goldSupply < 100) || (myVillagers < MinVil))
+                if ((goldSupply < 120) || (myVillagers < MinVil))
                 {
                     aiPlanDestroy(wallPlanIndexID);
                     otherBase2RingWallTeamStartTime = -1;
@@ -2148,7 +1999,7 @@ inactive
 		}
 	}
     
-    if ((goldSupply < 150) || (myVillagers < MinVil))
+    if ((goldSupply < 300) || (myVillagers < MinVil))
 	return;
     string Readable = "OtherBase2RingWallTeamPlan";
     gOtherBase2RingWallTeamPlanID = createCommonRingWallPlan(Readable, gOtherBase2ID, gOtherBaseWallRadius);
@@ -2168,9 +2019,9 @@ inactive
     if (aiGetWorldDifficulty() < cDifficultyNightmare)
 	gOtherBaseWallRadius = 19;
 	
-	int MinVil = 10;
+	int MinVil = 12;
 	if (cMyCulture == cCultureAtlantean)
-	MinVil = 3;
+	MinVil = 4;
 	if (cMyCulture == cCultureNorse)
 	MinVil = 0;	//fake it	
 	int myVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);			
@@ -2190,7 +2041,7 @@ inactive
                 if (otherBase3RingWallTeamStartTime < 0)
 				otherBase3RingWallTeamStartTime = xsGetTime();
                 
-                if ((goldSupply < 100) || (myVillagers < MinVil))
+                if ((goldSupply < 120) || (myVillagers < MinVil))
                 {
                     aiPlanDestroy(wallPlanIndexID);
                     otherBase3RingWallTeamStartTime = -1;
@@ -2232,7 +2083,7 @@ inactive
 		}
 	}
     
-    if ((goldSupply < 150) || (myVillagers < MinVil))
+    if ((goldSupply < 300) || (myVillagers < MinVil))
 	return;
 	string Readable = "OtherBase3RingWallTeamPlan";
     gOtherBase3RingWallTeamPlanID = createCommonRingWallPlan(Readable, gOtherBase3ID, gOtherBaseWallRadius);
@@ -2252,9 +2103,9 @@ inactive
 	if (aiGetWorldDifficulty() < cDifficultyNightmare)
 	gOtherBaseWallRadius = 19;
 	
-	int MinVil = 10;
+	int MinVil = 12;
 	if (cMyCulture == cCultureAtlantean)
-	MinVil = 3;
+	MinVil = 4;
 	if (cMyCulture == cCultureNorse)
 	MinVil = 0;	//fake it	
 	int myVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);		
@@ -2274,7 +2125,7 @@ inactive
                 if (otherBase4RingWallTeamStartTime < 0)
 				otherBase4RingWallTeamStartTime = xsGetTime();
                 
-                if ((goldSupply < 100) || (myVillagers < MinVil))
+                if ((goldSupply < 120) || (myVillagers < MinVil))
                 {
                     aiPlanDestroy(wallPlanIndexID);
                     otherBase4RingWallTeamStartTime = -1;
@@ -2316,7 +2167,7 @@ inactive
 		}
 	}
 	
-    if ((goldSupply < 150) || (myVillagers < MinVil))
+    if ((goldSupply < 300) || (myVillagers < MinVil))
 	return;    
 	string Readable = "OtherBase4RingWallTeamPlan";
     gOtherBase4RingWallTeamPlanID = createCommonRingWallPlan(Readable, gOtherBase4ID, gOtherBaseWallRadius);
@@ -2338,6 +2189,9 @@ inactive
     if (kbBaseGetNumberUnits(cMyID, kbBaseGetMainID(cMyID), cPlayerRelationSelf, cUnitTypeSkyPassage) < 1)
     {  
         // We don't have one...make sure we have a plan in the works
+		if (findPlanByString("BuildLocalSkyPassage", cPlanBuild) != -1)
+		return;
+	
         int planID=aiPlanCreate("BuildLocalSkyPassage", cPlanBuild);
         if (planID < 0)
 		return;
@@ -2347,7 +2201,7 @@ inactive
         aiPlanSetMilitary(planID, true);
         aiPlanSetEconomy(planID, false);
         aiPlanSetEscrowID(planID, cMilitaryEscrowID);
-        aiPlanAddUnitType(planID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+        aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
         aiPlanSetBaseID(planID, kbBaseGetMainID(cMyID));
         aiPlanSetActive(planID);
 		return;
@@ -2357,7 +2211,6 @@ inactive
 	
 	// Local base is covered, now let's check near our Most Hated Player's TC
 	int MHPTC = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
-	int NumSelf = 1;
 	vector enemyTCvec = kbUnitGetPosition(MHPTC);
 	
 	if (MHPTC > 0)
@@ -2370,20 +2223,17 @@ inactive
 		// Now, check if that's on ground, and just give up if it isn't
 		// Figure out if it's on our enemy's areaGroup.  If not, step 5% closer until it is.
 		int enemyAreaGroup = -1;
-		int testAreaGroup = -1;
-		testAreaGroup = kbAreaGroupGetIDByPosition(target);
 		enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
-		int NumEnemy = -1;
 		
 		vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
 		bool success = false;
 		
 		for (i=0; <18)	// Keep testing until areaGroups match
 		{
-			testAreaGroup = kbAreaGroupGetIDByPosition(target);
-			NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 23.0, false);
-			NumSelf = getNumUnits(cUnitTypeSkyPassage, cUnitStateAliveOrBuilding, -1, cMyID, target, 100.0);
-			if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0) && (NumSelf < 2))
+			int testAreaGroup = kbAreaGroupGetIDByPosition(target);
+			int NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 23.0, false);
+			int NumSelf = getNumUnits(cUnitTypeSkyPassage, cUnitStateAliveOrBuilding, -1, cMyID, target, 100.0);
+			if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0) && (NumSelf == 0))
 			{
 				success = true;
 				break;
@@ -2403,10 +2253,8 @@ inactive
 		aiPlanSetVariableInt(remotePlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(target));
 		aiPlanSetVariableInt(remotePlanID, cBuildPlanNumAreaBorderLayers, 0, 1);
 		aiPlanSetDesiredPriority(remotePlanID, 70);
-		aiPlanSetMilitary(remotePlanID, true);
-		aiPlanSetEconomy(remotePlanID, false);
 		aiPlanSetEscrowID(remotePlanID, cMilitaryEscrowID);
-		aiPlanAddUnitType(remotePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+		aiPlanAddUnitType(remotePlanID, cBuilderType, 1, 1, 1);
 		aiPlanSetActive(remotePlanID);
 	}
 }
@@ -2531,10 +2379,7 @@ inactive
        return;
 	}	
 }
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-    int numBuilders = kbUnitCount(cMyID, builderType, cUnitStateAlive);
+    int numBuilders = kbUnitCount(cMyID, cBuilderType, cUnitStateAlive);
     
     //Over time, we will find out what areas are good and bad to build in.
     //Use that info here, because we want to protect houses.
@@ -2549,9 +2394,9 @@ inactive
         aiPlanSetBaseID(planID, otherBaseID);
         aiPlanSetDesiredPriority(planID, 100);
         if ((cMyCulture == cCultureAtlantean) || (numBuilders < 20))
-		aiPlanAddUnitType(planID, builderType, 1, 1, 1);
+		aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
         else
-		aiPlanAddUnitType(planID, builderType, 3, 3, 3);
+		aiPlanAddUnitType(planID, cBuilderType, 3, 3, 3);
         
         aiPlanSetEscrowID(planID, cMilitaryEscrowID);
         
@@ -2658,7 +2503,7 @@ inactive
         if (ShowAiEcho == true) aiEcho("numTowersNearBase #"+otherBaseID+": "+numTowersNearBase);
         if ((numTowersNearBase > 1) && (kbGetAge() == cAge2))
 		return;
-        else if (numTowersNearBase >= 3)
+        else if (numTowersNearBase >= 2)
 		return;
 		
         baseID = otherBaseID;
@@ -2709,11 +2554,6 @@ inactive
     else if ((currentWood < 500) || (currentGold < 300))
 	return;
 	
-    //variables for our tower placing
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-	
     //Build a tower near our other base
     numTowersNearBase = numTowersNearBase + 1;
     int buildTowerAtOtherBasePlanID = aiPlanCreate("buildTowerAtOtherBase: tower #"+numTowersNearBase, cPlanBuild);
@@ -2727,7 +2567,7 @@ inactive
         aiPlanSetVariableFloat(buildTowerAtOtherBasePlanID, cBuildPlanRandomBPValue, 0, 0.99);
         aiPlanSetVariableVector(buildTowerAtOtherBasePlanID, cBuildPlanCenterPosition, 0, otherBaseLocation);
         aiPlanSetVariableFloat(buildTowerAtOtherBasePlanID, cBuildPlanCenterPositionDistance, 0, 13.0);
-        aiPlanAddUnitType(buildTowerAtOtherBasePlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(buildTowerAtOtherBasePlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(buildTowerAtOtherBasePlanID, cMilitaryEscrowID);
         aiPlanSetBaseID(buildTowerAtOtherBasePlanID, baseID);
         aiPlanSetActive(buildTowerAtOtherBasePlanID);
@@ -2857,11 +2697,6 @@ inactive
         return;
 	}
 	
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-    
-	
     //Force building #1 to go down.
     int buildBuilding1AtOtherBasePlanID = aiPlanCreate("buildBuilding1AtOtherBase", cPlanBuild);
     if (buildBuilding1AtOtherBasePlanID >= 0)
@@ -2885,7 +2720,7 @@ inactive
         aiPlanSetVariableVector(buildBuilding1AtOtherBasePlanID, cBuildPlanInfluencePosition, 0, location);    // Position influence for landing position				
 		
         aiPlanSetDesiredPriority(buildBuilding1AtOtherBasePlanID, 100);
-        aiPlanAddUnitType(buildBuilding1AtOtherBasePlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(buildBuilding1AtOtherBasePlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(buildBuilding1AtOtherBasePlanID, cMilitaryEscrowID);
         aiPlanSetBaseID(buildBuilding1AtOtherBasePlanID, otherBaseID);
         aiPlanSetActive(buildBuilding1AtOtherBasePlanID);
@@ -2994,7 +2829,7 @@ inactive
         
         aiPlanSetVariableVector(buildMirrorTowerPlanID, cBuildPlanCenterPosition, 0, otherBaseLocation);
         aiPlanSetVariableFloat(buildMirrorTowerPlanID, cBuildPlanCenterPositionDistance, 0, 13.0);
-        aiPlanAddUnitType(buildMirrorTowerPlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+        aiPlanAddUnitType(buildMirrorTowerPlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(buildMirrorTowerPlanID, cMilitaryEscrowID);
         aiPlanSetBaseID(buildMirrorTowerPlanID, baseID);
         aiPlanSetActive(buildMirrorTowerPlanID);
@@ -3063,10 +2898,6 @@ minInterval 41 //starts in cAge1
     vector frontVector = kbBaseGetFrontVector(cMyID, kbBaseGetMainID(cMyID));
     float fx = xsVectorGetX(frontVector);
     float fz = xsVectorGetZ(frontVector);
-    
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
 	
     //Force a temple to go down            
     int templePlanID = aiPlanCreate("build temple", cPlanBuild);
@@ -3098,7 +2929,7 @@ minInterval 41 //starts in cAge1
 		}
 		
         aiPlanSetDesiredPriority(templePlanID, 100);
-        aiPlanAddUnitType(templePlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(templePlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(templePlanID, cEconomyEscrowID);
         aiPlanSetBaseID(templePlanID, mainBaseID);
         aiPlanSetActive(templePlanID);
@@ -3147,10 +2978,6 @@ minInterval 47 //starts in cAge1
     float bz = xsVectorGetZ(backVector);
     float bxOrig = bx;
     float bzOrig = bz;
-	
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
     
     static bool firstPlan = true;
     int armoryPlanID=aiPlanCreate("Armory", cPlanBuild);
@@ -3181,7 +3008,7 @@ minInterval 47 //starts in cAge1
             aiPlanSetVariableFloat(armoryPlanID, cBuildPlanInfluencePositionValue, 0, 100.0);
 		}
         aiPlanSetDesiredPriority(armoryPlanID, 100);
-        aiPlanAddUnitType(armoryPlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(armoryPlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(armoryPlanID, cMilitaryEscrowID);
         aiPlanSetBaseID(armoryPlanID, mainBaseID);
         aiPlanSetActive(armoryPlanID);
@@ -3354,10 +3181,7 @@ minInterval 15 //starts in cAge1
     float woodSupply = kbResourceGet(cResourceWood);
     if ((woodSupply < 150) && (cMyCulture != cCultureAtlantean) || (woodSupply < 250) && (cMyCulture == cCultureAtlantean))
 	return;	
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-	
+
     //Force a granary (or guild or house) to go down            
     int researchGranaryPlanID=aiPlanCreate("buildResearchGranary", cPlanBuild);
     if (researchGranaryPlanID >= 0)
@@ -3371,7 +3195,7 @@ minInterval 15 //starts in cAge1
         aiPlanSetVariableFloat(researchGranaryPlanID, cBuildPlanInfluencePositionValue, 0, 10000.0);
 		
         aiPlanSetDesiredPriority(researchGranaryPlanID, 100);
-        aiPlanAddUnitType(researchGranaryPlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(researchGranaryPlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(researchGranaryPlanID, cEconomyEscrowID);
         aiPlanSetBaseID(researchGranaryPlanID, mainBaseID);
         aiPlanSetActive(researchGranaryPlanID);
@@ -3682,7 +3506,7 @@ inactive
         aiPlanSetVariableFloat(buildDropsitePlanID, cBuildPlanCenterPositionDistance, 0, 5.0);
 		
         aiPlanSetVariableFloat(buildDropsitePlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-        aiPlanAddUnitType(buildDropsitePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
+        aiPlanAddUnitType(buildDropsitePlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(buildDropsitePlanID, cEconomyEscrowID);
         aiPlanSetBaseID(buildDropsitePlanID, baseID);
         aiPlanSetDesiredPriority(buildDropsitePlanID, 100);
@@ -3782,12 +3606,8 @@ inactive
 	}
     
     float distToMainBase = xsVectorLength(mainBaseLocation - location);
-	
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-    int numBuilders = kbUnitCount(cMyID, builderType, cUnitStateAlive);    
-	
+    int numBuilders = kbUnitCount(cMyID, cBuilderType, cUnitStateAlive);    
+
     //Build a tower near the gold mine
     static int count = 1;
     int buildGoldMineTowerPlanID = aiPlanCreate("Build gold mine tower #"+count, cPlanBuild);
@@ -3803,7 +3623,7 @@ inactive
         aiPlanSetVariableFloat(buildGoldMineTowerPlanID, cBuildPlanCenterPositionDistance, 0, 4.0);
 		
         aiPlanSetVariableFloat(buildGoldMineTowerPlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-		aiPlanAddUnitType(buildGoldMineTowerPlanID, builderType, 1, 1, 1);
+		aiPlanAddUnitType(buildGoldMineTowerPlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(buildGoldMineTowerPlanID, cMilitaryEscrowID);
         aiPlanSetBaseID(buildGoldMineTowerPlanID, mainBaseID);
 		
@@ -3973,11 +3793,6 @@ inactive
 	// We have found a location (success == true) or we need to just do a brute force placement around the TC.
 	if (success == false)
 	testVec = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
-	
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-    
     if (ShowAiEcho == true) aiEcho("using location: "+testVec);
 	
     //Build a tower near our main base
@@ -3996,7 +3811,7 @@ inactive
         aiPlanSetVariableFloat(buildMBTowerPlanID, cBuildPlanRandomBPValue, 0, 0.99);
         
         aiPlanSetVariableVector(buildMBTowerPlanID, cBuildPlanCenterPosition, 0, testVec);
-        aiPlanAddUnitType(buildMBTowerPlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(buildMBTowerPlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(buildMBTowerPlanID, cMilitaryEscrowID);
         // Add position influence for nearby towers
         aiPlanSetVariableInt(buildMBTowerPlanID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeTower); 
@@ -4104,7 +3919,7 @@ inactive
 
 //==============================================================================
 rule buildExtraFarms
-minInterval 29 //gets activated in updateFoodBreakdown
+minInterval 25 //gets activated in updateFoodBreakdown
 inactive
 {
     if (ShowAiEcho == true) aiEcho("buildExtraFarms:");
@@ -4233,15 +4048,12 @@ inactive
 }
 
 //==============================================================================
-rule makeExtraMarket    //If it takes more than 5 minutes to place our trade market, throw down a local one
+rule makeExtraMarket    //If it takes more than 4 minutes to place our trade market, throw down a local one
 inactive
-minInterval 37 //starts in cAge3, activated in tradeWithCaravans
+minInterval 240 //starts in cAge3, activated in tradeWithCaravans
 {
-    xsSetRuleMinIntervalSelf(37);
-    static int ruleStartTime = -1;
+    xsSetRuleMinIntervalSelf(67);
     if (ShowAiEcho == true) aiEcho("makeExtraMarket:");
-    if (ruleStartTime == -1)
-	ruleStartTime = xsGetTime();
     
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
@@ -4292,47 +4104,41 @@ minInterval 37 //starts in cAge3, activated in tradeWithCaravans
         {
             int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
             if ((aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeMarket) && (aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanAreaID, 0) == mainBaseAreaID))
-            {
-                ruleStartTime = -1;
-                return;
-			}
+            return;
 		}
 	}
 	
-    if ((numMarkets > 1) || ((numMarkets > 0) && (kbUnitGetCurrentHitpoints(gTradeMarketUnitID) <= 0)))
-    {
-        ruleStartTime = -1;
-        return;
-	}
-    
-    
-    static bool firstRun = true;
-    int minutes = 2;
-    if (firstRun == true)
-	minutes = 3;
-    
-    if (xsGetTime() < ruleStartTime + minutes*60*1000)
-	return;
-    
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
-    
+    if ((numMarkets > 1) || (numMarkets > 0) && (kbUnitGetCurrentHitpoints(gTradeMarketUnitID) <= 0) || (kbBaseGetNumberUnits(cMyID, mainBaseID, -1, cUnitTypeMarket) > 0))
+    return;
+
     // Time has expired, add another market.
     int marketPlanID = aiPlanCreate("BuildNearbyMarket", cPlanBuild);
     if (marketPlanID >= 0)
     {
         aiPlanSetVariableInt(marketPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeMarket);
         aiPlanSetVariableInt(marketPlanID, cBuildPlanNumAreaBorderLayers, 0, 2);
-        aiPlanSetVariableInt(marketPlanID, cBuildPlanAreaID, 0, mainBaseAreaID);        
+        aiPlanSetVariableInt(marketPlanID, cBuildPlanAreaID, 0, mainBaseAreaID);  
+        //Put it way in the back.
+        vector backVector=kbBaseGetBackVector(cMyID, kbBaseGetMainID(cMyID));
+        float x = xsVectorGetX(backVector);
+        float z = xsVectorGetZ(backVector);
+        x = x * 60.0;
+        z = z * 60.0;
+        backVector = xsVectorSetX(backVector, x);
+        backVector = xsVectorSetZ(backVector, z);
+        backVector = xsVectorSetY(backVector, 0.0);
+        vector location = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
+        location = location + backVector;		
+        aiPlanSetVariableVector(marketPlanID, cBuildPlanInfluencePosition, 0, location);
+        aiPlanSetVariableFloat(marketPlanID, cBuildPlanInfluencePositionDistance, 0, 30.0);
+        aiPlanSetVariableFloat(marketPlanID, cBuildPlanInfluencePositionValue, 0, 100.0);
         aiPlanSetDesiredPriority(marketPlanID, 100);
-        aiPlanAddUnitType(marketPlanID, builderType, 1, 1, 1);
+        aiPlanAddUnitType(marketPlanID, cBuilderType, 1, 1, 1);
         aiPlanSetEscrowID(marketPlanID, cEconomyEscrowID);
         aiPlanSetBaseID(marketPlanID, mainBaseID);
         aiPlanSetActive(marketPlanID);
         gExtraMarket = true; // Set the global so we know to look for SECOND market before trading.
-        xsSetRuleMinIntervalSelf(127);
-        firstRun = false;
+        xsSetRuleMinIntervalSelf(67);
 	}
 }
 // moved from Extra, expansion stuff etc
@@ -4379,8 +4185,7 @@ inactive
 			aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
 			aiPlanSetBaseID(planID, kbBaseGetMainID(cMyID));
 			aiPlanSetDesiredPriority(planID, 20);
-			int builderTypeID = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder,0);
-			aiPlanAddUnitType(planID, builderTypeID, 1, 1, 1);
+			aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
 			aiPlanSetEscrowID(planID, cRootEscrowID);
 			
 			//If we don't have the query yet, create one.
@@ -4438,37 +4243,31 @@ rule buildGarden
 minInterval 11
 inactive
 {
-	int gardenProtoID = cUnitTypeGarden;
-	//If we have any houses that are building, skip.
-	if (kbUnitCount(cMyID, gardenProtoID, cUnitStateBuilding) > 0)
+	if (kbUnitCount(cMyID, cUnitTypeGarden, cUnitStateBuilding) > 0)
 	return;
-    
-	if (kbGetAge() == cAge2)
-	gGardenBuildLimit = 4;
-	else gGardenBuildLimit = 10;
 	
 	//If we already have gGardenBuildLimit gardens, we shouldn't build anymore.
 	if (gGardenBuildLimit != -1)
 	{
-		int numberOfGardens = kbUnitCount(cMyID, gardenProtoID, cUnitStateAliveOrBuilding);
+		int numberOfGardens = kbUnitCount(cMyID, cUnitTypeGarden, cUnitStateAliveOrBuilding);
 		if (numberOfGardens >= gGardenBuildLimit)
 		return;
 	}
 	//If we already have a garden plan active, skip.
-	if (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, gardenProtoID) > -1)
+	if (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, cUnitTypeGarden) > -1)
 	return;
 	
 	//Over time, we will find out what areas are good and bad to build in.  Use that info here, because we want to protect houses.
 	int planID = aiPlanCreate("BuildGarden", cPlanBuild);
 	if (planID >= 0)
 	{
-		aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, gardenProtoID);
+		aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeGarden);
 		aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, true);
 		aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 100.0);
 		aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
 		aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
 		aiPlanSetDesiredPriority(planID, 100);
-		aiPlanAddUnitType(planID, cUnitTypeVillagerChinese, 1, 1, 1);
+		aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
 		aiPlanSetEscrowID(planID, cEconomyEscrowID);
 		
 		vector backVector = kbBaseGetBackVector(cMyID, kbBaseGetMainID(cMyID));
@@ -4497,7 +4296,7 @@ inactive
 }
 
 //==============================================================================
-// Rule: ChooseGardenResource  // Redefined to fit this Ai better. (Reth)
+// Rule: ChooseGardenResource
 //==============================================================================
 rule ChooseGardenResource
 minInterval 20
@@ -4529,30 +4328,26 @@ inactive
 		resname = "Favor";
 	}
 	
-	if (MyFavor < 30 && FoodSupply > 150)
+	if (MyFavor < 30 && FoodSupply > 250)
 	{
 		res  = cResourceFavor;
 		resname = "Favor";
 	}
 	
-	if ((FoodSupply > 400) && (WoodSupply > 400) && (GoldSupply > 400) && (MyFavor > 60))
+	if ((FoodSupply > 500) && (WoodSupply > 400) && (GoldSupply > 400) && (MyFavor > 60))
 	{  	
-		int choice = -1;
-		choice = aiRandInt(3);     // 0-3
-		
+		int choice = 0;
+		if (WoodSupply > GoldSupply)
+		choice = 1;
+	
 		switch(choice)
 		{
-			case 0:  // Food
-			{
-				res  = cResourceFood;
-				resname = "Food";
-			}
-			case 1:  // Wood
+			case 0:  // Wood
 			{
 				res  = cResourceWood;
 				resname = "Wood";
 			}
-			case 2:  // Gold
+			case 1:  // Gold
 			{
 				res  = cResourceGold;
 				resname = "Gold";
@@ -4678,12 +4473,7 @@ inactive
 	if ((kbIsPlayerHuman(actualIndex) == false) || (alliedBaseUnitID == MBalliedBaseUnitID) || (goldSupply < 160) || (alliedBaseUnitID == -1))
 	return;
 	
-	
-	
     int radius = 18;
-    int builderType = cUnitTypeAbstractVillager;
-    if (cMyCulture == cCultureNorse)
-	builderType = cUnitTypeAbstractInfantry;
     static int count = 1;
     int OtherWallAllyPlanID = aiPlanCreate("OtherWallAllyPlanID #"+count, cPlanBuildWall);
     if (OtherWallAllyPlanID != -1)
@@ -4774,9 +4564,9 @@ inactive
 		
 		aiPlanSetVariableInt(OtherWallAllyPlanID, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
 		if (cMyCulture == cCultureAtlantean)
-		aiPlanAddUnitType(OtherWallAllyPlanID, builderType, 1, 1, 1);
+		aiPlanAddUnitType(OtherWallAllyPlanID, cBuilderType, 1, 1, 1);
 		else 
-		aiPlanAddUnitType(OtherWallAllyPlanID, builderType, 2, 2, 2);
+		aiPlanAddUnitType(OtherWallAllyPlanID, cBuilderType, 2, 2, 2);
 		aiPlanSetVariableInt(OtherWallAllyPlanID, cBuildWallPlanNumberOfGates, 0, 40);
 		aiPlanSetVariableFloat(OtherWallAllyPlanID, cBuildWallPlanEdgeOfMapBuffer, 0, 15.0);
 		aiPlanSetBaseID(OtherWallAllyPlanID, alliedBaseUnitID);
@@ -4820,7 +4610,7 @@ minInterval 37
     {
 		aiPlanSetVariableInt(RebuildSiegeCamp, cBuildPlanBuildingTypeID, 0, cUnitTypeSiegeCamp);      
 		aiPlanSetDesiredPriority(RebuildSiegeCamp, 100);
-		aiPlanAddUnitType(RebuildSiegeCamp, cUnitTypeAbstractVillager, 1, 1, 1);
+		aiPlanAddUnitType(RebuildSiegeCamp, cBuilderType, 1, 1, 1);
 		aiPlanSetEscrowID(RebuildSiegeCamp, cMilitaryEscrowID);
 		aiPlanSetBaseID(RebuildSiegeCamp, mainBaseID);
 		aiPlanSetActive(RebuildSiegeCamp);
@@ -4856,12 +4646,13 @@ inactive
 	
 	if ((currentPop <= currentPopCap*0.5) && (ActivePlans > 0))
 	{
-		int CancelActivePlans = findPlanByString("Buildforwardfortress", cPlanBuild, -1, false);
-		if (CancelActivePlans != -1)
+        for (l = 0; < ActivePlans)
 		{
-			aiPlanDestroy(CancelActivePlans);
-			return;
+            int StalledPlanID = findPlanByString("Buildforwardfortress", cPlanBuild, -1, false);
+            if (StalledPlanID != -1)
+            aiPlanDestroy(StalledPlanID);
 		}
+		return;
 	}
 	
     if ((ActivePlans >= 2) || (kbResourceGet(cResourceGold) < 600) ||
@@ -4874,28 +4665,22 @@ inactive
 	(kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture == cCultureEgyptian))
 	xsSetRuleMinIntervalSelf(22);
 	int MHPTC = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
-	int NumSelf = 2;
 	if (MHPTC > 0)
 	{
         vector enemyTCvec = kbUnitGetPosition(MHPTC);
 		vector offset = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)) - enemyTCvec;
 		offset = xsVectorNormalize(offset);
 		vector target = enemyTCvec + (offset * 80.0);
-		
-		int enemyAreaGroup = -1;
-		int testAreaGroup = -1;
-		testAreaGroup = kbAreaGroupGetIDByPosition(target);
-		enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
-		int NumEnemy = -1;
+		int enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
 		
 		vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
 		bool success = false;
 		
 		for (i=0; <18)	// Keep testing until areaGroups match
 		{
-			testAreaGroup = kbAreaGroupGetIDByPosition(target);
-			NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 28.0, false);
-			NumSelf = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, target, 100.0);
+			int testAreaGroup = kbAreaGroupGetIDByPosition(target);
+			int NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 28.0, false);
+			int NumSelf = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, target, 100.0);
 			if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0) && (NumSelf < 2))
 			{
 				success = true;
@@ -4921,8 +4706,74 @@ inactive
 		aiPlanSetDesiredPriority(remotePlanID, 80);
 		aiPlanSetEscrowID(remotePlanID, cMilitaryEscrowID);
 		if (cMyCulture == cCultureAtlantean)
-		aiPlanAddUnitType(remotePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 1, 1, 1);
-		else aiPlanAddUnitType(remotePlanID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0), 2, 3, 3);
+		aiPlanAddUnitType(remotePlanID, cBuilderType, 1, 1, 1);
+		else aiPlanAddUnitType(remotePlanID, cBuilderType, 2, 3, 3);
 		aiPlanSetActive(remotePlanID);
+	}
+}
+
+//==============================================================================
+rule BunkerUpThatWonder
+minInterval 1 
+inactive
+{	
+	xsSetRuleMinIntervalSelf(22+aiRandInt(8));
+	int WonderPlanID = findPlanByString("Ally Wonder Defend Plan", cPlanDefend);
+	if (WonderPlanID < 0)
+	return;
+
+	int WonderUnitID = findUnitByRel(cUnitTypeWonder, cUnitStateAliveOrBuilding, -1, cPlayerRelationAlly, aiPlanGetLocation(WonderPlanID), 75);
+	if (WonderUnitID <= 0)
+    WonderUnitID = findUnitByRel(cUnitTypeWonder, cUnitStateAliveOrBuilding, -1, cPlayerRelationSelf, aiPlanGetLocation(WonderPlanID), 75);
+	
+	if (WonderUnitID <= 0)
+	return;		
+	
+	vector location = kbUnitGetPosition(WonderUnitID);
+	
+    float woodSupply = kbResourceGet(cResourceWood);
+    float goldSupply = kbResourceGet(cResourceGold);
+    if ((woodSupply < 200) || (goldSupply < 200))
+	return;
+    
+    int Building = cUnitTypeTower;
+    int numBuilders = 2;
+	if (cMyCulture == cCultureAtlantean)
+	numBuilders = 1;
+	
+    int numBuildingNearBase = getNumUnits(Building, cUnitStateAliveOrBuilding, -1, cMyID, location, 75.0);
+	
+    if (numBuildingNearBase >= 2)
+    {
+        if (cMyCulture != cCultureAtlantean)
+		numBuilders = 4;
+		Building = MyFortress;
+	    numBuildingNearBase = getNumUnits(Building, cUnitStateAliveOrBuilding, -1, cMyID, location, 75.0);	
+		if (numBuildingNearBase > 1)
+		return;
+	}
+	
+	
+    if (findPlanByString("BunkerUpthatWonder", cPlanBuild) != -1)
+	return;
+	
+    //Force building #1 to go down.
+    int BunkerUpWonder = aiPlanCreate("BunkerUpthatWonder", cPlanBuild);
+    if (BunkerUpWonder >= 0)
+    {
+        aiPlanSetVariableInt(BunkerUpWonder, cBuildPlanBuildingTypeID, 0, Building);
+        aiPlanSetVariableBool(BunkerUpWonder, cBuildPlanInfluenceAtBuilderPosition, 0, false);
+		aiPlanSetVariableInt(BunkerUpWonder, cBuildPlanMaxRetries, 0, 5);
+        aiPlanSetVariableFloat(BunkerUpWonder, cBuildPlanRandomBPValue, 0, 0.99);
+        aiPlanSetVariableVector(BunkerUpWonder, cBuildPlanCenterPosition, 0, location);
+		aiPlanSetVariableInt(BunkerUpWonder, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeBuildingsThatShoot); 
+		aiPlanSetVariableFloat(BunkerUpWonder, cBuildPlanInfluenceUnitDistance, 0, 12);    
+		aiPlanSetVariableFloat(BunkerUpWonder, cBuildPlanInfluenceUnitValue, 0, -20.0);
+        aiPlanSetVariableFloat(BunkerUpWonder, cBuildPlanCenterPositionDistance, 0, 20.0);
+        aiPlanSetVariableFloat(BunkerUpWonder, cBuildPlanBuildingBufferSpace, 0, 10.0);
+        aiPlanSetDesiredPriority(BunkerUpWonder, 100);
+        aiPlanAddUnitType(BunkerUpWonder, cBuilderType, numBuilders, numBuilders, numBuilders);
+        aiPlanSetEscrowID(BunkerUpWonder, cMilitaryEscrowID);
+        aiPlanSetActive(BunkerUpWonder);
 	}
 }

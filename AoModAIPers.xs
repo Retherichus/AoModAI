@@ -30,7 +30,6 @@ void persDecidePersonality(void)
 	choice = aiRandInt(6);
     else
     choice = Personality;     // 0..5
-	
     switch(choice)
     {
         case 0:  // Defensive Boomer (protector)
@@ -81,7 +80,7 @@ void persDecidePersonality(void)
             cvRushBoomSlider = 0.9;
             cvMilitaryEconSlider = 0.9;
             cvOffenseDefenseSlider = 0.9;
-            cvSliderNoise = 0.2;    
+            cvSliderNoise = 0.2;  
             break;
 		}
 	}

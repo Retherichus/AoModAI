@@ -42,6 +42,8 @@ void navalAge3Handler(int age=2)
 void navalAge4Handler(int age=3)
 {
     if (ShowAiEcho == true) aiEcho("Naval Age "+age+".");
+	if (gNavalUPID != -1)
+	kbUnitPickSetDesiredNumberUnitTypes(gNavalUPID, 3, 3, true);
 }
 
 //==============================================================================
@@ -51,19 +53,19 @@ group NavalHeroic
 inactive
 {
 	if (ShowAiEcho == true) aiEcho("findOtherSettlements:");
-	int Builder = cUnitTypeAbstractVillager;
 	static int bStartTime = -1;
 	static int Attempts = 0;
 	int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
-	if (cMyCulture == cCultureNorse)
-	Builder = cUnitTypeAbstractInfantry;
-	int TotalBuilders = kbUnitCount(cMyID, Builder, cUnitStateAlive);
+	int TotalBuilders = kbUnitCount(cMyID, cBuilderType, cUnitStateAlive);
 	if (cMyCulture == cCultureAtlantean)
 	TotalBuilders = TotalBuilders * 2;
+    else if ((cMyCulture == cCultureNorse) && (TotalBuilders >= 3))
+	TotalBuilders = 10; // fake it
+    
 	
 	int ActivePlans = findPlanByString("Remote Settlement Transport", cPlanTransport, -1, true);
 	int ActiveBackupPlans = findPlanByString("Backup Remote Settlement", cPlanBuild, -1, true);
-	if ((ActivePlans >= 1) || (TotalBuilders < 14) || (kbUnitCount(cMyID, transportPUID, cUnitStateAlive) < 1) 
+	if ((ActivePlans >= 1) || (TotalBuilders < 10) || (kbUnitCount(cMyID, transportPUID, cUnitStateAlive) < 1) 
 	|| (kbResourceGet(cResourceGold) < 500) || (kbResourceGet(cResourceFood) < 200) || (kbResourceGet(cResourceWood) < 400) && (cMyCulture != cCultureEgyptian))
 	return;
 	
@@ -85,10 +87,10 @@ inactive
 	// therefore remember the pos where we did the transport to
 	static vector gTransportToSettlementPos = cInvalidVector;
 	
-	if ((bStartTime != -1) && (ActiveBackupPlans > 0) && (xsGetTime() - bStartTime > 4*60*1000))
+	if ((bStartTime != -1) && (ActiveBackupPlans > 0) && (xsGetTime() - bStartTime > 3*60*1000))
 	{
 		int ActiveBackupPlanID = findPlanByString("Backup Remote Settlement", cPlanBuild, -1);
-		if (ActiveBackupPlanID > 0)
+		if (ActiveBackupPlanID != -1)
 		{
 			aiPlanDestroy(ActiveBackupPlanID);
 			Attempts = 0;
@@ -99,18 +101,17 @@ inactive
 	// been there, done that
 	if (equal(gTransportToSettlementPos, there))
 	{
-		int builderTypeID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionBuilder, 0);
-		int NumNeutralTC = getNumUnits(cUnitTypeSettlement, cUnitStateAny, -1, 0, there, 125.0, true);	
-		int NumBuilder = getNumUnits(builderTypeID, cUnitStateAlive, -1, cMyID, there, 125.0);
+		int NumNeutralTC = NumUnitsOnAreaGroupByRel(true, kbAreaGroupGetIDByPosition(there), cUnitTypeSettlement, 0);	
+		int NumBuilder = NumUnitsOnAreaGroupByRel(false, kbAreaGroupGetIDByPosition(there), cBuilderType);	
 		
-		if ((NumBuilder > 0) && (NumNeutralTC == 1) && (ActiveBackupPlans <= 0))
+		if ((NumBuilder > 0) && (NumNeutralTC >= 1) && (ActiveBackupPlans <= 0))
 		{
 			int planID=aiPlanCreate("Backup Remote Settlement", cPlanBuild);
 			aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, cUnitTypeSettlementLevel1);
 			aiPlanSetDesiredPriority(planID, 100);
 			aiPlanSetEconomy(planID, true);
 			aiPlanSetEscrowID(planID, cEconomyEscrowID);
-			aiPlanAddUnitType(planID, builderTypeID, 1, 1, NumBuilder);
+			aiPlanAddUnitType(planID, cBuilderType, 1, 1, NumBuilder);
 			aiPlanSetInitialPosition(planID, there);
 			aiPlanSetVariableVector(planID, cBuildPlanSettlementPlacementPoint, 0, there);
 			aiPlanSetActive(planID);
@@ -118,7 +119,7 @@ inactive
 		}
 		if (ActiveBackupPlans <= 0)
 		Attempts = Attempts + 1;
-		if (Attempts > 6)
+		if (Attempts > 4)
 		gTransportToSettlementPos = cInvalidVector;	
 		return;
 	}	
@@ -140,6 +141,7 @@ inactive
 	if ((kbGetAge() < 1) || (aiGetMostHatedPlayerID() < 0))
 	return;
     static int reduceCount = 0;
+	int ArrowShipMaintain = -1;
     int doomedID = -1;
 	
 	//See if we have any enemy warships running around.
@@ -164,9 +166,7 @@ inactive
 	
 	int numMyMilShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
 	int numAlliedMilShips = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationAlly);
-	int numEnemyMilShips = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy);
-	
-	if ((numMyMilShips + numAlliedMilShips > numEnemyMilShips + 1) && (numMyMilShips > 1))
+	if ((numMyMilShips + numAlliedMilShips > numberEnemyWarships + 2) && (numMyMilShips > 1))
 	reduceCount = reduceCount + 1;
 	else
 	reduceCount = 0;
@@ -182,7 +182,7 @@ inactive
 	}
 	
 	//Figure out the min/max number of warships we want.
-	int minShips=0;
+	int minShips=2;
 	int maxShips=0;
 	if (numberEnemyWarships >= 0)
 	{
@@ -243,15 +243,22 @@ inactive
 	//want anything, just set 1 since we've already done it before.
 	if (gNavalUPID >= 0)
 	{
-		if (maxShips <= 0)
+		if (maxShips <= 2)
 		{
 			kbUnitPickSetMinimumNumberUnits(gNavalUPID, 1);
 			kbUnitPickSetMaximumNumberUnits(gNavalUPID, 1);
+			kbUnitPickSetMinimumPop(gNavalUPID, 1);
+			kbUnitPickSetMaximumPop(gNavalUPID, 4);
 		}
 		else
 		{
-			kbUnitPickSetMinimumNumberUnits(gNavalUPID, minShips);
+			kbUnitPickSetMinimumNumberUnits(gNavalUPID, 2);
 			kbUnitPickSetMaximumNumberUnits(gNavalUPID, maxShips);
+			kbUnitPickSetMinimumPop(gNavalUPID, minShips);
+			if (kbGetAge() < cAge3)
+			kbUnitPickSetMaximumPop(gNavalUPID, maxShips*2);
+			else
+			kbUnitPickSetMaximumPop(gNavalUPID, maxShips*1.5);
 		}
 		return;
 	}
@@ -275,12 +282,48 @@ inactive
 	kbUnitPickSetCombatEfficiencyWeight(gNavalUPID, 4.0);
 	kbUnitPickSetCostWeight(gNavalUPID, 7.0);
 	kbUnitPickSetDesiredNumberUnitTypes(gNavalUPID, 3, 2, true);
-	kbUnitPickSetMinimumNumberUnits(gNavalUPID, minShips);
-	kbUnitPickSetMaximumNumberUnits(gNavalUPID, maxShips);
+	kbUnitPickSetMinimumNumberUnits(gNavalUPID, 1);
+	kbUnitPickSetMaximumNumberUnits(gNavalUPID, 3);
+	kbUnitPickSetMinimumPop(gNavalUPID, 1);
+	kbUnitPickSetMaximumPop(gNavalUPID, 4);	
 	kbUnitPickSetAttackUnitType(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary);
 	kbUnitPickSetGoalCombatEfficiencyType(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary);
-	kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary, 1.0);
 	kbUnitPickSetMovementType(gNavalUPID, cMovementTypeWater);
+
+	//have to add them manually, otherwise the Unit Picker will go crazy and over train units.
+	if (cMyCulture == cCultureGreek)
+	{
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeTrireme, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeRammingShipGreek, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipGreek, 1.0);	 
+	}
+	else if (cMyCulture == cCultureEgyptian)
+	{
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeKebenit, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeRammingShipEgyptian, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipEgyptian, 1.0);	
+	}
+	else if (cMyCulture == cCultureNorse)
+	{
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeLongboat, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeRammingShipNorse, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipNorse, 1.0);	
+	}
+	else if (cMyCulture == cCultureAtlantean)
+	{
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeBireme, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeFireShipAtlantean, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipAtlantean, 1.0);	
+	}
+	else if (cMyCulture == cCultureChinese)
+	{
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeJunk, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeFireShipChinese, 1.0);
+		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipChinese, 1.0);	
+	}
+	kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeMythUnit, 0.8);	
+	
+	
 	//Create the attack goal.
 	gNavalAttackGoalID=createSimpleAttackGoal("Naval Attack", -1, gNavalUPID, -1, kbGetAge(), -1, -1, false);
 	if (gNavalAttackGoalID < 0)
@@ -292,6 +335,31 @@ inactive
 	aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanSetAreaGroups, 0, false);
     aiPlanSetNumberVariableValues(gNavalAttackGoalID, cGoalPlanUpgradeBuilding, 1, true);
     aiPlanSetVariableInt(gNavalAttackGoalID, cGoalPlanUpgradeBuilding, 0, cUnitTypeDock);
+	int ArrowShip = -1;
+	if (cMyCulture == cCultureGreek)
+	{
+		ArrowShip = cUnitTypeTrireme;
+	}
+	else if (cMyCulture == cCultureEgyptian)
+	{
+		ArrowShip = cUnitTypeKebenit;
+	}
+	else if (cMyCulture == cCultureNorse)
+	{
+		ArrowShip = cUnitTypeLongboat;
+	}
+	else if (cMyCulture == cCultureAtlantean)
+	{
+		ArrowShip = cUnitTypeBireme;	
+	}
+	else if (cMyCulture == cCultureChinese)
+	{
+		ArrowShip = cUnitTypeJunk;
+	}	
+	if (ArrowShip != -1)
+	ArrowShipMaintain = createSimpleMaintainPlan(ArrowShip, 2, false, kbBaseGetMainID(cMyID));
+
+	xsEnableRule("FishBoatMonitor"); // looks for transport too
 	
 	if (gWaterExploreID == -1)
     {
