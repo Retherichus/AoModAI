@@ -407,14 +407,6 @@ void initRethlAge1(void)  // Am I doing this right??
 	}
 	if ((kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusUnobtainable) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusActive))
 	TitanAvailable = true;
-	
-	int houseProtoID = cUnitTypeHouse;
-	if (cMyCulture == cCultureAtlantean)
-	houseProtoID = cUnitTypeManor;
-	int CheckUnitPop = kbGetPopSlots(cMyID, cUnitTypeHoplite);  // <3 Loggy <3
-	int maxHouses = kbGetBuildLimit(cMyID, houseProtoID);
-	if ((maxHouses == -1) || (CheckUnitPop != 2))
-    aiEcho("Warning:  Modded Protox file detected, results may vary.");
 
 	if (cMyCulture == cCultureEgyptian)
 	MyFortress = cUnitTypeMigdolStronghold;
@@ -484,8 +476,6 @@ void initRethlAge2(void)
 		    xsEnableRule("ChooseGardenResource");
 		    if (cMyCiv == cCivNuwa)	
 		    xsEnableRule("getAcupuncture");	
-		    else if (cMyCiv == cCivFuxi)
-		    xsEnableRule("getDomestication");	
 		    else if (cMyCiv == cCivShennong)
 		    xsEnableRule("getWheelbarrow");
 		    aiPlanSetVariableInt(mChineseImmortal, cTrainPlanNumberToMaintain, 0, 8);
@@ -2012,8 +2002,7 @@ inactive
 	aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 4, kbAreaGroupGetIDByPosition(RandVillager));	
 	aiPlanAddUnitType(TransportAttPlanID, cUnitTypeHumanSoldier, 0, 0, 1);
 	attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
-    
-	aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
+	
     aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanPlayerID, 0, AttackPlayer);
 	aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
     aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);

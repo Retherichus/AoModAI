@@ -2598,7 +2598,7 @@ rule randomAttackGenerator
 minInterval 41 //starts in cAge2
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("******* randomAttackGenerator:");
+    if (ShowAiEcho == true) aiEcho("randomAttackGenerator:");
 	if (ShouldIAgeUp() == true)
     xsSetRuleMinIntervalSelf(82);
     else
@@ -2808,9 +2808,6 @@ inactive
         {
             aiTaskUnitMove(militaryUnit1ID, gRandomAttackLastTargetLocation);
 		}
-        else
-        {
-		}
 	}
     
     if ((targetIsMarket == false) && (equal(gRandomAttackLastMarketLocation, cInvalidVector) == false) && (aiRandInt(2) < 1))
@@ -2819,9 +2816,6 @@ inactive
         if (militaryUnit2ID > 0)
         {
             aiTaskUnitMove(militaryUnit2ID, gRandomAttackLastMarketLocation);
-		}
-        else
-        {
 		}
 	}
 	
@@ -3350,7 +3344,7 @@ inactive
 		xsDisableSelf();
 		return;
 	}   
-    if (ShowAiEcho == true) aiEcho("........defendAlliedBase: ");
+    if (ShowAiEcho == true) aiEcho("defendAlliedBase: ");
     xsSetRuleMinIntervalSelf(89);
     int alliedBaseUnitID = -1;
     int startIndex = aiRandInt(cNumberPlayers);
@@ -3427,7 +3421,7 @@ inactive
                     return;
 				}
 				
-                if ((numEnemyTitansNearDefPointInR70 < 1) && (numEnemyMilUnitsNearDefPointInR70 < alliedMilUnitsNearDefPointInR70) || (numEnemyMilUnitsNearDefPointInR70 < 1) && (numEnemyTitansNearDefPointInR70 < 1))
+                if ((numEnemyTitansNearDefPointInR70 < 1) && (numEnemyMilUnitsNearDefPointInR70 < alliedMilUnitsNearDefPointInR70))
                 {
                     if (count > 1)
                     {
@@ -3470,7 +3464,7 @@ inactive
         enemySettlementAtAlliedBasePosition = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationEnemy, alliedBaseLocation, 15.0);
         numMotherNatureSettlementsAtAlliedBasePosition = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, 0, alliedBaseLocation, 15.0);		
 		
-		if ((alliedMilUnitsInR70 > numEnemyMilUnitsInR70+3))
+		if ((alliedMilUnitsInR70 > numEnemyMilUnitsInR70+4))
 		return;
 	}
 	

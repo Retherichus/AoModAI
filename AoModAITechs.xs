@@ -40,8 +40,7 @@ inactive
     {
         if (kbGetTechStatus(techID) < cTechStatusResearching)
         {
-            if (((foodSupply > 560) && (goldSupply > 350) && (kbGetAge() == cAge2))
-			|| ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() == cAge3)))
+            if ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() == cAge3))
             {
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
@@ -52,21 +51,12 @@ inactive
     
     if (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching)
 	return;
-    
-    if ((xsGetTime() < 25*60*1000) && (kbGetAge() < cAge3))
-	return;
-    
-    if ((foodSupply < 400) || (woodSupply < 600))
-	return;
-	
-    if ((foodSupply > 560) && (foodSupply < 850) && (goldSupply > 200) && (kbGetAge() == cAge2))
-	return;
-    
-    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() == cAge3))
+       
+    if ((foodSupply < 400) || (woodSupply < 600) || (foodSupply > 700) && (goldSupply > 700) && (kbGetAge() == cAge3))
 	return;
     
     if (kbGetTechStatus(techID) < cTechStatusResearching)
-    createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 40, true);
+    createSimpleResearchPlan(techID, -1, cRootEscrowID, 40, true);
 }
 
 //==============================================================================
@@ -117,9 +107,7 @@ inactive
         return;
         
 	}
-	
-    if (kbGetTechStatus(techID) < cTechStatusResearching)
-    createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 80, true);
+    createSimpleResearchPlan(techID, -1, cRootEscrowID, 80, true);
 }
 
 //==============================================================================
@@ -235,23 +223,6 @@ inactive
 group age1EconUpgrades
 {
     int techID = cTechPickaxe;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-	}
-    if (ShowAiEcho == true) aiEcho("getPickaxe:");        
-    
-    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-        }
-        return;
-    }
-	
     int buildingType = cUnitTypeEarlyGoldDropsite;
     if (cMyCulture == cCultureAtlantean)
 	buildingType = cUnitTypeGuild;
@@ -266,6 +237,7 @@ group age1EconUpgrades
 		return;
 	}
 	createSimpleResearchPlan(techID, -1, cEconomyEscrowID, 95, true);
+	xsDisableSelf();
 }
 
 //==============================================================================
@@ -275,25 +247,6 @@ inactive
 group age1EconUpgrades
 {    
     int techID = cTechHandAxe;
-    if (kbGetTechStatus(cTechHandAxe) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-	}
-    if ((kbGetAge() < cAge2) && (cMyCulture == cCultureEgyptian))
-	return;	
-    if (ShowAiEcho == true) aiEcho("getHandaxe:");
-    
-    if (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true));
-            aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-        }
-        return;
-    }
-	
     int buildingType = cUnitTypeEarlyWoodDropsite;
     if (cMyCulture == cCultureAtlantean)
 	buildingType = cUnitTypeGuild;	
@@ -304,10 +257,11 @@ group age1EconUpgrades
     
     if (kbGetAge() < cAge2)
     {
-        if (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching)
+        if ((kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) || (cMyCulture == cCultureEgyptian))
 		return;
 	}
 	createSimpleResearchPlan(techID, -1, cEconomyEscrowID, 95, true);
+	xsDisableSelf();
 }
 
 //==============================================================================
@@ -571,7 +525,7 @@ minInterval 107 //starts in cAge2
     if (woodSupply < 500)
 	return;
     
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 5);
+	createSimpleResearchPlan(techID, -1, cRootEscrowID, 5);
 }
 
 //==============================================================================
@@ -580,30 +534,14 @@ inactive
 minInterval 79 //starts in cAge3
 {
     int techID = cTechBoilingOil;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getBoilingOil:");
-	
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;
-    
-    int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
 	int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
-	int Sbuildings = numFortresses + numTowers;
     int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding);
-    if ((Sbuildings < 1) || (numMarkets < 1))
+   
+    if ((numTowers < 1) || (numMarkets < 1))
 	return;
-	
-    float woodSupply = kbResourceGet(cResourceWood);
-    float foodSupply = kbResourceGet(cResourceFood);
-    if ((woodSupply < 450) || (foodSupply < 200))
-	return;
-	
+
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 70);
+	xsDisableSelf();
 }
 
 //==============================================================================
@@ -612,17 +550,6 @@ inactive
 minInterval 107 //starts in cAge2 activated in getSignalFires
 {
     int techID = cTechCarrierPigeons;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getCarrierPigeons:");
-	
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;
-    
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding);
     if ((numFortresses < 1) || (numMarkets < 1))
@@ -632,7 +559,8 @@ minInterval 107 //starts in cAge2 activated in getSignalFires
     if (woodSupply < 800)
 	return;
     
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 5);
+	createSimpleResearchPlan(techID, -1, cRootEscrowID, 5);
+	xsDisableSelf();
 }
 
 //==============================================================================
@@ -641,18 +569,8 @@ inactive
 minInterval 10 //starts in cAge2
 {
     int techID = cTechWatchTower;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getWatchTower:");
-	
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;
-    
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 100);
+	xsDisableSelf();
 }
 
 //==============================================================================
@@ -708,23 +626,13 @@ inactive
 minInterval 47 //starts in cAge3 activated in getGuardTower
 {
     int techID = cTechBallistaTower;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getBallistaTower:");
-	
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;
-    
     float foodSupply = kbResourceGet(cResourceFood);
     float woodSupply = kbResourceGet(cResourceWood);
     if ((woodSupply < 800) || (foodSupply < 500))
 	return;
 	
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 80);
+	xsDisableSelf();
 }
 
 //==============================================================================
@@ -759,10 +667,7 @@ minInterval 37 //starts in cAge2
             {
                 aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
                 xsSetRuleMinIntervalSelf(37);
-			}
-			else
-	        if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
-	        aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);			
+			}		
 		}
         return;
 	}
@@ -819,11 +724,7 @@ minInterval 37 //starts in cAge2 activated in getStoneWall
 	return;
     
 	if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	{
-		if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
-		aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
-		return;
-	}
+	return;
     
 	static int count = 0;        
     if (count < 1)
@@ -860,11 +761,7 @@ minInterval 37 //starts in cAge2 activated in getFortifiedWall
 	return;
 	
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	{
-		if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
-		aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
-		return;
-	}				
+	return;		
 	
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
 }
@@ -886,20 +783,13 @@ minInterval 37 //starts in cAge2 activated in getStoneWall
     
     float goldSupply = kbResourceGet(cResourceGold);
     float foodSupply = kbResourceGet(cResourceFood);
-    if ((goldSupply < 450) || (foodSupply < 600))
-	return;
 	
-    if (((foodSupply > 750) || (goldSupply > 500)) && (kbGetAge() == cAge2))
-	return;
-    else if ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() == cAge3))
+    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() == cAge3))
 	return;
     
 	if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	{
-		if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
-		aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
-		return;
-	}
+	return;
+	
     
 	static int count = 0;        
     if (count < 1)
@@ -940,11 +830,7 @@ minInterval 37 //starts in cAge2 activated in getBronzeWall
 	return;
 	
 	if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	{
-		if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
-		aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
-		return;
-	}	
+	return;
 	
     static int count = 0;        
     if (count < 1)
@@ -981,11 +867,7 @@ minInterval 37 //starts in cAge2 activated in getIronWall
 	return;
 	
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	{
-		if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
-		aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
-		return;
-	}	
+	return;	
 	
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
 	xsSetRuleMinIntervalSelf(307);
@@ -1084,11 +966,18 @@ minInterval 41 //starts in cAge4
 rule getMediumInfantry
 inactive
 minInterval 13 //starts in cAge2
-group mediumGreek
+group mediumUpg
 {
     int techID = cTechMediumInfantry;
+	int NeededRes = 300;
 	if (cMyCulture == cCultureChinese)
 	techID = cTechMediumBarracks;
+	else if (cMyCulture == cCultureEgyptian)
+	{
+	    techID = cTechMediumSpearmen;
+        NeededRes = 200;
+    }		
+
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
         xsDisableSelf();
@@ -1118,6 +1007,9 @@ group mediumGreek
 	return;
 	
     int numInfantry = kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive);
+	if (cMyCulture == cCultureChinese)
+	numInfantry = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
+
     if ((numInfantry < 5) && (kbGetAge() < cAge3))
 	return;
     
@@ -1125,7 +1017,7 @@ group mediumGreek
     {
         if (numInfantry < 9)
         {
-            if ((goldSupply < 300) || (foodSupply < 300))
+            if ((goldSupply < NeededRes) || (foodSupply < NeededRes))
 			return;
 			
             if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
@@ -1141,11 +1033,18 @@ group mediumGreek
 rule getMediumCavalry
 inactive
 minInterval 12 //starts in cAge2
-group mediumGreek
+group mediumUpg
 {
     int techID = cTechMediumCavalry;
+	int NeededFood = 400;
 	if (cMyCulture == cCultureChinese)
 	techID = cTechMediumStable;	
+	else if (cMyCulture == cCultureEgyptian)
+	{
+	    techID = cTechMediumAxemen;
+        NeededFood = 200;
+    }
+	
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
         xsDisableSelf();
@@ -1182,7 +1081,7 @@ group mediumGreek
     {
         if (numCavalry < 9)
         {
-            if ((goldSupply < 200) || (foodSupply < 400))
+            if ((goldSupply < 200) || (foodSupply < NeededFood))
 			return;
 			
             if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
@@ -1198,9 +1097,11 @@ group mediumGreek
 rule getMediumArchers
 inactive
 minInterval 11 //starts in cAge2
-group mediumGreek
+group mediumUpg
 {
     int techID = cTechMediumArchers;
+	if (cMyCulture == cCultureEgyptian)
+	techID = cTechMediumSlingers;	
     if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
         xsDisableSelf();
@@ -1247,72 +1148,6 @@ group mediumGreek
     
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 49);
 	xsSetRuleMinIntervalSelf(11);
-}
-
-//==============================================================================
-rule getChampionInfantry
-inactive
-minInterval 18 //starts in cAge4
-group championGreek
-{
-    int techID = cTechChampionInfantry;
-    if (ShowAiEcho == true) aiEcho("getChampionInfantry:");
-    
-    int numberOfInfantry = kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAlive);
-    if (numberOfInfantry < 5)
-	return;
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-    if ((goldSupply < 500) || (foodSupply < 600))
-	return;
-    
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 50, true);
-	xsDisableSelf();
-}
-
-//==============================================================================
-rule getChampionCavalry
-inactive
-minInterval 16 //starts in cAge4
-group championGreek
-{
-    int techID = cTechChampionCavalry;
-    if (ShowAiEcho == true) aiEcho("getChampionCavalry:");
-    
-    int numberOfCavalry = kbUnitCount(cMyID, cUnitTypeAbstractCavalry, cUnitStateAlive);
-    if (numberOfCavalry < 5)
-	return;
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-    if ((goldSupply < 300) || (foodSupply < 800))
-	return;
-    
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 50, true);
-	xsDisableSelf();
-}
-
-//==============================================================================
-rule getChampionArchers
-inactive
-minInterval 15 //starts in cAge4
-group championGreek
-{
-    int techID = cTechChampionArchers;
-    if (ShowAiEcho == true) aiEcho("getChampionArchers:");
-	
-    int numberOfArchers = kbUnitCount(cMyID, cUnitTypeAbstractArcher, cUnitStateAlive);
-    if (numberOfArchers < 5)
-	return;
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float woodSupply = kbResourceGet(cResourceWood);
-    if ((goldSupply < 500) || (woodSupply < 600))
-	return;
-    
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 50, true);
-	xsDisableSelf();
 }
 
 //==============================================================================
@@ -1559,96 +1394,6 @@ group ArmoryAge2
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 50);
 	xsSetRuleMinIntervalSelf(11);
 }
-//==============================================================================
-rule getMediumAxemen
-inactive
-minInterval 13 //starts in cAge2
-group mediumEgyptian
-{
-    int techID = cTechMediumAxemen;
-    if (ShowAiEcho == true) aiEcho("getMediumAxemen:");
-	
-    int numAxemen = kbUnitCount(cMyID, cUnitTypeAxeman, cUnitStateAlive);
-    if ((numAxemen < 6) && (kbGetAge() < cAge3))
-	return;  
-    
-    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
-    {
-        if (numAxemen < 9)
-        {
-            float goldSupply = kbResourceGet(cResourceGold);
-            float foodSupply = kbResourceGet(cResourceFood);
-            if ((goldSupply < 200) || (foodSupply < 200))
-			return;
-			
-            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
-			return;
-		}
-	}  
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 49);
-	xsDisableSelf();
-}
-
-//==============================================================================
-rule getMediumSpearmen
-inactive
-minInterval 12 //starts in cAge2
-group mediumEgyptian
-{
-    int techID = cTechMediumSpearmen;	
-    if (ShowAiEcho == true) aiEcho("getMediumSpearmen:");
-
-    int numSpearmen = kbUnitCount(cMyID, cUnitTypeSpearman, cUnitStateAlive);
-    if ((numSpearmen < 6) && (kbGetAge() < cAge3))
-	return;
-    
-    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
-    {
-        if (numSpearmen < 9)
-        {
-            float goldSupply = kbResourceGet(cResourceGold);
-            float foodSupply = kbResourceGet(cResourceFood);
-            if ((goldSupply < 200) || (foodSupply < 200))
-			return;
-			
-            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
-			return;
-		}
-	}
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 49);
-	xsDisableSelf();
-}
-
-//==============================================================================
-rule getMediumSlingers
-inactive
-minInterval 11 //starts in cAge2
-group mediumEgyptian
-{
-    int techID = cTechMediumSlingers;	
-    if (ShowAiEcho == true) aiEcho("getMediumSlingers:");
-	
-    int numSlingers = kbUnitCount(cMyID, cUnitTypeSlinger, cUnitStateAlive);
-    if ((numSlingers < 6) && (kbGetAge() < cAge3))
-	return;
-    
-    if (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching)
-    {
-        if (numSlingers < 9)
-        {
-            float foodSupply = kbResourceGet(cResourceFood);
-            float goldSupply = kbResourceGet(cResourceGold);
-            float woodSupply = kbResourceGet(cResourceWood);
-            if ((goldSupply < 200) || (woodSupply < 200))
-			return;
-			
-            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
-			return;
-		}
-	}
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 49);
-	xsDisableSelf();
-}
 
 //==============================================================================
 rule getSecretsOfTheTitan
@@ -1875,7 +1620,7 @@ minInterval 30 //starts in cAge3
 group Apollo
 {
     int techID = cTechTempleofHealing;
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 6);
+	createSimpleResearchPlan(techID, -1, cRootEscrowID, 6);
 	xsDisableSelf();
 }
 
@@ -1902,7 +1647,7 @@ group Apollo
     if ((woodSupply < 300) && (favorSupply < 20))
 	return;
 	
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 5);
+	createSimpleResearchPlan(techID, -1, cRootEscrowID, 5);
 	xsDisableSelf();
 }
 
@@ -2141,7 +1886,7 @@ minInterval 23
 {
     if (kbGetAge() < cAge3)
 	return;
-	createSimpleResearchPlan(cTechFeral, -1, cMilitaryEscrowID, 5);
+	createSimpleResearchPlan(cTechFeral, -1, cRootEscrowID, 5);
     xsDisableSelf();
 }
 
@@ -2159,7 +1904,7 @@ group Anubis
     float goldSupply = kbResourceGet(cResourceGold);
     if (kbGetAge() < cAge3 && goldSupply < 750)
 	return;
-	createSimpleResearchPlan(cTechNecropolis, -1, cMilitaryEscrowID, 10);
+	createSimpleResearchPlan(cTechNecropolis, -1, cRootEscrowID, 10);
     xsDisableSelf();
 }
 
@@ -2172,7 +1917,7 @@ inactive
 minInterval 31
 group Bast
 {
-    if ((kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 2) || (kbResourceGet(cResourceWood) < 250) || (kbGetAge() < cAge4))
+    if ((kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 2) || (kbResourceGet(cResourceWood) < 250))
 	return;
 	createSimpleResearchPlan(cTechCriosphinx, -1, cMilitaryEscrowID, 10);
     xsDisableSelf();
@@ -2186,7 +1931,7 @@ inactive
 minInterval 33
 group Bast
 {
-    if ((kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 2) || (kbResourceGet(cResourceWood) < 300) || (kbGetAge() < cAge4))
+    if ((kbUnitCount(cMyID, cUnitTypeSphinx, cUnitStateAlive) < 2) || (kbResourceGet(cResourceWood) < 350))
 	return;
 	createSimpleResearchPlan(cTechHieracosphinx, -1, cMilitaryEscrowID, 10);
     xsDisableSelf();
@@ -2215,7 +1960,7 @@ inactive
 minInterval 27
 group Hathor
 {
-	createSimpleResearchPlan(cTechSundriedMudBrick, -1, cMilitaryEscrowID, 25);
+	createSimpleResearchPlan(cTechSundriedMudBrick, -1, cRootEscrowID, 25);
     xsDisableSelf();
 }
 
@@ -2229,7 +1974,7 @@ group Hathor
 {
     if ((kbGetAge() < cAge4) || (kbResourceGet(cResourceFood) < 1000))
 	return;
-	createSimpleResearchPlan(cTechMedjay, -1, cMilitaryEscrowID, 2);
+	createSimpleResearchPlan(cTechMedjay, -1, cRootEscrowID, 2);
     xsDisableSelf();
 }
 
@@ -2241,7 +1986,7 @@ inactive
 minInterval 31
 group Hathor
 {
-    if ((kbUnitCount(cMyID, cUnitTypePetsuchos, cUnitStateAlive) < 3)|| (kbResourceGet(cResourceWood) < 450))
+    if ((kbUnitCount(cMyID, cUnitTypePetsuchos, cUnitStateAlive) < 3)|| (kbResourceGet(cResourceWood) < 500))
 	return;
 	createSimpleResearchPlan(cTechCrocodopolis, -1, cMilitaryEscrowID, 10);
     xsDisableSelf();
@@ -2277,27 +2022,17 @@ group Sekhmet
 }
 
 //==============================================================================
-// RULE: getStonesOfRedLinen // cPlanResearch is not working with this one for some reason, so we'll have to manually research it and give it 10 attempts at max.
+// RULE: getStonesOfRedLinen
 //==============================================================================
 rule getStonesOfRedLinen
 inactive
 minInterval 31
 group Sekhmet
 {
-    if ((kbGetAge() < cAge4) || (kbUnitCount(cMyID, cUnitTypeCatapult, cUnitStateAlive) < 1))
+    if (kbUnitCount(cMyID, cUnitTypeCatapult, cUnitStateAlive) < 1)
 	return;
-    if (kbGetTechStatus(cTechStonesofRedLinen) == cTechStatusAvailable)
-    {
-	    static int Attempt = 0;
-        int SiegeCamp = findUnit(cUnitTypeSiegeCamp, cUnitStateAlive, -1, cMyID); 
-		if ((SiegeCamp > 0) && (kbResourceGet(cResourceWood) > 350) && (kbResourceGet(cResourceFavor) > 30) && (kbGetTechStatus(cTechStonesofRedLinen) < cTechStatusResearching))
-        {
-			aiTaskUnitResearch(SiegeCamp, cTechStonesofRedLinen);  
-			Attempt = Attempt + 1;
-		}
-        if (Attempt > 9)	
-        xsDisableSelf();
-	}
+    createSimpleResearchPlan(cTechStonesofRedLinen, cUnitTypeSiegeCamp, cMilitaryEscrowID, 25);
+	xsDisableSelf();
 }
 
 //==============================================================================
@@ -2414,7 +2149,7 @@ minInterval 36 //starts in cAge1
     
     if ((kbGetAge() < cAge4) || (kbUnitCount(cMyID, cUnitTypeUlfsark, cUnitStateAlive) < 5) || (kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive) < 10))
 	return;
-	createSimpleResearchPlan(cTechLoneWanderer, -1, cMilitaryEscrowID, 5);
+	createSimpleResearchPlan(cTechLoneWanderer, -1, cRootEscrowID, 5);
     xsDisableSelf();
 }
 
@@ -2425,9 +2160,9 @@ rule getEyesInTheForest
 inactive
 minInterval 36 //starts in cAge1
 {
-    if (kbGetAge() < cAge4)
+    if (kbGetAge() < cAge3)
 	return;
-	createSimpleResearchPlan(cTechEyesintheForest, -1, cMilitaryEscrowID, 5);
+	createSimpleResearchPlan(cTechEyesintheForest, -1, cRootEscrowID, 5);
     xsDisableSelf();
 }
 
@@ -2445,7 +2180,7 @@ group Heimdall
     if (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching)
 	return;
 
-	createSimpleResearchPlan(cTechSafeguard, -1, cMilitaryEscrowID, 25);
+	createSimpleResearchPlan(cTechSafeguard, -1, cRootEscrowID, 25);
 	xsDisableSelf();
 }
 
@@ -2549,7 +2284,7 @@ minInterval 23
 {
     if (kbGetAge() < cAge3)
 	return;
-    createSimpleResearchPlan(cTechChannels, -1, cEconomyEscrowID, 2);
+    createSimpleResearchPlan(cTechChannels, -1, cRootEscrowID, 2);
     xsDisableSelf();
 }
 
@@ -2563,7 +2298,7 @@ minInterval 23
 {
     if (kbResourceGet(cResourceWood) < 800)
 	return;
-    createSimpleResearchPlan(cTechFocus, -1, cMilitaryEscrowID, 1);
+    createSimpleResearchPlan(cTechFocus, -1, cRootEscrowID, 1);
     xsDisableSelf();
 }
 
@@ -2588,7 +2323,7 @@ minInterval 23
     if ((woodSupply < 250) || (favorSupply < 15))
 	return;
     
-    createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 40);
+    createSimpleResearchPlan(techID, -1, cRootEscrowID, 40);
 	xsDisableSelf();
 }
 
@@ -2624,8 +2359,8 @@ inactive
 minInterval 29
 group Rheia
 {
-    createSimpleResearchPlan(cTechHornsofConsecration, -1, cMilitaryEscrowID, 20);
-	createSimpleResearchPlan(cTechRheiasGift, -1, cMilitaryEscrowID, 25);
+    createSimpleResearchPlan(cTechHornsofConsecration, -1, cRootEscrowID, 20);
+	createSimpleResearchPlan(cTechRheiasGift, -1, cRootEscrowID, 25);
     xsDisableSelf();
 }
 
@@ -2640,7 +2375,7 @@ group Theia
 {
     if ((kbResourceGet(cResourceGold) < 250) || (kbResourceGet(cResourceFood) < 300))
 	return;
-    createSimpleResearchPlan(cTechLemurianDescendants, -1, cMilitaryEscrowID, 20);
+    createSimpleResearchPlan(cTechLemurianDescendants, -1, cRootEscrowID, 20);
     xsDisableSelf();
 }
 //==============================================================================
@@ -2697,7 +2432,7 @@ inactive
 minInterval 27
 group Atlas
 {
-    createSimpleResearchPlan(cTechTitanShield, -1, cMilitaryEscrowID, 25);
+    createSimpleResearchPlan(cTechTitanShield, -1, cRootEscrowID, 25);
     xsDisableSelf();
 }
 
@@ -2732,9 +2467,9 @@ group Atlas
 
 //Hekate
 //==============================================================================
-// RULE: getMythicRejuvenation
+// RULE: getHekateMisc
 //==============================================================================
-rule getMythicRejuvenation
+rule getHekateMisc
 inactive
 minInterval 27
 group Hekate
@@ -2742,23 +2477,9 @@ group Hekate
     if (kbUnitCount(cMyID, cUnitTypeMythUnit, cUnitStateAlive) < 3)
 	return;
     createSimpleResearchPlan(cTechMythicRejuvenation, -1, cMilitaryEscrowID, 25);
+	createSimpleResearchPlan(cTechCelerity, -1, cMilitaryEscrowID, 15);
     xsDisableSelf();
 }
-
-//==============================================================================
-// RULE: getCelerity
-//==============================================================================
-rule getCelerity
-inactive
-minInterval 29
-group Hekate
-{
-    if (kbUnitCount(cMyID, cUnitTypeMythUnit, cUnitStateAlive) < 3)
-	return;
-    createSimpleResearchPlan(cTechCelerity, -1, cMilitaryEscrowID, 15);
-    xsDisableSelf();
-}
-
 //==============================================================================
 // RULE: getAsperBlood
 //==============================================================================
@@ -2776,9 +2497,9 @@ group Hekate
 
 //Helios
 //==============================================================================
-// RULE: getPetrified
+// RULE: getHeliosMisc
 //==============================================================================
-rule getPetrified
+rule getHeliosMisc
 inactive
 minInterval 29
 group Helios
@@ -2786,6 +2507,7 @@ group Helios
     if(kbUnitCount(cMyID, cUnitTypeAbstractSiegeWeapon, cUnitStateAlive) < 2)
 	return;	
     createSimpleResearchPlan(cTechPetrified, -1, cMilitaryEscrowID, 15);
+	createSimpleResearchPlan(cTechHalooftheSun, cUnitTypePalace, cMilitaryEscrowID, 15);
     xsDisableSelf();
 }
 //==============================================================================
@@ -2804,26 +2526,14 @@ inactive
 minInterval 30
 {
     float foodSupply = kbResourceGet(cResourceFood);
-    if (foodSupply < 1000)
+    if ((foodSupply < 1000) || (kbGetAge() < cAge3))
 	return;
     createSimpleResearchPlan(cTechAcupuncture, -1, cEconomyEscrowID, 5);
     xsDisableSelf();
 }
 
 //FuXi
-//==============================================================================
-// RULE: getDomestication
-//==============================================================================
-rule getDomestication
-inactive
-minInterval 50
-{
-    float woodSupply = kbResourceGet(cResourceWood);
-    if (woodSupply < 1000)
-	return;
-    createSimpleResearchPlan(cTechDomestication, -1, cEconomyEscrowID, 1);
-    xsDisableSelf();
-}
+// not worth it, unless they adjust the base food value of Herdables to 51.
 
 //Shennong
 //==============================================================================
@@ -2836,7 +2546,6 @@ minInterval 25
     createSimpleResearchPlan(cTechWheelbarrow, -1, cEconomyEscrowID, 75);
     xsDisableSelf();	
 }
-
 
 //age2
 //Chang'e
@@ -2870,7 +2579,7 @@ group Huangdi
 {
     
     float woodSupply = kbResourceGet(cResourceWood);
-    if ((kbGetAge() < cAge3 && woodSupply < 900) || (kbUnitCount(cMyID, cUnitTypeTerracottaSoldier, cUnitStateAlive) < 3))
+    if ((kbGetAge() < cAge3 && woodSupply < 600) || (kbUnitCount(cMyID, cUnitTypeTerracottaSoldier, cUnitStateAlive) < 3))
 	return;
     createSimpleResearchPlan(cTechStoneArmor, -1, cMilitaryEscrowID, 1);
     xsDisableSelf();	
@@ -2899,7 +2608,7 @@ minInterval 45
 group Dabogong
 {
     float foodSupply = kbResourceGet(cResourceFood);
-	if ((foodSupply < 500) || (kbGetAge() < cAge4))
+	if ((foodSupply < 600) || (kbGetAge() < cAge4))
 	return;
     createSimpleResearchPlan(cTechLandlordSpirit, -1, cEconomyEscrowID, 10);
     xsDisableSelf();	
@@ -3047,11 +2756,7 @@ inactive
 minInterval 27
 group Aokuang
 {
-    if (gTransportMap == false)
-    {
-        xsDisableSelf();
-        return;
-	}
+    if (gTransportMap == true)
 	createSimpleResearchPlan(cTechEastSea, -1, cMilitaryEscrowID, 10);
 	xsDisableSelf();
 }
@@ -3074,11 +2779,8 @@ minInterval 37 //starts in cAge2
     if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
 	return;
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	{
-		if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
-		aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
-		return;
-	}		
+	return;
+
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
 }
 
@@ -3103,11 +2805,7 @@ minInterval 37 //starts in cAge2 activated in getStoneWall
 	}
 	
     if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	{
-		if ((kbCanAffordTech(techID, cMilitaryEscrowID) == true) && (kbGetTechStatus(techID) < cTechStatusResearching))
-		aiTaskUnitResearch(findUnit(cUnitTypeGate), techID);
-		return;
-	}
+    return;
     
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     if (numFortresses < 1)

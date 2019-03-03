@@ -956,12 +956,12 @@ inactive
     
     if ((alreadyStarted == false) && (kbGetAge() < cAge2))
     {
-        if ((goldSupply < 50) && (kbGetAge() < cAge2) || (goldSupply < 300) && (cMyCulture == cCultureAtlantean))
+        if ((goldSupply < 50) && (kbGetAge() < cAge2) || (cMyCulture == cCultureAtlantean))
 		return;
 	}
     else
     {
-        if (goldSupply < 150)
+        if ((goldSupply < 150) || (alreadyStarted == false) && (kbUnitCount(cMyID, cUnitTypeAge2Building, cUnitStateAliveOrBuilding) < 2) && (cMyCulture == cCultureAtlantean))
 		return;
 	}
 	if (myVillagers < MinVil)
@@ -2206,7 +2206,7 @@ inactive
         aiPlanSetActive(planID);
 		return;
 	}
-	if (gTransportMap == true)
+	if ((gTransportMap == true) || (kbResourceGet(cResourceGold) < 300) || (kbResourceGet(cResourceWood) < 400))
 	return;
 	
 	// Local base is covered, now let's check near our Most Hated Player's TC
@@ -2371,8 +2371,8 @@ inactive
 	
 	if (TryMB == true)
 	{
-    otherBaseUnitID = mainBaseID;
-    location = kbBaseGetLocation(cMyID, otherBaseUnitID);
+    otherBaseID = mainBaseID;
+    location = kbBaseGetLocation(cMyID, otherBaseID);
     int numFortressesNearMainBase = getNumUnits(bigBuildingID, cUnitStateAliveOrBuilding, -1, cMyID, location, 60.0);
     if (numFortressesNearMainBase > 4)
     {
@@ -2387,7 +2387,7 @@ inactive
     if (planID >= 0)
     {
         aiPlanSetVariableInt(planID, cBuildPlanBuildingTypeID, 0, bigBuildingID);
-        aiPlanSetVariableInt(planID, cBuildPlanMaxRetries, 0, 5);
+        aiPlanSetVariableInt(planID, cBuildPlanMaxRetries, 0, 8);
         aiPlanSetVariableBool(planID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
         aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionValue, 0, 0.0);
         aiPlanSetVariableFloat(planID, cBuildPlanInfluenceBuilderPositionDistance, 0, 5.0);
@@ -2952,7 +2952,7 @@ minInterval 47 //starts in cAge1
 	int numBuilders = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
 	int MilBuildings = kbUnitCount(cMyID, cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAliveOrBuilding);
 	
-    if ((kbGetAge() < cAge2)|| (kbGetAge() >= cAge2) && (woodSupply < 450) && (cMyCulture != cCultureEgyptian) || (MilBuildings < 3))
+    if ((kbGetAge() < cAge2)|| (kbGetAge() >= cAge2) && (woodSupply < 450) && (cMyCulture != cCultureEgyptian) || (MilBuildings < 4))
 	return;
     
     xsSetRuleMinIntervalSelf(47);
@@ -3662,7 +3662,7 @@ inactive
 	
     if (kbGetAge() == cAge2)
     {
-        if ((currentWood < 300) || (currentGold < 600))
+        if ((currentWood < 500) || (currentGold < 700))
 		return;
 	}
     else if (kbGetAge() == cAge3)
@@ -3948,7 +3948,7 @@ inactive
         return;
 	}
     else
-	xsSetRuleMinIntervalSelf(25);
+	xsSetRuleMinIntervalSelf(20);
 	
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
     if (activeBuildPlans > 0)
@@ -3992,8 +3992,8 @@ inactive
         aiPlanSetVariableFloat(farmBuildPlan, cBuildPlanInfluenceUnitDistance, 0, 25);    
 		aiPlanSetVariableFloat(farmBuildPlan, cBuildPlanInfluenceUnitValue, 0, 25.0);   
         aiPlanSetVariableVector(farmBuildPlan, cBuildPlanInfluencePosition, 0, backLocation);
-        aiPlanSetVariableFloat(farmBuildPlan, cBuildPlanInfluencePositionDistance, 0, 10);     
-        aiPlanSetVariableFloat(farmBuildPlan, cBuildPlanInfluencePositionValue, 0, 10.0);        		
+        aiPlanSetVariableFloat(farmBuildPlan, cBuildPlanInfluencePositionDistance, 0, 30);     
+        aiPlanSetVariableFloat(farmBuildPlan, cBuildPlanInfluencePositionValue, 0, 30.0);        		    		
 		//
 		
         aiPlanSetVariableBool(farmBuildPlan, cBuildPlanInfluenceAtBuilderPosition, 0, false);
@@ -4187,24 +4187,8 @@ inactive
 			aiPlanSetDesiredPriority(planID, 20);
 			aiPlanAddUnitType(planID, cBuilderType, 1, 1, 1);
 			aiPlanSetEscrowID(planID, cRootEscrowID);
-			
-			//If we don't have the query yet, create one.
-			if (unitQueryID < 0)
-			unitQueryID=kbUnitQueryCreate("My Settlement Query");
-			
-			//Define a query to get all matching units
-			if (unitQueryID != -1)
-			{
-				kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-				kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSettlement);
-				kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-			}
-			
-			
-			kbUnitQueryResetResults(unitQueryID);
-			int numberFound=kbUnitQueryExecute(unitQueryID);
-			int unit=kbUnitQueryGetResult(unitQueryID, aiRandInt(numberFound));
-			
+
+			int unit = findUnit(cUnitTypeAbstractSettlement);
 			int unitBaseID=kbBaseGetMainID(cMyID);
 			if (unit != -1)
 			{

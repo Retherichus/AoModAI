@@ -1168,7 +1168,6 @@ bool military=false, bool economy=true, int escrowID=-1, int baseID=-1, int numb
         aiPlanSetActive(planID);
 	}
 }
-
 //==============================================================================
 int getSoftPopCap(void) //Calculate our pop limit if we had all houses built
 {
@@ -1436,7 +1435,37 @@ vector calcMonumentPos(int which=-1)
     pos = basePos+pos;
     return(pos);
 }
-
+//==============================================================================
+bool AgingUp() 
+{
+    if (kbGetTechStatus(gAge2MinorGod) == cTechStatusResearching)
+	return(true);
+    if (kbGetTechStatus(gAge3MinorGod) == cTechStatusResearching)
+	return(true);
+    if (kbGetTechStatus(gAge4MinorGod) == cTechStatusResearching)
+	return(true);
+    if (kbGetTechStatus(cTechSecretsoftheTitans) == cTechStatusResearching)
+	return(true);			
+    return(false);
+}
+bool ShouldIAgeUp()
+{
+	bool YesOrNo = false;
+	if ((kbGetAge() > cAge3) || (kbGetAge() == cAge1) || (AgingUp() == true))
+	return(YesOrNo);
+	
+	for (i=0; < cNumberPlayers)
+	{
+		if ((i == cMyID) || (kbIsPlayerAlly(i) == true))
+		continue;
+		if (kbGetAgeForPlayer(i) > kbGetAge())
+		{
+			YesOrNo = true;
+			break;
+		}
+	}
+	return(YesOrNo);
+}
 //==============================================================================
 void taskMilUnitTrainAtBase(int baseID = -1)
 {
@@ -1705,7 +1734,7 @@ void taskMilUnitTrainAtBase(int baseID = -1)
 		}
 	}
     
-    if (puid == -1)
+    if ((puid == -1) || (kbCanAffordUnit(puid, cMilitaryEscrowID) == false) && (ShouldIAgeUp() = true))
     {
         if (ShowAiEcho == true) aiEcho("puid == -1, returning");
         return;
@@ -1779,38 +1808,7 @@ int findClosestUnitTypeByLoc(int Relevance = cPlayerRelationEnemy, int UnitType 
 }
 // Thank you, "Artifical Zoo"!. .I hope you don't mind me using your stuff. :)
 
-//==============================================================================
-bool AgingUp() 
-{
-    if (kbGetTechStatus(gAge2MinorGod) == cTechStatusResearching)
-	return(true);
-    if (kbGetTechStatus(gAge3MinorGod) == cTechStatusResearching)
-	return(true);
-    if (kbGetTechStatus(gAge4MinorGod) == cTechStatusResearching)
-	return(true);
-    if (kbGetTechStatus(cTechSecretsoftheTitans) == cTechStatusResearching)
-	return(true);			
-    return(false);
-}
 
-bool ShouldIAgeUp()
-{
-	bool YesOrNo = false;
-	if ((kbGetAge() > cAge3) || (kbGetAge() == cAge1) || (AgingUp() == true))
-	return(YesOrNo);
-	
-	for (i=0; < cNumberPlayers)
-	{
-		if ((i == cMyID) || (kbIsPlayerAlly(i) == true))
-		continue;
-		if (kbGetAgeForPlayer(i) > kbGetAge())
-		{
-			YesOrNo = true;
-			break;
-		}
-	}
-	return(YesOrNo);
-}
 
 //==============================================================================
 vector GetMilGatherOrBase (bool Mil = true)
@@ -1881,9 +1879,10 @@ int createDefOrAttackPlan(string Name = "INVALID", bool DefendPlan = true, int E
 			aiPlanSetUnitStance(PlanID, cUnitStanceDefensive);
 			aiPlanSetVariableBool(PlanID, cDefendPlanPatrol, 0, false);
 			
-			aiPlanSetNumberVariableValues(PlanID, cDefendPlanAttackTypeID, 2, true);
-			aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 0, cUnitTypeUnit);
-			aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 1, cUnitTypeBuilding);
+			aiPlanSetNumberVariableValues(PlanID, cDefendPlanAttackTypeID, 3, true);
+			aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 0, cUnitTypeAbstractVillager);
+			aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 1, cUnitTypeUnit);
+			aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 2, cUnitTypeBuilding);
 			if (Prio != -1)
 			aiPlanSetDesiredPriority(PlanID, Prio);
 			
@@ -1916,9 +1915,10 @@ int createDefOrAttackPlan(string Name = "INVALID", bool DefendPlan = true, int E
             else
 	        aiPlanSetVariableBool(PlanID, cAttackPlanAutoUseGPs, 0, true);			
 			
-			aiPlanSetNumberVariableValues(PlanID, cAttackPlanTargetTypeID, 2, true);
-            aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 0, cUnitTypeUnit);
-            aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 1, cUnitTypeBuilding);
+			aiPlanSetNumberVariableValues(PlanID, cAttackPlanTargetTypeID, 3, true);
+			aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);
+            aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
+            aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
 			if (Prio != -1)
 			aiPlanSetDesiredPriority(PlanID, Prio);
 			
@@ -1942,7 +1942,7 @@ bool IsTechActive(int TechID = -1)
 //==============================================================================
 //createSimpleResearchPlan
 //==============================================================================
-int createSimpleResearchPlan(int techID=-1, int buildingID=-1, int escrowID=cRootEscrowID, int pri = 50, bool progress = false, bool Override = false)
+int createSimpleResearchPlan(int techID=-1, int buildingType=-1, int escrowID=cRootEscrowID, int pri = 50, bool progress = false, bool Override = false)
 {
     
 	string ReadableTech = kbGetTechName(techID);
@@ -1971,8 +1971,8 @@ int createSimpleResearchPlan(int techID=-1, int buildingID=-1, int escrowID=cRoo
 		}
 		else
 		aiPlanSetVariableInt(planID, cResearchPlanTechID, 0, techID);
-		if (buildingID != -1)
-		aiPlanSetVariableInt(planID, cResearchPlanBuildingID, 0, buildingID);
+		if (buildingType != -1)
+		aiPlanSetVariableInt(planID, cResearchPlanBuildingTypeID, 0, buildingType);
 		aiPlanSetDesiredPriority(planID, pri);
 		aiPlanSetEscrowID(planID, escrowID);
         aiPlanAddUserVariableInt(planID, 0, "TechInfo", 3);

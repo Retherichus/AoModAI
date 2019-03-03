@@ -93,7 +93,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     {
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
-        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 12);
+        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 8);
         aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceGold);
         aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
         return (true);
@@ -1735,7 +1735,7 @@ inactive
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 35.0);
-	if (NumTreesMB <= 20)
+	if (NumTreesMB <= 10)
 	JustCastIt = true;
     static int count = 0;
     bool autoCast = aiPlanGetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0);

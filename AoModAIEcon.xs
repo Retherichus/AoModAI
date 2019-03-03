@@ -68,7 +68,7 @@ inactive
 	if (cMyCulture == cCultureAtlantean)
 	desiredWoodPlans = 1 + (woodGathererCount/4);
 
-	if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) || (xsGetTime() < 8*60*1000))
+	if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) || (kbGetAge() == cAge2) && (kbUnitCount(cMyID,cUnitTypeAge2Building, cUnitStateAlive) < 3))
     desiredWoodPlans = 1;
 	
     if (woodGathererCount < desiredWoodPlans)
@@ -227,7 +227,7 @@ inactive
 	if (desiredGoldPlans >= 2)
 	desiredGoldPlans = 2;
 	
-	if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) || (xsGetTime() < 10*60*1000))
+	if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) || (kbGetAge() == cAge2) && (kbUnitCount(cMyID,cUnitTypeAge2Building, cUnitStateAlive) < 3))
     desiredGoldPlans = 1;
     
 	if (goldGathererCount < desiredGoldPlans)
@@ -338,8 +338,6 @@ inactive
     int otherFarmPriority = 88;
     if ((cMyCulture == cCultureNorse) && (kbGetAge() < cAge2))
 	aggressivePriority = 66; // above wood/gold so it doesn't steal the oxcart
-    else if (kbGetAge() < cAge2)
-    aggressivePriority = 45;
 
     int numFarms = kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive);
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
@@ -358,8 +356,8 @@ inactive
     int gathererCount = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
     
-    if (foodGathererCount <= 0) //always some units on food
-	foodGathererCount = 1;
+    if (foodGathererCount <= 2) //always some units on food
+	foodGathererCount = 2;
 
 	MoreFarms = foodGathererCount; // Update build more farms
 	if (MoreFarms >= 32)
@@ -528,7 +526,7 @@ inactive
 
     if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 2*60*1000)))   // can build farms
     {
-        if ((totalNumberResourceSpots < 2) || (totalAmount <= (500 + 50*foodGathererCount)) || (gFarming == true) || (kbGetAge() >= cAge3) || (aiGetWorldDifficulty() == cDifficultyNightmare))
+        if ((totalNumberResourceSpots < 2) || (totalAmount <= 1500) || (gFarming == true) || (kbGetAge() >= cAge3) || (aiGetWorldDifficulty() == cDifficultyNightmare))
         {
 	        static bool FirstTime = true;
             if (cMyCulture == cCultureAtlantean)
@@ -573,16 +571,13 @@ inactive
     }	
 	
 	int numPlansWanted = 2;
-    bool LimitPlans = false;
 	int farmThreshold = 20;
     if (cMyCulture == cCultureAtlantean)
     farmThreshold = 7;
     
 	if ((gFarming == true) && (farmerReserve >= farmThreshold))
-    {
-        numPlansWanted = 1;
-        LimitPlans = true;
-    }		
+    numPlansWanted = 1;
+
     if (unassigned <= 0)
     {
         if (kbGetAge() < cAge3)
@@ -602,7 +597,8 @@ inactive
     if ((kbGetAge() == cAge1) && (numTemples < 1) || (numHouses < 1) || (unassigned < numPlansWanted) || (kbGetAge() == cAge1) && (cMyCulture == cCultureNorse))
     {
         numPlansWanted = 1;
-        LimitPlans = true;
+		if ((cMyCulture == cCultureAtlantean) && (aiGetMinNumberNeedForGatheringAggressives() > 1))
+		numberAggressiveResourceSpots = 0;
     }
 	
     if (unassigned <= 0)
@@ -612,32 +608,15 @@ inactive
 	
     if (numPlansWanted > totalNumberResourceSpots)
     numPlansWanted = totalNumberResourceSpots;
-    /*
-	//try to preserve plans unless LimitPlans is active.
-	if ((LimitPlans == false) && (kbGetAge() < cAge3))
-	{
-        int numFoodPlans = 0;
-        int aEasy = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeEasy);
-        int aAgg = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHuntAggressive);
-        if (aEasy > 0)
-        numFoodPlans = numFoodPlans + aEasy;
-	    if (aEasy > 0)
-		numFoodPlans = numFoodPlans + aAgg;
-	
-        if ((numPlansWanted > 0) && (numPlansWanted < numFoodPlans))
-        numPlansWanted = numFoodPlans;
-		if (numPlansWanted > 2)
-		numPlansWanted = 2;
-    }
-    */
+
     int numPlansUnassigned = numPlansWanted;
     int minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives();
-	if (cMyCulture == cCultureAtlantean)
-	minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives();
+
+    int HuntPlanState = aiPlanGetState(findPlanByString("AutoGPFoodHuntAggressive"));
     // Start a new plan if we have enough villies and we have the resource.
     // If we have a plan open, don't kill it as long as we are within 2 of the needed min...the plan will steal from elsewhere.
     if ((numPlansUnassigned > 0) && (numberAggressiveResourceSpots > 0)
-    && (unassigned > minVillsToStartAggressive) || (numAggressivePlans > 0) && (unassigned >= minVillsToStartAggressive - 2))
+    && (unassigned > minVillsToStartAggressive) || (numAggressivePlans > 0) && (HuntPlanState > 0) &&(unassigned >= minVillsToStartAggressive - 2))
     {
 		aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumFoodPlans, cAIResourceSubTypeHuntAggressive, 1);
 		aggHunters = aiGetMinNumberNeedForGatheringAggressives(); // This plan will over-grab due to high priority
@@ -1218,7 +1197,7 @@ void econAge2Handler(int age=1)
 	
     // Set escrow caps
     kbEscrowSetCap(cEconomyEscrowID, cResourceFood, 900.0);    // Age 3
-	kbEscrowSetCap(cEconomyEscrowID, cResourceWood, 300.0);
+	kbEscrowSetCap(cEconomyEscrowID, cResourceWood, 400.0);
 	kbEscrowSetCap(cEconomyEscrowID, cResourceGold, 600.0);    // Age 3
     kbEscrowSetCap(cEconomyEscrowID, cResourceFavor, 30.0);
     kbEscrowSetCap(cMilitaryEscrowID, cResourceFood, 200.0);

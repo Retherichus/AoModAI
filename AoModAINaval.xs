@@ -183,7 +183,7 @@ inactive
 	
 	//Figure out the min/max number of warships we want.
 	int minShips=2;
-	int maxShips=0;
+	int maxShips=1;
 	if (numberEnemyWarships >= 0)
 	{
 		//Build at most 2 ships on easy.
@@ -245,20 +245,17 @@ inactive
 	{
 		if (maxShips <= 2)
 		{
-			kbUnitPickSetMinimumNumberUnits(gNavalUPID, 1);
-			kbUnitPickSetMaximumNumberUnits(gNavalUPID, 1);
-			kbUnitPickSetMinimumPop(gNavalUPID, 1);
-			kbUnitPickSetMaximumPop(gNavalUPID, 4);
+			kbUnitPickSetMinimumNumberUnits(gNavalUPID, 2);
+			kbUnitPickSetMaximumNumberUnits(gNavalUPID, 5);
+			kbUnitPickSetMinimumPop(gNavalUPID, 2);
+			kbUnitPickSetMaximumPop(gNavalUPID, 10);
 		}
 		else
 		{
 			kbUnitPickSetMinimumNumberUnits(gNavalUPID, 2);
 			kbUnitPickSetMaximumNumberUnits(gNavalUPID, maxShips);
 			kbUnitPickSetMinimumPop(gNavalUPID, minShips);
-			if (kbGetAge() < cAge3)
 			kbUnitPickSetMaximumPop(gNavalUPID, maxShips*2);
-			else
-			kbUnitPickSetMaximumPop(gNavalUPID, maxShips*1.5);
 		}
 		return;
 	}
@@ -323,7 +320,6 @@ inactive
 	}
 	kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeMythUnit, 0.8);	
 	
-	
 	//Create the attack goal.
 	gNavalAttackGoalID=createSimpleAttackGoal("Naval Attack", -1, gNavalUPID, -1, kbGetAge(), -1, -1, false);
 	if (gNavalAttackGoalID < 0)
@@ -335,6 +331,8 @@ inactive
 	aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanSetAreaGroups, 0, false);
     aiPlanSetNumberVariableValues(gNavalAttackGoalID, cGoalPlanUpgradeBuilding, 1, true);
     aiPlanSetVariableInt(gNavalAttackGoalID, cGoalPlanUpgradeBuilding, 0, cUnitTypeDock);
+	aiPlanSetDesiredPriority(gNavalAttackGoalID, 91);
+	
 	int ArrowShip = -1;
 	if (cMyCulture == cCultureGreek)
 	{
@@ -358,7 +356,8 @@ inactive
 	}	
 	if (ArrowShip != -1)
 	ArrowShipMaintain = createSimpleMaintainPlan(ArrowShip, 2, false, kbBaseGetMainID(cMyID));
-
+	aiPlanSetDesiredPriority(ArrowShipMaintain, 100);
+	
 	xsEnableRule("FishBoatMonitor"); // looks for transport too
 	
 	if (gWaterExploreID == -1)

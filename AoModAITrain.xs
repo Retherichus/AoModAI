@@ -79,12 +79,9 @@ inactive
     if ((NumTcs > 1) && (IhaveAllies == true) || (kbGetAge() > cAge3) && (foodSupply > 1500))
 	tradeTargetPop = tradeTargetPop + 1 + NumTcs;
     
-    static bool firstRun = true;
-    if (firstRun == true)
-	unitTypeToTrain = tradeCartPUID;
-    else if (numTradeUnits < tradeTargetPop)
+    if (numTradeUnits < tradeTargetPop)
     {
-        if ((numTradeUnits < 5) && (foodSupply > 100))
+        if ((numTradeUnits < 3) && (foodSupply > 100))
 		unitTypeToTrain = tradeCartPUID;
         else
         {
@@ -92,34 +89,21 @@ inactive
 			unitTypeToTrain = tradeCartPUID;
 		}
 	}
-    
     if (unitTypeToTrain == -1)
     return;
 	
-    
     string planName = "Trade unit "+kbGetProtoUnitName(unitTypeToTrain)+" maintain";    
     int trainTradeUnitPlanID = aiPlanCreate(planName, cPlanTrain);
     if (trainTradeUnitPlanID < 0)
 	return;
 	
-    aiPlanSetMilitary(trainTradeUnitPlanID, true);
+	aiPlanSetEconomy(trainTradeUnitPlanID, true);
     aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanUnitType, 0, unitTypeToTrain);
-    if (firstRun == true)
-    {
-        if ((cMyCiv == cCivNuwa) && (kbGetAge() < cAge3))
-        aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 2);
-	    else
-		aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 5);
-        firstRun = false;
-        aiTaskUnitTrain(gTradeMarketUnitID, unitTypeToTrain);
-	}
-    else
-	{
-    if (numTradeUnits < tradeTargetPop - 3)
+    
+	if (numTradeUnits < tradeTargetPop - 3)
 	aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 2);
 	else
 	aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 1);
-	}
     
     aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanFrequency, 0, 10);    
     aiPlanSetBaseID(trainTradeUnitPlanID, mainBaseID);
@@ -127,7 +111,7 @@ inactive
     if (kbUnitGetCurrentHitpoints(gTradeMarketUnitID) > 0)
 	aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanBuildingID, 0, gTradeMarketUnitID);
     aiPlanSetVariableBool(trainTradeUnitPlanID, cTrainPlanUseMultipleBuildings, 0, false);
-    aiPlanSetDesiredPriority(trainTradeUnitPlanID, 100);
+    aiPlanSetDesiredPriority(trainTradeUnitPlanID, 96);
     aiPlanSetActive(trainTradeUnitPlanID);
 }
 
@@ -617,7 +601,7 @@ inactive
 				{
 					//Try to train a siege weapon via aiTaskUnitTrain
 					aiTaskUnitTrain(siegeWeaponBuildingIDNearMBInR60, siegeUnitType1);
-					if ((goldSupply > 700) && (woodSupply > 700) && (kbGetAge() >= cAge4)) // add an extra one
+					if ((goldSupply > 800) && (woodSupply > 800) && (kbGetAge() >= cAge4)) // add an extra one
 					aiTaskUnitTrain(siegeWeaponBuildingIDNearMBInR60, siegeUnitType1);
 					if (ShowAiEcho == true) aiEcho("Trying to train a siege weapon: "+siegeUnitType1+" at siegeWeaponBuildingIDNearMBInR60: "+siegeWeaponBuildingIDNearMBInR60);
 				}
@@ -635,16 +619,8 @@ inactive
     
 	if ((numSiegeUnitType1 < numSiegeUnitType1ToTrain) && (siegeUnitType1BeingTrained == false))
     {
-        if ((cMyCulture == cCultureAtlantean) && (kbGetAge() < cAge4))
-        {
-            if (((numSiegeUnitType1 < 2) && (foodSupply > 150) && (goldSupply > 150)) || ((foodSupply > 300) && (goldSupply > 300)))
-			unitTypeToTrain = siegeUnitType1;
-		}
-        else
-        {
-            if (((numSiegeUnitType1 < 1) && (woodSupply > 200) && (goldSupply > 200)) || ((woodSupply > 300) && (goldSupply > 300)))
-			unitTypeToTrain = siegeUnitType1;
-		}
+           if ((woodSupply > 300) && (goldSupply > 300))
+		   unitTypeToTrain = siegeUnitType1;
 	}
     
     if (unitTypeToTrain == -1)
@@ -670,108 +646,6 @@ inactive
     aiPlanSetActive(trainSiegeUnitPlanID);
     if (ShowAiEcho == true) aiEcho("Training a siege unit: "+kbGetProtoUnitName(unitTypeToTrain)+" at main base: "+mainBaseID);
 }
-
-//==============================================================================
-rule maintainHeroes
-minInterval 37 //starts in cAge1
-inactive
-{
-    if (ShowAiEcho == true) aiEcho("maintainHeroes:");
-    
-    int numTemples = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAlive);
-    if (numTemples < 1)
-	return;
-	
-    if (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching)
-	return;
-	
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    
-    int buildingIDToUse = -1;
-    int hero1ID = -1;
-    int hero2ID = -1;
-    
-    float requiredGold = 0.0;
-    float requiredFood = 0.0;
-    
-    if (cMyCulture == cCultureGreek)
-    {
-        buildingIDToUse = getMainBaseUnitIDForPlayer(cMyID);
-        requiredGold = 50.0;
-        requiredFood = 100.0;
-		
-        if (cMyCiv == cCivZeus)
-        {
-            hero1ID = cUnitTypeHeroGreekJason;
-            hero2ID = cUnitTypeHeroGreekOdysseus;
-		}
-        else if (cMyCiv == cCivPoseidon)
-        {
-            hero1ID = cUnitTypeHeroGreekTheseus;
-            hero2ID = cUnitTypeHeroGreekHippolyta;
-		}
-        else if (cMyCiv == cCivHades)
-        {
-            hero1ID = cUnitTypeHeroGreekAjax;
-            hero2ID = cUnitTypeHeroGreekChiron;
-		}
-	}
-    else if (cMyCulture == cCultureEgyptian)
-    {
-        buildingIDToUse = getMainBaseUnitIDForPlayer(cMyID);
-        requiredGold = 100.0;
-        hero1ID = cUnitTypePriest;
-	}
-    else if (cMyCulture == cCultureNorse)
-    {
-        //prefer temple near our mainbase
-        buildingIDToUse = findUnitByIndex(cUnitTypeTemple, 0, cUnitStateAlive, -1, cMyID, mainBaseLocation, 50.0);
-        if (buildingIDToUse == -1)  //if there's no temple near our mainbase, use a random temple
-		buildingIDToUse = findUnit(cUnitTypeTemple, cUnitStateAlive, -1, cMyID);
-        
-        requiredGold = 40.0;
-        requiredFood = 80.0;
-        hero1ID =  cUnitTypeHeroNorse;
-	}
-	if (xsGetTime() > 10*60*1000)
-    {
-		requiredFood = requiredFood * 2;
-		requiredGold = requiredGold * 2;
-	}	
-	
-    
-    float woodSupply = kbResourceGet(cResourceWood);
-    float foodSupply = kbResourceGet(cResourceFood);
-    float goldSupply = kbResourceGet(cResourceGold);
-    float favorSupply = kbResourceGet(cResourceFavor);
-	
-    int numHero1 = kbUnitCount(cMyID, hero1ID, cUnitStateAliveOrBuilding);
-    int numHero2 = kbUnitCount(cMyID, hero2ID, cUnitStateAliveOrBuilding);
-    int desiredNumHeroes = 1;
-    if (cMyCulture == cCultureNorse)
-	desiredNumHeroes = 2;
-    if (numHero1 < desiredNumHeroes)
-    {
-        if ((goldSupply > requiredGold) && (foodSupply > requiredFood))
-        {
-            aiTaskUnitTrain(buildingIDToUse, hero1ID);
-            if (ShowAiEcho == true) aiEcho("Attempting to train hero type:"+hero1ID+" at building with ID"+buildingIDToUse);
-		}
-	}
-    if ((cMyCulture == cCultureGreek) && (kbGetAge() > cAge1))
-    {
-        if (numHero2 < 1)
-        {
-            if ((woodSupply > 200) && (favorSupply > 2))
-            {
-                aiTaskUnitTrain(buildingIDToUse, hero2ID);
-                if (ShowAiEcho == true) aiEcho("Attempting to train hero type:"+hero2ID+" at building with ID"+buildingIDToUse);
-			}
-		}
-	}
-}
-
 //==============================================================================
 rule makeAtlanteanHeroes
 minInterval 20 //starts in cAge1
@@ -837,7 +711,6 @@ inactive
 		}
 	}
 	
-    
     int currentPop = kbGetPop();
     int numHumanSoldiers = kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive);
     int numMacemen = kbUnitCount(cMyID, cUnitTypeMaceman, cUnitStateAlive);
