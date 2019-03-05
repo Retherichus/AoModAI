@@ -15,6 +15,8 @@
 //you don't really want to touch this.. and if you do, you'll break stuff.
 //==============================================================================
 extern int fCitadelPlanID = -1;
+extern bool AutoDetectMap = false;
+extern bool NeedTransportCheck = false;
 extern int gShiftingSandPlanID= -1;
 mutable void wonderDeathHandler(int playerID=-1) { }
 extern bool gHuntingDogsASAP = false;     // Will automatically be called upon if there is hunt nearby the MB.
@@ -378,7 +380,7 @@ void initRethlAge1(void)  // Am I doing this right??
         aiSetMinNumberWantForGatheringAggressives(3);
 	}
 	
-	if ((cvMapSubType == VINLANDSAGAMAP) || (cRandomMapName == "islands"))
+	if ((cvMapSubType == VINLANDSAGAMAP) || (cRandomMapName == "islands") || (cvRandomMapName == "river styx"))
 	{
 		cvOkToBuildWalls = false;
 		bWallUp = false;
@@ -521,7 +523,7 @@ void initRethlAge2(void)
 // RULE ActivateRethOverridesAge 1-4
 //==============================================================================
 rule ActivateRethOverridesAge1
-minInterval 2
+minInterval 1
 active
 {
 	
@@ -530,6 +532,53 @@ active
 	aiResourceCheat(cMyID, cResourceWood, 0.1);
 	aiResourceCheat(cMyID, cResourceGold, 0.1);
 	
+	//Delayed map check, as kbUnitCount is restricted to visible targets only, until the first second of the game has passed.
+	if (AutoDetectMap == true)
+	{
+        bool Success = false;		
+        int transport = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+		int numSettlements = kbUnitCount(0, cUnitTypeAbstractSettlement, cUnitStateAny);
+		if ((kbUnitCount(cMyID, cUnitTypeBuilding, cUnitStateAlive) < 1) && (numSettlements > 0)) // check for nomad too?
+		{
+		    xsEnableRule("nomadSearchMode");
+			cvMapSubType = NOMADMAP;
+			if (ShowAiEcho == true) aiEcho("Map has been detected as a Nomad Map!");
+		}
+		if (NeedTransportCheck == true) 
+		{
+			for (k = 0; < cNumberPlayers)
+			{
+				int targetSettlementID = getMainBaseUnitIDForPlayer(k);
+				vector targetSettlementPos = kbUnitGetPosition(targetSettlementID);
+				if ((targetSettlementID != -1) && (kbAreaGroupGetIDByPosition(targetSettlementPos) != kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)))) 
+				|| (kbUnitCount(cMyID, transport, cUnitStateAlive) > 0))
+				{
+					Success = true;
+					break;
+				}
+			}
+			if (Success == false) // check neutral Tcs
+			{
+				for (l = 0; < numSettlements)
+				{
+					int nTCID = findUnitByIndex(cUnitTypeAbstractSettlement, l, cUnitStateAny, -1, 0);
+					vector targetNeutralPos = kbUnitGetPosition(nTCID);
+					if ((nTCID != -1) && (kbAreaGroupGetIDByPosition(targetNeutralPos) != kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)))))
+					{
+						Success = true;
+						break;
+					}
+				}
+			}
+			if (Success == true)
+			{
+				gTransportMap = true;
+				aiSetWaterMap(gTransportMap == true);
+				gWaterMap = true;
+				if (ShowAiEcho == true) aiEcho("Transport is needed, because a player or a TC is on a different island!");
+			}
+		}
+	}
 	// Consider any of these below, as Aggressive Animals at the start of the game.
 	int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);

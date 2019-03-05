@@ -111,24 +111,10 @@ void preInitMap()
     {
         if (ShowAiEcho == true) aiEcho("This is an unknown map.");
         xsEnableRule("findFish");
+		AutoDetectMap = true;
 	    int WaterOnMap = kbAreaGetClosetArea(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)), cAreaTypeWater);
         if (WaterOnMap != -1)
-        {
-		    for (k = 1; < cNumberPlayers)
-	        {
-		        int fMainBaseUnitID = getMainBaseUnitIDForPlayer(k);
-		        int targetSettlementID = fMainBaseUnitID;
-		        vector targetSettlementPos = kbUnitGetPosition(targetSettlementID); // uses main TC
-		        if ((targetSettlementID != -1) && (kbAreaGroupGetIDByPosition(targetSettlementPos) != kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)))) 
-				|| (kbUnitCount(cMyID, transport, cUnitStateAlive) > 0))
-		        {
-	                gTransportMap = true;
-			    	if (ShowAiEcho == true) aiEcho("Transport is needed, because player "+k+" is on a different island!");
-			        break;
-		        }
-	        }	        
-
-	    }		
+		NeedTransportCheck = true;	            		
 	}	
     // find out what subtype the map is of
     if (cRandomMapName == "gold rush" ||
@@ -136,14 +122,6 @@ void preInitMap()
 	cRandomMapName == "treasure island" )
     {
         cvMapSubType = KOTHMAP;
-	}
-    else if ( cRandomMapName == "shimo archipelago" ||
-	cRandomMapName == "shimo alfheim" ||
-	cRandomMapName == "shimo mediterranean" ||
-	cRandomMapName == "shimo savannah" ||
-	cRandomMapName == "shimo midgard" )
-    {
-        cvMapSubType = SHIMOMAP;
 	}
     else if ( cRandomMapName == "vinlandsaga" ||
 	cRandomMapName == "team migration" ||
@@ -153,13 +131,6 @@ void preInitMap()
 	kbUnitCount(cMyID, transport, cUnitStateAlive) > 0) )
     {
         cvMapSubType = VINLANDSAGAMAP;
-	}
-    else if ( cRandomMapName == "nomad" ||
-	cRandomMapName == "nomad rivers" ||
-	cRandomMapName == "EPH Nomadic Arabia" ||
-	cRandomMapName == "land nomad")
-    {
-        cvMapSubType = NOMADMAP;
 	}
     else if ( cRandomMapName == "tos_northamerica-v1" ||
 	(cRandomMapName == "tos_northamerica") ||    
@@ -244,12 +215,6 @@ void initMapSpecific()
 		gHuntingDogsASAP = false;
 		IsRunHuntingDogs = true;
 	}
-    //Nomad.
-    else if (cvMapSubType == NOMADMAP)
-    {
-        xsEnableRule("nomadSearchMode");
-	}
-    //Make a scout plan to find the plenty vault
     else if (cvMapSubType == KOTHMAP)
     {
         if (ShowAiEcho == true) aiEcho("looking for KOTH plenty Vault");
@@ -293,11 +258,9 @@ void initMapSpecific()
 		}
         gVinlandsagaInitialBaseID=kbBaseGetMainID(cMyID);
         if (ShowAiEcho == true) aiEcho("Initial Base="+gVinlandsagaInitialBaseID);
-		
-        int transportPUID=cUnitTypeTransport;
-		
+
         // Move the transport toward map center to find continent quickly.
-        gTransportUnit = findUnit(transportPUID);
+        gTransportUnit = findUnit(cUnitTypeTransport);
         nearCenter = kbGetMapCenter();
         nearCenter = (nearCenter + kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) / 2.0;    // Halfway between start and center
         nearCenter = (nearCenter + kbGetMapCenter()) / 2.0;   // 3/4 of the way to map center
@@ -319,20 +282,6 @@ void initMapSpecific()
         xsDisableRule("fishing");
         //Pause the age upgrades.
         aiSetPauseAllAgeUpgrades(true);
-	}
-    else if ( cvMapSubType == SHIMOMAP )
-    {
-        gShimoKingID = findUnit(gShimoKingUnitTypeID);
-        if ( gShimoKingID >= 0 )
-        {
-            // TODO: no idea so far, what we could do on such map. Sadly, we cannot garrison our king. No way from
-            // script level :-(
-            // create defend plan?
-            // enable Rule to make king flee, if necessary!
-            int myFortress=findUnit(cUnitTypeAbstractFortress);
-		}
-        else
-		if (ShowAiEcho == true) aiEcho("Assumed Shimo map, but did not find king :-(");
 	}
 }
 

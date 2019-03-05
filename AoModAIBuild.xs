@@ -741,7 +741,7 @@ vector calcDockPos(int which=-1)
 //==============================================================================
 rule dockMonitor
 inactive
-minInterval 89 //starts in cAge1
+minInterval 87 //starts in cAge1
 {
     if (ShowAiEcho == true) aiEcho("dockMonitor:");
     
@@ -751,14 +751,14 @@ minInterval 89 //starts in cAge1
         return;
 	}
 	
-    if (( kbGetAge() < cAge3) && (xsGetTime() < 10*60*1000))
+    if (( kbGetAge() < cAge3) && (xsGetTime() < 8*60*1000))
 	return;
 	
     int numDocks = kbUnitCount(cMyID, cUnitTypeDock, cUnitStateAliveOrBuilding);
     int numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
 	
     int desiredDocks = 2;
-	if ((gNavalUPID == -1) && (gFishPlanID != -1))
+	if ((gNavalUPID == -1) && (gFishPlanID != -1) || (kbGetAge() == cAge2))
 	desiredDocks = 1;
 		
     // everything ok. we have enough docks
@@ -769,7 +769,7 @@ minInterval 89 //starts in cAge1
 	}
 	
     if (((numDocks >= kbGetAge()+1) && (numDocks >= numSettlements))
-	|| (aiPlanGetIDByTypeAndVariableType(cPlanBuild, cBuildPlanBuildingTypeID, cUnitTypeDock) >= 0) || (numDocks >= 3))
+	|| (findPlanByString("BuildDock", cPlanBuild) != -1) || (numDocks >= 3))
     {
         if (ShowAiEcho == true) aiEcho("(numDocks >= kbGetAge()+1 AND numDocks >= numSettlements) or another dockplan already active, returning");
         return;
@@ -795,7 +795,7 @@ minInterval 89 //starts in cAge1
 	}
 	
     if (ShowAiEcho == true) aiEcho("dockPos x="+xsVectorGetX(dockPos)+" z="+xsVectorGetZ(dockPos));
-	
+	aiEcho("dockMonitor:");
     int buildDock = aiPlanCreate("BuildDock", cPlanBuild);
     if (buildDock >= 0)
     {

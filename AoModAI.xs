@@ -485,7 +485,8 @@ active
         else if ((kbCanAffordUnit(gathererPUID, cEconomyEscrowID) == true) && (kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAliveOrBuilding) < VilPop) 
 		&& (kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive) > 0) && (AgingUp() == false) && (kbResourceGet(cResourceFood) < 300) 
         && (kbUnitCount(cMyID, gathererPUID, cUnitStateBuilding) == 1))
-        {	if ((cMyCulture != cCultureNorse) || (kbUnitCount(cMyID, cUnitTypeOxCart, cUnitStateAliveOrBuilding) > 1) && (kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAliveOrBuilding) > 1))
+        {
+		    if ((cMyCulture != cCultureNorse) || (kbUnitCount(cMyID, cUnitTypeOxCart, cUnitStateAliveOrBuilding) > 1) && (kbUnitCount(cMyID, cUnitTypeAbstractInfantry, cUnitStateAliveOrBuilding) > 1))
 			{
                 if(aiTaskUnitTrain(findUnit(cUnitTypeAbstractSettlement), gathererPUID))
                 FailedToTrain = 0;
@@ -3072,9 +3073,9 @@ void age2Handler(int age=1)
 	xsEnableRule("buildMBTower");
 	
     //Maintain a water transport, if this is a transport map.
-    if ((gTransportMap == true) && (gMaintainWaterXPortPlanID < 0) || (cvRandomMapName == "king of the hill"))
+    if ((gTransportMap == true) && (gMaintainWaterXPortPlanID < 0) || (cvRandomMapName == "king of the hill") && (KoTHWaterVersion == true))
     {
-        gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 0, false, -1);
+        gMaintainWaterXPortPlanID=createSimpleMaintainPlan(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0), 0, true, -1);
 		aiPlanSetDesiredPriority(gMaintainWaterXPortPlanID, 95);
 	}
 	
@@ -3803,7 +3804,7 @@ void resignHandler(int result =-1)
 
 //==============================================================================
 rule findFish   //We don't know if this is a water map...if you see fish, it is.
-minInterval 1 //starts in cAge1
+minInterval 2 //starts in cAge1
 active
 {
 	xsSetRuleMinIntervalSelf(25);
