@@ -469,7 +469,7 @@ inactive
 			
 		    if ((gTransportMap == false) && (planState == cPlanStateTransport))
 			{
-				aiErrorMessage("ERROR an attack plan is trying to transport!  ID: "+attackPlanID);
+				aiEcho("ERROR an attack plan is trying to transport!  ID: "+attackPlanID);
 				aiPlanAddUnitType(attackPlanID, cUnitTypeLogicalTypeLandMilitary, 0, 0, 0);  // try to kill
 			    if ((aiPlanGetNumberUnits(attackPlanID) < 1) && (aiPlanGetDesiredPriority(attackPlanID) == 1) && (aiPlanGetIDByTypeAndVariableType(cPlanTransport) == -1))
 				aiPlanDestroy(attackPlanID);				
