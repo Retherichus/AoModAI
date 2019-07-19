@@ -153,16 +153,7 @@ minInterval 30 //starts in cAge2
 inactive
 {
     int techID = cTechPurseSeine;
-    if (ShowAiEcho == true) aiEcho("getPurseSeine:");
-    
-    static int ruleStartTime = -1;
-    
-    if (ruleStartTime == -1)
-	ruleStartTime = xsGetTime();
-	
-    if ((kbUnitCount(cMyID, cUnitTypeUtilityShip, cUnitStateAlive) < 3) || (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (xsGetTime() - ruleStartTime < 5*60*1000))
-	return;
-    
+    if (ShowAiEcho == true) aiEcho("getPurseSeine:"); 
 	createSimpleResearchPlan(techID, -1, cEconomyEscrowID, 45, true);
 	xsDisableSelf();
 }
@@ -174,10 +165,6 @@ inactive
 {
     int techID = cTechSaltAmphora;
     if (ShowAiEcho == true) aiEcho("getSaltAmphora:");
-    
-    if (kbUnitCount(cMyID, cUnitTypeUtilityShip, cUnitStateAlive) < 3)
-	return;
-	
 	createSimpleResearchPlan(techID, -1, cEconomyEscrowID, 80, true);
 	xsDisableSelf();
 }

@@ -71,13 +71,13 @@ inactive
 	tradeTargetPop = cvMaxTradePop;
     int unitTypeToTrain = -1;
     
-    if (NumTcs >=4)
+    if (NumTcs >=5)
 	NumTcs = 5;
 	if ((aiGetWorldDifficulty() == cDifficultyNightmare) && (NumTcs >= 2))
 	NumTcs = 2;
 	
     if ((NumTcs > 1) && (IhaveAllies == true) || (kbGetAge() > cAge3) && (foodSupply > 1500))
-	tradeTargetPop = tradeTargetPop + 1 + NumTcs;
+	tradeTargetPop = tradeTargetPop + NumTcs;
     
     if (numTradeUnits < tradeTargetPop)
     {
@@ -208,7 +208,7 @@ inactive
 {
     if (ShowAiEcho == true) aiEcho("trainMythUnit:");
 	
-    if ((xsGetTime() < 15*60*1000) && (kbGetAge() < cAge3))
+    if (kbGetAge() < cAge3)
 	return;
     
     float foodSupply = kbResourceGet(cResourceFood);
@@ -222,7 +222,7 @@ inactive
 	}
     else
     {
-        if ((foodSupply > 600) && (goldSupply > 600))
+        if ((foodSupply > 400) && (goldSupply > 400))
 		return;
 	}
     
@@ -590,7 +590,7 @@ inactive
 	
     if ((siegeUnitType1BeingTrained == true) && (ShouldIAgeUp() == false))
 	{
-		if ((numSiegeUnitType1 < 1) && (goldSupply > 450) && (woodSupply > 450) && (kbGetAge() >= cAge3))
+		if ((numSiegeUnitType1 < 1) && (goldSupply > 500) && (woodSupply > 500) && (kbGetAge() >= cAge3))
 		{
 			int numSiegeWeaponBuildingsNearMBInR60 = getNumUnits(siegeWeaponBuildingType, cUnitStateAlive, -1, cMyID, mainBaseLocation, 100.0);
 			if ((numSiegeWeaponBuildingsNearMBInR60 > 0) && (kbGetPop() >= kbGetPopCap()*0.90) && (kbGetPopCap() >= 115) && (kbGetPop() >= 115))
@@ -614,8 +614,10 @@ inactive
     if (kbGetAge() > cAge3)
 	numSiegeUnitType1ToTrain = 4;
 	
-	if ((cMyCulture == cCultureNorse) && (siegeUnitType1 == cUnitTypePortableRam) || (cMyCulture == cCultureAtlantean) && (siegeUnitType1 == cUnitTypeFireSiphon)) // train some PortableRams or Siphons?
+	if ((siegeUnitType1 == cUnitTypePortableRam) || (siegeUnitType1 == cUnitTypeFireSiphon)) // train some PortableRams or Siphons?
 	numSiegeUnitType1ToTrain = 2;
+	else if (siegeUnitType1 == cUnitTypeSiegeTower)
+	numSiegeUnitType1ToTrain = 1;
     
 	if ((numSiegeUnitType1 < numSiegeUnitType1ToTrain) && (siegeUnitType1BeingTrained == false))
     {

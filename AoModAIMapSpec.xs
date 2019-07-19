@@ -185,7 +185,8 @@ void initMapSpecific()
 	}
     //Vinlandsaga.
     else if (cvMapSubType == VINLANDSAGAMAP)
-    {
+    {    
+        gpDelayMigration = true;
         //Enable the rule that looks for the mainland.
         xsEnableRule("findVinlandsagaBase");
         //Turn off auto dropsite building.
@@ -237,6 +238,8 @@ void initMapSpecific()
 		}
 		xsEnableRule("getKingOfTheHillVault");
         xsEnableRule("findFish");
+		if (KoTHWaterVersion == false)
+		xsEnableRule("BunkerUpThatWonder"); 
 	}
     //Water Nomad (this is sorta mixture between nomad and vinlandsaga)
     else if (cvMapSubType == WATERNOMADMAP)
@@ -293,16 +296,6 @@ inactive
     if (ShowAiEcho == true) aiEcho("findVinlandsagaBase:");
     //Save our initial base ID.
     gVinlandsagaInitialBaseID=kbBaseGetMainID(cMyID);
-	
-	static bool RunOnce = false;
-	if ((cMyCulture == cCultureEgyptian) && (RunOnce == false))
-	{
-		RunOnce = true;
-		int Pharaoh=findUnit(cUnitTypePharaoh, cUnitStateAlive, -1, cMyID);
-		int TC=findUnit(cUnitTypeDropsite, cUnitStateAliveOrBuilding, -1, cMyID);
-		if ((Pharaoh != -1) && (TC != -1))
-		aiTaskUnitWork(Pharaoh, TC);
-	}
     
 	//Get our initial location.
     vector location=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
@@ -323,7 +316,7 @@ inactive
         mainlandGroupID=kbFindAreaGroupByLocation(cAreaGroupTypeLand, 0.5, 0.5);  // Can fail if mountains at map center
 	}
     float easyAmount = kbGetAmountValidResources(gVinlandsagaInitialBaseID, cResourceFood, cAIResourceSubTypeEasy, 45);
-    if ((mainlandGroupID < 0) || (xsGetTime() < 1*60*1000) && (easyAmount >= 50) && (aiGetGameMode() != cGameModeDeathmatch))
+    if ((mainlandGroupID < 0) || (xsGetTime() < 2*60*1000) && (easyAmount >= 50) && (aiGetGameMode() != cGameModeDeathmatch))
 	return;
 	
     if (ShowAiEcho == true) aiEcho("findVinlandsagaBase: Found the mainland, AGID="+mainlandGroupID+".");
@@ -345,6 +338,7 @@ inactive
 		aiPlanSetVariableInt(mainlandBaseGID, cGoalPlanDoneGoal, 0, callbackGID);
 	}
     //Done.
+	gpDelayMigration = false;
     xsDisableSelf();
 }  
 
@@ -502,7 +496,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
 	
     //change the farming baseID
     gFarmBaseID=kbBaseGetMainID(cMyID);
-	
+	ResourceBaseID = CreateBaseInBackLoc(kbBaseGetMainID(cMyID), 10, 100, "Temp Resource Base");
     //Allow auto dropsites again.
     aiSetAllowAutoDropsites(true);
     aiSetAllowBuildings(true);
@@ -559,7 +553,7 @@ minInterval 20 //starts in cAge1
 	if (goalAreaID == -1)
 	goalAreaID = kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)));
 
-    transportAllUnitsID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 88, gVinlandsagaInitialBaseID);
+    transportAllUnitsID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 100, gVinlandsagaInitialBaseID);
     if ( transportAllUnitsID >= 0 )
     {
         aiPlanSetVariableBool(transportAllUnitsID, cTransportPlanReturnWhenDone, 0, true);
@@ -571,7 +565,9 @@ minInterval 20 //starts in cAge1
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeScout, 1, 1, 1);
 		if (cMyCulture == cCultureNorse)
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeOxCart, 1, 1, 1);
-        aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 0, 0, 2);	
+	    if (cMyCiv == cCivSet)
+		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHyenaofSet, 0, 1, 1);
+        aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 0, 1, 2);	
 	    aiPlanAddUnitType(transportAllUnitsID, cUnitTypeFlyingUnit, 0, 0, 0);
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHerdable, 0, 0, 0);		
         aiPlanSetActive(transportAllUnitsID);
@@ -799,6 +795,7 @@ minInterval 1 //starts in cAge1
             {
                 kbBaseDestroy(cMyID, oldMainBase);
                 kbBaseSetMain(cMyID, kbUnitGetBaseID(tc),true);
+	            ResourceBaseID = CreateBaseInBackLoc(kbUnitGetBaseID(tc), 40, 85, "Temp Resource Base");
 			}
             if (ShowAiEcho == true) aiEcho("TC is in base "+kbUnitGetBaseID(tc));
             if (ShowAiEcho == true) aiEcho("New main base is "+kbBaseGetMainID(cMyID));
@@ -877,6 +874,7 @@ bool mapPreventsWalls() //some maps do not allow walls or it doesn't make sense 
 	cRandomMapName == "daemonwood" ||
 	cRandomMapName == "black forest" ||
 	cRandomMapName == "holy mountain" ||
+	cRandomMapName == "black sea"  ||
 	cvMapSubType == VINLANDSAGAMAP ||		
 	cRandomMapName == "akIslandDom" )
     {

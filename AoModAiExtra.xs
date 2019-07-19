@@ -20,6 +20,9 @@ extern bool NeedTransportCheck = false;
 extern int gShiftingSandPlanID= -1;
 mutable void wonderDeathHandler(int playerID=-1) { }
 extern bool gHuntingDogsASAP = false;     // Will automatically be called upon if there is hunt nearby the MB.
+extern bool RiverSLowBoar = false;
+extern bool RetardedLowBoarSpawn = false;
+extern bool gpDelayMigration = false;
 extern int gGardenBuildLimit = 0;
 extern int wonderBPID = -1;
 extern bool IsRunHuntingDogs = false;
@@ -44,6 +47,7 @@ extern int mChineseImmortal = -1;
 extern int eChineseHero = -1;
 extern int cMonkMaintain = -1;
 extern int StuckTransformID = 0;
+extern int ResourceBaseID = -1;
 extern bool HasHumanAlly = false;
 extern int gExaminationID = -1;
 extern int MigrationAreaID = -1;
@@ -53,6 +57,7 @@ extern const int Tellothers = 30;
 extern const int admiralTellothers = 31;
 extern const int AttackTarget = 35;
 extern const int cEmergency = 38;
+extern const int cLowPriority = 39;
 extern const int VectorData = 40;
 extern bool ChangeMHP = false;
 extern int MHPTime = 0;
@@ -90,13 +95,13 @@ extern bool ShowAIComms = false;
 //There's also a small description on all of them, to make it a little easier to understand what happens when you set it to true.
 //==============================================================================
 extern bool mCanIDefendAllies = true;     // Allows the AI to defend his allies.
-extern bool gWallsInDM = true;            // This allows the Ai to build walls in the gametype ''Deathmatch''.
+extern bool gWallsInDM = true;            // This allows the Ai to build walls in the game mode ''Deathmatch''.
 extern bool gAgeReduceMil = false;         // This will lower the amount of military units the AI will train until Mythic Age, this will also help the AI to advance a little bit faster, more configs below.
 extern bool bWallUp = true;              // This ensures that the Ai will build walls, regardless of personality.
 
 extern bool CanIChat = true;              // This will allow the Ai to send chat messages, such as asking for help if it's in danger.
 extern bool bHouseBunkering = true;       // Makes the Ai bunker up towers with Houses.
-extern bool bWallAllyMB = true;          // Walls up TC for human allies, only the team captain can do this and Mainbases are skipped.
+extern bool bWallAllyMB = true;          // Walls up TCs for human allies, only the team captain can do this and MBs are skipped.
 extern bool bWallCleanup = true;          // Prevents the AI from building small wall pieces inside of gates and/or deletes them if one were to slip through the check.
 
 //For gAgeReduceMil when true.
@@ -234,7 +239,7 @@ void Comms(int PlayerID = -1)
 				    int Building = cUnitTypeTower;
 					if ((cMyCulture == cCultureAtlantean) && (kbGetTechStatus(cTechAge4Helios) == cTechStatusActive) && (kbUnitCount(cMyID, cUnitTypeTowerMirror, cUnitStateAliveOrBuilding) < 10))
 					Building = cUnitTypeTowerMirror;	
-					if ((aiRandInt(4) < 3) && (kbCanAffordUnit(MyFortress, cMilitaryEscrowID) == true))
+					if ((aiRandInt(4) < 3) && (kbCanAffordUnit(MyFortress, cMilitaryEscrowID) == true) && (kbUnitCount(cMyID, MyFortress, cUnitStateAliveOrBuilding) < 10))
 					Building = MyFortress;
 					aiPlanSetVariableInt(TowerPlan, cBuildPlanBuildingTypeID, 0, Building);
 					aiPlanSetVariableInt(TowerPlan, cBuildPlanMaxRetries, 0, 5);
@@ -263,7 +268,9 @@ void Comms(int PlayerID = -1)
 			return;
             int AmountToSend = 0.0;
 			float Percentage = 0.30;
-			if (IsTechActive(cTechAmbassadors) == true)
+			if (iUserData == cLowPriority)
+			Percentage = 0.20;
+			else if (IsTechActive(cTechAmbassadors) == true)
 			Percentage = 0.40;
 			
             switch(iPromptType)
@@ -446,7 +453,18 @@ void initRethlAge2(void)
 		    else if (cMyCiv == cCivRa)
 			xsEnableRule("getSkinOfTheRhino");	
 		    else if (cMyCiv == cCivSet)
-			xsEnableRule("getFeral");
+			{ 
+			    xsEnableRule("getFeral");
+				int Hyena = createSimpleMaintainPlan(cUnitTypeHyenaofSet, 1, false, kbBaseGetMainID(cMyID));
+				aiPlanSetDesiredPriority(Hyena, 20);
+			}
+			if (cMyCiv != cCivSet)
+			{
+				int Spearman = createSimpleMaintainPlan(cUnitTypeSpearman, 1, false, kbBaseGetMainID(cMyID));
+				aiPlanSetDesiredPriority(Spearman, 20);				
+		        gAirScout = cUnitTypeSpearman;
+                xsEnableRule("airScout1");	
+            }			
 			break;
 		}
 		case cCultureNorse:
@@ -468,7 +486,11 @@ void initRethlAge2(void)
 		    else if (cMyCiv == cCivOuranos)
 		    xsEnableRule("buildSkyPassages");
 		    else if (cMyCiv == cCivKronos)
-			xsEnableRule("getFocus");		
+			xsEnableRule("getFocus");
+			int Turma = createSimpleMaintainPlan(cUnitTypeJavelinCavalry, 1, false, kbBaseGetMainID(cMyID));
+			aiPlanSetDesiredPriority(Turma, 20);			
+		    gAirScout = cUnitTypeJavelinCavalry;
+            xsEnableRule("airScout1");		
 			break;
 		}
 		case cCultureChinese:
@@ -480,6 +502,8 @@ void initRethlAge2(void)
 		    xsEnableRule("getAcupuncture");	
 		    else if (cMyCiv == cCivShennong)
 		    xsEnableRule("getWheelbarrow");
+	        else if (cMyCiv == cCivFuxi)
+	        xsEnableRule("rSpeedUpBuilding");		
 		    aiPlanSetVariableInt(mChineseImmortal, cTrainPlanNumberToMaintain, 0, 8);
 		    aiPlanSetDesiredPriority(mChineseImmortal, 91);		
 			break;
@@ -517,7 +541,8 @@ void initRethlAge2(void)
     //Try to transport stranded Units.
 	if (gTransportMap == true)
 	xsEnableRule("TransportBuggedUnits");
-}	
+
+}
 
 //==============================================================================
 // RULE ActivateRethOverridesAge 1-4
@@ -532,13 +557,25 @@ active
 	aiResourceCheat(cMyID, cResourceWood, 0.1);
 	aiResourceCheat(cMyID, cResourceGold, 0.1);
 	
+	int mainBaseID = kbBaseGetMainID(cMyID);
 	//Delayed map check, as kbUnitCount is restricted to visible targets only, until the first second of the game has passed.
+	if ((cvRandomMapName == "river styx") && (cMyCulture != cCultureEgyptian))
+	{
+		int Boars = NumUnitsOnAreaGroupByRel(true, kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))), cUnitTypeBoar, 0);
+		if (Boars < 6)
+		{
+			RiverSLowBoar = true;
+			if (Boars < 5)
+			RetardedLowBoarSpawn = true;
+		}
+	}
+	
 	if (AutoDetectMap == true)
 	{
         bool Success = false;		
         int transport = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
 		int numSettlements = kbUnitCount(0, cUnitTypeAbstractSettlement, cUnitStateAny);
-		if ((kbUnitCount(cMyID, cUnitTypeBuilding, cUnitStateAlive) < 1) && (numSettlements > 0)) // check for nomad too?
+		if ((mainBaseID == -1) && (kbUnitCount(cMyID, cUnitTypeBuilding, cUnitStateAlive) < 1) && (numSettlements > 0)) // check for nomad too?
 		{
 		    xsEnableRule("nomadSearchMode");
 			cvMapSubType = NOMADMAP;
@@ -579,8 +616,8 @@ active
 			}
 		}
 	}
+
 	// Consider any of these below, as Aggressive Animals at the start of the game.
-	int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
 	int numberAggressiveResourceSpots = kbGetNumberValidResources(mainBaseID, cResourceFood, cAIResourceSubTypeHuntAggressive, 85);
 	int FakeAggressives = getNumUnits(cUnitTypeAnimalPrey, cUnitStateAny, -1, 0, mainBaseLocation, 85);
@@ -592,6 +629,13 @@ active
 	
 	if ((gBuildWallsAtMainBase == true) && (mRusher == false) && (cvOkToBuildWalls == true))
 	xsEnableRule("mainBaseAreaWallTeam1");
+    if (cMyCulture == cCultureEgyptian)
+	xsEnableRule("EarlyPharaoh");
+    if ((mainBaseID >= 0) && (cvMapSubType != VINLANDSAGAMAP))
+	{
+	    ResourceBaseID = CreateBaseInBackLoc(mainBaseID, 30, 100, "Temp Resource Base");
+	}
+
 	xsDisableSelf();	   
 }
 
@@ -637,8 +681,10 @@ active
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge2Prometheus) == cTechStatusActive)
         xsEnableRuleGroup("Prometheus");
         if (cMyCulture == cCultureAtlantean && kbGetTechStatus(cTechAge2Okeanus) == cTechStatusActive)
-	    xsEnableRuleGroup("Oceanus");
-		
+		{
+	        xsEnableRuleGroup("Oceanus");
+			int oMedic = createSimpleMaintainPlan(cUnitTypeFlyingMedic, 1, false, kbBaseGetMainID(cMyID));
+	    }
 		xsEnableRule("activateObeliskClearingPlan"); // this also looks for villagers, don't get confused by the name.
 		if (aiGetWorldDifficulty() != cDifficultyEasy)
 		xsEnableRule("LaunchAttacks"); // try to get them running more often, if pop/mil is within reason etc.
@@ -655,8 +701,7 @@ active
         //GREEK MINOR GOD SPECIFIC
 		if (cMyCulture == cCultureGreek && kbGetTechStatus(cTechAge3Aphrodite) == cTechStatusActive)
         xsEnableRuleGroup("Aphrodite");
-        //if (cMyCulture == cCultureGreek && kbGetTechStatus(cTechAge3Dionysos) == cTechStatusActive)
-        //xsEnableRuleGroup("Dionysos");
+
         if (cMyCulture == cCultureGreek && kbGetTechStatus(cTechAge3Apollo) == cTechStatusActive)
 		xsEnableRuleGroup("Apollo");
 	
@@ -677,8 +722,11 @@ active
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge3Sekhmet) == cTechStatusActive)
         xsEnableRuleGroup("Sekhmet");
         if (cMyCulture == cCultureEgyptian && kbGetTechStatus(cTechAge3Hathor) == cTechStatusActive)
-		xsEnableRuleGroup("Hathor");
-		
+		{
+	        xsEnableRuleGroup("Hathor");
+			if (gTransportMap == true)
+			int hRoc = createSimpleMaintainPlan(cUnitTypeRoc, 1, false, kbBaseGetMainID(cMyID));
+	    }			
 		
 		//Norse MINOR GOD SPECIFIC
         if (cMyCulture == cCultureNorse && kbGetTechStatus(cTechAge3Skadi) == cTechStatusActive)
@@ -729,11 +777,11 @@ active
 		}
 		if (cMyCulture == cCultureNorse)
 		{
-        	kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeJarl, 0.8+aiRandInt(3));
+        	kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeJarl, 0.8+upAV(3));
 			if (cMyCiv == cCivOdin)
 			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeHuskarl, 1.0);
 			else
-			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeHuskarl, 0.8+aiRandInt(3));
+			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeHuskarl, 0.8+upAV(3));
         }
 		if (aiGetWorldDifficulty() != cDifficultyEasy)
 		{
@@ -851,7 +899,7 @@ active
 		// Unit picker
 		
 		if (cMyCiv == cCivZeus)
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMyrmidon, 0.5+aiRandInt(4));
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeMyrmidon, 0.5+upAV(4));
 		if (cMyCiv == cCivSet)
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeCrocodileofSet, 0.05);
 		if (cMyCulture == cCultureChinese)
@@ -861,13 +909,13 @@ active
 			else kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeFireLance, 1.0);
 		}
 		if (cMyCulture == cCultureNorse)
-		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractArcher, 0.8+aiRandInt(3)); // Ok to Bogsveigir now
+		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeAbstractArcher, 0.8+upAV(3)); // Ok to Bogsveigir now
 	
 		if (cMyCulture == cCultureAtlantean)
 		{
-			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeTridentSoldier, 0.6+aiRandInt(5));
+			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeTridentSoldier, 0.6+upAV(5));
 			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeArcherAtlantean, 1.0);
-			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+aiRandInt(4));
+			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeRoyalGuard, 0.5+upAV(4));
 		}		
 		//		
 		xsDisableSelf();  
@@ -1247,7 +1295,7 @@ group HateScripts
 		(kbUnitIsType(unitID, cUnitTypeAbstractInfantry)) && (kbUnitIsType(enemyID, cUnitTypeFireLanceShennong) == true) ||
 		(kbUnitIsType(unitID, cUnitTypeAbstractInfantry)) && (kbUnitIsType(enemyID, cUnitTypeChieroballista) == true) ||
 		(kbUnitIsType(unitID, cUnitTypeHeroChineseMonk)) || (kbUnitIsType(unitID, cUnitTypeHeroRagnorok)) || 
-		(kbUnitIsType(unitID, cUnitTypePriest)) || (kbUnitIsType(unitID, cUnitTypeAbstractPharaoh)) ||(kbUnitIsType(unitID, cUnitTypeMythUnit)))
+		(kbUnitIsType(unitID, cUnitTypePriest)) || (kbUnitIsType(unitID, cUnitTypeAbstractPharaoh)) || (kbUnitIsType(unitID, cUnitTypeMythUnit)))
 		continue;
 		int NumBSelf = getNumUnits(cUnitTypeBuilding, cUnitStateAlive, -1, cMyID, unitLoc, 36.0);
 		int NumBAllies = getNumUnitsByRel(cUnitTypeBuilding, cUnitStateAlive, -1, cPlayerRelationAlly, unitLoc, 36.0, true);
@@ -1648,8 +1696,8 @@ group HateScripts
 		int enemyID = findClosestUnitTypeByLoc(cPlayerRelationEnemy, UnitToCounter, unitLoc, Range);
         if ((kbUnitIsType(enemyID, cUnitTypeSettlement) == true) || (kbUnitIsType(enemyID, cUnitTypeAbstractFarm) == true) 
 		|| (kbUnitIsType(enemyID, cUnitTypeHealingSpringObject) == true) || (kbUnitIsType(enemyID, cUnitTypePlentyVault) == true)
-		|| (kbUnitIsType(enemyID, cUnitTypeHesperidesTree) == true))
-		continue;		
+		|| (kbUnitIsType(enemyID, cUnitTypeHesperidesTree) == true) || (kbUnitIsType(unitID, cUnitTypeChieroballista)))
+		continue;
 		if(enemyID > -1)
 	    aiTaskUnitWork(unitID, enemyID);
 	}		
@@ -1969,6 +2017,39 @@ inactive
     if (Success == true)
     xsSetRuleMinIntervalSelf(2);	
 }
+
+//==============================================================================
+rule RemoveTooCloseDocks
+minInterval 6
+inactive
+{
+	int unitTypeID = cUnitTypeDock;
+	int UnitsFound = kbUnitCount(cMyID, unitTypeID, cUnitStateAlive);
+	if (UnitsFound < 1)
+	return;
+    bool Success = false;
+	for (i=0; < UnitsFound)
+	{
+		int unitID = findUnitByIndex(unitTypeID, i, cUnitStateAlive);
+		vector unitLoc = kbUnitGetPosition(unitID);
+		int BadDocks = kbUnitCount(cMyID, unitTypeID, cUnitStateBuilding);
+		for (j=0; < BadDocks)
+		{		
+			int BadDock = findUnitByIndex(unitTypeID, j, cUnitStateBuilding, -1, cMyID, unitLoc, 15);
+			if (BadDock != unitID)
+			{
+				aiTaskUnitDelete(BadDock);
+				Success = true;
+			}
+		}		
+		
+	}
+	if (Success == true)
+	{
+	    xsSetRuleMinInterval("dockMonitor", 8);
+		xsEnableRule("dockMonitor");
+	}
+}
 //==============================================================================
 rule TransportBuggedUnits  
 minInterval 10
@@ -2126,10 +2207,10 @@ inactive
 {
 	int mainBaseID = kbBaseGetMainID(cMyID);
 	vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-	int numEnemyMilUnitsNearMBInR80 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, 100.0, true);
+	int numEnemyMilUnitsNearMBInR80 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, 80.0, true);
 	vector defPlanDefPoint = aiPlanGetVariableVector(gDefendPlanID, cDefendPlanDefendPoint, 0);
-	int numEnemyMilUnitsNearDefPlan = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, defPlanDefPoint, 100.0, true);
-	int numEnemyTitansNearMBInR85 = getNumUnitsByRel(cUnitTypeAbstractTitan, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, 85.0, true);
+	int numEnemyMilUnitsNearDefPlan = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, defPlanDefPoint, 70.0, true);
+	int numEnemyTitansNearMBInR85 = getNumUnitsByRel(cUnitTypeAbstractTitan, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, 90.0, true);
 	int LandAActive = findPlanByString("landAttackPlan", cPlanAttack);
 	int SettlementAActive = findPlanByString("enemy settlement attack plan", cPlanAttack);
 	
@@ -2140,31 +2221,31 @@ inactive
 	
 	
 	if ((numEnemyTitansNearMBInR85 > 0) || (numEnemyMilUnitsNearMBInR80 > 10) || (numEnemyMilUnitsNearDefPlan > 10) || (kbGetAge() == cAge2) && (LandAActive > 0)
-	|| (LandAActive > 0) && (SettlementAActive > 0) || (kbGetAge() == cAge2) && (xsGetTime() >= 16*60*1000))
+	|| (LandAActive > 0) && (SettlementAActive > 0) || (kbGetAge() == cAge2) && (xsGetTime() >= 15*60*1000))
 	return;
 	
 	if (ReadyToAttack() == true)
 	{
 		if ((LandAActive < 0) && (SettlementAActive != -1) || (kbGetAge() == cAge2))
 		{
-			xsSetRuleMinInterval("createLandAttack", 3);
+			xsSetRuleMinInterval("createLandAttack", 2);
 			xsEnableRule("createLandAttack");
 		}
 		else if ((SettlementAActive < 0) && (LandAActive != -1))	
 		{  
-			xsSetRuleMinInterval("attackEnemySettlement", 3);
+			xsSetRuleMinInterval("attackEnemySettlement", 2);
 			xsEnableRule("attackEnemySettlement");	
 		}
 		else
 		{
 			if (aiRandInt(3) == 0)
 			{
-				xsSetRuleMinInterval("attackEnemySettlement", 3);
+				xsSetRuleMinInterval("attackEnemySettlement", 2);
 				xsEnableRule("attackEnemySettlement");	
 			}
 			else
 			{
-				xsSetRuleMinInterval("createLandAttack", 3);
+				xsSetRuleMinInterval("createLandAttack", 2);
 				xsEnableRule("createLandAttack");	
 			}
 		}
@@ -2234,6 +2315,19 @@ inactive
 			}
 		}
 	}
+}
+
+rule EarlyPharaoh  
+minInterval 5
+inactive
+{
+	int Pharaoh = findUnit(cUnitTypePharaoh, cUnitStateAlive, cActionIdle, cMyID);
+	int TC = findUnit(cUnitTypeDropsite, cUnitStateBuilding, -1, cMyID);
+	if (TC == -1)
+	TC = findUnit(cUnitTypeDropsite, cUnitStateAliveOrBuilding, -1, cMyID);
+	if ((Pharaoh != -1) && (TC != -1))
+	aiTaskUnitWork(Pharaoh, TC);	
+    xsDisableSelf();
 }
 //==============================================================================
 //Testing ground

@@ -148,7 +148,7 @@ inactive
 					}
 				}
 				
-				aiPlanSetVariableFloat(defendPlanID, cDefendPlanEngageRange, 0, 54.0);  //just a little less, keepUnitsWithinRange will pull them farther back
+				aiPlanSetVariableFloat(defendPlanID, cDefendPlanEngageRange, 0, 60.0);  //just a little less, keepUnitsWithinRange will pull them farther back
 				keepUnitsWithinRange(defendPlanID, defPlanDefPoint);
 				continue;
 			}
@@ -379,10 +379,6 @@ inactive
 							xsSetRuleMinInterval("defendBaseUnderAttack", 1);
 							xsDisableRule("defendBaseUnderAttack");
 							aiPlanDestroy(defendPlanID);
-							
-							aiPlanDestroy(gDefendPlanID);
-							gDefendPlanID = -1;
-							xsDisableRule("defendPlanRule");
 							gBaseUnderAttackID = -1;
 							
 							xsSetRuleMinInterval("defendPlanRule", 2);
@@ -407,7 +403,7 @@ minInterval 7 //starts in cAge2
 inactive
 {
     if (ShowAiEcho == true) aiEcho("* monitorAttackPlans:");
-    
+    xsSetRuleMinIntervalSelf(7);
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     int numEnemyMilUnitsNearMBInR85 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, 85.0, true);
@@ -462,9 +458,6 @@ inactive
             int numAlliedMilUnitsNearAttPlan = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, attPlanPosition, 50.0, true);
             int numEnemyMilUnitsNearAttPlan = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, attPlanPosition, 30.0, true);
             int numEnemyBuildingsThatShootNearAttPlanInR25 = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, attPlanPosition, 25.0, true);
-			int NumVar = aiPlanGetNumberUserVariableValues(attackPlanID, 0);
-			int SpecialNum = aiPlanGetUserVariableInt(attackPlanID, 0, 0);
-			int	TimeActive = aiPlanGetUserVariableInt(attackPlanID, 0, 1);
             
             int numTitansInPlan = aiPlanGetNumberUnits(attackPlanID, cUnitTypeAbstractTitan);
             int numMilUnitsInPlan = aiPlanGetNumberUnits(attackPlanID, cUnitTypeLogicalTypeLandMilitary);
@@ -473,6 +466,29 @@ inactive
             static int killRandomAttPlanCount = -1;
             static int killRaidAttPlanCount = -1;
             static int killLandAttPlanCount = -1;
+			
+		    if ((gTransportMap == false) && (planState == cPlanStateTransport))
+			{
+				aiErrorMessage("ERROR an attack plan is trying to transport!  ID: "+attackPlanID);
+				aiPlanAddUnitType(attackPlanID, cUnitTypeLogicalTypeLandMilitary, 0, 0, 0);  // try to kill
+			    if ((aiPlanGetNumberUnits(attackPlanID) < 1) && (aiPlanGetDesiredPriority(attackPlanID) == 1) && (aiPlanGetIDByTypeAndVariableType(cPlanTransport) == -1))
+				aiPlanDestroy(attackPlanID);				
+                aiPlanSetDesiredPriority(attackPlanID, 1);		
+				xsSetRuleMinIntervalSelf(2);
+                for (h = 0; < 2)
+                {
+					int TransportPlanID = aiPlanGetIDByTypeAndVariableType(cPlanTransport);
+				    if (TransportPlanID != -1)
+					{
+					    aiEcho(" Found plan to destroy:  "+TransportPlanID);
+						aiPlanAddUnitType(TransportPlanID, cUnitTypeLogicalTypeLandMilitary, 0, 0, 0);  // try to kill
+						aiPlanSetDesiredPriority(TransportPlanID, 1);	
+						aiPlanDestroy(TransportPlanID);
+						xsSetRuleMinIntervalSelf(2);
+						
+					}
+				}
+			}			
             
             if (attackPlanID == gEnemySettlementAttPlanID)
             {
@@ -811,13 +827,6 @@ inactive
                 {
                     aiPlanAddUnitType(attackPlanID, cUnitTypeLogicalTypeLandMilitary, 200, 200, 200);
                     aiPlanSetDesiredPriority(attackPlanID, 99);
-					
-                    aiPlanDestroy(gDefendPlanID);
-                    aiPlanDestroy(gMBDefPlan1ID);
-                    aiPlanDestroy(gOtherBase1DefPlanID);
-                    aiPlanDestroy(gOtherBase2DefPlanID);
-                    aiPlanDestroy(gOtherBase3DefPlanID);
-                    aiPlanDestroy(gOtherBase4DefPlanID);
                     continue;
 				}
 			}
@@ -955,7 +964,7 @@ inactive
     if ((gBaseUnderAttackID != -1) && (equal(gBaseUnderAttackLocation, cInvalidVector) == false) && (numAttEnemyMilUnitsNearMBInR60 < 7))
     {
         baseToUse = gBaseUnderAttackID;
-	}
+	}	
 	
     bool defendPlanActive = false;
     int activeDefPlans = aiPlanGetNumber(cPlanDefend, -1, true);
@@ -981,8 +990,9 @@ inactive
                     if ((numEnemyTitansNearMBInR80 > 0) || (enemySettlementsAtDefPlanDefPoint - motherNatureSettlementsAtDefPlanDefPoint > 0)
 					|| ((numAttEnemyMilUnitsNearMBInR80 > 10) && (numAttEnemyMilUnitsNearMBInR80 > myMilUnitsNearMBInR80 * 1.3)))
                     {
-                        aiPlanDestroy(defendPlanID);
-                        gDefendPlanID = -1;
+                        
+						aiPlanSetVariableVector(defendPlanID, cDefendPlanDefendPoint, 0, kbBaseGetLocation(cMyID, baseToUse));
+			            aiPlanSetBaseID(defendPlanID, baseToUse);
                         xsSetRuleMinIntervalSelf(2);
                         if (ShowAiEcho == true) aiEcho("destroying current gDefendPlanID and restarting defendPlanRule");
                         return;
@@ -996,8 +1006,6 @@ inactive
     if (defendPlanActive == true)
     return;
 	
-	if (gTransportMap == true)
-    baseToUse = mainBaseID;
     int defPlanID = createDefOrAttackPlan("Defend plan #"+defendCount, true, 80, 30, kbBaseGetLocation(cMyID, baseToUse), baseToUse, 20, false);
     if (defPlanID != -1)
     {
@@ -1083,13 +1091,10 @@ inactive
 	
     static bool alreadyInAge3 = false;
     Vector Temp = cInvalidVector;
-    if ((kbGetAge() == cAge3) && (alreadyInAge3 == false))
+    if ((kbGetAge() >= cAge3) && (alreadyInAge3 == false))
     {
         alreadyInAge3 = true;
-        aiPlanDestroy(gMBDefPlan1ID);
-        gMBDefPlan1ID = -1;
 		xsSetRuleMinIntervalSelf(20);
-        if (ShowAiEcho == true) aiEcho("destroying gMBDefPlan1ID");
 	}
 	
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -1125,14 +1130,14 @@ inactive
 					
 				}
 			    aiPlanSetVariableVector(gMBDefPlan1ID, cDefendPlanDefendPoint, 0, kbBaseGetLocation(cMyID, mainBaseID));
-			    aiPlanSetVariableFloat(gMBDefPlan1ID, cDefendPlanGatherDistance, 0, 25.0);
+			    aiPlanSetVariableFloat(gMBDefPlan1ID, cDefendPlanGatherDistance, 0, 30.0);
                 if (ShowAiEcho == true) aiEcho("mainBaseDefPlan1 exists: ID is "+defendPlanID);
                 return;
 			}
 		}
 	}
 	
-    int mainBaseDefPlan1ID = createDefOrAttackPlan("mainBaseDefPlan1", true, 50, 25, kbBaseGetLocation(cMyID, mainBaseID), mainBaseID, 40, false);
+    int mainBaseDefPlan1ID = createDefOrAttackPlan("mainBaseDefPlan1", true, 60, 30, kbBaseGetLocation(cMyID, mainBaseID), mainBaseID, 40, false);
     if (mainBaseDefPlan1ID != -1)
     {
         if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
@@ -1140,7 +1145,9 @@ inactive
 		
 		if (gAge2MinorGod == cTechAge2Okeanus)
 		aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeFlyingMedic, 1, 1, 1);
-	    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeLogicalTypeLandMilitary, 0, 2, 2);
+		if ((gAge3MinorGod == cTechAge3Hathor) && (gTransportMap == true))
+		aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeRoc, 1, 1, 1);	
+	    aiPlanAddUnitType(mainBaseDefPlan1ID, cUnitTypeLogicalTypeLandMilitary, 0, 8, 8);
         aiPlanSetActive(mainBaseDefPlan1ID);
         gMBDefPlan1ID = mainBaseDefPlan1ID;
         if (ShowAiEcho == true) aiEcho("mainBaseDefPlan1 set active: "+gMBDefPlan1ID);
@@ -1473,7 +1480,8 @@ inactive
 	}
     
     vector newBaseUnitPosition = kbUnitGetPosition(newBaseUnitID);
-    
+    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+	
     int number = -1;      // For plan numbering
     if (otherBase1DefPlan == false)
 	number = 1;
@@ -1487,6 +1495,9 @@ inactive
     int otherBaseDefPlanID = createDefOrAttackPlan("otherBase"+number+"DefPlan", true, 40, 15, newBaseUnitPosition, newBaseID, 25, false);
     if (otherBaseDefPlanID != -1)
     {
+        int distanceToMainBase = xsVectorLength(mainBaseLocation - newBaseUnitPosition);
+        if (distanceToMainBase >= 120)
+        aiPlanAddUnitType(otherBaseDefPlanID, cUnitTypeHumanSoldier, 0, 2, 2);
         aiPlanSetActive(otherBaseDefPlanID);
         if (otherBase1DefPlan == false)
 		gOtherBase1DefPlanID = otherBaseDefPlanID;
@@ -1515,38 +1526,9 @@ inactive
     xsSetRuleMinIntervalSelf(120);
     else
 	xsSetRuleMinIntervalSelf(29);	
-    int numSiegeWeapons = kbUnitCount(cMyID, cUnitTypeAbstractSiegeWeapon, cUnitStateAlive);
     int numTitans = kbUnitCount(cMyID, cUnitTypeAbstractTitan, cUnitStateAlive);
-    static bool ResetOk = false;
-	
-	int SiegeMU = 0;
-	int SiegeMU2 = 0;
-	
-	if (cMyCulture == cCultureGreek)
-	SiegeMU = cUnitTypeColossus;
-	else if (cMyCulture == cCultureEgyptian)
-	{
-		SiegeMU = cUnitTypeScarab;
-		SiegeMU2 = cUnitTypeSphinx;
-	}
-	else if (cMyCulture == cCultureNorse)
-	SiegeMU = cUnitTypeMountainGiant;
-
-	else if (cMyCulture == cCultureAtlantean)
-	SiegeMU = cUnitTypeBehemoth;
-	
-	else if (cMyCulture == cCultureChinese)
-	{
-		SiegeMU = cUnitTypeVermilionBird;
-		SiegeMU2 = cUnitTypePixiu;
-	}
-	
-	int sMUCombined = ((kbUnitCount(cMyID, SiegeMU, cUnitStateAlive)) + (kbUnitCount(cMyID, SiegeMU2, cUnitStateAlive)));
-	if (sMUCombined < 0)
-	sMUCombined = 0;
-	
-	numSiegeWeapons = numSiegeWeapons + sMUCombined;
-    
+   
+	static bool ResetOk = false;
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     
@@ -1691,9 +1673,6 @@ inactive
         if ((cRandomMapName != "anatolia") && (gTransportMap == false)) //water myth units cause problems!
 		aiPlanAddUnitType(gMBDefPlan1ID, cUnitTypeLogicalTypeMythUnitNotTitan, 0, 0, 1);
 	}
-    
-    bool randomAttackPlanActive = false;
-    bool landAttackPlanActive = false;
 	int numMilUnitsInDefPlans = AvailableUnitsFromDefPlans();
     
     int currentPop = kbGetPop();
@@ -1740,7 +1719,7 @@ inactive
 					aiPlanSetVariableVector(attackPlanID, cAttackPlanGatherPoint, 0, gEnemySettlementAttPlanLastAttPoint);
 					aiPlanSetUnitStance(attackPlanID, cUnitStanceAggressive);
 					ResetOk = false;
-				}
+				}				
 				
                 if (planState == cPlanStateAttack)
                 {
@@ -1785,19 +1764,6 @@ inactive
                 if (ShowAiEcho == true) aiEcho("returning");
                 return;                
 			}
-            else if (attackPlanID == gRandomAttackPlanID)
-            {
-                if (planState < cPlanStateAttack)
-                {
-                    randomAttackPlanActive = true;
-				}
-                continue;
-			}
-            else if ((attackPlanID == gLandAttackPlanID) && (numMilUnitsInDefPlans < 15)) // trying this..
-            {
-                landAttackPlanActive = true;
-                continue;
-			}
 		}
 	}
     
@@ -1818,11 +1784,12 @@ inactive
 		if (ShowAiEcho == true) aiEcho ("returning as there are too many enemies near our main base");
         return;
 	}
-    
-	if ((kbGetAge() < cAge3) && (gRushAttackCount >= gRushCount))
-	return;
-	
-    
+ 	
+	if (ReadyToAttack() == false)
+	{
+		if (ShowAiEcho == true) aiEcho ("returning as we're not ready to make an attack");
+		return;
+	}	   
     bool settlementPosDefPlanActive = false;
     
     // Find the defend plans
@@ -1850,54 +1817,25 @@ inactive
 			}
 		}
 	}
-    int numSiegeUnitsIngDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeAbstractSiegeWeapon);
-    int numMythUnitsIngDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeLogicalTypeMythUnitNotTitan);
-    int numTitansIngDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeAbstractTitan);
-	
+
     if (ShowAiEcho == true) aiEcho("total numMilUnitsInDefPlans: "+numMilUnitsInDefPlans);   
 	
     int mostHatedPlayerID = aiGetMostHatedPlayerID();
     int numMHPlayerSettlements = kbUnitCount(mostHatedPlayerID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
     if (ShowAiEcho == true) aiEcho("numMHPlayerSettlements: "+numMHPlayerSettlements);      
-    
-	if (ReadyToAttack() == false)
-	{
-		if (ShowAiEcho == true) aiEcho ("returning as we're not ready to make an attack");
-		return;
-	}	
 	
     if (targetSettlementCloseToMB == false)
     {
-        if ((numMHPlayerSettlements < 1) && (targetSettlementID < 0))
-        {
-            if (ShowAiEcho == true) aiEcho("targetSettlementID < 0 and numMHPlayerSettlements < 1, returning");
-            return;
-		}
         if ((settlementPosDefPlanActive == true) && (myBaseAtDefPlanPosition + alliedBaseAtDefPlanPosition < 1) && (Combined > 5))
         {
 			if (ShowAiEcho == true) aiEcho ("returning as there's a settlementPosDefPlan active");
             return;
 		}
-        else if (randomAttackPlanActive == true)
-        {
-			if (ShowAiEcho == true) aiEcho ("returning as there is a gRandomAttackPlanID active and gathering units");
-            return;
-		}
-        else if (landAttackPlanActive == true)
-        {
-			if (ShowAiEcho == true) aiEcho ("returning as there is a landAttackPlan active");
-            return;
-		}
-        else if ((numSiegeWeapons < 1) && (aiRandInt(10) > 5))
-        {
-			if (ShowAiEcho == true) aiEcho ("returning as we don't have a Titan, a siege weapon, or a military myth unit");
-            return;	
-		}
 	}
 	
-    
     int enemyMainBaseUnitID = -1;
     float veryCloseRange = 65.0;
+	bool ConvertToLand = false;
     
     if ((targetSettlementID != -1) && (targetPlayerID != -1))
     {
@@ -1917,11 +1855,11 @@ inactive
                     targetPlayerID = secondClosestSettlementPlayerID;
                     if (ShowAiEcho == true) aiEcho("setting targetSettlementID to secondClosestSettlementID: "+targetSettlementID);
 				}
-				}
 			}
 		}
+	}
 		
-	if ((targetSettlementID < 0) || ((lastTargetCount > 3) && (targetSettlementCloseToMB == false)))
+	if ((targetSettlementID < 0) || ((lastTargetCount > 4) && (targetSettlementCloseToMB == false)))
 	{    
 		if ((targetSettlementID != secondClosestSettlementID) && (secondClosestSettlementID != -1) && (aiRandInt(5) < 4))
 		{
@@ -1942,7 +1880,7 @@ inactive
             else
             {
                 if (ShowAiEcho == true) aiEcho("targetSettlementID < 0, returning");
-                return;
+                ConvertToLand = true;
 			}
 		}
 	}
@@ -1954,53 +1892,7 @@ inactive
     enemyMainBaseUnitID = getMainBaseUnitIDForPlayer(targetPlayerID);
     if (ShowAiEcho == true) aiEcho("enemyMainBaseUnitID: "+enemyMainBaseUnitID+" for player: "+targetPlayerID);
     bool targetIsEnemyMainBase = false;
-	
-    if (targetSettlementID == enemyMainBaseUnitID)
-    {
-        if (ShowAiEcho == true) aiEcho("Enemy Settlement is his mainbase");
-		
-        if ((numTitansIngDefendPlan > 0)
-        || ((numMilUnitsInDefPlans > 14) && ((numSiegeUnitsIngDefendPlan > 1) || (numMythUnitsIngDefendPlan > 1)
-	    || ((numSiegeUnitsIngDefendPlan > 0) && (numMythUnitsIngDefendPlan > 0)))) || (numMilUnitsInDefPlans >= 20) && (aiRandInt(3) == 0))
-		{
-			targetIsEnemyMainBase = true;
-			if (ShowAiEcho == true) aiEcho ("We have enough troops, attacking enemy main base!");
-		}
-		else
-		{
-			if (ShowAiEcho == true) aiEcho ("returning as we don't have enough troops to attack his main base");
-			return;
-		}
-	}
-    else
-    {
-        if ((targetSettlementCloseToMB == true) && (numSettlementsBeingBuiltCloseToMB > 0))
-        {
-            if (numMilUnitsInDefPlans < 8)
-            {
-				if (ShowAiEcho == true) aiEcho ("returning as we don't have enough troops to attack targetSettlementID:"+targetSettlementID+" in close range");
-                return;
-			}
-            else
-            {
-				if (ShowAiEcho == true) aiEcho ("We have enough troops to attack targetSettlementID:"+targetSettlementID+" in close range");
-			}
-		}
-        else
-        {
-            if ((numTitansIngDefendPlan > 0) || ((numMilUnitsInDefPlans > 12) && ((numSiegeUnitsIngDefendPlan > 0)
-            || (numMythUnitsIngDefendPlan > 0))))
-            {
-				if (ShowAiEcho == true) aiEcho ("We have enough troops to attack targetSettlementID:"+targetSettlementID);
-			}
-            else
-            {
-				if (ShowAiEcho == true) aiEcho ("returning as we don't have enough troops to attack targetSettlementID:"+targetSettlementID);
-                return;
-			}
-		}
-	}
-    
+
     int enemySettlementAttPlanID = createDefOrAttackPlan("enemy settlement attack plan", false, -1, 30, cInvalidVector, -1, -1, false);
     if (enemySettlementAttPlanID < 0)
 	return;
@@ -2014,13 +1906,13 @@ inactive
     
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanPlayerID, 0, targetPlayerID);
     
-    // Specify other continent so that armies will transport
+	// Specify other continent so that armies will transport
 	if (gTransportMap == true)
 	{
-		aiPlanSetNumberVariableValues(enemySettlementAttPlanID, cAttackPlanTargetAreaGroups, 2, true);  
+		aiPlanSetNumberVariableValues(enemySettlementAttPlanID, cAttackPlanTargetAreaGroups, 2, true);
 		aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetAreaGroups, 0, kbAreaGroupGetIDByPosition(mainBaseLocation));
 		aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanTargetAreaGroups, 1, kbAreaGroupGetIDByPosition(targetSettlementPos));
-	}
+	}	
 	
     if (numTitans > 0)
 	aiPlanAddUnitType(enemySettlementAttPlanID, cUnitTypeAbstractTitan, 0, 1, 1);
@@ -2030,7 +1922,7 @@ inactive
 	aiPlanSetDesiredPriority(enemySettlementAttPlanID, 55);
     else
 	aiPlanSetDesiredPriority(enemySettlementAttPlanID, 52);
-
+    if (ConvertToLand == false)
     aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, targetSettlementID);
   	aiPlanSetVariableInt(enemySettlementAttPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
 	
@@ -2045,7 +1937,7 @@ inactive
 	if (gSomeData != -1)
 	aiPlanSetUserVariableInt(gSomeData, SettlementAttackTarget, 0 , targetPlayerID);
 	
-    if (lastTargetUnitID == targetSettlementID)
+    if ((lastTargetUnitID == targetSettlementID) && (targetSettlementID != -1))
     lastTargetCount = lastTargetCount + 1;
     else
     {
@@ -2066,7 +1958,7 @@ inactive
 	bool Announce = false;
 	static int lastAnnounced = 0;
 	
-	if ((aiRandInt(3) == 0) && (IhaveAllies == true) && (aiGetCaptainPlayerID(cMyID) == cMyID) && (targetSettlementID > 0) && (xsGetTime() > lastAnnounced + 3*60*1000))
+	if ((aiRandInt(3) == 0) && (IhaveAllies == true) && (aiGetCaptainPlayerID(cMyID) == cMyID) && (targetSettlementID >= 0) && (xsGetTime() > lastAnnounced + 3*60*1000))
 	{
 		Announce = true;
 		lastAnnounced = xsGetTime();
@@ -2220,7 +2112,8 @@ inactive
 	
 	int BaseToUse = kbUnitGetBaseID(findUnit(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, cActionAny, cMyID, gSettlementPosDefPlanDefPoint, 30));
 	if (BaseToUse == -1)  
-	return;
+    BaseToUse = mainBaseID;
+
     if (ShowAiEcho == true) aiEcho("gSettlementPosDefPlanDefPoint: "+gSettlementPosDefPlanDefPoint);
     int settlementPosDefPlanID = createDefOrAttackPlan("settlementPosDefPlan", true, 40, 20, gSettlementPosDefPlanDefPoint, BaseToUse, 52, false);
     if (settlementPosDefPlanID > 0)
@@ -2263,7 +2156,7 @@ inactive
 
 //==============================================================================
 rule createRaidingParty
-minInterval 67 //starts in cAge2
+minInterval 57 //starts in cAge2
 inactive
 {
     if (ShowAiEcho == true) aiEcho("*!*!*createRaidingParty:");
@@ -2958,7 +2851,6 @@ rule createLandAttack
 minInterval 53 //starts in cAge2
 inactive
 {
-	
 	if (ShouldIAgeUp() == true)
     xsSetRuleMinIntervalSelf(106);
     else
@@ -2967,9 +2859,6 @@ inactive
 	
     int numTitans = kbUnitCount(cMyID, cUnitTypeAbstractTitan, cUnitStateAlive);
     static int attackPlanStartTime = -1;
-    bool enemySettlementAttPlanActive = false;
-    bool randomAttackPlanActive = false;
-    
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     
@@ -3000,7 +2889,7 @@ inactive
             
             if (attackPlanID == gLandAttackPlanID)
             {
-                if (ShowAiEcho == true) aiEcho("attackPlanID == gLandAttackPlanID");
+                if (ShowAiEcho == true) aiEcho("attackPlanID == gLandAttackPlanID");		
 				
                 if ((aiPlanGetState(attackPlanID) < cPlanStateAttack)
 				&& (((xsGetTime() > attackPlanStartTime + 3*60*1000) && (attackPlanStartTime != -1))
@@ -3013,16 +2902,6 @@ inactive
 				}
                 if (ShowAiEcho == true) aiEcho("returning");
                 return;
-			}
-            else if (attackPlanID == gEnemySettlementAttPlanID)
-            {
-                if (ShowAiEcho == true) aiEcho("there is a gEnemySettlementAttPlanID active");
-                enemySettlementAttPlanActive = true;
-			}
-            else if (attackPlanID == gRandomAttackPlanID)
-            {
-                if (ShowAiEcho == true) aiEcho("there is a gRandomAttackPlanID active");
-                randomAttackPlanActive = true;
 			}
 		}
 	}
@@ -3094,22 +2973,7 @@ inactive
 		}
 	}
     
-    if ((enemySettlementAttPlanActive == true) && (numMilUnitsInDefPlans < 15)) //trying this..
-    {
-        if (ShowAiEcho == true) aiEcho("returning as there is a gEnemySettlementAttPlanID active");
-        return;
-	}
-    else if ((randomAttackPlanActive == true) && (aiPlanGetState(attackPlanID) < cPlanStateAttack))
-    {
-        if (ShowAiEcho == true) aiEcho("returning as there is a gRandomAttackPlanID active and gathering units");
-        return;
-	}
-    else if ((randomAttackPlanActive == true) && (numMilUnitsInDefPlans < 15)) //trying this..
-    {
-        if (ShowAiEcho == true) aiEcho("returning as there is a gRandomAttackPlanID active and there are more than 10 units in the plan");
-        return;
-	}
-    else if ((settlementPosDefPlanActive == true) && (myBaseAtDefPlanPosition + alliedBaseAtDefPlanPosition < 1) && (Combined > 5))
+    if ((settlementPosDefPlanActive == true) && (myBaseAtDefPlanPosition + alliedBaseAtDefPlanPosition < 1) && (Combined > 5))
     {
         if (ShowAiEcho == true) aiEcho("returning as there is a gSettlementPosDefPlanID active");
         return;
@@ -3131,6 +2995,28 @@ inactive
         return;
 	} 
     
+	if (TitanAvailable == true)
+	{
+        bool TitanGate = false;
+		int tGates = getNumUnitsByRel(cUnitTypeTitanGate, cUnitStateAliveOrBuilding, -1, cPlayerRelationEnemy);
+		if (tGates > 0)
+		{
+			for (n=1; <= cNumberPlayers)
+			{
+		        if ((n == cMyID) || (kbIsPlayerAlly(n) == true) || (kbHasPlayerLost(n) == true))
+			    continue;
+				int UnitID = findUnit(cUnitTypeTitanGate, cUnitStateAliveOrBuilding, -1, n);
+				float targetHealth = kbUnitGetHealth(UnitID);
+				if ((UnitID > 0) && (targetHealth > 0.00))
+				{
+					enemyPlayerID = n;
+					TitanGate = true;
+					break;
+				}
+			}
+		}
+	}
+	
     int landAttackPlanID = createDefOrAttackPlan("landAttackPlan", false, -1, 30, cInvalidVector, -1, 50, false);
     if (landAttackPlanID < 0)
 	return;
@@ -3138,16 +3024,15 @@ inactive
     aiPlanSetVariableInt(landAttackPlanID, cAttackPlanPlayerID, 0, enemyPlayerID);
 	aiPlanAddUnitType(landAttackPlanID, cUnitTypeLogicalTypeLandMilitary, numMilUnitsInDefPlans, numMilUnitsInDefPlans, numMilUnitsInDefPlans);  
 	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
+	if (TitanGate == true)
+	aiPlanSetVariableInt(landAttackPlanID, cAttackPlanSpecificTargetID, 0, UnitID);
     
 	// Specify other continent so that armies will transport
-    if (gTransportMap == true)
+	if (gTransportMap == true)
 	{
-		int enemyMainBaseUnitID = getMainBaseUnitIDForPlayer(enemyPlayerID);
-		int targetSettlementID = enemyMainBaseUnitID;
-		vector targetSettlementPos = kbUnitGetPosition(targetSettlementID); // uses main TC
-		aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetAreaGroups, 2, true);  
+		aiPlanSetNumberVariableValues(landAttackPlanID, cAttackPlanTargetAreaGroups, 2, true);
 		aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetAreaGroups, 0, kbAreaGroupGetIDByPosition(mainBaseLocation));
-		aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetAreaGroups, 1, kbAreaGroupGetIDByPosition(targetSettlementPos));
+		aiPlanSetVariableInt(landAttackPlanID, cAttackPlanTargetAreaGroups, 1, kbAreaGroupGetIDByPosition(kbBaseGetLocation(enemyPlayerID, kbBaseGetMainID(enemyPlayerID))));
 	}
 	
 	gLandAttackPlanID = landAttackPlanID;
@@ -3244,9 +3129,6 @@ inactive
 					if (ShowAiEcho == true) aiEcho("destroying gBaseUnderAttackDefPlanID as there are too many enemies near our main base");
                     gBaseUnderAttackDefPlanID = -1;
                     
-                    aiPlanDestroy(gDefendPlanID);
-                    gDefendPlanID = -1;
-                    xsDisableRule("defendPlanRule");
                     if (ShowAiEcho == true) aiEcho("destroying current gDefendPlanID and restarting defendPlanRule");
                     gBaseUnderAttackID = -1;
                     
@@ -3498,7 +3380,7 @@ inactive
 	}
     
     if (ShowAiEcho == true) aiEcho("alliedBaseLocation: "+alliedBaseLocation);
-    int alliedBaseDefPlanID = createDefOrAttackPlan("alliedBaseDefPlan", true, 70, 20, alliedBaseLocation, -1, 35, false);
+    int alliedBaseDefPlanID = createDefOrAttackPlan("alliedBaseDefPlan", true, 85, 20, alliedBaseLocation, -1, 35, false);
     if (alliedBaseDefPlanID > 0)
     {
         defendPlanStartTime = xsGetTime();
@@ -3799,9 +3681,6 @@ inactive
                     gBaseUnderAttackID = otherBaseID;
                     xsEnableRule("defendBaseUnderAttack");
 					
-                    aiPlanDestroy(gDefendPlanID);
-                    gDefendPlanID = -1;
-                    xsDisableRule("defendPlanRule");
                     if (ShowAiEcho == true) aiEcho("destroying current gDefendPlanID and restarting defendPlanRule");
                     xsSetRuleMinInterval("defendPlanRule", 2);
                     xsEnableRule("defendPlanRule");

@@ -16,12 +16,11 @@ inactive
     if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
 	return;
     int mainBaseID = kbBaseGetMainID(cMyID);
+	int randomBaseID = mainBaseID;
     int randomBase = findUnit(cUnitTypeAbstractSettlement);
-    if (randomBase < 0)
-	return;
-    else
+    if (randomBase >= 0)
     {
-        int randomBaseID = kbUnitGetBaseID(randomBase);
+        randomBaseID = kbUnitGetBaseID(randomBase);
 	}
 	
     if ((aiRandInt(4) < 2) && (randomBaseID != mainBaseID))
@@ -29,22 +28,39 @@ inactive
         randomBaseID = mainBaseID;
 	}
 	
-    int woodPriority=50;
+    int woodPriority = 50;
     if (cMyCulture == cCultureEgyptian)
-    woodPriority=55;
+    woodPriority = 55;
+
+    float ResSupply = kbResourceGet(cResourceWood) * 1.2;
+	float Forecast = gWoodForecast;
+	if (Forecast <= 200)
+	Forecast = 200;
+
+	float Ponti = 0.0;
+	if(ResSupply < Forecast)
+    Ponti = 0.0; 
+    else
+    Ponti = ResSupply/Forecast -1;
+
     float Percentage = 1.0;
-	
+    Percentage = Percentage - Ponti;
+    if (Percentage > 1.0)
+	Percentage = 1.0; 
+    else if (Percentage < 0.1)
+	Percentage = 0.1; 
+    
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
     int woodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceWood, cRGPActual) * gathererCount;
     int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy);
-
 	bool reducedWoodGathererCount = false;
 	if ((woodGathererCount <= 0) && (kbGetAge() < cAge3) && (closeMainBaseSites > 0))
 	{	
 	    woodGathererCount = 1;
         reducedWoodGathererCount = true;
-    }
-	// If we have no need for wood, set plans=0 and exit
+	}		
+	
+    // If we have no need for wood, set plans=0 and exit
     if (woodGathererCount <= 0)
     {
         aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, 0);
@@ -52,37 +68,50 @@ inactive
         if (gWoodBaseID != mainBaseID)
 		aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);
         return;
-	}
+	}  
     // If we're this far, we need some wood gatherers.  The number of plans we use will be the greater of 
     // a) the ideal number for this number of gatherers, or
     // b) the number of plans active that have resource sites, either main base or wood base.
 	
     //Count of sites.
+    int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy);
     int numberWoodBaseSites = 0;
-    if ( (gWoodBaseID >= 0) && (gWoodBaseID != mainBaseID) )    // Count wood base if different
+    if ((gWoodBaseID >= 0) && (gWoodBaseID != mainBaseID))    // Count wood base if different
 	numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
-	
+
     //Get the count of plans we currently have going.
     int numWoodPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0);
+	
 	int desiredWoodPlans = 1 + (woodGathererCount/12);
 	if (cMyCulture == cCultureAtlantean)
 	desiredWoodPlans = 1 + (woodGathererCount/4);
-
-	if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) || (kbGetAge() == cAge2) && (kbUnitCount(cMyID,cUnitTypeAge2Building, cUnitStateAlive) < 3))
+	
+	if (desiredWoodPlans >= 2)
+	desiredWoodPlans = 2;
+	
+	if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) || (kbGetAge() == cAge2) && (kbUnitCount(cMyID,cUnitTypeAge2Building, cUnitStateAlive) < 2))
     desiredWoodPlans = 1;
-	
-    if (woodGathererCount < desiredWoodPlans)
+    
+	if (woodGathererCount < desiredWoodPlans)
 	desiredWoodPlans = woodGathererCount;
-	
-    if ((desiredWoodPlans < numWoodPlans) && (reducedWoodGathererCount == false))
+    
+	if ((desiredWoodPlans < numWoodPlans) && (reducedWoodGathererCount == false))
     desiredWoodPlans = numWoodPlans;    // Try to preserve existing plans
 	
+	if (ResourceBaseID != -1)
+	{
+	    int numberResBaseSites = kbGetNumberValidResources(ResourceBaseID, cResourceWood, cAIResourceSubTypeEasy);
+		if ((xsGetTime() < 45*60*1000) && (numberResBaseSites > 0))
+        numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy, 20);
+	}	
+	
+    if (ShowAiEcho == true) aiEcho("desiredWoodPlans: "+desiredWoodPlans);
     // Three cases are possible:
     // 1)  We have enough sites at our main base.  All should work in main base.
     // 2)  We have some wood at main, but not enough.  Split the sites
     // 3)  We have no wood at main...use woodBase
-
-    if (closeMainBaseSites >= desiredWoodPlans) // case 1
+	
+    if (numberMainBaseSites >= desiredWoodPlans) // case 1
     {
         // remove any breakdown for woodBaseID
         if (gWoodBaseID != mainBaseID)
@@ -93,36 +122,38 @@ inactive
         return;
 	}
 	
-    if ( (closeMainBaseSites > 0) && (closeMainBaseSites < desiredWoodPlans) )  // case 2
+    if ( (numberMainBaseSites > 0) && (numberMainBaseSites < desiredWoodPlans) )  // case 2
     {
-        aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, closeMainBaseSites, woodPriority, Percentage, mainBaseID);
+        aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, numberMainBaseSites, woodPriority, Percentage, mainBaseID);
 		
         if (numberWoodBaseSites > 0)  // We do have remote wood
         {
-            aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - closeMainBaseSites, woodPriority, Percentage, gWoodBaseID);
+            aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, Percentage, gWoodBaseID);		
             aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);
 		}
         else  // No remote wood...bummer.  Kill old breakdown, look for more
-        {	
-		    if ((gTransportMap == false) || (gWoodBaseID != mainBaseID) && (gTransportMap == true))
+        {
             aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
             //Try to find a new wood base.
-			gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, randomBaseID);
+			if (ResourceBaseID != -1)
+			gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, ResourceBaseID);
 			
-            if ((gWoodBaseID >= 0) && (kbBaseGetUnderAttack(cMyID, gWoodBaseID) == false))
+			if (gWoodBaseID < 0)
+			gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, randomBaseID);
+            if (gWoodBaseID >= 0)
             {
-                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
-                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - closeMainBaseSites, woodPriority, Percentage, gWoodBaseID);
+                aiSetResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, desiredWoodPlans - numberMainBaseSites, woodPriority, Percentage, gWoodBaseID);	
+				aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      // We can have the full amount
 			}
             else
             {
-                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, closeMainBaseSites);   // That's all we get
+                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, numberMainBaseSites);   // That's all we get
 			}
 		}
         return;
 	}
 	
-    if (closeMainBaseSites < 1)  // case 3
+    if (numberMainBaseSites < 1)  // case 3
     {
         aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy,mainBaseID);
 		
@@ -141,17 +172,20 @@ inactive
             int oldWoodBase=gWoodBaseID;
             aiRemoveResourceBreakdown(cResourceWood, cAIResourceSubTypeEasy, gWoodBaseID);   // Remove old breakdown
             //Try to find a new wood base.
-			gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, randomBaseID);
+			if (ResourceBaseID != -1)
+			gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, ResourceBaseID);
 			
-            if((gWoodBaseID < 0) && (gTransportMap == true))
-            {            
+			if (gWoodBaseID < 0)
+			gWoodBaseID=kbBaseFindCreateResourceBase(cResourceWood, cAIResourceSubTypeEasy, randomBaseID);
+            if ((gWoodBaseID < 0) && (gTransportMap == true)) // did not find base on my mainbase
+            {
                 // try to find a wood base on another island
                 gWoodBaseID = newResourceBase(oldWoodBase, cResourceWood);
-            }
+			}			
 			
-            if ((gWoodBaseID >= 0) && (kbBaseGetUnderAttack(cMyID, gWoodBaseID) == false))
+            if (gWoodBaseID >= 0)
             {
-                numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
+				numberWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
                 if (numberWoodBaseSites < desiredWoodPlans)
 				desiredWoodPlans = numberWoodBaseSites;
                 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumWoodPlans, 0, desiredWoodPlans);      
@@ -171,12 +205,11 @@ inactive
     if ((aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4) && (xsGetTime() < 4*60*1000))
 	return;
     int mainBaseID = kbBaseGetMainID(cMyID);
+	int randomBaseID = mainBaseID;
     int randomBase = findUnit(cUnitTypeAbstractSettlement);
-    if (randomBase < 0)
-	return;
-    else
+    if (randomBase >= 0)
     {
-        int randomBaseID = kbUnitGetBaseID(randomBase);
+        randomBaseID = kbUnitGetBaseID(randomBase);
 	}
 	
     if ((aiRandInt(4) < 2) && (randomBaseID != mainBaseID))
@@ -187,8 +220,25 @@ inactive
     int goldPriority = 50; // Same as wood for non-Egyptians
     if (cMyCulture == cCultureEgyptian)
     goldPriority = 56;	
-    float Percentage = 1.0;
 	
+    float ResSupply = kbResourceGet(cResourceGold) * 1.2;
+	float Forecast = gGoldForecast;
+	if (Forecast <= 200)
+	Forecast = 200;
+ 
+	float Ponti = 0.0;
+	if(ResSupply < Forecast)
+    Ponti = 0.0; 
+    else
+    Ponti = ResSupply/Forecast -1;
+
+    float Percentage = 1.0;
+    Percentage = Percentage - Ponti;
+    if (Percentage > 1.0)
+	Percentage = 1.0; 
+    else if (Percentage < 0.1)
+	Percentage = 0.1; 
+
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
     int goldGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceGold, cRGPActual) * gathererCount;
     int closeMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
@@ -217,6 +267,7 @@ inactive
     int numberGoldBaseSites = 0;
     if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
 	numberGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
+	
     //Get the count of plans we currently have going.
     int numGoldPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0);
 	
@@ -227,7 +278,7 @@ inactive
 	if (desiredGoldPlans >= 2)
 	desiredGoldPlans = 2;
 	
-	if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) < cTechStatusResearching) || (kbGetAge() == cAge2) && (kbUnitCount(cMyID,cUnitTypeAge2Building, cUnitStateAlive) < 3))
+	if ((kbGetAge() == cAge1) || (kbGetAge() == cAge2) && (kbUnitCount(cMyID,cUnitTypeAge2Building, cUnitStateAlive) < 2))
     desiredGoldPlans = 1;
     
 	if (goldGathererCount < desiredGoldPlans)
@@ -235,6 +286,13 @@ inactive
     
 	if ((desiredGoldPlans < numGoldPlans) && (reducedGoldGathererCount == false))
     desiredGoldPlans = numGoldPlans;    // Try to preserve existing plans
+
+	if (ResourceBaseID != -1)
+	{
+	    int numberResBaseSites = kbGetNumberValidResources(ResourceBaseID, cResourceGold, cAIResourceSubTypeEasy);
+		if ((xsGetTime() < 35*60*1000) && (numberResBaseSites > 0))
+        numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy, 40);
+	}
 	
     if (ShowAiEcho == true) aiEcho("desiredGoldPlans: "+desiredGoldPlans);
     // Three cases are possible:
@@ -264,14 +322,17 @@ inactive
 		}
         else  // No remote gold...bummer.  Kill old breakdown, look for more
         {
-		    if ((gTransportMap == false) || (gGoldBaseID != mainBaseID) && (gTransportMap == true))
+			if (gGoldBaseID != mainBaseID)
             aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);   // Remove old breakdown
             //Try to find a new gold base.
+			if (ResourceBaseID != -1)
+			gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, ResourceBaseID);
+            if (gGoldBaseID < 0)
 			gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, randomBaseID);
-            if ((gGoldBaseID >= 0) && (kbBaseGetUnderAttack(cMyID, gGoldBaseID) == false))
+            if (gGoldBaseID >= 0)
             {
-                aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);      // We can have the full amount
                 aiSetResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, desiredGoldPlans - numberMainBaseSites, goldPriority, Percentage, gGoldBaseID);
+			    aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);      // We can have the full amount
 			}
             else
             {
@@ -300,6 +361,9 @@ inactive
             int oldGoldBase=gGoldBaseID;
             aiRemoveResourceBreakdown(cResourceGold, cAIResourceSubTypeEasy, gGoldBaseID);   // Remove old breakdown
             //Try to find a new gold base.
+			if (ResourceBaseID != -1)
+			gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, ResourceBaseID);
+			if (gGoldBaseID < 0)
 			gGoldBaseID=kbBaseFindCreateResourceBase(cResourceGold, cAIResourceSubTypeEasy, randomBaseID);
 			
             if ((gGoldBaseID < 0) && (gTransportMap == true)) // did not find base on my mainbase
@@ -308,9 +372,9 @@ inactive
                 gGoldBaseID = newResourceBase(oldGoldBase, cResourceGold);
 			}			
 			
-            if ((gGoldBaseID >= 0) && (kbBaseGetUnderAttack(cMyID, gGoldBaseID) == false))
+            if (gGoldBaseID >= 0)
             {
-                numberGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
+				numberGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
                 if (numberGoldBaseSites < desiredGoldPlans)
 				desiredGoldPlans = numberGoldBaseSites;
                 aiPlanSetVariableInt(gGatherGoalPlanID, cGatherGoalPlanNumGoldPlans, 0, desiredGoldPlans);      
@@ -336,10 +400,14 @@ inactive
     int aggressivePriority = 45;
     int mainFarmPriority = 90;
     int otherFarmPriority = 88;
-    if ((cMyCulture == cCultureNorse) && (kbGetAge() < cAge2))
-	aggressivePriority = 66; // above wood/gold so it doesn't steal the oxcart
+    if (kbGetAge() < cAge2)
+	{
+        if (cMyCulture == cCultureNorse)
+	    aggressivePriority = 66; // above wood/gold so it doesn't steal the oxcart
+        else 
+	    aggressivePriority = 60;
+	}
 
-    int numFarms = kbUnitCount(cMyID, cUnitTypeFarm, cUnitStateAlive);
     int numAggressivePlans = aiGetResourceBreakdownNumberPlans(cResourceFood, cAIResourceSubTypeHuntAggressive, mainBaseID);
 	float distance = gMaximumBaseResourceDistance - 10;
 	
@@ -356,12 +424,19 @@ inactive
     int gathererCount = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     int foodGathererCount = 0.5 + aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
     
-    if (foodGathererCount <= 2) //always some units on food
-	foodGathererCount = 2;
+    if (foodGathererCount <= 0) //always some units on food
+    {
+        if (totalNumberResourceSpots > 0)
+        foodGathererCount = 2;
+        else
+        foodGathererCount = 1;
+    }
 
 	MoreFarms = foodGathererCount; // Update build more farms
 	if (MoreFarms >= 32)
 	MoreFarms = 32;
+    if ((cMyCulture == cCultureAtlantean) && (MoreFarms > 10))
+	MoreFarms = 10;
 
     // Preference order is existing farms (except in age 1), new farms if low on food sites, aggressive hunt (size permitting), easy, then age 1 farms.  
     int aggHunters = 0;
@@ -396,8 +471,8 @@ inactive
 		building1ID = cUnitTypeBarracksChinese;			
         else if (cMyCulture == cCultureAtlantean)
 		building1ID = cUnitTypeBarracksAtlantean;
-		
         farmerReserve = kbBaseGetNumberUnits(cMyID, gFarmBaseID, -1, cUnitTypeFarm);
+
         if (gOtherBase1ID > 0)
         {
             otherBaseLocation = kbBaseGetLocation(cMyID, gOtherBase1ID);
@@ -524,11 +599,10 @@ inactive
 	|| (xsGetTime() > 10*60*1000))
 	totalAmount = 200; 
 
-    if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 2*60*1000)))   // can build farms
+    if ((kbGetAge() > cAge1) || ((cMyCulture == cCultureEgyptian) && (xsGetTime() > 3*60*1000)))   // can build farms
     {
         if ((totalNumberResourceSpots < 2) || (totalAmount <= 1500) || (gFarming == true) || (kbGetAge() >= cAge3) || (aiGetWorldDifficulty() == cDifficultyNightmare))
         {
-	        static bool FirstTime = true;
             if (cMyCulture == cCultureAtlantean)
 		    farmerPreBuild = 2;  
             else
@@ -537,37 +611,35 @@ inactive
             farmerPreBuild = unassigned;
             unassigned = unassigned - farmerPreBuild;
 			if (farmerPreBuild > 0)
-			{	
-		        if (FirstTime == true)
-				farmerPreBuild = 1;
-		        FirstTime = false;
-			    gFarming = true;
-			}
-			if (cMyCulture != cCultureAtlantean)
+			gFarming = true;
+			static bool extraFarms = false;
+			if (extraFarms == false)
 			{
-				static bool extraFarms = false;
-				if (extraFarms == false)
-				{
-					if ((aiGetGameMode() != cGameModeLightning) && (aiGetWorldDifficulty() == cDifficultyHard))
-					xsEnableRule("buildExtraFarms");
-					extraFarms = true;
-				}			
-		    }
+				if ((aiGetGameMode() != cGameModeLightning) && (aiGetWorldDifficulty() == cDifficultyHard))
+				xsEnableRule("buildExtraFarms");
+				extraFarms = true;
+			}			
+		    
 	     
 		 }
 	}
-    
-	if ((unassigned <= 0) && (totalNumberResourceSpots > 0))
+
+    if ((unassigned <= 0) && (totalNumberResourceSpots > 0))
     {
         if (numberEasyResourceSpots > 0)
         {
             if (cMyCulture == cCultureAtlantean)
             unassigned = 1;
             else
-            unassigned = 4;
+            unassigned = 3;
         }
         else
-        unassigned = aiGetMinNumberNeedForGatheringAggressives();
+        {
+            if (cMyCulture == cCultureAtlantean)
+            unassigned = aiGetMinNumberNeedForGatheringAggressives();
+            else
+            unassigned = aiGetMinNumberNeedForGatheringAggressives() - 1;
+        }
     }	
 	
 	int numPlansWanted = 2;
@@ -594,7 +666,7 @@ inactive
 	numTemples = kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAlive);
     int numHouses = kbUnitCount(cMyID, houseProtoID, cUnitStateAlive);
     
-    if ((kbGetAge() == cAge1) && (numTemples < 1) || (numHouses < 1) || (unassigned < numPlansWanted) || (kbGetAge() == cAge1) && (cMyCulture == cCultureNorse))
+    if ((kbGetAge() == cAge1) && (numTemples < 1) || (unassigned < numPlansWanted) || (kbGetAge() == cAge1) && (cMyCulture == cCultureNorse))
     {
         numPlansWanted = 1;
 		if ((cMyCulture == cCultureAtlantean) && (aiGetMinNumberNeedForGatheringAggressives() > 1))
@@ -607,7 +679,12 @@ inactive
     }
 	
     if (numPlansWanted > totalNumberResourceSpots)
-    numPlansWanted = totalNumberResourceSpots;
+    {
+        if ((totalNumberResourceSpots < 1) && (kbGetAge() < cAge3))
+        numPlansWanted = 1;
+        else
+        numPlansWanted = totalNumberResourceSpots;
+    }
 
     int numPlansUnassigned = numPlansWanted;
     int minVillsToStartAggressive = aiGetMinNumberNeedForGatheringAggressives();
@@ -744,10 +821,7 @@ inactive
             {
 			    static bool IncreasePlans = false;
 				IncreasePlans = true;
-				
-				if (aiGetWorldDifficulty() == cDifficultyNightmare)
-			    numFarmPlansWanted = numFarmPlansWanted + 1;
-				else if ((aiGetWorldDifficulty() == cDifficultyHard) && (IncreasePlans == true) && (aiGetGameMode() != cGameModeLightning))
+				if ((aiGetWorldDifficulty() >= cDifficultyHard) && (IncreasePlans == true) && (aiGetGameMode() != cGameModeLightning))
 			    numFarmPlansWanted = numFarmPlansWanted + 2;	
 				else numFarmPlansWanted = numFarmPlansWanted + 1;
 			}                
@@ -814,13 +888,12 @@ inactive
 		aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, 0, otherFarmPriority, 0, gOtherBase4ID);
 	}
 	
-	
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeFarm, numFarmPlansWanted, mainFarmPriority, (100.0*farmersAtMainBase)/(foodGathererCount*100.0), gFarmBaseID);
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeHuntAggressive, numberAggressiveResourceSpots, aggressivePriority, (100.0*aggHunters)/(foodGathererCount*100.0), mainBaseID); 
     aiSetResourceBreakdown(cResourceFood, cAIResourceSubTypeEasy, numberEasyResourceSpots, easyPriority, (100.0*easy)/(foodGathererCount*100.0), mainBaseID);
 	
 	//Check the current farm base for a settlement.. and try to relocate the second plan on Hard difficulty.	
-	if ((aiGetWorldDifficulty() == cDifficultyHard) && (aiGetGameMode() != cGameModeLightning) && (cMyCulture != cCultureAtlantean) && (cvMapSubType != VINLANDSAGAMAP))
+	if ((aiGetWorldDifficulty() >= cDifficultyHard) && (aiGetGameMode() != cGameModeLightning) && (cMyCulture != cCultureAtlantean) && (cvMapSubType != VINLANDSAGAMAP))
 	{
 		for (i = 0; < numFarmPlansWanted)
 		{
@@ -1004,11 +1077,7 @@ int changeMainBase(int newSettle = -1)
             xsDisableRule("otherBase4RingWallTeam");
 		}
 	}   
-    
-    // call these to update the gatherplans with the new mainbase
-    updateFoodBreakdown();
-    updateGoldBreakdown();
-    updateWoodBreakdown();
+   
 	
     //increase the gHouseAvailablePopRebuild
     gHouseAvailablePopRebuild = 22;
@@ -1025,6 +1094,17 @@ int changeMainBase(int newSettle = -1)
 	    }
 		xsEnableRule("fishing");
 	}	
+
+	if (ResourceBaseID != -1)
+	{
+		kbBaseDestroy(cMyID, ResourceBaseID);
+        ResourceBaseID = CreateBaseInBackLoc(newBaseID, 40, 100, "Temp Resource Base");
+	}
+
+    // call these to update the gatherplans with the new mainbase
+    updateFoodBreakdown();
+    updateGoldBreakdown();
+    updateWoodBreakdown();
 	
     return(newBaseID);
 }
@@ -1034,10 +1114,6 @@ rule relocateFarming
 minInterval 108 //starts in cAge2 (or cAge3 on transport maps)
 inactive
 {
-    //Not farming yet, don't do anything.
-    if (gFarming == false)
-	return;
-	
     if (ShowAiEcho == true) aiEcho("relocateFarming:");
 	int mainBaseID = kbBaseGetMainID(cMyID);
     //Fixup the old RB for farming.
@@ -1196,18 +1272,14 @@ void econAge2Handler(int age=1)
 	}
 	
     // Set escrow caps
-    kbEscrowSetCap(cEconomyEscrowID, cResourceFood, 900.0);    // Age 3
+    kbEscrowSetCap(cEconomyEscrowID, cResourceFood, 800.0);    // Age 3
 	kbEscrowSetCap(cEconomyEscrowID, cResourceWood, 400.0);
-	kbEscrowSetCap(cEconomyEscrowID, cResourceGold, 600.0);    // Age 3
+	kbEscrowSetCap(cEconomyEscrowID, cResourceGold, 500.0);    // Age 3
     kbEscrowSetCap(cEconomyEscrowID, cResourceFavor, 30.0);
     kbEscrowSetCap(cMilitaryEscrowID, cResourceFood, 200.0);
     kbEscrowSetCap(cMilitaryEscrowID, cResourceWood, 200.0);   // Towers
     kbEscrowSetCap(cMilitaryEscrowID, cResourceGold, 200.0);   // Towers
     kbEscrowSetCap(cMilitaryEscrowID, cResourceFavor, 30.0);
-	
-    // enable the relocateFarming rule now if this is no transport map
-    if (gTransportMap == false)
-	xsEnableRule("relocateFarming");
 }
 
 
@@ -1243,9 +1315,9 @@ void econAge3Handler(int age=0)
 	}
 	
     // Set escrow caps
-    kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 1100.0);    // Age 4
+    kbEscrowSetCap( cEconomyEscrowID, cResourceFood, 1000.0);    // Age 4
     kbEscrowSetCap( cEconomyEscrowID, cResourceWood, 400.0);     // Settlements, upgrades
-    kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 1100.0);    // Age 4
+    kbEscrowSetCap( cEconomyEscrowID, cResourceGold, 1000.0);    // Age 4
     kbEscrowSetCap( cEconomyEscrowID, cResourceFavor, 30.0);
     kbEscrowSetCap( cMilitaryEscrowID, cResourceFood, 400.0);
     kbEscrowSetCap( cMilitaryEscrowID, cResourceWood, 400.0);
@@ -1620,7 +1692,7 @@ inactive
 	
 	bool noFarmsAvailable = false;
 	
-	int numFarmsNearMainBase = getNumUnits(cUnitTypeFarm, cUnitStateAlive, -1, cMyID, mainBaseLocation, 85.0);
+	int numFarmsNearMainBase = kbBaseGetNumberUnits(cMyID, gFarmBaseID, -1, cUnitTypeFarm);
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);  
     int foodGathererCount = aiGetResourceGathererPercentage(cResourceFood, cRGPActual) * gathererCount;
 	
@@ -2022,15 +2094,6 @@ inactive
 	
     if (builtMarket == false)
     {
-        for (l = 0; < 2) // Clear the old stuck plans.
-		{
-            int StalledPlanID = findPlanByString("BuildMarket", cPlanBuild);
-            if (StalledPlanID != -1)
-            aiPlanDestroy(StalledPlanID);
-		}
-        buildPlanID=aiPlanCreate("BuildMarket", cPlanBuild);
-        if (buildPlanID < 0)
-		return;
         vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);  // my main base location
         vector allyLocation = cInvalidVector;
         vector marketLocation = cInvalidVector;
@@ -2165,10 +2228,12 @@ inactive
         // second closest corner.
 		
         int chosenCorner = -1;
+		static int LastCorner = -1;
+		static int SwitchCount = 0;
 		
         if ((mapRestrictsMarketAttack() == false) && (IhaveAllies == false) || (cRandomMapName == "watering hole"))
         {
-		    if ((aiRandInt(2) == 0) && (cRandomMapName != "watering hole"))
+		    if ((aiRandInt(3) <= 1) && (cRandomMapName != "watering hole"))
 			chosenCorner = secondClosestToMe;
 			else
 			chosenCorner = closestToMe;
@@ -2184,6 +2249,20 @@ inactive
                 chosenCorner = closestToAlly;
 			}
 		}
+		if (LastCorner == -1)
+		LastCorner = chosenCorner;
+	    
+		if ((LastCorner != chosenCorner) && (LastCorner != -1))
+		{
+			SwitchCount = SwitchCount + 1;
+			if (SwitchCount >= 2)
+			{
+				LastCorner = chosenCorner;
+				SwitchCount  = 0;
+			}
+			else
+			chosenCorner = LastCorner;
+	    }
 		
         switch(chosenCorner)
         {
@@ -2343,38 +2422,46 @@ inactive
 		
         static float distanceIncrease = 0;
 		
-        //Setup the build plan.
-        aiPlanSetVariableInt(buildPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeMarket);
-        if ((override == false) || (equal(marketLocation, mainBaseLocation) == true))
-        {
-            aiPlanSetVariableVector(buildPlanID, cBuildPlanInfluencePosition, 0, marketLocation);
-            aiPlanSetVariableFloat(buildPlanID, cBuildPlanInfluencePositionDistance, 0, 30.0);
-            aiPlanSetVariableFloat(buildPlanID, cBuildPlanInfluencePositionValue, 0, 100.0);
-            aiPlanSetVariableInt(buildPlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(marketLocation));
-            aiPlanSetVariableInt(buildPlanID, cBuildPlanNumAreaBorderLayers, 0, 2);
-		}
-        else
-        {
-            aiPlanSetVariableFloat(buildPlanID, cBuildPlanRandomBPValue, 0, 0.99);
-            aiPlanSetVariableVector(buildPlanID, cBuildPlanCenterPosition, 0, marketLocation);
-            aiPlanSetVariableFloat(buildPlanID, cBuildPlanCenterPositionDistance, 0, 15.0 + distanceIncrease);          
-		}
-        if (cMyCulture == cCultureAtlantean)
-		aiPlanAddUnitType(buildPlanID, cBuilderType, 1, 1, 1);
-        else
-		aiPlanAddUnitType(buildPlanID, cBuilderType, 1, 2, 2);
-        aiPlanSetDesiredPriority(buildPlanID, 100);
-	    aiPlanSetVariableInt(buildPlanID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeMarket);
-        aiPlanSetVariableFloat(buildPlanID, cBuildPlanInfluenceUnitDistance, 0, 35.0);
-        aiPlanSetVariableFloat(buildPlanID, cBuildPlanInfluenceUnitValue, 0, -15.0);
-        aiPlanSetEscrowID(buildPlanID, cEconomyEscrowID);
-        aiPlanSetActive(buildPlanID);
+		bool Skip = false;
+		int MarketsThere = getNumUnits(cUnitTypeMarket, cUnitStateAliveOrBuilding, -1, cMyID, marketLocation, 35.0);
+        int ExistingPlan = findPlanByString("BuildMarket", cPlanBuild);
+		if ((ExistingPlan >= 0) || (MarketsThere > 0))
+		Skip = true;
+	    if (Skip == false)
+	    {
+            buildPlanID=aiPlanCreate("BuildMarket", cPlanBuild);
+            if (buildPlanID < 0)
+		    return;		
+            //Setup the build plan.
+            aiPlanSetVariableInt(buildPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeMarket);
+            if ((override == false) || (equal(marketLocation, mainBaseLocation) == true))
+            {
+                aiPlanSetVariableVector(buildPlanID, cBuildPlanInfluencePosition, 0, marketLocation);
+                aiPlanSetVariableFloat(buildPlanID, cBuildPlanInfluencePositionDistance, 0, 30.0);
+                aiPlanSetVariableFloat(buildPlanID, cBuildPlanInfluencePositionValue, 0, 100.0);
+                aiPlanSetVariableInt(buildPlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(marketLocation));
+                aiPlanSetVariableInt(buildPlanID, cBuildPlanNumAreaBorderLayers, 0, 2);
+		    }
+            else
+            {
+                aiPlanSetVariableFloat(buildPlanID, cBuildPlanRandomBPValue, 0, 0.99);
+                aiPlanSetVariableVector(buildPlanID, cBuildPlanCenterPosition, 0, marketLocation);
+                aiPlanSetVariableFloat(buildPlanID, cBuildPlanCenterPositionDistance, 0, 15.0 + distanceIncrease);          
+		    }
+            if (cMyCulture == cCultureAtlantean)
+		    aiPlanAddUnitType(buildPlanID, cBuilderType, 1, 1, 1);
+            else
+		    aiPlanAddUnitType(buildPlanID, cBuilderType, 1, 2, 2);
+        	aiPlanSetDesiredPriority(buildPlanID, 100);
+	    	aiPlanSetVariableInt(buildPlanID, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeMarket);
+        	aiPlanSetVariableFloat(buildPlanID, cBuildPlanInfluenceUnitDistance, 0, 35.0);
+        	aiPlanSetVariableFloat(buildPlanID, cBuildPlanInfluenceUnitValue, 0, -15.0);
+        	aiPlanSetEscrowID(buildPlanID, cEconomyEscrowID);
+       	    aiPlanSetActive(buildPlanID);
 		
-        builtMarket = true;
-        marketTime = xsGetTime();
-		xsSetRuleMinIntervalSelf(10);
-		return;    
-		
+        	builtMarket = true;
+        	marketTime = xsGetTime(); 
+		}
     }
     //If we don't have a query ID, create it.
     static int marketQueryID=-1;
@@ -2459,27 +2546,10 @@ inactive
     {
         return;
 	}
-    if (equal(gTradeMarketLocation, mainBaseLocation) == false)
-    {
-	    int numTowersNearMarket = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, gTradeMarketLocation, 45.0);
-        if (numTowersNearMarket < 1)  
-	    {
-			//Build a tower near our trade market
-			int StalledTowerPlanID = findPlanByString("Build trade market tower", cPlanBuild);
-			if (StalledTowerPlanID > 0)
-			aiPlanDestroy(StalledTowerPlanID); 		
-			int buildTowerPlanID = aiPlanCreate("Build trade market tower", cPlanBuild);
-			if (buildTowerPlanID >= 0)
-			{
-				aiPlanSetVariableInt(buildTowerPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeTower);
-				aiPlanSetDesiredPriority(buildTowerPlanID, 100);
-				aiPlanSetVariableInt(buildTowerPlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(gTradeMarketLocation));
-				aiPlanAddUnitType(buildTowerPlanID, cBuilderType, 1, 1, 1);
-				aiPlanSetEscrowID(buildTowerPlanID, cMilitaryEscrowID);
-				aiPlanSetActive(buildTowerPlanID);
-			}
-		}	
-	}
+    static bool MarketTower = false;
+	if (MarketTower == false)
+    xsEnableRule("TowerUpMarket"); 
+	MarketTower = true;
 	
     // We have a market for trade, activate the rule to rebuild if lost
     xsEnableRule("rebuildMarket");      // Will restart process if market is lost
@@ -2565,6 +2635,7 @@ inactive
     
     static int lastUsedMarket = -1;
     static bool override = false;
+	bool RetreatMB = false;
     static int count = 0;
     int tradeMarket1ID = -1;
     int tradeMarket2ID = -1;
@@ -2649,6 +2720,18 @@ inactive
     
     if (override == true)
     {
+        vector otradeMarketPosition = kbUnitGetPosition(marketToUse);
+        int onumEnemyAttBuildingsNearMarketInR50 = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, tradeMarketPosition, 50.0);
+        int onumMotherNatureAttBuildingsNearMarketInR50 = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, 0, tradeMarketPosition, 50.0);
+        int onumEnemyMilUnitsNearMarketInR30 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, tradeMarketPosition, 30.0, true);
+        int omyMilUnitsNearMarketInR30 = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, tradeMarketPosition, 30.0);
+        int oalliedMilUnitsNearMarketInR30 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, tradeMarketPosition, 30.0, true);
+        if ((onumEnemyAttBuildingsNearMarketInR50 - onumMotherNatureAttBuildingsNearMarketInR50 > 0)
+		|| (onumEnemyMilUnitsNearMarketInR30 - omyMilUnitsNearMarketInR30 - oalliedMilUnitsNearMarketInR30 > 1))
+        {
+            RetreatMB = true;
+		}
+		
         if (count > 1)
         {
             override = false;
@@ -2680,7 +2763,7 @@ inactive
     if (ShowAiEcho == true) aiEcho("action: "+action);
     
 	int numTcs = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
-    float minRequiredDistance = 40.0;
+    float minRequiredDistance = 36.0;
 	
     int tradeDestinationID = -1;
     int mainBaseID = kbBaseGetMainID(cMyID);
@@ -2753,6 +2836,9 @@ inactive
             {
                 if (override == true)
                 {
+			        if (RetreatMB == true)
+					aiTaskUnitMove(tradeUnitID, mainBaseLocation);	
+					else
                     aiTaskUnitWork(tradeUnitID, marketToUse);
                     if (ShowAiEcho == true) aiEcho("Sending trade unit: "+tradeUnitID+" to new market: "+marketToUse);
                     continue;
@@ -2761,7 +2847,6 @@ inactive
                 if (action == -1)   //check the currentTradeRouteLength of all tradeUnits
                 {
                     planID = kbUnitGetPlanID(tradeUnitID);
-                    if (ShowAiEcho == true) aiEcho("planID: "+planID);
                     if (planID != -1)
 					continue;
 					
@@ -2837,6 +2922,9 @@ inactive
             {
                 if (override == true)
                 {
+			        if (RetreatMB == true)
+					aiTaskUnitMove(tradeUnitID, mainBaseLocation);	
+					else
                     aiTaskUnitWork(tradeUnitID, marketToUse);
                     if (ShowAiEcho == true) aiEcho("Sending trade unit: "+tradeUnitID+" to new market: "+marketToUse);
                     continue;
@@ -2845,7 +2933,6 @@ inactive
                 if (action == -1)   //check the currentTradeRouteLength of all tradeUnits
                 {
                     planID = kbUnitGetPlanID(tradeUnitID);
-                    if (ShowAiEcho == true) aiEcho("planID: "+planID);
                     if (planID != -1)
 					continue;
 					
@@ -2906,7 +2993,7 @@ inactive
 }
 
 //==============================================================================
-rule airScout1  //air scout plan that avoids attacked areas
+rule airScout1
 minInterval 83 //starts in cAge1
 inactive
 {
@@ -3003,12 +3090,21 @@ inactive
     int airScout1PlanID = aiPlanCreate("AirScout1Plan", cPlanExplore);
     if (airScout1PlanID >= 0)
     {
-        aiPlanAddUnitType(airScout1PlanID, scoutType, 1, 1, 1);
+		if ((cMyCulture == cCultureAtlantean) || (cMyCulture == cCultureEgyptian))
+		{
+		    aiPlanAddUnitType(airScout1PlanID, scoutType, 0, 1, 1);
+		    aiPlanSetDesiredPriority(airScout1PlanID, 48);
+		}
+	    else
+		{
+		
+            aiPlanAddUnitType(airScout1PlanID, scoutType, 1, 1, 1);
+		    aiPlanSetDesiredPriority(airScout1PlanID, 100);	
+		}
         aiPlanSetVariableBool(airScout1PlanID, cExplorePlanDoLoops, 0, false);
         aiPlanSetVariableBool(airScout1PlanID, cExplorePlanAvoidingAttackedAreas, 0, true);
         aiPlanSetVariableFloat(airScout1PlanID, cExplorePlanLOSMultiplier, 0, 4.0);
         aiPlanSetEscrowID(airScout1PlanID, cEconomyEscrowID);
-        aiPlanSetDesiredPriority(airScout1PlanID, 100);
         aiPlanSetActive(airScout1PlanID);
         gAirScout1PlanID = airScout1PlanID;
 	}

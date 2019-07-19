@@ -190,7 +190,7 @@ bool equal(vector left=cInvalidVector, vector right=cInvalidVector) //true if th
 // Query must be created prior to calling, and the results reset and the query executed
 // after the call.
 // ***************************************************************************** 
-bool  configQuery( int queryID = -1, int unitType = -1, int action = -1, int state = -1, int player = -1, 
+bool configQuery( int queryID = -1, int unitType = -1, int action = -1, int state = -1, int player = -1, 
 vector center = cInvalidVector, bool sort = false, float radius = -1, bool seeable = false, int areaID = -1 )
 {
     if ( queryID == -1)
@@ -199,32 +199,17 @@ vector center = cInvalidVector, bool sort = false, float radius = -1, bool seeab
         return(false);
 	}
 	
-    if (player != -1)
 	kbUnitQuerySetPlayerID(queryID, player);
-	
-    if (unitType != -1)
 	kbUnitQuerySetUnitType(queryID, unitType);
-	
-    if (action != -1)
 	kbUnitQuerySetActionType(queryID, action);
-	
-    if (state != -1)
 	kbUnitQuerySetState(queryID, state);
+
+	kbUnitQuerySetPosition(queryID, center);
+	kbUnitQuerySetAscendingSort(queryID, sort);
+	kbUnitQuerySetMaximumDistance(queryID, radius);
 	
-    if (equal(center, cInvalidVector) == false)
-    {
-        kbUnitQuerySetPosition(queryID, center);
-        if (sort == true)
-		kbUnitQuerySetAscendingSort(queryID, true);
-        if (radius != -1)
-		kbUnitQuerySetMaximumDistance(queryID, radius);
-	}
-	
-    if (areaID != -1)
 	kbUnitQuerySetAreaID(queryID, areaID);
-	
-    if (seeable == true)
-	kbUnitQuerySetSeeableOnly(queryID, true);
+	kbUnitQuerySetSeeableOnly(queryID, seeable);
 	
     return(true);
 }
@@ -237,41 +222,25 @@ vector center = cInvalidVector, bool sort = false, float radius = -1, bool seeab
 // after the call.
 // Unlike configQuery(), this uses the PLAYER RELATION rather than the player number
 // ***************************************************************************** 
-bool  configQueryRelation( int queryID = -1, int unitType = -1, int action = -1, int state = -1, int playerRelation = -1, 
-vector center = cInvalidVector, bool sort = false, float radius = -1, bool seeable = false, int areaID = -1 )
+bool configQueryRelation( int queryID = -1, int unitType = -1, int action = -1, int state = -1, int playerRelation = -1, 
+vector center = cInvalidVector, bool sort = false, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    if ( queryID == -1)
+    if (queryID == -1)
     {
-        if (ShowAiEcho == true) aiEcho("Invalid query ID");
+        aiEcho("Invalid query ID");
         return(false);
 	}
 	
-    if (playerRelation != -1)
 	kbUnitQuerySetPlayerRelation(queryID, playerRelation);
-	
-    if (unitType != -1)
 	kbUnitQuerySetUnitType(queryID, unitType);
-	
-    if (action != -1)
 	kbUnitQuerySetActionType(queryID, action);
+    kbUnitQuerySetState(queryID, state);
+	kbUnitQuerySetPosition(queryID, center);
+	kbUnitQuerySetAscendingSort(queryID, sort);
+	kbUnitQuerySetMaximumDistance(queryID, radius);
 	
-    if (state != -1)
-	kbUnitQuerySetState(queryID, state);
-	
-    if (equal(center, cInvalidVector) == false)
-    {
-        kbUnitQuerySetPosition(queryID, center);
-        if (sort == true)
-		kbUnitQuerySetAscendingSort(queryID, true);
-        if (radius != -1)
-		kbUnitQuerySetMaximumDistance(queryID, radius);
-	}
-	
-    if (areaID != -1)
 	kbUnitQuerySetAreaID(queryID, areaID);
-	
-    if (seeable == true)
-	kbUnitQuerySetSeeableOnly(queryID, true);
+	kbUnitQuerySetSeeableOnly(queryID, seeable);
     
     return(true);
 }
@@ -490,7 +459,6 @@ float _sin(float n = 0)
 int findUnit(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, 
 int playerID = cMyID, vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    int count = -1;
     static int unitQueryID = -1;
 	
     //If we don't have the query yet, create one.
@@ -516,7 +484,6 @@ int playerID = cMyID, vector center = cInvalidVector, float radius = -1, bool se
 int findUnitByRel(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, int playerRelation = cPlayerRelationSelf,
 vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    int count = -1;
     static int unitQueryID = -1;
 	
     //If we don't have the query yet, create one.
@@ -542,7 +509,6 @@ vector center = cInvalidVector, float radius = -1, bool seeable = false, int are
 int findUnitByIndex(int unitTypeID = -1, int index = 0, int state = cUnitStateAlive, int action = -1, int playerID = cMyID, 
 vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {	
-    int count = -1;
     static int unitQueryID = -1;
 	
     //If we don't have the query yet, create one.
@@ -570,7 +536,6 @@ int playerRelation = cPlayerRelationSelf, vector center = cInvalidVector, float 
 bool seeable = false, int areaID = -1)
 {
     
-    int count = -1;
     static int unitQueryID = -1;
 	
     //If we don't have the query yet, create one.
@@ -597,7 +562,6 @@ int getNumUnits(int unitTypeID = -1, int state = cUnitStateAlive, int action = -
 int playerID = cMyID, vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
 	
-    int count = -1;
     static int unitQueryID = -1;
 	
     //If we don't have the query yet, create one.
@@ -968,50 +932,6 @@ bool persistent=false, int transportPUID=-1, int pri=-1, int baseID=-1)
     //Done.
     return(planID);
 }
-//==============================================================================
-vector findBestSettlement(int playerID=0)   //Will find the closet settlement of the given playerID
-{
-    if (ShowAiEcho == true) aiEcho("findBestSettlement:");
-	
-    int numberFound=-1;
-    static int unitQueryID=-1;
-    vector townLocation=kbGetTownLocation();
-    vector best=cInvalidVector;
-    best=townLocation;
-	
-    //Create the query if we don't have it yet.
-    if (unitQueryID < 0)
-	unitQueryID=kbUnitQueryCreate("getUnClaimedSettlements");
-	
-    //Define a query to get all matching units.
-    if (unitQueryID != -1)
-    {
-        kbUnitQuerySetPlayerID(unitQueryID, playerID);
-        kbUnitQuerySetUnitType(unitQueryID, cUnitTypeSettlement);
-        kbUnitQuerySetState(unitQueryID, cUnitStateAny);
-	}
-    else
-	return(cInvalidVector);
-	
-    //Find the best one.
-    float bestDistSqr=100000000.0;
-    kbUnitQueryResetResults(unitQueryID);
-    numberFound=kbUnitQueryExecute(unitQueryID);
-    for (i=0; < numberFound)
-    {
-        vector position=kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i));
-        float dx=xsVectorGetX(townLocation)-xsVectorGetX(position);
-        float dz=xsVectorGetZ(townLocation)-xsVectorGetZ(position);
-		
-        float curDistSqr=((dx*dx) + (dz*dz));
-        if (curDistSqr < bestDistSqr)
-        {
-            best=position;
-            bestDistSqr=curDistSqr;
-		}
-	}
-    return(best);
-}
 
 //==============================================================================
 // claimSettlement
@@ -1029,17 +949,13 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
 	int NumBuilder = NumUnitsOnAreaGroupByRel(false, kbAreaGroupGetIDByPosition(where), cBuilderType);
     if ((cBuilderType < 0 ) || (NumBuilder > 0))
 	return;
-	
-    int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
-    if (transportPUID < 0)
-	return;
     
 	baseID = kbBaseGetMainID(cMyID);
     vector baseLoc = kbBaseGetLocation(cMyID, baseID); 
     startAreaID = kbAreaGetIDByPosition(baseLoc);
 	
     int remoteSettlementTransportPlan=createTransportPlan("Remote Settlement Transport", startAreaID, kbAreaGetIDByPosition(where),
-	false, transportPUID, 80, baseID);
+	false, cUnitTypeTransport, 80, baseID);
 	
     // add the builders to the transport plan
 	int NumBuilders = 2;
@@ -1594,7 +1510,7 @@ void taskMilUnitTrainAtBase(int baseID = -1)
         //shouldn't happen anyway
         if (ShowAiEcho == true) aiEcho("strange, no building available, returning");
         return;
-	}
+		}
     
     int puid = -1;
 	
@@ -1790,9 +1706,6 @@ int findClosestUnitTypeByLoc(int Relevance = cPlayerRelationEnemy, int UnitType 
         if (findTargets < 0)
 		return(-1);
 	}
-    // configure the query, each time again.
-	if (radius <= 0)
-	radius = 10000;
     kbUnitQuerySetPlayerRelation(findTargets, Relevance);
 	kbUnitQuerySetSeeableOnly(findTargets, seeable);
 	kbUnitQuerySetAscendingSort(findTargets, true);
@@ -1995,11 +1908,16 @@ int createSimpleResearchPlan(int techID=-1, int buildingType=-1, int escrowID=cR
 //==============================================================================
 int AvailableUnitsFromDefPlans(int NumberFound=0)
 {
-	int numMilUnitsIngDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeLogicalTypeLandMilitary);
-	int numMilUnitsInMBDefPlan1 = aiPlanGetNumberUnits(gMBDefPlan1ID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInBaseUnderAttackDefPlan = aiPlanGetNumberUnits(gBaseUnderAttackDefPlanID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInSettlementPosDefPlan = aiPlanGetNumberUnits(gSettlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + numMilUnitsInMBDefPlan1 + numMilUnitsInBaseUnderAttackDefPlan * 0.4 + numMilUnitsInSettlementPosDefPlan * 0.4;
+	int numMilUnitsIngDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeUnit);
+	int numMilUnitsInMBDefPlan1 = aiPlanGetNumberUnits(gMBDefPlan1ID, cUnitTypeUnit);
+    int numMilUnitsInBaseUnderAttackDefPlan = aiPlanGetNumberUnits(gBaseUnderAttackDefPlanID, cUnitTypeUnit) * 0.4;
+    int numMilUnitsInSettlementPosDefPlan = aiPlanGetNumberUnits(gSettlementPosDefPlanID, cUnitTypeUnit) * 0.4;
+    int numMilUnitsInOB1DefPlan = aiPlanGetNumberUnits(gOtherBase1DefPlanID, cUnitTypeLogicalTypeLandMilitary);
+    int numMilUnitsInOB2DefPlan = aiPlanGetNumberUnits(gOtherBase2DefPlanID, cUnitTypeLogicalTypeLandMilitary);
+    int numMilUnitsInOB3DefPlan = aiPlanGetNumberUnits(gOtherBase3DefPlanID, cUnitTypeLogicalTypeLandMilitary);
+    int numMilUnitsInOB4DefPlan = aiPlanGetNumberUnits(gOtherBase4DefPlanID, cUnitTypeLogicalTypeLandMilitary);
+    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + numMilUnitsInMBDefPlan1 + numMilUnitsInBaseUnderAttackDefPlan + numMilUnitsInSettlementPosDefPlan 
+	+ numMilUnitsInOB1DefPlan + numMilUnitsInOB2DefPlan + numMilUnitsInOB3DefPlan + numMilUnitsInOB4DefPlan;
 	if (ShowAiEcho == true) aiEcho("total numMilUnitsInDefPlans: "+numMilUnitsInDefPlans);
 	
 	if (numMilUnitsInDefPlans > 0)
@@ -2016,10 +1934,7 @@ bool ReadyToAttack()
 	// Try not to be too aggressive if we're lagging behind.
     if ((xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2) || (kbGetAge() == cAge2) && (ShouldIAgeUp() == true))
 	return(Ready);
-	
-	// AoModAI
-    int currentPop = kbGetPop();
-    int currentPopCap = kbGetPopCap();
+
 	// Standard AI
 	int upID = -1;
 	int targetPop = -1;              
@@ -2031,7 +1946,7 @@ bool ReadyToAttack()
 	targetPop = kbUnitPickGetMinimumPop(upID);  
     int numMilUnitsInDefPlans = AvailableUnitsFromDefPlans();   
 	//
-	if ((numMilUnitsInDefPlans*3 > targetPop) || (currentPop >= currentPopCap*0.80) && (kbResourceGet(cResourceFood) > 200) || (kbGetAge() == cAge2) && (gRushAttackCount < gRushCount)) 
+	if (numMilUnitsInDefPlans*3 >= targetPop)
 	Ready = true;	
     return(Ready);
 }
@@ -2043,7 +1958,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 	int Villagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if (cMyCulture == cCultureAtlantean)
     Villagers = Villagers * 2;
-    if ((Villagers < 14) || (findPlanByString("Remote Resource Transport", cPlanTransport) != -1))
+    if ((Villagers < 14) || (findPlanByString("Remote Resource Transport", cPlanTransport) != -1) || (kbUnitCount(cMyID, cUnitTypeTransport, cUnitStateAlive) < 1))
 	return(-1);
 
     int queryUnitID=cUnitTypeGold;
@@ -2056,7 +1971,6 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
     configQuery(resourceQueryID, queryUnitID, -1, cUnitStateAlive, 0, kbBaseGetLocation(cMyID, kbBaseGetMain(cMyID)), true);
     kbUnitQueryResetResults(resourceQueryID);
     int numResults = kbUnitQueryExecute(resourceQueryID);
-	
     if (numResults <= 0)
     return(-1);
 	
@@ -2064,7 +1978,6 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 	
     if ( isOnMyIsland(there) )
     return(-1);
-	
     if (resourceID==cResourceGold)
     {
         static vector gTransportToGoldPos = cInvalidVector;
@@ -2077,6 +1990,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
         if (equal(gTransportToWoodPos, there))
 		return(-1);	
 	}
+	
     int startBaseID = -1;
     if ( oldResourceBase >= 0 )
 	startBaseID = oldResourceBase;
@@ -2084,20 +1998,27 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 	startBaseID = kbBaseGetMainID(cMyID);
     vector here=kbBaseGetLocation(cMyID, startBaseID);
     int startAreaID=kbAreaGetIDByPosition(here);
-	
-    int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
-    if ((transportPUID < 0) || (kbUnitCount(cMyID, transportPUID, cUnitStateAlive) < 1))
-    return(-1);
+	int hereID = kbAreaGetIDByPosition(there);
 
     int resourceTransportPlan = -1;
-    resourceTransportPlan=createTransportPlan("Remote Resource Transport", startAreaID, kbAreaGetIDByPosition(there), false, transportPUID, 80, startBaseID);
+    resourceTransportPlan=createTransportPlan("Remote Resource Transport", startAreaID, kbAreaGetIDByPosition(there), false, cUnitTypeTransport, 80, startBaseID);
 	
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
     int numVills = 0.5 + aiGetResourceGathererPercentage(resourceID, cRGPActual) * gathererCount;
-	if ((cMyCulture == cCultureAtlantean) && (numVills > 3))
-	numVills = 3;
-    else if (numVills > 12)
-	numVills = 12;	
+	if (cMyCulture == cCultureAtlantean)
+    {
+        if (numVills > 3)
+	    numVills = 3;
+        else if ((cMyCulture == cCultureAtlantean) && (numVills <= 1))
+	    numVills = 1;		
+	}		
+    else
+    {
+        if (numVills > 12)
+	    numVills = 12;
+		else if (numVills <= 6)
+	    numVills = 6;	
+	}		
     aiPlanAddUnitType(resourceTransportPlan, cUnitTypeAbstractVillager, numVills, numVills, numVills);
     if ( cMyCulture == cCultureNorse )
 	aiPlanAddUnitType( resourceTransportPlan, cUnitTypeOxCart, 1, 1, 1 );
@@ -2116,11 +2037,58 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
     else
 	basename="Wood Base"+kbBaseGetNextID();
 	
-    int newBaseID=kbBaseCreate(cMyID, basename, there, 40.0);
+    int newBaseID=kbBaseCreate(cMyID, basename, there, gMaximumBaseResourceDistance);
     if (newBaseID > -1)
     {
         kbBaseSetEconomy(cMyID, newBaseID, true);
         kbBaseSetMaximumResourceDistance(cMyID, newBaseID, gMaximumBaseResourceDistance);
 	}
     return(newBaseID);
+}
+
+float upAV(float value = 0, int DivideNum = 10)
+{
+    float retVal = value;
+    retVal = retVal / DivideNum;
+    return(retVal);
+}
+bool IsImpossiblePoint(vector TestLocation = cInvalidVector) 
+{
+    return((xsVectorGetX(TestLocation) < 0.0) || (xsVectorGetZ(TestLocation) < 0.0));
+}   
+int CreateBaseInBackLoc(int BaseID = -1, float Distance = 0, float baseRadius = 25, string Name = "INVALID NAME")
+{
+	vector backVector=kbBaseGetBackVector(cMyID, BaseID);
+	vector position = kbBaseGetLocation(cMyID, BaseID);
+    int NewDistance = Distance; 
+	bool Success = false;
+    for (i = 0; < 30) // test it a few times so we don't fall out of the map!
+	{
+	    backVector=kbBaseGetBackVector(cMyID, BaseID);
+		float x = xsVectorGetX(backVector);
+		float z = xsVectorGetZ(backVector);
+		x = x * NewDistance;
+		z = z * NewDistance;
+		backVector = xsVectorSetX(backVector, x);
+		backVector = xsVectorSetZ(backVector, z);
+		backVector = xsVectorSetY(backVector, 0.0);
+		vector location = kbBaseGetLocation(cMyID, BaseID);
+		location = location + backVector;
+        int AreaGroupBase = kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, BaseID));
+        int AreaGroupNewLoc=kbAreaGroupGetIDByPosition(location);
+        int Trees = getNumUnits(cUnitTypeTree, cUnitStateAny, -1, 0, location, 2);
+	    if ((IsImpossiblePoint(location) == false) && (AreaGroupBase == AreaGroupNewLoc) && (kbCanPath2(position, location, cUnitTypeHoplite) == true) && (Trees <= 0) || (baseRadius == 0))
+		{
+	        Success = true;
+		    break;
+		}
+		NewDistance = NewDistance - 2;
+	}
+    if (Success == false)
+	return(-1);
+
+	int Base = kbBaseCreate(cMyID, ""+Name, location, baseRadius);
+	kbBaseSetMaximumResourceDistance(cMyID, Base, baseRadius);
+	aiEcho("A New Base was successfully created! *** Name:  "+Name+",  ID:  "+Base+",  Final distance:  "+NewDistance+".");
+    return(Base);
 }

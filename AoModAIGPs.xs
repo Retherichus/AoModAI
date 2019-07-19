@@ -35,44 +35,6 @@
 //==============================================================================
 
 //==============================================================================
-vector findHuntableInfluence()
-{
-    if (ShowAiEcho == true) aiEcho("findHuntableInfluence:");    
-	
-	vector townLocation=kbGetTownLocation();
-	vector best=townLocation;
-	float bestDistSqr=0.0;
-	
-	//Run a query.
-	int queryID=kbUnitQueryCreate("Huntable Units");
-	if (queryID < 0)
-	return(best);
-	
-	kbUnitQueryResetData(queryID);
-	kbUnitQueryResetResults(queryID);
-	kbUnitQuerySetPlayerID(queryID, 0);
-	kbUnitQuerySetUnitType(queryID, cUnitTypeHuntable);
-	kbUnitQuerySetState(cUnitStateAlive);
-	int numberFound=kbUnitQueryExecute(queryID);
-	
-	for (i=0; < numberFound)
-	{
-		vector position=kbUnitGetPosition(kbUnitQueryGetResult(queryID, i));
-		float dx=xsVectorGetX(townLocation)-xsVectorGetX(position);
-		float dz=xsVectorGetZ(townLocation)-xsVectorGetZ(position);
-		
-		float curDistSqr=((dx*dx) + (dz*dz));
-		if (curDistSqr > bestDistSqr)
-		{
-			best=position;
-			bestDistSqr=curDistSqr;
-		}
-	}
-	
-	return(best);
-}
-
-//==============================================================================
 bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 {
     if (ShowAiEcho == true) aiEcho("setupGodPowerPlan:");    
@@ -149,8 +111,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelQuery);
         aiPlanSetVariableInt(planID, cGodPowerPlanQueryPlayerID, 0, 0);
-		
-		
         //-- now set up the targeting and the influences for targeting
         aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTown);
 		
@@ -159,9 +119,9 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         //-- we also prevent the default "back of town" placement
         aiPlanSetVariableInt(planID, cGodPowerPlanBPLocationPreference, 0, cBuildingPlacementPreferenceNone);
 		
-        vector v = findHuntableInfluence();
+        vector v = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeHuntable, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)), 85));
         aiPlanSetVariableVector(planID, cGodPowerPlanBPInfluence, 0, v);
-        aiPlanSetVariableFloat(planID, cGodPowerPlanBPInfluenceValue, 0, 10.0);
+        aiPlanSetVariableFloat(planID, cGodPowerPlanBPInfluenceValue, 0, 300.0);
         aiPlanSetVariableFloat(planID, cGodPowerPlanBPInfluenceDistance, 0, 100.0);
         return (true);  
 	}
@@ -487,12 +447,15 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	{
 		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
 		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelKBResource);
-		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelLocation);
-		
+		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTown);
 		aiPlanSetVariableInt(planID,  cGodPowerPlanResourceType, 0, cResourceFood);
 		aiPlanSetVariableInt(planID,  cGodPowerPlanResourceSubType, 0, cAIResourceSubTypeEasy);
+        vector v2 = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeHuntable, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))));
+        aiPlanSetVariableVector(planID, cGodPowerPlanBPInfluence, 0, v2);
+        aiPlanSetVariableFloat(planID, cGodPowerPlanBPInfluenceValue, 0, 300.0);
+        aiPlanSetVariableFloat(planID, cGodPowerPlanBPInfluenceDistance, 0, 150.0);		
 		aiPlanSetVariableBool(planID,  cGodPowerPlanResourceFilterHuntable, 0, true);
-		aiPlanSetVariableFloat(planID, cGodPowerPlanResourceFilterTotal, 0, 600.0);
+		aiPlanSetVariableFloat(planID, cGodPowerPlanResourceFilterTotal, 0, 300.0);
 		return (true);  
 	}
 	
@@ -1035,7 +998,7 @@ inactive
     if (ShowAiEcho == true) aiEcho("rAge1FindGP:");    
 	
     int id=aiGetGodPowerTechIDForSlot(0); 
-    if (id == -1)
+    if ((id == -1) || (gpDelayMigration == true) && (kbGetAge() < cAge2))
 	return;
 	
     gAge1GodPowerID=aiGetGodPowerProtoIDForTechID(id);
@@ -1725,6 +1688,9 @@ inactive
 {
     if (ShowAiEcho == true) aiEcho("rGaiaForestPower:"); 
 	static bool FirstRun = false;	
+	if (kbGetAge() < cAge2) 
+	return;
+
     xsSetRuleMinIntervalSelf(109);
     if (gGaiaForestPlanID == -1)
     {
@@ -1734,7 +1700,7 @@ inactive
     bool JustCastIt = false;
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 35.0);
+    int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 45.0);
 	if (NumTreesMB <= 10)
 	JustCastIt = true;
     static int count = 0;
@@ -1815,69 +1781,39 @@ inactive
     if (ShowAiEcho == true) aiEcho("rCitadel:");    
 	
     int planID=fCitadelPlanID;
-    static int unitQueryID=-1;
-    static int enemyQueryID=-1;
-	
-	
-    //If we don't have the query yet, create one.
-    if (unitQueryID < 0)
-    unitQueryID=kbUnitQueryCreate("Settlement Query");
-	
-    //Define a query to get all matching units
-    if (unitQueryID != -1)
-    {
-        if (aiRandInt(100) < 50)
-        {
-            kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-            kbUnitQuerySetPlayerRelation(unitQueryID, cPlayerRelationSelf);
-		}
-        else
-        {
-            kbUnitQuerySetPlayerID(unitQueryID, -1);
-            kbUnitQuerySetPlayerRelation(unitQueryID, cPlayerRelationAlly);
-		}
-        kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSettlement);
-        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-	}
-	
-    kbUnitQueryResetResults(unitQueryID);
-    int settlementFound=kbUnitQueryExecute(unitQueryID);
+    bool Ally = true;
+    if (aiRandInt(2) < 1)
+    Ally = false;
+  
+    int settlementFound= 0;
+    if (Ally == true)
+	settlementFound = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly);
+	else
+    settlementFound = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 	
     if (settlementFound < 1)
 	return;
+	int baseID = -1;
 	
-    //If we don't have the query yet, create one.
-    if (enemyQueryID < 0)
-	enemyQueryID=kbUnitQueryCreate("Enemy Query");
-	
-    //Define a query to get all matching units
-    if (enemyQueryID != -1)
-    {
-        kbUnitQuerySetPlayerID(enemyQueryID, -1);
-        kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-        kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeLogicalTypeLandMilitary);
-        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-        kbUnitQuerySetMaximumDistance(enemyQueryID, 32);
-	}
-	
-    int i=0;
-    int baseID=-1;
-    int enemyFound=0;
     for (i=0; < settlementFound)
     {
-        kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-        kbUnitQueryResetResults(enemyQueryID);
-        enemyFound=kbUnitQueryExecute(enemyQueryID);
-        if (enemyFound > 4)
+        int unitID = -1; 
+	    if (Ally == true)
+		unitID = findUnitByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly);
+	    else
+		unitID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive);	
+	    vector unitLoc = kbUnitGetPosition(unitID);	
+	    int enemyMilUnits = getNumUnitsByRel(cUnitTypeMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 32.0, true);
+        if ((enemyMilUnits > 4) && (unitID != -1))
         {
-            baseID = kbUnitGetBaseID(kbUnitQueryGetResult(unitQueryID, i));
+            baseID = kbUnitGetBaseID(unitID);
             break;
 		}
 	}
 	
     if (baseID != -1)
     {
-        if (aiCastGodPowerAtUnit(cTechCitadel,kbUnitQueryGetResult(unitQueryID, i)) == true)
+        if (aiCastGodPowerAtUnit(cTechCitadel, unitID) == true)
         {
             aiPlanSetBaseID(planID, baseID);
             aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
@@ -1967,8 +1903,7 @@ bool canAffordSpeedUpConstruction(int queryID = -1, int index = -1, int escrowID
 	int wood  = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceWood );
 	int food  = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceFood );
 	int favor = kbBuildingGetSpeedUpConstructionCost(queryID, index, cResourceFavor);
-	if (kbGetAge() < cAge2)
-	return(false);
+
 	if(kbEscrowGetAmount(escrowID, cResourceGold)<gold)
 	{
 		return(false);
@@ -2018,39 +1953,11 @@ inactive
 		if(kbBuildingCanSpeedUpConstruction(queryID, i))
 		{
 			// Things we should speed up
-			if(kbUnitIsType(buildingID,cUnitTypeEconomicBuilding))
+			if(kbUnitIsType(buildingID,cUnitTypeBuilding))
 			{
-				if(canAffordSpeedUpConstruction(queryID,0,cEconomyEscrowID))
+				if(canAffordSpeedUpConstruction(queryID,0,cRootEscrowID))
 				{
-					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cEconomyEscrowID);
-				}
-			}
-			else if(kbUnitIsType(buildingID,cUnitTypeAbstractTemple))
-			{
-				if(canAffordSpeedUpConstruction(queryID,0,cEconomyEscrowID))
-				{
-					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cEconomyEscrowID);
-				}
-			}
-			else if(kbUnitIsType(buildingID,cUnitTypeDropsite))
-			{
-				if(canAffordSpeedUpConstruction(queryID,0,cEconomyEscrowID))
-				{
-					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cEconomyEscrowID);
-				}
-			}
-			else if(kbUnitIsType(buildingID,cUnitTypeAbstractDock))
-			{
-				if(canAffordSpeedUpConstruction(queryID,0,cEconomyEscrowID))
-				{
-					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cEconomyEscrowID);
-				}
-			}
-			else if(kbUnitIsType(buildingID,cUnitTypeBuilding)&&kbGetAge()>cAge1)
-			{
-				if(canAffordSpeedUpConstruction(queryID,0,cMilitaryEscrowID))
-				{
-					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cMilitaryEscrowID);
+					kbBuildingPushSpeedUpConstructionButton(queryID, 0, cRootEscrowID);
 				}
 			}
 		}
@@ -2124,11 +2031,11 @@ inactive
 // RULE rCastHeavyGP -- TARTARIAN
 //==============================================================================
 rule rCastHeavyGP
-minInterval 14
+minInterval 10
 inactive
 {
 	static int CastAttempt = 0;
-    int TartGate = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
+    int TartGate = kbUnitCount(cMyID, cUnitTypeTartarianGate, cUnitStateAlive);
 	if ((TartGate > 1) || (CastAttempt > 5))
 	{
 		xsDisableSelf();
@@ -2138,13 +2045,12 @@ inactive
 	int NumSettle = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationEnemy);
 	for (i=0; < NumSettle)
 	{
-		int unitID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive);
+		int unitID = findUnitByRelByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive, -1, cPlayerRelationEnemy);
 		vector unitLoc = kbUnitGetPosition(unitID);
-		int numFarms = getNumUnitsByRel(cUnitTypeFarm, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 35.0, true);
-		int numForts = getNumUnitsByRel(cUnitTypeAbstractFortress, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 40.0, true);
-		if ((numFarms > 4) && (numForts > 0) && (unitID != -1))
+		int numFarms = getNumUnitsByRel(cUnitTypeFarm, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 50.0, true);
+		if ((numFarms >= 4) && (unitID != -1))
 		{
-	        int Target = findUnitByRel(cUnitTypeAbstractFortress, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 40, true);
+	        int Target = findUnitByRel(cUnitTypeAbstractFortress, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 50, true);
 	        vector loc = kbUnitGetPosition(Target);
 			if ((kbLocationVisible(loc) == true) && (Target != -1))
 			{
@@ -2162,10 +2068,10 @@ inactive
 // RULE SetSpecialGP // Goodbye Titan gate.
 //==============================================================================
 rule SetSpecialGP  
-minInterval 15
+minInterval 14
 inactive
 {
-    xsSetRuleMinIntervalSelf(15);
+    xsSetRuleMinIntervalSelf(10+aiRandInt(7));
 	static int CastAttempt=0;
 	static bool CastNow = false;
 	static bool TargetSettlement = false;
@@ -2185,11 +2091,15 @@ inactive
 	
 	if ((TargetTitanGate == true) && (TargetSettlement == false))
 	{
-		int NumGates = kbUnitCount(enemyPlayerID, cUnitTypeTitanGate, cUnitStateAliveOrBuilding);
+		int NumGates = getNumUnitsByRel(cUnitTypeTitanGate, cUnitStateAliveOrBuilding, -1, cPlayerRelationEnemy);
 		for (j = 0; < NumGates)
 		{
-			eUnitID = findUnitByIndex(cUnitTypeTitanGate, j, cUnitStateAliveOrBuilding, -1, enemyPlayerID);
-			eLocation = kbUnitGetPosition(eUnitID);
+		    eUnitID = findUnitByRelByIndex(cUnitTypeTitanGate, j, cUnitStateAliveOrBuilding, -1, cPlayerRelationEnemy);
+			if (eUnitID != -1)
+			{
+			    eLocation = kbUnitGetPosition(eUnitID);
+				break;
+			}
 		}
 	}
 	
