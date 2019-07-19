@@ -1437,9 +1437,9 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     
     aiSetResourceGathererPercentageWeight(cRGPScript, 1.0);
     aiSetResourceGathererPercentageWeight(cRGPCost, 0.0);
-    aiSetResourceGathererPercentage(cResourceGold, goldAssignment, true, cRGPScript);
-    aiSetResourceGathererPercentage(cResourceWood, woodAssignment, true, cRGPScript);
-    aiSetResourceGathererPercentage(cResourceFood, foodAssignment, true, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceGold, goldAssignment, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceWood, woodAssignment, false, cRGPScript);
+    aiSetResourceGathererPercentage(cResourceFood, foodAssignment, false, cRGPScript);
     if (cMyCulture == cCultureGreek)
     {
         if (kbGetAge() < cAge3)
