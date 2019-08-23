@@ -495,7 +495,6 @@ void initRethlAge2(void)
 		}
 		case cCultureChinese:
 		{	
-		    xsEnableRule("getEarthenWall");
 		    xsEnableRule("buildGarden");
 		    xsEnableRule("ChooseGardenResource");
 		    if (cMyCiv == cCivNuwa)	
@@ -540,7 +539,7 @@ void initRethlAge2(void)
 	
     //Try to transport stranded Units.
 	if (gTransportMap == true)
-	xsEnableRule("TransportBuggedUnits");
+	xsEnableRuleGroup("BuggedTransport");
 
 }
 
@@ -556,6 +555,7 @@ active
 	aiResourceCheat(cMyID, cResourceFood, 0.1); 
 	aiResourceCheat(cMyID, cResourceWood, 0.1);
 	aiResourceCheat(cMyID, cResourceGold, 0.1);
+	kbLookAtAllUnitsOnMap(); // this is cheating, but it is super crucial for map detection and consistency and should have little effect on the game as it goes on.
 	
 	int mainBaseID = kbBaseGetMainID(cMyID);
 	//Delayed map check, as kbUnitCount is restricted to visible targets only, until the first second of the game has passed.
@@ -2052,7 +2052,8 @@ inactive
 }
 //==============================================================================
 rule TransportBuggedUnits  
-minInterval 10
+minInterval 14
+group BuggedTransport
 inactive
 {
 	static int TransportAttPlanID = -1;
@@ -2064,8 +2065,7 @@ inactive
 	static vector attPlanPosition = cInvalidVector;
 	bool Filled = false;
 	
-	
-    int activeAttPlans = aiPlanGetNumber(cPlanAttack, -1, true );  // Attack plans, any state, active only
+    int activeAttPlans = aiPlanGetNumber(cPlanAttack, -1, true);  // Attack plans, any state, active only
 	if (activeAttPlans > 0)
     {
         for (i = 0; < activeAttPlans)
@@ -2103,7 +2103,7 @@ inactive
 					aiPlanDestroy(TransportAttPlanID);
 					xsSetRuleMinIntervalSelf(5);
 				}
-				return;		   
+				return;
 			}
 		}
 	}
@@ -2156,6 +2156,46 @@ inactive
 }
 
 //==============================================================================
+rule TransportShipMonitor
+minInterval 30
+group BuggedTransport
+inactive
+{
+	int TransAlive = kbUnitCount(cMyID, cUnitTypeTransport, cUnitStateAlive);
+	int Docks = kbUnitCount(cMyID, cUnitTypeDock, cUnitStateAlive);
+	int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+	if ((TransAlive > 0) || (Docks < 1))
+	return;
+	
+	int currentPop = kbGetPop();
+	int currentPopCap = kbGetPopCap();
+	int TransInProgress = kbUnitCount(cMyID, cUnitTypeTransport, cUnitStateBuilding);
+	if ((currentPop >= currentPopCap - 3) && (currentPopCap > 100) && (TransInProgress > 0))
+	{
+		int PlanToUse = findPlanByString("landAttackPlan", cPlanAttack);
+		int KillCounter = 0;
+		if (PlanToUse == -1)
+		PlanToUse = findPlanByString("enemy settlement attack plan", cPlanAttack);
+		if ((PlanToUse != -1) && (aiPlanGetState(PlanToUse) == cPlanStateTransport))
+		{
+			for (i = 0; < kbUnitCount(cMyID, cUnitTypeHumanSoldier, cUnitStateAlive))
+			{
+				int UnitToKill = findUnitByIndex(cUnitTypeHumanSoldier, i, cUnitStateAlive, -1, cMyID);
+				if ((aiPlanGetState(kbUnitGetPlanID(UnitToKill)) <=0) || (UnitToKill == -1))
+				continue ;
+				aiTaskUnitDelete(UnitToKill);
+				KillCounter = KillCounter + 1;
+				if (KillCounter >= 2)
+				break;
+			}
+		}
+			
+	}
+	else if ((currentPop >= currentPopCap - 3) && (currentPopCap > 100) && (TransInProgress < 1) && (kbResourceGet(cResourceWood) > 250))
+	aiTaskUnitTrain(findUnit(cUnitTypeDock), transportPUID);		
+}
+
+//==============================================================================
 rule StuckNorseTransform  
 minInterval 3
 inactive
@@ -2182,7 +2222,7 @@ inactive
 		int FishingShips = getNumUnits(Ship, cUnitStateAlive, -1, cMyID);
 		int Training = aiPlanGetVariableInt(gFishPlanID, cFishPlanNumberInTraining, 0);
 		
-		if ((kbResourceGet(cResourceWood) < 75) && (kbGetAge() > cAge1) || (IdleFishingShips >= 1) 
+		if ((kbResourceGet(cResourceWood) < 125) || (IdleFishingShips >= 1) 
 		|| (gNavalAttackGoalID != -1) && (kbGetAge() >= cAge2) && (aiGetWorldDifficulty() > cDifficultyModerate) && (kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive) < 2) 
 		|| (kbGetAge() == cAge1) && (FishingShips >= 4) && (kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding) < 1) && (cMyCulture != cCultureEgyptian))
 		{

@@ -467,9 +467,10 @@ inactive
             static int killRaidAttPlanCount = -1;
             static int killLandAttPlanCount = -1;
 			
-		    if ((gTransportMap == false) && (planState == cPlanStateTransport))
+			int transportPUID=kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
+		    if ((planState == cPlanStateTransport) && (gTransportMap == false) || (gTransportMap == true) && (planState == cPlanStateTransport) && (kbUnitCount(cMyID, transportPUID, cUnitStateAlive) < 1))
 			{
-				aiEcho("ERROR an attack plan is trying to transport!  ID: "+attackPlanID);
+				//aiEcho("ERROR an attack plan is trying to transport!  ID: "+attackPlanID);
 				aiPlanAddUnitType(attackPlanID, cUnitTypeLogicalTypeLandMilitary, 0, 0, 0);  // try to kill
 			    if ((aiPlanGetNumberUnits(attackPlanID) < 1) && (aiPlanGetDesiredPriority(attackPlanID) == 1) && (aiPlanGetIDByTypeAndVariableType(cPlanTransport) == -1))
 				aiPlanDestroy(attackPlanID);				

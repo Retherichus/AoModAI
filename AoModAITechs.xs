@@ -608,6 +608,119 @@ minInterval 43 //starts in cAge3
 }
 
 //==============================================================================
+rule WallManager
+inactive
+minInterval 37
+{
+    int techID = -1;
+    static int Step = 0;
+	int FinalStep = 3;
+	if (cMyCulture == cCultureGreek)
+	FinalStep = 1;
+    else if (cMyCulture == cCultureEgyptian)
+	FinalStep = 2;
+    else if (cMyCulture == cCultureNorse)
+	FinalStep = 0;
+    int GoldNeeded = 350;
+	int FoodNeeded = 350;
+    xsSetRuleMinIntervalSelf(37);
+	
+    switch(Step)
+    {
+        case 0:
+        {
+	        if (cMyCulture == cCultureChinese)
+			{	
+			    techID = cTechEarthenWall;
+                GoldNeeded = 200;
+	            FoodNeeded = 200;				
+			}
+		    else
+			techID = cTechStoneWall;	
+            break;
+		}	
+        case 1:
+        {
+			
+		    if (cMyCulture == cCultureChinese)
+			techID = cTechStoneWallChinese;
+		    else
+			{
+		        if (cMyCulture == cCultureAtlantean)
+				{
+                    techID = cTechBronzeWall;
+                    GoldNeeded = 400;
+	                FoodNeeded = 500;
+				}
+			    else
+				{
+				    techID = cTechFortifiedWall;
+                    GoldNeeded = 600;
+	                FoodNeeded = 750;
+			    }
+			}		
+            break;
+		}
+        case 2:
+        {
+		    if (cMyCulture == cCultureAtlantean)
+            techID = cTechIronWall;
+		    else if (cMyCulture == cCultureEgyptian)
+			techID = cTechCitadelWall;	
+            else if (cMyCulture == cCultureChinese)
+			techID = cTechFortifiedWall;    
+            GoldNeeded = 600;
+	        FoodNeeded = 750;		
+            break;
+		}
+        case 3:
+        {
+		    if (cMyCulture == cCultureAtlantean)
+            techID = cTechOreichalkosWall;			
+            else if (cMyCulture == cCultureChinese)
+			techID = cTechGreatWall;
+            GoldNeeded = 750;
+	        FoodNeeded = 1080;		
+            break;
+		}
+	}
+	
+	if ((Step > FinalStep) || (techID == -1))
+	{	
+        xsDisableSelf();
+		aiEcho("Wall upgrades finished");
+        return;
+	}
+	
+	if (kbGetTechStatus(techID) > cTechStatusResearching)
+    {
+        Step = Step + 1;
+		xsSetRuleMinIntervalSelf(8);
+		return;
+	}
+    float goldSupply = kbResourceGet(cResourceGold);
+    float foodSupply = kbResourceGet(cResourceFood);
+	
+    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
+    {
+        if (kbGetTechStatus(techID) < cTechStatusResearching)
+        {
+            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge2) 
+			|| (foodSupply > 800) && (goldSupply > 750) && (kbGetTechStatus(gAge4MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge3))
+            {
+                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
+                xsSetRuleMinIntervalSelf(37);
+			}		
+		}
+        return;
+	}
+    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
+	return;
+    if ((foodSupply < FoodNeeded) || (goldSupply < GoldNeeded))
+	return; 
+	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
+}
+//==============================================================================
 rule getBallistaTower
 inactive
 minInterval 47 //starts in cAge3 activated in getGuardTower
@@ -622,243 +735,6 @@ minInterval 47 //starts in cAge3 activated in getGuardTower
 	xsDisableSelf();
 }
 
-//==============================================================================
-rule getStoneWall
-inactive
-minInterval 37 //starts in cAge2
-{
-    int techID = cTechStoneWall;
-	if (cMyCulture == cCultureChinese)
-	techID = cTechStoneWallChinese;
-    
-	if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        if (cMyCulture == cCultureAtlantean)
-		xsEnableRule("getBronzeWall");
-        else if ((cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureGreek) || (cMyCulture == cCultureChinese))
-		xsEnableRule("getFortifiedWall");
-        xsDisableSelf();
-        return;
-	}
-	
-    if (ShowAiEcho == true) aiEcho("getStoneWall:");
-	
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-	
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-    {
-        if (kbGetTechStatus(techID) < cTechStatusResearching)
-        {
-            if ((foodSupply > 560) && (goldSupply > 350) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
-            {
-                aiPlanDestroy(aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true));
-                xsSetRuleMinIntervalSelf(37);
-			}		
-		}
-        return;
-	}
-    
-    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
-	return;
-	
-    if (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching)
-    {
-        if ((goldSupply < 400) || (foodSupply < 400))
-		return;
-        
-        if ((foodSupply > 560) && (goldSupply > 350))
-		return;
-	}
-    
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
-}
-
-//==============================================================================
-rule getFortifiedWall
-inactive
-minInterval 37 //starts in cAge2 activated in getStoneWall
-{
-    int techID = cTechFortifiedWall;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        if (cMyCulture == cCultureEgyptian)
-		xsEnableRule("getCitadelWall");
-        if (cMyCulture == cCultureChinese)
-		xsEnableRule("getGreatWall");			
-		
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getFortifiedWall:");
-	
-    if (kbGetTechStatus(cTechStoneWall) < cTechStatusResearching)
-    {
-        return;
-	}		
-    
-    int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
-    if (numFortresses < 1)
-	return;
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);    
-    if ((goldSupply < 600) || (foodSupply < 750))
-	return;
-	
-    if ((kbGetAge() == cAge3) && (goldSupply > 700) && (foodSupply > 700))
-	return;
-    
-	if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;
-    
-	static int count = 0;        
-    if (count < 1)
-    {
-        count = count + 1;
-        return;
-	}
-	
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
-}
-
-//==============================================================================
-rule getCitadelWall
-inactive
-minInterval 37 //starts in cAge2 activated in getFortifiedWall
-{
-    int techID = cTechCitadelWall;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getCitadelWall:");
-	
-    if (kbGetTechStatus(cTechFortifiedWall) < cTechStatusResearching)
-    {
-        return;
-	}
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-    if ((goldSupply < 750) || (foodSupply < 1080))
-	return;
-	
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;		
-	
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
-}
-
-//==============================================================================
-rule getBronzeWall
-inactive
-minInterval 37 //starts in cAge2 activated in getStoneWall
-{
-    int techID = cTechBronzeWall;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsEnableRule("getIronWall");
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getBronzeWall:");		
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-	
-    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() == cAge3))
-	return;
-    
-	if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;
-	
-    
-	static int count = 0;        
-    if (count < 1)
-    {
-        count = count + 1;
-        return;
-	}
-	
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
-}
-
-//==============================================================================
-rule getIronWall
-inactive
-minInterval 37 //starts in cAge2 activated in getBronzeWall
-{
-    int techID = cTechIronWall;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsEnableRule("getOreichalkosWall");
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getIronWall:");
-	
-    if (kbGetTechStatus(cTechBronzeWall) < cTechStatusResearching)
-    {
-        return;
-	}	
-    int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
-    if (numFortresses < 1)
-	return;
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-    if ((goldSupply < 675) || (foodSupply < 900))
-	return;
-	
-	if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;
-	
-    static int count = 0;        
-    if (count < 1)
-    {
-        count = count + 1;
-        return;
-	}
-	
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
-}
-
-//==============================================================================
-rule getOreichalkosWall
-inactive
-minInterval 37 //starts in cAge2 activated in getIronWall
-{
-    int techID = cTechOreichalkosWall;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getOreichalkosWall:");
-	
-    if (kbGetTechStatus(cTechIronWall) < cTechStatusResearching)
-    {
-        return;
-	}
-	
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);
-    if ((goldSupply < 900) || (foodSupply < 1275))
-	return;
-	
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;	
-	
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
-	xsSetRuleMinIntervalSelf(307);
-}
 
 //==============================================================================
 rule getHandsOfThePharaoh
@@ -2746,72 +2622,6 @@ group Aokuang
     if (gTransportMap == true)
 	createSimpleResearchPlan(cTechEastSea, -1, cMilitaryEscrowID, 10);
 	xsDisableSelf();
-}
-
-//==============================================================================
-rule getEarthenWall
-inactive
-minInterval 37 //starts in cAge2
-{
-    int techID = cTechEarthenWall;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {
-        xsEnableRule("getStoneWall");
-        xsDisableSelf();
-        return;
-	}
-	
-    if (ShowAiEcho == true) aiEcho("getEarhernWall:");
-    
-    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
-	return;
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-	return;
-
-	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
-}
-
-//==============================================================================
-rule getGreatWall
-inactive
-minInterval 37 //starts in cAge2 activated in getStoneWall
-{
-    int techID = cTechGreatWall;
-    if (kbGetTechStatus(techID) > cTechStatusResearching)
-    {		
-		
-        xsDisableSelf();
-        return;
-	}
-    
-    if (ShowAiEcho == true) aiEcho("getGreatWall:");
-	
-    if (kbGetTechStatus(cTechStoneWallChinese) < cTechStatusResearching)
-    {
-        return;
-	}
-	
-    if (aiPlanGetIDByTypeAndVariableType(cPlanResearch, cResearchPlanTechID, techID, true) >= 0)
-    return;
-    
-    int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
-    if (numFortresses < 1)
-	return;
-    
-    float goldSupply = kbResourceGet(cResourceGold);
-    float foodSupply = kbResourceGet(cResourceFood);    
-    if ((goldSupply < 600) || (foodSupply < 750))
-	return;
-	
-	
-    static int count = 0;        
-    if (count < 1)
-    {
-        count = count + 1;
-        return;
-	}
-	
-    createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
 }
 
 //==============================================================================

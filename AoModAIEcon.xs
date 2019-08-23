@@ -1457,7 +1457,7 @@ inactive
     int gathererCount = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
 	
     if (cMyCulture == cCultureAtlantean)
-	gathererCount = gathererCount * 2;
+	gathererCount = gathererCount * 3;
     gathererCount = gathererCount + kbUnitCount(cMyID, kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0), cUnitStateAlive);
 	
     if ((gathererCount < 7) && (xsGetTime() < 2*60*1000))

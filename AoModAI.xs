@@ -1152,22 +1152,6 @@ minInterval 6
 				}
 			}
 		}
-	} 	
-	
-	// Special Treatment for excess gold as requested, thanks StinnerV!
-	bool Ok = true;
-	if ((foodSupply > 10000) && (goldSupply > mGoldBeforeTrade) && (woodSupply > 10000))
-	Ok = false;
-	
-	if ((aiGetWorldDifficulty() > cDifficultyEasy) && (kbGetAge() > cAge3 && xsGetTime() > 14*60*1000) && (Ok == true))
-	{
-		if (goldSupply > mGoldBeforeTrade)
-		{
-			if (woodSupply > foodSupply)
-			aiBuyResourceOnMarket(cResourceFood);
-			else
-			aiBuyResourceOnMarket(cResourceWood);  
-		}
 	}
 }
 
@@ -1418,22 +1402,6 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 			}
 		}
 	}
-
-	//Test
-    //if we lost a lot of villagers, keep them close to our settlements (=farming)
-    int minVillagers = 14;
-    if (cMyCulture == cCultureAtlantean)
-	minVillagers = 5;
-	if (aiGetWorldDifficulty() > cDifficultyHard)
-	minVillagers = minVillagers / 2;		
-    int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
-    if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2) && (xsGetTime() > 16*60*1000))
-    {
-        goldAssignment = 0.1;
-        woodAssignment = 0.2;
-        foodAssignment = 0.7;
-	}
-	//Test end
     
     aiSetResourceGathererPercentageWeight(cRGPScript, 1.0);
     aiSetResourceGathererPercentageWeight(cRGPCost, 0.0);
@@ -1476,9 +1444,9 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 		}
 	}
 	
-    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceGold, aiGetResourceGathererPercentage(cResourceGold, cRGPScript));
-    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceWood, aiGetResourceGathererPercentage(cResourceWood, cRGPScript));
-    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood, aiGetResourceGathererPercentage(cResourceFood, cRGPScript));
+    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceGold, goldAssignment);
+    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceWood, woodAssignment);
+    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood, foodAssignment);
     aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFavor, aiGetResourceGathererPercentage(cResourceFavor, cRGPScript));
 	aiNormalizeResourceGathererPercentages(cRGPScript);
 	
@@ -3281,8 +3249,7 @@ void age2Handler(int age=1)
         xsEnableRule("otherBaseRingWallTeam1");
         
         //start up the wall upgrades.
-		if (cMyCulture != cCultureChinese)
-        xsEnableRule("getStoneWall");
+        xsEnableRule("WallManager");
         
 	    if (cMyCulture == cCultureNorse)
         xsEnableRule("norseInfantryBuild");

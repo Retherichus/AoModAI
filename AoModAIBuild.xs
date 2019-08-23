@@ -2325,6 +2325,12 @@ inactive
                     int motherNatureSettlementAtBuildPlanPos = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, 0, buildPlanCenterPos, 15.0);
                     enemySettlementAtBuildPlanPos = enemySettlementAtBuildPlanPos - motherNatureSettlementAtBuildPlanPos;
                     int alliedSettlementAtBuildPlanPos = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly, buildPlanCenterPos, 15.0);
+					if (aiPlanGetBaseID(buildPlanIndexID) == mainBaseID) 
+                    {
+                        alliedSettlementAtBuildPlanPos = 0;
+                        enemySettlementAtBuildPlanPos = 0;
+					}
+					
                     if ((enemySettlementAtBuildPlanPos > 0) || (alliedSettlementAtBuildPlanPos > 0))
                     {
                         if (ShowAiEcho == true) aiEcho("destroying fortressBuildPlan as an enemy or an ally has built a settlement at the cBuildPlanCenterPosition");
@@ -2407,7 +2413,7 @@ inactive
         
         aiPlanSetEscrowID(planID, cMilitaryEscrowID);
         
-        aiPlanSetInitialPosition(planID, location);
+        
         //variables for our fortress placing
         vector frontVector = kbBaseGetFrontVector(cMyID, otherBaseID);
         float fx = xsVectorGetX(frontVector);
@@ -2416,23 +2422,21 @@ inactive
         if (otherBaseID == mainBaseID)
         {
             aiPlanSetVariableFloat(planID, cBuildPlanRandomBPValue, 0, 0.99);
-            int desiredNumFortresses = 3;
-            if ((numFortressesNearMainBase >= desiredNumFortresses) && (kbGetAge() < cAge4))
-			return;
-            
-            fx = fx * aiRandInt(30) + 15;
-            fz = fz * aiRandInt(30) + 15;
-			
+            fx = fx * aiRandInt(40) + 25;
+            fz = fz * aiRandInt(40) + 25;
             frontVector = xsVectorSetX(frontVector, fx);
             frontVector = xsVectorSetZ(frontVector, fz);
             frontVector = xsVectorSetY(frontVector, 0.0);
             
             location = location + frontVector;
             aiPlanSetVariableVector(planID, cBuildPlanInfluencePosition, 0, location);
-            aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionDistance, 0, 20.0);
-            aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionValue, 0, 1.0);
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionDistance, 0, 40.0);
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluencePositionValue, 0, 100.0);
 
-            aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 5.0);
+            aiPlanSetVariableFloat(planID, cBuildPlanBuildingBufferSpace, 0, 10.0);
+            aiPlanSetVariableInt(planID, cBuildPlanInfluenceUnitTypeID, 0, MyFortress); 
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitDistance, 0, 15);    
+            aiPlanSetVariableFloat(planID, cBuildPlanInfluenceUnitValue, 0, -22.0);  			
 		}
         else
         {
@@ -2446,7 +2450,7 @@ inactive
             // Weight it to stay very close to center point.
             aiPlanSetVariableVector(planID, cBuildPlanInfluencePosition, 0, location);    // Position influence for landing position			
 		}
-        
+        aiPlanSetInitialPosition(planID, location);
         aiPlanSetActive(planID);
         if (ShowAiEcho == true) aiEcho("buildFortress: attempting to build at base: #"+otherBaseID);
 	}
