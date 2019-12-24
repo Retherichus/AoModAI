@@ -688,14 +688,13 @@ minInterval 37
 	if ((Step > FinalStep) || (techID == -1))
 	{	
         xsDisableSelf();
-		aiEcho("Wall upgrades finished");
         return;
 	}
 	
 	if (kbGetTechStatus(techID) > cTechStatusResearching)
     {
         Step = Step + 1;
-		xsSetRuleMinIntervalSelf(8);
+		xsSetRuleMinIntervalSelf(5);
 		return;
 	}
     float goldSupply = kbResourceGet(cResourceGold);
@@ -714,11 +713,11 @@ minInterval 37
 		}
         return;
 	}
-    if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
-	return;
-    if ((foodSupply < FoodNeeded) || (goldSupply < GoldNeeded))
+    if ((foodSupply < FoodNeeded) || (goldSupply < GoldNeeded) || (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (gTransportMap == false))
 	return; 
+
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 30);
+	xsSetRuleMinIntervalSelf(2);
 }
 //==============================================================================
 rule getBallistaTower

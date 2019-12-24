@@ -32,6 +32,7 @@ extern int gHeavyGPPlan=-1;
 extern int gDefendPlentyVaultWater=-1;
 extern int WallAllyPlanID=-1;
 extern int FailedToTrain = 0;
+extern int defWantedCaravans = 22;
 extern bool KOTHStopRefill = false;
 extern vector KOTHGlobal = cInvalidVector;
 extern bool IhaveAllies = false;
@@ -56,6 +57,9 @@ extern bool AoModAllies = false;
 extern const int Tellothers = 30;
 extern const int admiralTellothers = 31;
 extern const int AttackTarget = 35;
+extern const int cAttackTC = 36;
+extern int aEnemyTCID = -1;
+extern int aLastTCIDTime = 0;
 extern const int cEmergency = 38;
 extern const int cLowPriority = 39;
 extern const int VectorData = 40;
@@ -110,7 +114,6 @@ extern int eHMaxMilPop = 25;              // Heroic age.
 
 
 //STINNERV Stuff, or rather what's left of it.
-extern int gTitanTradeCarts = 15;         // Max trade carts for Titan (+5)
 extern int mGoldBeforeTrade = 6500;       //Excess gold to other resources, (All modes).
 extern bool DisallowPullBack = false;  // set true to make the AI no longer retreat(All modes).
 // End of STINNERV
@@ -209,6 +212,29 @@ void Comms(int PlayerID = -1)
 			ChangeMHP = true;
 			MHPTime = xsGetTime();
 		}		
+		else if (iPromptType == cAttackTC)
+		{
+			if ((aiGetCaptainPlayerID(cMyID) == cMyID) || (iUserData < 0))
+			return;
+		    aEnemyTCID = iUserData;
+			aLastTCIDTime = xsGetTime();
+			if (ShowAIComms == true) aiEcho("Player "+iSenderID+" is asking us to assist on tcid: "+iUserData);	
+			if (aiPlanGetState(gEnemySettlementAttPlanID) > 0)
+			{
+				vector SettleThere = kbUnitGetPosition(aEnemyTCID);
+				for (n=1; <= cNumberPlayers)
+                {
+					if ((n == cMyID) || (kbIsPlayerAlly(n) == true) || (kbHasPlayerLost(n) == true))
+		            continue;
+					if (getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, n, SettleThere, 15.0) > 0)
+					{
+						aiPlanSetVariableInt(gEnemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, aEnemyTCID);
+						aiPlanSetVariableInt(gEnemySettlementAttPlanID, cAttackPlanPlayerID, 0, n);
+						break;
+					}	
+				}
+			}
+		}
 		
 		else if (iPromptType == INeedHelp)
 		{
@@ -230,8 +256,12 @@ void Comms(int PlayerID = -1)
 	            return;			
 				int NumBThatShoots = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, iPos, 75.0);
 				int ActiveBPlan = findPlanByString("TowerRequested", cPlanBuild);
+				int allowconstructors = 15;
+				if (cMyCulture == cCultureAtlantean)
+				allowconstructors = 5;		
+			    int numGatherers = kbUnitCount(cMyID,cBuilderType, cUnitStateAlive);
 				
-				if ((ActiveBPlan  == -1) && (NumBThatShoots < 2) && (kbGetAge() > cAge2))
+				if ((ActiveBPlan  == -1) && (NumBThatShoots < 2) && (kbGetAge() > cAge2) && (numGatherers > allowconstructors))
 				{
 					int TowerPlan=aiPlanCreate("TowerRequested", cPlanBuild);
 					if (TowerPlan < 0)
@@ -259,6 +289,8 @@ void Comms(int PlayerID = -1)
 					aiPlanSetActive(TowerPlan);
 					if (ShowAIComms == true) aiEcho("Player "+iSenderID+" is requesting a tower over at the following location: "+iPos);	
 				}
+				if ((ActiveBPlan  != -1) && (numGatherers <= allowconstructors))
+				aiPlanDestroy(TowerPlan);				
 			}
 		}
 		
@@ -349,6 +381,7 @@ void initRethlAge1(void)  // Am I doing this right??
 {
 	aiSetWonderDeathEventHandler("wonderDeathHandler");
 	aiCommsSetEventHandler("Comms");
+	kbLookAtAllUnitsOnMap(); // this is cheating, but it is super crucial for map detection and consistency and should have little effect on the game as it goes on.
 	gSomeData = aiPlanCreate("Game Data", cPlanData);
 	if (gSomeData != -1)
 	{
@@ -360,9 +393,11 @@ void initRethlAge1(void)  // Am I doing this right??
 	    aiPlanAddUserVariableFloat(gSomeData, 5, "G% ", 1);
 	    aiPlanAddUserVariableFloat(gSomeData, 6, "W% ", 1);
 		aiPlanAddUserVariableInt(gSomeData, 7, "Caravans ", 1);
+		aiPlanAddUserVariableFloat(gSomeData, 8, "gGlutRatio ", 1);
 		aiPlanAddUserVariableFloat(gSomeData, EcoPercentage, "EcoEscrow% ", 1);
 	    aiPlanAddUserVariableFloat(gSomeData, MilPercentage, "MilEscrow% ", 1);
 		aiPlanAddUserVariableFloat(gSomeData, RootPercentage, "RootEscrow% ", 1);
+		
 		
 		//Military
 	    aiPlanAddUserVariableString(gSomeData, 84, "=-------- Military --------", 1);
@@ -405,15 +440,6 @@ void initRethlAge1(void)  // Am I doing this right??
 		if (ShowAiEcho == true) aiEcho("Not going to waste pop slots on Transport ships.");
 	}
 	
-	if (cMyCulture == cCultureChinese)
-	{
-		if (cRandomMapName == "vinlandsaga" || cRandomMapName == "team migration")
-		{
-			int areaID=kbAreaGetClosetArea(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)), cAreaTypeWater);
-			aiUnitCreateCheat(cMyID, cUnitTypeTransportShipChinese, kbAreaGetCenter(areaID), "Spawn missing boat", 1);
-			xsEnableRule("StartingBoatFailsafe");
-		}
-	}
 	if ((kbGetTechStatus(cTechSecretsoftheTitans) > cTechStatusUnobtainable) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusActive))
 	TitanAvailable = true;
 
@@ -430,6 +456,9 @@ void initRethlAge1(void)  // Am I doing this right??
 	MyFortress = cUnitTypePalace;	
 	else if (cMyCulture == cCultureChinese)
 	MyFortress = cUnitTypeCastle;
+	if ((aiGetWorldDifficulty() == cDifficultyNightmare) || (aiGetWorldDifficulty() == cDifficultyEasy))
+	gMaxTradeCarts = 16;
+	defWantedCaravans = gMaxTradeCarts;
 }
 
 //==============================================================================
@@ -504,7 +533,6 @@ void initRethlAge2(void)
 	        else if (cMyCiv == cCivFuxi)
 	        xsEnableRule("rSpeedUpBuilding");		
 		    aiPlanSetVariableInt(mChineseImmortal, cTrainPlanNumberToMaintain, 0, 8);
-		    aiPlanSetDesiredPriority(mChineseImmortal, 91);		
 			break;
 		}		
 	}
@@ -550,13 +578,6 @@ rule ActivateRethOverridesAge1
 minInterval 1
 active
 {
-	
-	//Adds 0.1 (not even 1!) of all resources to fix a critical "startup-inventory" bug that can potentially block the AI from making vills until the first villager have returned any resource.
-	aiResourceCheat(cMyID, cResourceFood, 0.1); 
-	aiResourceCheat(cMyID, cResourceWood, 0.1);
-	aiResourceCheat(cMyID, cResourceGold, 0.1);
-	kbLookAtAllUnitsOnMap(); // this is cheating, but it is super crucial for map detection and consistency and should have little effect on the game as it goes on.
-	
 	int mainBaseID = kbBaseGetMainID(cMyID);
 	//Delayed map check, as kbUnitCount is restricted to visible targets only, until the first second of the game has passed.
 	if ((cvRandomMapName == "river styx") && (cMyCulture != cCultureEgyptian))
@@ -575,19 +596,68 @@ active
         bool Success = false;		
         int transport = kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionWaterTransport, 0);
 		int numSettlements = kbUnitCount(0, cUnitTypeAbstractSettlement, cUnitStateAny);
+		vector mainBasePos = kbBaseGetLocation(cMyID, mainBaseID);
 		if ((mainBaseID == -1) && (kbUnitCount(cMyID, cUnitTypeBuilding, cUnitStateAlive) < 1) && (numSettlements > 0)) // check for nomad too?
 		{
 		    xsEnableRule("nomadSearchMode");
 			cvMapSubType = NOMADMAP;
+			mainBasePos = kbUnitGetPosition(findUnit(cUnitTypeUnit));
+			if (kbUnitCount(cMyID, cUnitTypeTransport, cUnitStateAny) > 0)
+			{
+				int query=kbUnitQueryCreate("initialpos");
+				configQuery(query, -1, -1, -1, cMyID);
+				kbUnitQueryResetResults(query);
+				int num=kbUnitQueryExecute(query);
+				int base=kbBaseCreate(cMyID, "InitialIslandBase", kbUnitGetPosition(kbUnitQueryGetResult(query, 0)), 15.0);
+				kbBaseSetMain(cMyID, base);
+				kbBaseSetEconomy(cMyID, base, true);
+				kbBaseSetMilitary(cMyID, base, true);
+				kbBaseSetActive(cMyID, base, true); 
+				if (ShowAiEcho == true) aiEcho("num="+num);
+				for ( i=0; < num)
+				{
+					if (ShowAiEcho == true) aiEcho("adding unit "+i);
+					kbBaseAddUnit(cMyID, base, kbUnitQueryGetResult(query, i));
+				}
+				gVinlandsagaInitialBaseID=kbBaseGetMainID(cMyID);
+				if (ShowAiEcho == true) aiEcho("Initial Base="+gVinlandsagaInitialBaseID);
+				cvMapSubType = WATERNOMADMAP;
+				// Move the transport toward map center to find continent quickly.
+				int gTransportUnit = findUnit(cUnitTypeTransport);
+				vector nearCenter = kbGetMapCenter();
+				nearCenter = (nearCenter + kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) / 2.0;    // Halfway between start and center
+				nearCenter = (nearCenter + kbGetMapCenter()) / 2.0;   // 3/4 of the way to map center
+				aiTaskUnitMove(gTransportUnit, nearCenter);
+				if (ShowAiEcho == true) aiEcho("Sending transport "+gTransportUnit+" to near map center at "+nearCenter);
+				xsEnableRule("vinlandsagaFailsafe");  // In case something prevents transport from reaching, turn on the explore plan.
+				
+				//Enable the rule that looks for the mainland.
+				xsEnableRule("findVinlandsagaBase");
+				//Turn off auto dropsite building.
+				if ( cMyCulture != cCultureEgyptian )
+				aiSetAllowAutoDropsites(false);
+				// turn off all buildings
+				aiSetAllowBuildings(false);
+				// turn off housebuilding rule
+				xsDisableRule("buildHouse");
+				
+				//Turn off fishing.
+				xsDisableRule("fishing");
+				//Pause the age upgrades.
+				aiSetPauseAllAgeUpgrades(true);
+			}
 			if (ShowAiEcho == true) aiEcho("Map has been detected as a Nomad Map!");
+			
 		}
 		if (NeedTransportCheck == true) 
 		{
-			for (k = 0; < cNumberPlayers)
+			for (k = 1; < cNumberPlayers)
 			{
 				int targetSettlementID = getMainBaseUnitIDForPlayer(k);
+				if (targetSettlementID == -1)
+				continue;
 				vector targetSettlementPos = kbUnitGetPosition(targetSettlementID);
-				if ((targetSettlementID != -1) && (kbAreaGroupGetIDByPosition(targetSettlementPos) != kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)))) 
+				if ((kbAreaGroupGetIDByPosition(targetSettlementPos) != kbAreaGroupGetIDByPosition(mainBasePos))
 				|| (kbUnitCount(cMyID, transport, cUnitStateAlive) > 0))
 				{
 					Success = true;
@@ -600,7 +670,7 @@ active
 				{
 					int nTCID = findUnitByIndex(cUnitTypeAbstractSettlement, l, cUnitStateAny, -1, 0);
 					vector targetNeutralPos = kbUnitGetPosition(nTCID);
-					if ((nTCID != -1) && (kbAreaGroupGetIDByPosition(targetNeutralPos) != kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)))))
+					if ((nTCID != -1) && (kbAreaGroupGetIDByPosition(targetNeutralPos) != kbAreaGroupGetIDByPosition(mainBasePos)))
 					{
 						Success = true;
 						break;
@@ -612,7 +682,7 @@ active
 				gTransportMap = true;
 				aiSetWaterMap(gTransportMap == true);
 				gWaterMap = true;
-				if (ShowAiEcho == true) aiEcho("Transport is needed, because a player or a TC is on a different island!");
+				aiEcho("Transport is needed, because a player or a TC is on a different island!");
 			}
 		}
 	}
@@ -630,12 +700,11 @@ active
 	if ((gBuildWallsAtMainBase == true) && (mRusher == false) && (cvOkToBuildWalls == true))
 	xsEnableRule("mainBaseAreaWallTeam1");
     if (cMyCulture == cCultureEgyptian)
-	xsEnableRule("EarlyPharaoh");
+    xsEnableRule("PharaohEmp");
     if ((mainBaseID >= 0) && (cvMapSubType != VINLANDSAGAMAP))
 	{
 	    ResourceBaseID = CreateBaseInBackLoc(mainBaseID, 30, 100, "Temp Resource Base");
 	}
-
 	xsDisableSelf();	   
 }
 
@@ -782,6 +851,7 @@ active
 			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeHuskarl, 1.0);
 			else
 			kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeHuskarl, 0.8+upAV(3));
+			xsEnableRuleGroup("HateScriptsSpecial");
         }
 		if (aiGetWorldDifficulty() != cDifficultyEasy)
 		{
@@ -802,10 +872,10 @@ active
 			}
 			if (MyCata != -1)
 			{
-				int CataMaintain = createSimpleMaintainPlan(MyCata, 2, false, kbBaseGetMainID(cMyID));
+				int CataMaintain = createSimpleMaintainPlan(MyCata, 3, false, kbBaseGetMainID(cMyID));
 				aiPlanSetDesiredPriority(CataMaintain, 90);
 			}
-			xsEnableRule("buildForwardFortress");		
+			xsEnableRule("SupportUnits");		
 		}
 		xsDisableSelf();  
 	}
@@ -1039,7 +1109,7 @@ Group Donations
     
     static int startIndex = -1; 
     startIndex = aiRandInt(cNumberPlayers);
-
+	
     int actualPlayerID = -1;
     for (i = 0; < cNumberPlayers)
     {
@@ -1423,17 +1493,21 @@ inactive
 group HateScriptsSpecial
 {
 	int UnitType = cUnitTypeCrossbowman;
+	int Range = 25;
+	int UnitToCounter = cUnitTypeLogicalTypeBuildingsNotWalls;	
 	if (cMyCulture == cCultureChinese)
 	{
 		if (cMyCiv == cCivShennong)
 		UnitType = cUnitTypeFireLanceShennong;
 		else UnitType = cUnitTypeFireLance;
-	}	
-	int Range = 25;
-	int UnitToCounter = cUnitTypeLogicalTypeBuildingsNotWalls;
-	if (cMyCulture == cCultureChinese)
-    UnitToCounter = cUnitTypeAbstractArcher;
-	
+		UnitToCounter = cUnitTypeAbstractArcher;
+	}
+	else if (cMyCulture == cCultureNorse)
+	{
+	    UnitType = cUnitTypeBogsveigir;
+		UnitToCounter = cUnitTypeFlyingUnit;
+	}
+
 	int UnitsFound = kbUnitCount(cMyID, UnitType, cUnitStateAlive);
 	if ((UnitsFound < 1) || (UnitType == -1) || (UnitToCounter == -1))
 	return;
@@ -1942,33 +2016,6 @@ inactive
 }
 // KOTH COMPLEX END
 //==============================================================================
-rule StartingBoatFailsafe  // for vinlandsaga and team migration where ships may fail to spawn, will also scout the mainland.
-minInterval 5
-inactive
-{
-	vector HomeBase = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
-	int boats = kbUnitCount(cMyID, cUnitTypeTransport, cUnitStateAlive);
-	static int TransportUnit=-1;
-	static bool CheckCenter = false;
-	static bool Spawned = false;
-	if ((boats <= 0) && (Spawned == false))
-	{
-		aiUnitCreateCheat(cMyID, cUnitTypeRoc, HomeBase, "Spawn backup roc", 1);
-		Spawned = true;
-		return;
-	}
-	if ((CheckCenter == false) && (boats >= 1))
-	{
-		vector nearCenter = kbGetMapCenter();
-        TransportUnit = findUnit(cUnitTypeTransport);
-        nearCenter = kbGetMapCenter();
-        nearCenter = (nearCenter + kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) / 2.0;
-        nearCenter = (nearCenter + kbGetMapCenter()) / 2.0;   
-        aiTaskUnitMove(TransportUnit, nearCenter);
-		CheckCenter = true;
-	}	
-	xsDisableSelf();
-}
 
 //==============================================================================
 rule RemoveBadWalls
@@ -2123,7 +2170,8 @@ inactive
 	vector targetSettlementPos = kbUnitGetPosition(targetSettlementID); // uses main TC
     vector RandUnit = kbUnitGetPosition(findUnit(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, AttackPlayer));
 	vector RandBuilding = kbUnitGetPosition(findUnit(cUnitTypeLogicalTypeBuildingsNotWalls, cUnitStateAlive, -1, AttackPlayer));
-    vector RandVillager = kbUnitGetPosition(findUnit(cUnitTypeAbstractVillager, cUnitStateAlive, -1, AttackPlayer));	
+    vector RandVillager = kbUnitGetPosition(findUnit(cUnitTypeAbstractVillager, cUnitStateAlive, -1, AttackPlayer));
+	attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
 	aiPlanSetNumberVariableValues(TransportAttPlanID, cAttackPlanTargetAreaGroups, 5, true);   
 	aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 0, kbAreaGroupGetIDByPosition(attPlanPosition));
 	aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 1, kbAreaGroupGetIDByPosition(targetSettlementPos));
@@ -2131,9 +2179,8 @@ inactive
     aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 3, kbAreaGroupGetIDByPosition(RandBuilding));
 	aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanTargetAreaGroups, 4, kbAreaGroupGetIDByPosition(RandVillager));	
 	aiPlanAddUnitType(TransportAttPlanID, cUnitTypeHumanSoldier, 0, 0, 1);
-	attPlanPosition = aiPlanGetLocation(TransportAttPlanID);
 	
-    aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanPlayerID, 0, AttackPlayer);
+	
 	aiPlanSetInitialPosition(TransportAttPlanID, attPlanPosition);
     aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
     aiPlanSetVariableInt(TransportAttPlanID, cAttackPlanAttackRoutePattern, 0, cAttackPlanAttackRoutePatternBest);
@@ -2357,18 +2404,6 @@ inactive
 	}
 }
 
-rule EarlyPharaoh  
-minInterval 5
-inactive
-{
-	int Pharaoh = findUnit(cUnitTypePharaoh, cUnitStateAlive, cActionIdle, cMyID);
-	int TC = findUnit(cUnitTypeDropsite, cUnitStateBuilding, -1, cMyID);
-	if (TC == -1)
-	TC = findUnit(cUnitTypeDropsite, cUnitStateAliveOrBuilding, -1, cMyID);
-	if ((Pharaoh != -1) && (TC != -1))
-	aiTaskUnitWork(Pharaoh, TC);	
-    xsDisableSelf();
-}
 //==============================================================================
 //Testing ground
 rule TEST  

@@ -62,8 +62,8 @@ inactive
 	TotalBuilders = 10; // fake it
     
 	
-	int ActivePlans = findPlanByString("Remote Settlement Transport", cPlanTransport, -1, true);
-	int ActiveBackupPlans = findPlanByString("Backup Remote Settlement", cPlanBuild, -1, true);
+	int ActivePlans = findPlanByString("Remote Settlement Transport", cPlanTransport, -1, true, true);
+	int ActiveBackupPlans = findPlanByString("Backup Remote Settlement", cPlanBuild, -1, true, true);
 	if ((ActivePlans >= 1) || (TotalBuilders < 10) || (kbUnitCount(cMyID, cUnitTypeTransport, cUnitStateAlive) < 1) 
 	|| (kbResourceGet(cResourceGold) < 500) || (kbResourceGet(cResourceFood) < 200) || (kbResourceGet(cResourceWood) < 400) && (cMyCulture != cCultureEgyptian))
 	return;
@@ -101,7 +101,7 @@ inactive
 	if (equal(gTransportToSettlementPos, there))
 	{
 		int NumNeutralTC = NumUnitsOnAreaGroupByRel(true, kbAreaGroupGetIDByPosition(there), cUnitTypeSettlement, 0);	
-		int NumBuilder = NumUnitsOnAreaGroupByRel(false, kbAreaGroupGetIDByPosition(there), cBuilderType);	
+		int NumBuilder = NumUnitsOnAreaGroupByRel(true, kbAreaGroupGetIDByPosition(there), cBuilderType, cMyID);	
 		
 		if ((NumBuilder > 0) && (NumNeutralTC >= 1) && (ActiveBackupPlans <= 0))
 		{
@@ -236,7 +236,7 @@ inactive
 	if ( minShips > maxShips)
 	minShips = maxShips;
 	
-	gTargetNavySize = maxShips;   // Set the global var for forecasting
+	gTargetNavySize = maxShips+2;   // Set the global var for forecasting
 	
 	//If we already have a Naval UP, just set the numbers and be done.  If we don't
 	//want anything, just set 1 since we've already done it before.
@@ -284,40 +284,8 @@ inactive
 	kbUnitPickSetMaximumPop(gNavalUPID, 4);	
 	kbUnitPickSetAttackUnitType(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary);
 	kbUnitPickSetGoalCombatEfficiencyType(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary);
+	kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeLogicalTypeNavalMilitary, 1.0);
 	kbUnitPickSetMovementType(gNavalUPID, cMovementTypeWater);
-
-	//have to add them manually, otherwise the Unit Picker will go crazy and over train units.
-	if (cMyCulture == cCultureGreek)
-	{
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeTrireme, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeRammingShipGreek, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipGreek, 1.0);	 
-	}
-	else if (cMyCulture == cCultureEgyptian)
-	{
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeKebenit, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeRammingShipEgyptian, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipEgyptian, 1.0);	
-	}
-	else if (cMyCulture == cCultureNorse)
-	{
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeLongboat, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeRammingShipNorse, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipNorse, 1.0);	
-	}
-	else if (cMyCulture == cCultureAtlantean)
-	{
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeBireme, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeFireShipAtlantean, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipAtlantean, 1.0);	
-	}
-	else if (cMyCulture == cCultureChinese)
-	{
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeJunk, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeFireShipChinese, 1.0);
-		kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeSiegeShipChinese, 1.0);	
-	}
-	kbUnitPickSetPreferenceFactor(gNavalUPID, cUnitTypeMythUnit, 0.8);	
 	
 	//Create the attack goal.
 	gNavalAttackGoalID=createSimpleAttackGoal("Naval Attack", -1, gNavalUPID, -1, kbGetAge(), -1, -1, false);
@@ -330,33 +298,24 @@ inactive
 	aiPlanSetVariableBool(gNavalAttackGoalID, cGoalPlanSetAreaGroups, 0, false);
     aiPlanSetNumberVariableValues(gNavalAttackGoalID, cGoalPlanUpgradeBuilding, 1, true);
     aiPlanSetVariableInt(gNavalAttackGoalID, cGoalPlanUpgradeBuilding, 0, cUnitTypeDock);
-	aiPlanSetDesiredPriority(gNavalAttackGoalID, 91);
 	
 	int ArrowShip = -1;
 	if (cMyCulture == cCultureGreek)
-	{
-		ArrowShip = cUnitTypeTrireme;
-	}
+	ArrowShip = cUnitTypeTrireme;
 	else if (cMyCulture == cCultureEgyptian)
-	{
-		ArrowShip = cUnitTypeKebenit;
-	}
+	ArrowShip = cUnitTypeKebenit;
 	else if (cMyCulture == cCultureNorse)
-	{
-		ArrowShip = cUnitTypeLongboat;
-	}
+	ArrowShip = cUnitTypeLongboat;
 	else if (cMyCulture == cCultureAtlantean)
-	{
-		ArrowShip = cUnitTypeBireme;	
-	}
+	ArrowShip = cUnitTypeBireme;	
 	else if (cMyCulture == cCultureChinese)
+	ArrowShip = cUnitTypeJunk;
+
+    if (ArrowShip != -1)
 	{
-		ArrowShip = cUnitTypeJunk;
-	}	
-	if (ArrowShip != -1)
-	ArrowShipMaintain = createSimpleMaintainPlan(ArrowShip, 2, false, kbBaseGetMainID(cMyID));
-	aiPlanSetDesiredPriority(ArrowShipMaintain, 100);
-	
+	    ArrowShipMaintain = createSimpleMaintainPlan(ArrowShip, 2, false, kbBaseGetMainID(cMyID));
+	    aiPlanSetDesiredPriority(ArrowShipMaintain, 100);
+	}
 	xsEnableRule("FishBoatMonitor"); // looks for transport too
 	
 	if (gWaterExploreID == -1)
@@ -492,7 +451,7 @@ minInterval 18
 	    return;	
 	}  
 	
-	if ((navyUnit < 0) || (DockUnit < 0))
+	if (DockUnit < 0)
 	return;
 	
 	if ((mWaterDefendPlan < 0) && (equal(Dock, cInvalidVector) == false))

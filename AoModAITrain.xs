@@ -47,7 +47,7 @@ inactive
 				}
                 else
                 {
-                    if (numTradeUnits < 2) 
+                    if ((numTradeUnits < 2) && (gMaxTradeCarts > 0))
                     {
                         if (foodSupply > 300)
                         {
@@ -65,19 +65,18 @@ inactive
 	if ((NumTcs < 1) || (numIdleTrade > 3) || (cMyCiv == cCivNuwa) && (kbGetAge() < cAge3) && (numTradeUnits >=3)) // don't train caravans if you have no TC or if too many are idle.
     return;
     int tradeTargetPop = gMaxTradeCarts;
-   	if ((aiGetWorldDifficulty() == cDifficultyNightmare) || (kbGetAge() < cAge4) && (xsGetTime() < 30*60*1000))
-    tradeTargetPop = gTitanTradeCarts;	
-    if ((cvMaxTradePop >= 0) && (tradeTargetPop > cvMaxTradePop))    // Stay under control variable limit
-	tradeTargetPop = cvMaxTradePop;
+	if (tradeTargetPop <= 0)
+	return;
+
     int unitTypeToTrain = -1;
-    
     if (NumTcs >=5)
 	NumTcs = 5;
-	if ((aiGetWorldDifficulty() == cDifficultyNightmare) && (NumTcs >= 2))
-	NumTcs = 2;
 	
-    if ((NumTcs > 1) && (IhaveAllies == true) || (kbGetAge() > cAge3) && (foodSupply > 1500))
-	tradeTargetPop = tradeTargetPop + NumTcs;
+    if ((NumTcs > 1) &&  (tradeTargetPop >= defWantedCaravans))
+	tradeTargetPop = tradeTargetPop + NumTcs;	
+    
+	if ((cvMaxTradePop >= 0) && (tradeTargetPop > cvMaxTradePop))    // Stay under control variable limit
+	tradeTargetPop = cvMaxTradePop;   
     
     if (numTradeUnits < tradeTargetPop)
     {
@@ -100,18 +99,18 @@ inactive
 	aiPlanSetEconomy(trainTradeUnitPlanID, true);
     aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanUnitType, 0, unitTypeToTrain);
     
-	if (numTradeUnits < tradeTargetPop - 3)
+	if ((numTradeUnits < tradeTargetPop - 3) && (tradeTargetPop > 4))
 	aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 2);
 	else
 	aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanNumberToTrain, 0, 1);
-    
-    aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanFrequency, 0, 10);    
     aiPlanSetBaseID(trainTradeUnitPlanID, mainBaseID);
     //Train at trade market if there is a trade market
     if (kbUnitGetCurrentHitpoints(gTradeMarketUnitID) > 0)
 	aiPlanSetVariableInt(trainTradeUnitPlanID, cTrainPlanBuildingID, 0, gTradeMarketUnitID);
     aiPlanSetVariableBool(trainTradeUnitPlanID, cTrainPlanUseMultipleBuildings, 0, false);
     aiPlanSetDesiredPriority(trainTradeUnitPlanID, 96);
+	if ((gGlutRatio >= 1.25) && (kbGetAge() >= cAge4))
+	aiPlanSetVariableBool(trainTradeUnitPlanID, cTrainPlanUseMultipleBuildings, 0, true);
     aiPlanSetActive(trainTradeUnitPlanID);
 }
 
@@ -167,14 +166,10 @@ inactive
 	return;
 	
     xsSetRuleMinIntervalSelf(17);
-    int settleQuery = kbUnitQueryCreate("SettleQuery");
-    configQuery(settleQuery, cUnitTypeAbstractSettlement, -1, cUnitStateAlive, cMyID);
-    kbUnitQueryResetResults(settleQuery);
-    int numSettles = kbUnitQueryExecute(settleQuery);
-    int settleID = -1;
-    for (j=0; < numSettles)
+    int numSettles = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
+    for (i=0; < numSettles)
     {
-        settleID = kbUnitQueryGetResult(settleQuery, j);
+        int settleID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive, -1, cMyID);
         int itsBase = kbUnitGetBaseID(settleID);
 		
         int numberEnemyUnits = kbBaseGetNumberUnits(cMyID, itsBase, cPlayerRelationEnemy, cUnitTypeLogicalTypeLandMilitary);
@@ -190,10 +185,16 @@ inactive
                 int numMercs = numberEnemyUnits / 3;
                 if (numMercs > 3)
 				numMercs = 3;
+			    if (gGoldGlutRatio > 1.5)
+				numMercs = numberEnemyUnits;
+			    if (numMercs > 12)
+				numMercs = 12;
                 if (ShowAiEcho == true) aiEcho("trainMercs: training="+numMercs+" Mercenaries.");
-                for (i=0; < numMercs)
+                for (j=0; < numMercs)
                 {
                     aiTaskUnitTrain(settleID, cUnitTypeMercenary);
+					if ((gGoldGlutRatio > 1.5) && (aiRandInt(3) == 0))
+					aiTaskUnitTrain(settleID, cUnitTypeMercenaryCavalry);
 				}
                 xsSetRuleMinIntervalSelf(61);
 			}
@@ -250,7 +251,7 @@ inactive
 		}
 	}
 	
-    if (numMilitaryMythUnits >= 8)
+    if (numMilitaryMythUnits >= 18)
 	return;
 	
 	
@@ -466,9 +467,10 @@ inactive
 	aiPlanSetBaseID(planID, mainBaseID);
     aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, puid);
     if (puid == age4MythUnitID)
-    aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 3);
+    aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 5);
 	else
     aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, 2);
+    aiPlanSetVariableBool(planID, cTrainPlanUseMultipleBuildings, 0, true);
     aiPlanSetDesiredPriority(planID, 100);
     aiPlanSetActive(planID);
 }
@@ -588,24 +590,22 @@ inactive
 	}
     int numSiegeUnitType1 = kbUnitCount(cMyID, siegeUnitType1, cUnitStateAliveOrBuilding);
 	
-    if ((siegeUnitType1BeingTrained == true) && (ShouldIAgeUp() == false))
+    if (siegeUnitType1BeingTrained == true)
 	{
-		if ((numSiegeUnitType1 < 1) && (goldSupply > 500) && (woodSupply > 500) && (kbGetAge() >= cAge3))
+        bool CloseRangeSiege = false;
+		if ((siegeUnitType1 == cUnitTypePortableRam) || (siegeUnitType1 == cUnitTypeSiegeTower) || (siegeUnitType1 == cUnitTypeFireSiphon))
+		CloseRangeSiege = true;	
+		if ((numSiegeUnitType1 < 1) && (goldSupply > 500) && (woodSupply > 500) && (kbGetAge() >= cAge3) || (numSiegeUnitType1 < 3) && (goldSupply > 800) && (woodSupply > 800) && (kbGetAge() > cAge3))
 		{
-			int numSiegeWeaponBuildingsNearMBInR60 = getNumUnits(siegeWeaponBuildingType, cUnitStateAlive, -1, cMyID, mainBaseLocation, 100.0);
-			if ((numSiegeWeaponBuildingsNearMBInR60 > 0) && (kbGetPop() >= kbGetPopCap()*0.90) && (kbGetPopCap() >= 115) && (kbGetPop() >= 115))
+			int SiegeBuilding = findUnit(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, cMyID, mainBaseLocation);
+
+			if ((SiegeBuilding != -1) && (kbGetPop() >= kbGetPopCap()*0.90) && (kbGetPopCap() >= 115) && (kbGetPop() >= 115) && (ShouldIAgeUp() == false))
 			{
-				int siegeWeaponBuildingIDNearMBInR60 = findUnitByIndex(siegeWeaponBuildingType, 0, cUnitStateAlive, -1, cMyID, mainBaseLocation, 100.0);
-				if (ShowAiEcho == true) aiEcho("siegeWeaponBuildingIDNearMBInR60: "+siegeWeaponBuildingIDNearMBInR60);
-				if (siegeWeaponBuildingIDNearMBInR60 != -1)
-				{
-					//Try to train a siege weapon via aiTaskUnitTrain
-					aiTaskUnitTrain(siegeWeaponBuildingIDNearMBInR60, siegeUnitType1);
-					if ((goldSupply > 800) && (woodSupply > 800) && (kbGetAge() >= cAge4)) // add an extra one
-					aiTaskUnitTrain(siegeWeaponBuildingIDNearMBInR60, siegeUnitType1);
-					if (ShowAiEcho == true) aiEcho("Trying to train a siege weapon: "+siegeUnitType1+" at siegeWeaponBuildingIDNearMBInR60: "+siegeWeaponBuildingIDNearMBInR60);
-				}
-			}
+			    if ((CloseRangeSiege == true) && (numSiegeUnitType1 < 1) || (CloseRangeSiege == false))
+				aiTaskUnitTrain(SiegeBuilding, siegeUnitType1);
+				if ((gGlutRatio > 0.70) && (numSiegeUnitType1 < 3) && (CloseRangeSiege == false)) // add an extra one
+				aiTaskUnitTrain(SiegeBuilding, siegeUnitType1);
+		    }    
 		}		
 		return;
 	}

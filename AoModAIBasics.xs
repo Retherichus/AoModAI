@@ -1671,16 +1671,16 @@ void taskMilUnitTrainAtBase(int baseID = -1)
  
 // borrowed from "Notonecta" ):
 //==============================================================================
-int findPlanByString(string autoName = "BUG", int iPlanType = -1, int iState = -1, bool ReturnNumbers = false) 
+int findPlanByString(string autoName = "BUG", int iPlanType = -1, int iState = -1, bool ActiveOnly = true, bool ReturnNumbers = false) 
 {
     int iPlanID = aiPlanGetID(autoName);
     if (iPlanID < 0) 
 	{
-        int iNumberOfPlans = aiPlanGetNumber(iPlanType, iState, true);
+        int iNumberOfPlans = aiPlanGetNumber(iPlanType, iState, ActiveOnly);
         int Number = 0;
         for (i = 0; < iNumberOfPlans) 
 		{
-            int iCurrentPlan = aiPlanGetIDByIndex(iPlanType, iState, true, i);
+            int iCurrentPlan = aiPlanGetIDByIndex(iPlanType, iState, ActiveOnly, i);
             if (aiPlanGetName(iCurrentPlan) == (autoName + ":" + iCurrentPlan)) 
 			{
                 iPlanID = iCurrentPlan;

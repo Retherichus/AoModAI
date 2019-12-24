@@ -42,11 +42,14 @@ extern float gWoodForecast = 0.0;
 extern float gFoodForecast = 0.0;
 extern int   gHerdPlanID = -1;            // Herds animals to base
 extern float gGlutRatio = 0.0;            // 1.0 indicates all resources at 3 min forecast.  2.0 means all at least double.  Used to trim econ pop.
+extern float gFoodGlutRatio = 0;
+extern float gWoodGlutRatio = 0;
+extern float gGoldGlutRatio = 0;
 extern int   gLastAgeHandled = cAge1;     // Set to cAge2..cAge5 as the age handlers run. Used to detect age-ups granted via triggers and starting conditions, 
 
 
 // Trade globals
-extern int gMaxTradeCarts = 22;           // Max trade carts
+extern int gMaxTradeCarts = 26;           // Max trade carts
 extern int gTradePlanID = -1;
 extern bool gExtraMarket = false;          // Used to indicate if an extra (non-trade) market has been requested
 extern int gTradeMarketUnitID = -1;       // Used to identify the market being used in our trade plan.
@@ -741,32 +744,9 @@ float econGoldEscrow=0.5, float econFavorEscrow=0.5)
 		tradeCount = 5; 
 		vilPop = vilPop - tradeCount;     // Vils = total-trade
 	}
-    
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    int numMainBaseGoldSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
-    int numGoldBaseSites = 0;
-    if ((gGoldBaseID >= 0) && (gGoldBaseID != mainBaseID))    // Count gold base if different
-	numGoldBaseSites = kbGetNumberValidResources(gGoldBaseID, cResourceGold, cAIResourceSubTypeEasy);
-    int numGoldSites = numMainBaseGoldSites + numGoldBaseSites;
-    
-	int numberMainBaseSites = kbGetNumberValidResources(mainBaseID, cResourceWood, cAIResourceSubTypeEasy);
-	int numWoodBaseSites  = 0;
-    if ((gWoodBaseID >= 0) && (gWoodBaseID != mainBaseID))
-	numWoodBaseSites = kbGetNumberValidResources(gWoodBaseID, cResourceWood, cAIResourceSubTypeEasy);
-    int numWoodSites = numberMainBaseSites + numWoodBaseSites;	
-
-    if ((numGoldSites < 1) && (xsGetTime() > 20*60*1000) && (kbGetAge() > cAge2))
-    {   
-		vilPop = vilPop - 10;
-	}
-    
-	if ((numWoodSites < 1) && (xsGetTime() > 20*60*1000) && (kbGetAge() > cAge2))
-    {   
-        vilPop = vilPop - 10;
-	}
 	
-    if ((vilPop < 27) && (kbGetAge() > cAge1))
-	vilPop = 27;
+    if ((vilPop < 15) && (kbGetAge() > cAge1))
+	vilPop = 15;
     
     if (cMyCulture == cCultureAtlantean)
 	vilPop = vilPop / 3;
@@ -868,15 +848,25 @@ active
 	}
 	else if (kbGetAge() >= cAge4)
 	{
-		civPopTarget = 60;
+		civPopTarget = 65;
+		civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115	
 		if (gGlutRatio > 1.0)
 		civPopTarget = civPopTarget / gGlutRatio;
-		civPopTarget = civPopTarget + 0.2 * (getSoftPopCap()-115);  // Plus 20% over 115
 		if ( (aiGetGameMode() == cGameModeLightning) && (civPopTarget > 35) )  // Can't use more than 35 in lightning,
 		civPopTarget = 35;
-	    
+
+        if (gGlutRatio >= 2.0)
+		{
+		    gMaxTradeCarts = gMaxTradeCarts / (gGlutRatio/2);
+			if (gMaxTradeCarts <= 0)
+			gMaxTradeCarts = 0;		
+		}
+	    else
+		gMaxTradeCarts = defWantedCaravans;
+
 		if ((aiGetGameMode() != cGameModeLightning) && (xsGetTime() > 20*60*1000))
 		{
+	
 			int mainBaseID = kbBaseGetMainID(cMyID);
 			int numMainBaseGoldSites = kbGetNumberValidResources(mainBaseID, cResourceGold, cAIResourceSubTypeEasy);
 			int numGoldBaseSites = 0;
@@ -891,13 +881,13 @@ active
 			int numWoodSites = numberMainBaseSites + numWoodBaseSites;	
 		    
 		    if (numGoldSites < 1)
-			civPopTarget = civPopTarget - 20;
+			civPopTarget = civPopTarget - 8;
 		    if (numWoodSites < 1)
-		    civPopTarget = civPopTarget - 20;
-			if (civPopTarget < 54)
-			civPopTarget = 54;
+		    civPopTarget = civPopTarget - 8;
 		}
-		milPopTarget = getSoftPopCap() - civPopTarget;
+        if (civPopTarget < 15)
+		civPopTarget = 15;		
+	    milPopTarget = getSoftPopCap() - civPopTarget;
 		
 		if ((kbGetAge() == cAge4) && (ageStartTime4 == -1))
 		ageStartTime4 = xsGetTime();		
@@ -939,7 +929,7 @@ active
 		econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);
 		econEscrow = econPercent;	
 	
-		if ((xsGetTime() > 12*60*1000) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching))
+		if ((xsGetTime() > 12*60*1000) && (kbGetTechStatus(gAge3MinorGod) < cTechStatusResearching) && (kbGetAge() == cAge2))
 		{
 			if (econEscrow < 0.50)
 			econEscrow = 0.50;
@@ -959,19 +949,51 @@ active
 	}
 	//Update all the econ stuff
 	updateEM(civPopTarget, milPopTarget, econPercent, 0.20, econEscrow, econEscrow, econEscrow, econEscrow);
+	if (ShowAiEcho == true) aiEcho("gGlutRatio: "+gGlutRatio+", civPopTarget: "+civPopTarget+", gFoodGlutRatio: "+gFoodGlutRatio+", gWoodGlutRatio: "+gWoodGlutRatio+", gGoldGlutRatio: "+gGoldGlutRatio); 
 }
 
+void updateGlutRatio(void)
+{
+    float goldSupply = kbResourceGet(cResourceGold);
+    float woodSupply = kbResourceGet(cResourceWood);
+    float foodSupply = kbResourceGet(cResourceFood);
+
+    gGlutRatio = 100.0;     // ludicrously high
+    
+	if ( (goldSupply/gGoldForecast) < gGlutRatio )
+	gGlutRatio = goldSupply/gGoldForecast;
+    if ( (woodSupply/gWoodForecast) < gGlutRatio )
+	gGlutRatio = woodSupply/gWoodForecast;
+    if ( (foodSupply/gFoodForecast) < gGlutRatio )
+	gGlutRatio = foodSupply/gFoodForecast;
+    float Increase = 0.0;
+	if (gGlutRatio >= 1.0)
+	Increase = gGlutRatio -1;	
+    gGlutRatio = gGlutRatio + Increase;
+	if (gGlutRatio <= 0.0)
+	gGlutRatio = 0.0;
+
+    gFoodGlutRatio = foodSupply/gFoodForecast;
+	gWoodGlutRatio = woodSupply/gWoodForecast;
+	gGoldGlutRatio = goldSupply/gGoldForecast;
+	
+	if ((kbGetAge() < cAge4) || (TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
+	gGlutRatio = 0.0;
+    if (gSomeData != -1)
+	aiPlanSetUserVariableFloat(gSomeData, 8, 0, gGlutRatio);
+}
 //==============================================================================
 rule updatePrices   // This rule constantly compares actual supply vs. forecast, updates AICost // values (internal resource prices), and buys/sells at the market as appropriate
-active
 minInterval 6
+active
 {
     // check for valid forecasts, exit if not ready
-    if (((gGoldForecast + gWoodForecast + gFoodForecast) < 100) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 11*60*1000))
+    if (((gGoldForecast + gWoodForecast + gFoodForecast) < 100))
 	return; 
-    xsSetRuleMinIntervalSelf(6);
+    updateGlutRatio();
+    xsSetRuleMinIntervalSelf(6);								
 	static int lastRequestTime = 0;	
-    float scaleFactor = 3.0;      // Higher values make prices more volatile
+    float scaleFactor = 5.0;      // Higher values make prices more volatile
     float goldStatus = 0.0;
     float woodStatus = 0.0;
     float foodStatus = 0.0;
@@ -1014,29 +1036,19 @@ minInterval 6
     kbSetAICostWeight(cResourceGold, 1.00);	// gold always 1.0, others relative to gold
     
     // Favor
-    float favorCost = 15.0 - (14.0*(kbResourceGet(cResourceFavor)/100.0));     // 15 when empty, 1.0 when full
-    float goldSupply = kbResourceGet(cResourceGold);
-    float woodSupply = kbResourceGet(cResourceWood);
-    float foodSupply = kbResourceGet(cResourceFood);
-    float favorSupply = kbResourceGet(cResourceFavor);
-    if ((kbGetTechStatus(gAge4MinorGod) >= cTechStatusResearching) && (cMyCulture == cCultureGreek))
-    {
-        if ((kbGetTechStatus(cTechForgeofOlympus) < cTechStatusResearching) && (favorSupply < 75) && (gAge4MinorGod == cTechAge4Hephaestus))
-		favorCost = 40.0;
-        else
-        {
-            if ((TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching) && (foodSupply > 500) && (goldSupply > 500) && (woodSupply > 500) && (favorSupply <= 70))
-            {
-                favorCost = 25.0;
-			}
-            else if (favorSupply > 70)
-			favorCost = 15.0 - (14.0*(kbResourceGet(cResourceFavor)/100.0));
-		}
-	}
-    
+    float favorCost = 15.0 - (14.0*(kbResourceGet(cResourceFavor)/100.0));     // 15 when empty, 2.0 when full
     if (favorCost < 1.0)
-	favorCost = 1.0;
+    favorCost = 1.0;
     kbSetAICostWeight(cResourceFavor, favorCost);  
+
+    // Update the gather plan goal
+    for (i = 0; < 3)
+    {
+        aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, i, kbGetAICostWeight(i));
+	}
+	
+	if ((aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 11*60*1000))
+	return;
 	
     //Compare that to the market price.  Buy if
     // the market price is lower and we have at least 
@@ -1117,12 +1129,39 @@ minInterval 6
                     aiSellResourceOnMarket(cResourceFood);
 				}
 			}
-		}		
-	}
-    // Update the gather plan goal
-    for (i = 0; < 3)
-    {
-        aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanResourceCostWeight, i, kbGetAICostWeight(i));
+		}
+		// Special Treatment for resource equalizing
+		if (gFoodGlutRatio > 1.50)
+		{
+			if (gGoldGlutRatio < 1.50)
+			{
+				aiSellResourceOnMarket(cResourceFood);
+				xsSetRuleMinIntervalSelf(1);
+				
+			}
+		}
+		if (gWoodGlutRatio > 1.50)
+		{
+			if (gGoldGlutRatio < 1.50)
+			{
+				aiSellResourceOnMarket(cResourceWood);
+				xsSetRuleMinIntervalSelf(1);
+				
+			}
+		}
+		if (gGoldGlutRatio > 1.50)
+		{
+			if (gFoodGlutRatio < 1.50)
+			{
+				aiBuyResourceOnMarket(cResourceFood);
+				xsSetRuleMinIntervalSelf(1);
+			}
+			if (gWoodGlutRatio < 1.50)
+			{
+				aiBuyResourceOnMarket(cResourceWood);
+				xsSetRuleMinIntervalSelf(1);
+			}		
+		}
 	}
 	
     if ((AoModAllies == true) && (kbGetAge() > cAge1))
@@ -1136,25 +1175,24 @@ minInterval 6
 				{
 					MessageRel(cPlayerRelationAlly, RequestFood, cLowPriority);
 					lastRequestTime = xsGetTime();
-					if (ShowAIComms == true) aiEcho("Requesting Food!");
+					if (ShowAiEcho == true) aiEcho("Requesting Food!");
 				}
 				if ((kbResourceGet(cResourceGold) < (totalResources / 10.0) && (kbResourceGet(cResourceGold) < 3500)))
 				{
 					MessageRel(cPlayerRelationAlly, RequestGold, cLowPriority);
 					lastRequestTime = xsGetTime();
-					if (ShowAIComms == true) aiEcho("Requesting Gold!");
+					if (ShowAiEcho == true) aiEcho("Requesting Gold!");
 				}
 				if ((kbResourceGet(cResourceWood) < (totalResources / 10.0) && (kbResourceGet(cResourceWood) < 3500)))
 				{
 					MessageRel(cPlayerRelationAlly, RequestWood, cLowPriority);
 					lastRequestTime = xsGetTime();
-					if (ShowAIComms == true) aiEcho("Requesting Wood!");
+					if (ShowAiEcho == true) aiEcho("Requesting Wood!");
 				}
 			}
 		}
-	}
+	} 	
 }
-
 //==============================================================================
 void updateGathererRatios(void) //Check the forecast variables, check inventory, set assignments
 {
@@ -1177,19 +1215,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     if (foodShortage < 0)
 	foodShortage = 0;
 	
-    gGlutRatio = 100.0;     // ludicrously high
-    if ( (goldSupply/gGoldForecast) < gGlutRatio )
-	gGlutRatio = goldSupply/gGoldForecast;
-    if ( (woodSupply/gWoodForecast) < gGlutRatio )
-	gGlutRatio = woodSupply/gWoodForecast;
-    if ( (foodSupply/gFoodForecast) < gGlutRatio )
-	gGlutRatio = foodSupply/gFoodForecast;
-    gGlutRatio = gGlutRatio * 1.85;   // Double it, i.e. start reducing civ pop when all resources are > 50% of forecast.
-    if (gGlutRatio > 3.0)
-	gGlutRatio = 3.0;    // Never cut econ below 1/3 of normal, but.. wait until we're in Mythic Age
-	if ((kbGetAge() < cAge4) || (TitanAvailable == true) && (kbGetTechStatus(cTechSecretsoftheTitans) < cTechStatusResearching))
-	gGlutRatio = 0.0;
-	
+    updateGlutRatio();
     float totalShortage = goldShortage + woodShortage + foodShortage;
     if (totalShortage < 1)
 	totalShortage = 1;
@@ -1218,47 +1244,23 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
     float civPopTotal = numGatherers + numTradeCarts + numFishBoats;
 	
     int doomedID = -1;   // Who to kill...
-    if (civPopTotal > (aiGetEconomyPop() + 5))
+	if (civPopTotal > (aiGetEconomyPop() + 5))
     {  
-        // We need to delete something
-        if (ShowAiEcho == true) aiEcho("We need to delete an econ unit");
-        if (numGatherers > numTradeCarts) // Gatherer or fish boat
-        {
-            if (numGatherers > numFishBoats)
-            {
-                //find idle units first
-                doomedID = findUnit(cUnitTypeAbstractVillager, cUnitStateAlive, cActionIdle, cMyID);
-                if (doomedID < 0)
-				doomedID = findUnit(cUnitTypeAbstractVillager);
-                if (ShowAiEcho == true) aiEcho("Deleting a villager. "+doomedID);
-			}
-            else
-            {
-                //find idle units first
-                doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0), cUnitStateAlive, cActionIdle, cMyID);
-                if (doomedID < 0)
-				doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0));
-                if (ShowAiEcho == true) aiEcho("Deleting a fishing boat. "+doomedID);
-			}
+		if (numTradeCarts > gMaxTradeCarts) // Trade Unit
+		{
+			//find idle units first
+			doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0), cUnitStateAlive, cActionIdle, cMyID);
+			if (doomedID < 0)
+			doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0));
+			if (ShowAiEcho == true) aiEcho("Deleting a trade cart. "+doomedID);
 		}
-        else  // Trade cart or fish boat
-        {
-            if (numTradeCarts > numFishBoats)
-            {
-                //find idle units first
-                doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0), cUnitStateAlive, cActionIdle, cMyID);
-                if (doomedID < 0)
-				doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionTrade, 0));
-                if (ShowAiEcho == true) aiEcho("Deleting a trade cart. "+doomedID);
-			}
-            else
-            {
-                //find idle units first
-                doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0), cUnitStateAlive, cActionIdle, cMyID);
-                if (doomedID < 0)
-				doomedID = findUnit(kbTechTreeGetUnitIDTypeByFunctionIndex(cUnitFunctionFish, 0));
-                if (ShowAiEcho == true) aiEcho("Deleting a fishing boat. "+doomedID);
-			}
+		else if (numTradeCarts <= gMaxTradeCarts)//vill
+		{
+			//find idle units first
+			doomedID = findUnit(cUnitTypeAbstractVillager, cUnitStateAlive, cActionIdle, cMyID);
+			if (doomedID < 0)
+			doomedID = findUnit(cUnitTypeAbstractVillager);
+			if (ShowAiEcho == true) aiEcho("Deleting a Villie. "+doomedID);
 		}
         aiTaskUnitDelete(doomedID);
         if (cMyCulture == cCultureAtlantean)
@@ -1402,12 +1404,26 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 			}
 		}
 	}
+
+	//Test
+    //if we lost a lot of villagers, keep them close to our settlements (=farming)
+    int minVillagers = 14;
+    if (cMyCulture == cCultureAtlantean)
+	minVillagers = 5;
+    int numVillagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
+    if ((numVillagers <= minVillagers) && (kbGetAge() > cAge2) && (xsGetTime() > 16*60*1000))
+    {
+        goldAssignment = 0.05;
+        woodAssignment = 0.05; 
+        foodAssignment = 0.90;
+	}
+	//Test end
     
-    aiSetResourceGathererPercentageWeight(cRGPScript, 1.0);
-    aiSetResourceGathererPercentageWeight(cRGPCost, 0.0);
-    aiSetResourceGathererPercentage(cResourceGold, goldAssignment, false, cRGPScript);
-    aiSetResourceGathererPercentage(cResourceWood, woodAssignment, false, cRGPScript);
-    aiSetResourceGathererPercentage(cResourceFood, foodAssignment, false, cRGPScript);
+    aiSetResourceGathererPercentageWeight( cRGPScript, 1.0);
+    aiSetResourceGathererPercentageWeight( cRGPCost, 0.0);
+    aiSetResourceGathererPercentage( cResourceGold, goldAssignment, false, cRGPScript);
+    aiSetResourceGathererPercentage( cResourceWood, woodAssignment, false, cRGPScript);
+    aiSetResourceGathererPercentage( cResourceFood, foodAssignment, false, cRGPScript);
     if (cMyCulture == cCultureGreek)
     {
         if (kbGetAge() < cAge3)
@@ -1436,7 +1452,7 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 				}
                 else
                 {
-                    aiSetResourceGathererPercentage(cResourceFavor, 0.06, false, cRGPScript);
+				    aiSetResourceGathererPercentage(cResourceFavor, 0.08, false, cRGPScript);
 				}
 			}
             
@@ -1444,9 +1460,9 @@ void updateGathererRatios(void) //Check the forecast variables, check inventory,
 		}
 	}
 	
-    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceGold, goldAssignment);
-    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceWood, woodAssignment);
-    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood, foodAssignment);
+    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceGold, aiGetResourceGathererPercentage(cResourceGold, cRGPScript));
+    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceWood, aiGetResourceGathererPercentage(cResourceWood, cRGPScript));
+    aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFood, aiGetResourceGathererPercentage(cResourceFood, cRGPScript));
     aiPlanSetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, cResourceFavor, aiGetResourceGathererPercentage(cResourceFavor, cRGPScript));
 	aiNormalizeResourceGathererPercentages(cRGPScript);
 	
@@ -1626,6 +1642,10 @@ void AddGenForecastNeeds(void)
 		gWoodForecast = gWoodForecast + Number*temp;
 	}
 	
+	if ((cvRandomMapName == "river styx") && (kbGetAge() == cAge1))
+    addUnitForecast(cUnitTypeTemple, 1);	
+	
+		
     if ((kbGetAge() >= cAge2) || (kbGetTechStatus(gAge2MinorGod) == cTechStatusResearching))
 	{	
         if (gBuildWalls == true)
@@ -2139,10 +2159,9 @@ void initChinese(void)
     gGatherRelicType = cUnitTypeHeroChineseImmortal;   //use Immortal hero       
     gGardenBuildLimit = 2;
 	
-	xsEnableRule("DelayImmortalHero"); 	
 	createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 2, false, kbBaseGetMainID(cMyID));
-	cMonkMaintain = createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(2)+3, false, kbBaseGetMainID(cMyID));
-	eChineseHero = createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 0, true, kbBaseGetMainID(cMyID));  // Eco
+	cMonkMaintain = createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(3)+4, false, kbBaseGetMainID(cMyID));
+	eChineseHero = createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 1, true, kbBaseGetMainID(cMyID));  // Eco
     mChineseImmortal = createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 0, false, kbBaseGetMainID(cMyID)); // Mil	
 	
 	//Create the Chinese scout plans.
@@ -2153,10 +2172,11 @@ void initChinese(void)
         if (exploreID >= 0)
         {
             aiPlanAddUnitType(exploreID, cUnitTypeScoutChinese, 0, 1, 1);
-            aiPlanAddUnitType(exploreID, cUnitTypeScoutChinese, 0, 1, 1); 
             aiPlanSetVariableBool(exploreID, cExplorePlanDoLoops, 0, false);
             aiPlanSetActive(exploreID);
 		}  
+        if (i == 1)
+		gLandExplorePlanID=exploreID;		
 	}
 	
 	// Make sure we always have at least 1 Scout Cavalry
@@ -2187,16 +2207,6 @@ void initChinese(void)
 	gAge4MinorGod = cvAge4GodChoice;
 }
 
-rule DelayImmortalHero
-minInterval 2
-inactive
-{
-    if (kbUnitCount(cMyID, cUnitTypeTemple, cUnitStateAliveOrBuilding) < 1)
-	return;
-    if (eChineseHero != -1)
-    aiPlanSetVariableInt(eChineseHero, cTrainPlanNumberToMaintain, 0, 1);
-	xsDisableSelf();
-}
 //==============================================================================
 int initUnitPicker(string name="BUG", int numberTypes=1, int minUnits=10,
 int maxUnits=20, int minPop=-1, int maxPop=-1, int numberBuildings=1,
@@ -2237,7 +2247,7 @@ bool guessEnemyUnitType=false)
 				kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractArcher, 0.7+upAV(4));
 				kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.3+upAV(8));
 				kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-				kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+				kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.0);
 				kbUnitPickSetPreferenceFactor(upID, cUnitTypeHelepolis, 0.2);
 				break;
 			}
@@ -2248,7 +2258,7 @@ bool guessEnemyUnitType=false)
 				kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractCavalry, 0.3+upAV(8));
 				kbUnitPickSetPreferenceFactor(upID, cUnitTypePriest, 0.1);
 				kbUnitPickSetPreferenceFactor(upID, cUnitTypeMythUnit, 0.3);
-				kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 1.0);
+				kbUnitPickSetPreferenceFactor(upID, cUnitTypeAbstractSiegeWeapon, 0.0);
 				kbUnitPickSetPreferenceFactor(upID, cUnitTypeSiegeTower, 0.2);
 				kbUnitPickSetPreferenceFactor(upID, cUnitTypeKhopesh, 0.0);
 				if (cMyCiv == cCivSet)
@@ -2721,7 +2731,7 @@ void init(void)
         if ( aiGetGameMode() != cGameModeDeathmatch )
 		gLateUPID=initUnitPicker("Late", 2, -1, -1, minPop, maxPop, gNumberBuildings, false);   // Attack with at least 20-33 pop slots, no more than 36-49.
         else  // DM, double number of buildings
-		gLateUPID=initUnitPicker("Late", 2, -1, -1, minPop, maxPop, 2*gNumberBuildings, false);   // Attack with at least 20-33 pop slots, no more than 36-49.
+		gLateUPID=initUnitPicker("Late", 2, -1, -1, minPop, maxPop, gNumberBuildings+2, false);   // Attack with at least 20-33 pop slots, no more than 36-49.
 	}
     else
     {
@@ -2735,7 +2745,7 @@ void init(void)
         if (aiGetGameMode() != cGameModeDeathmatch)
 		gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, gNumberBuildings, false);    // Min: 40-59, max 70 pop slots
         else  // Double buildings in DM
-		gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, 2*gNumberBuildings, false);    // Min: 40-59, max 70 pop slots
+		gLateUPID=initUnitPicker("Late", 3, -1, -1, minPop, maxPop, gNumberBuildings+2, false);    // Min: 40-59, max 70 pop slots
 	}
     
     int lateAttackAge = 2;
@@ -3250,7 +3260,6 @@ void age2Handler(int age=1)
         
         //start up the wall upgrades.
         xsEnableRule("WallManager");
-        
 	    if (cMyCulture == cCultureNorse)
         xsEnableRule("norseInfantryBuild");
         
@@ -3285,9 +3294,6 @@ void age2Handler(int age=1)
     //enable the rebuildDropsites rule for Greeks, Egyptians and chinese.
     if ((cMyCulture == cCultureGreek) || (cMyCulture == cCultureEgyptian) || (cMyCulture == cCultureChinese))
 	xsEnableRule("rebuildDropsites");
-    
-    //enable the buildGoldMineTower rule
-    xsEnableRule("buildGoldMineTower");
 	
 	if (cMyCiv == cCivNuwa)
 	{
@@ -3354,7 +3360,7 @@ void age3Handler(int age=2)
 	}
     else if (cMyCulture == cCultureEgyptian)
     {
-        xsEnableRule("decreaseRaxPref"); 
+        //xsEnableRule("decreaseRaxPref"); 
         aiSetMaxLOSProtoUnitLimit(9);
 	}
     else if (cMyCulture == cCultureNorse)
@@ -3493,9 +3499,6 @@ void age4Handler(int age=3)
 		gHero4MaintainPlan = createSimpleMaintainPlan(cUnitTypeHeroGreekPerseus, 1, false, kbBaseGetMainID(cMyID));
 		
         aiPlanSetDesiredPriority(gHero4MaintainPlan, 100);
-		
-        if (aiGetWorldDifficulty() != cDifficultyEasy)
-		createSimpleMaintainPlan(cUnitTypeHelepolis, 1, false, kbBaseGetMainID(cMyID));
 	}
     else if (cMyCulture == cCultureAtlantean)
     {
@@ -3523,6 +3526,8 @@ void age4Handler(int age=3)
 	
     //enable the getEngineers rule
     xsEnableRule("getEngineers");
+	
+	xsEnableRule("decreaseRaxPrefGreek");
 }
 
 //==============================================================================
@@ -3541,6 +3546,7 @@ void age5Handler(int age=4)
     xsEnableRule("rPlaceTitanGate");
     //enable the randomUpgrader rule
     xsEnableRule("randomUpgrader");
+	
 }
 
 //==============================================================================
@@ -3746,13 +3752,13 @@ void resignHandler(int result =-1)
 
 //==============================================================================
 rule findFish   //We don't know if this is a water map...if you see fish, it is.
-minInterval 2 //starts in cAge1
+minInterval 7 //starts in cAge1
 active
 {
 	xsSetRuleMinIntervalSelf(25);
 	
 	if (ShowAiEcho == true) aiEcho("findFish:");
-	if (xsGetTime() > 1*30*1000)  // Disable if we've tried for too long.
+	if (xsGetTime() > 1*60*1000)  // Disable if we've tried for too long.
 	xsDisableSelf();
 	
 	// Disable early fishing for Nomad & Highland, to later be enabled.

@@ -132,13 +132,6 @@ void preInitMap()
     {
         cvMapSubType = VINLANDSAGAMAP;
 	}
-    else if ( cRandomMapName == "tos_northamerica-v1" ||
-	(cRandomMapName == "tos_northamerica") ||    
-	(cRandomMapName == "tos_northamerica-v1-1") ||    
-	cRandomMapName == "great britain")
-    {
-        cvMapSubType = WATERNOMADMAP;
-	}
 	
 	if (cvRandomMapName == "Transport Scenario")
     {
@@ -240,51 +233,6 @@ void initMapSpecific()
         xsEnableRule("findFish");
 		if (KoTHWaterVersion == false)
 		xsEnableRule("BunkerUpThatWonder"); 
-	}
-    //Water Nomad (this is sorta mixture between nomad and vinlandsaga)
-    else if (cvMapSubType == WATERNOMADMAP)
-    {
-        int query=kbUnitQueryCreate("initialpos");
-        configQuery(query, -1, -1, -1, cMyID);
-        kbUnitQueryResetResults(query);
-        int num=kbUnitQueryExecute(query);
-        int base=kbBaseCreate(cMyID, "InitialIslandBase", kbUnitGetPosition(kbUnitQueryGetResult(query, 0)), 15.0);
-        kbBaseSetMain(cMyID, base);
-        kbBaseSetEconomy(cMyID, base, true);
-        kbBaseSetMilitary(cMyID, base, true);
-        kbBaseSetActive(cMyID, base, true); 
-        if (ShowAiEcho == true) aiEcho("num="+num);
-        for ( i=0; < num)
-        {
-            if (ShowAiEcho == true) aiEcho("adding unit "+i);
-            kbBaseAddUnit(cMyID, base, kbUnitQueryGetResult(query, i));
-		}
-        gVinlandsagaInitialBaseID=kbBaseGetMainID(cMyID);
-        if (ShowAiEcho == true) aiEcho("Initial Base="+gVinlandsagaInitialBaseID);
-
-        // Move the transport toward map center to find continent quickly.
-        gTransportUnit = findUnit(cUnitTypeTransport);
-        nearCenter = kbGetMapCenter();
-        nearCenter = (nearCenter + kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) / 2.0;    // Halfway between start and center
-        nearCenter = (nearCenter + kbGetMapCenter()) / 2.0;   // 3/4 of the way to map center
-        aiTaskUnitMove(gTransportUnit, nearCenter);
-        if (ShowAiEcho == true) aiEcho("Sending transport "+gTransportUnit+" to near map center at "+nearCenter);
-        xsEnableRule("vinlandsagaFailsafe");  // In case something prevents transport from reaching, turn on the explore plan.
-		
-        //Enable the rule that looks for the mainland.
-        xsEnableRule("findVinlandsagaBase");
-        //Turn off auto dropsite building.
-        if ( cMyCulture != cCultureEgyptian )
-		aiSetAllowAutoDropsites(false);
-        // turn off all buildings
-        aiSetAllowBuildings(false);
-        // turn off housebuilding rule
-        xsDisableRule("buildHouse");
-		
-        //Turn off fishing.
-        xsDisableRule("fishing");
-        //Pause the age upgrades.
-        aiSetPauseAllAgeUpgrades(true);
 	}
 }
 
@@ -473,7 +421,7 @@ void vinlandsagaBaseCallback(int parm1=-1)
     else
     {
         //Create the scout/villager xport plan.  If it works, add the unit type(s).
-        planID=createTransportPlan("Villager Transport", startAreaID, goalAreaID, false, transportPUID, 100, gVinlandsagaInitialBaseID);
+        planID=createTransportPlan("All Units Transport", startAreaID, goalAreaID, false, transportPUID, 100, gVinlandsagaInitialBaseID);
         if (planID >= 0)
         {
             if (cMyCulture == cCultureAtlantean)
@@ -487,7 +435,6 @@ void vinlandsagaBaseCallback(int parm1=-1)
             aiPlanAddUnitType(planID, gLandScout, 1, 1, 1);
             if (cMyCulture == cCultureNorse)
 			aiPlanAddUnitType(planID, cUnitTypeOxCart, 1, 1, 4);
-            aiPlanAddUnitType(planID, cUnitTypeHerdable, 0, 0, 0);
 			aiPlanSetVariableBool(planID, cTransportPlanReturnWhenDone, 0, false);
 			aiPlanSetActive(planID);
 		}
@@ -515,13 +462,7 @@ inactive
 minInterval 20 //starts in cAge1
 {
     static int transportAllUnitsID=-1;
-    int num = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeLogicalTypeGarrisonOnBoats, cUnitStateAlive);
-	int Herd = findNumUnitsInBase(cMyID, gVinlandsagaInitialBaseID, cUnitTypeHerdable, cUnitStateAlive);
-	if (Herd <= 0)
-	Herd = 0;
-	num = num - Herd;
-    if (num < 1)
-	return;
+    int num = NumUnitsOnAreaGroupByRel(true, kbAreaGroupGetIDByPosition(kbUnitGetPosition(gVinlandsagaInitialBaseID)), cUnitTypeLogicalTypeGarrisonOnBoats, cMyID);
 	
     //Get our water transport type.
     int transportPUID = cUnitTypeTransport;
@@ -530,24 +471,14 @@ minInterval 20 //starts in cAge1
     //Get our start area ID.
     int startAreaID=kbAreaGetIDByPosition(kbBaseGetLocation(cMyID, gVinlandsagaInitialBaseID));
     //Get our goal area ID.
-    int ActiveTransportPlans = aiPlanGetNumber(cPlanTransport, -1, true);
-	if (ActiveTransportPlans > 0)
-    {
-        for (i = 0; < ActiveTransportPlans)
-        {
-            int TransportPlanID = aiPlanGetIDByIndex(cPlanTransport, -1, true, i);
-            if (TransportPlanID == -1)
-			continue;
-		    if (TransportPlanID == transportAllUnitsID)	
-		    {
-				if (numTransport < 1)
-				aiPlanDestroy(transportAllUnitsID);
-				return; 
-			}
-		}
-	}		
+    int TransPlan = findPlanByString("All Units Transport", cPlanTransport);
+	if ((TransPlan != -1) && (numTransport < 1))
+	{
+	    aiPlanDestroy(TransPlan);
+        return;
+    }
 	
-    if (numTransport < 1)
+    if ((numTransport < 1) || (num < 1) || (TransPlan != -1))
 	return;
     int goalAreaID = MigrationAreaID;
 	if (goalAreaID == -1)
@@ -567,9 +498,9 @@ minInterval 20 //starts in cAge1
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeOxCart, 1, 1, 1);
 	    if (cMyCiv == cCivSet)
 		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHyenaofSet, 0, 1, 1);
+	    aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHerdable, 0, 4, 8);
         aiPlanAddUnitType(transportAllUnitsID, cUnitTypeLogicalTypeGarrisonOnBoats, 0, 1, 2);	
 	    aiPlanAddUnitType(transportAllUnitsID, cUnitTypeFlyingUnit, 0, 0, 0);
-		aiPlanAddUnitType(transportAllUnitsID, cUnitTypeHerdable, 0, 0, 0);		
         aiPlanSetActive(transportAllUnitsID);
 	}
 }

@@ -649,7 +649,6 @@ inactive
 	if (aiGetGameMode() == cGameModeDeathmatch)
     MaxInProgress = 4;
 	
-	
     int numberSettlementsPlanned = numberSettlements + numberBuildSettlementGoals;
 	
     if (numberSettlementsPlanned >= cvMaxSettlements)
@@ -678,20 +677,12 @@ inactive
     int numBuilders = 3;
     if (cMyCulture == cCultureAtlantean)
 	numBuilders = 1;
-	
-	// Increase NumBuilders if conditions are met
-	int MoreBuildersAvailable = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID);
-	float foodSupply = kbResourceGet(cResourceFood);
-	if (cMyCulture == cCultureAtlantean)
-	MoreBuildersAvailable = MoreBuildersAvailable *3;
-	
-	if ((MoreBuildersAvailable > 45) && (kbGetAge() > cAge2))
-	{
-        numBuilders = 6;
+    if (kbGetAge() > cAge2)
+    {
+        numBuilders = 3+aiRandInt(4);
         if (cMyCulture == cCultureAtlantean)
-        numBuilders = 2;            
-	}
-	
+	    numBuilders = 1+aiRandInt(2);
+    }
     //Else, do it.
     createBuildSettlementGoal("BuildSettlement", kbGetAge(), -1, kbBaseGetMainID(cMyID), numBuilders, cBuilderType, true, 100);
 }
@@ -1768,79 +1759,98 @@ inactive
 }
 
 //==============================================================================
-int createCommonRingWallPlan(string WallPlanName = "BUG", int BaseID=-1, int radius=19)
+int createCommonRingWallPlan(string WallPlanName = "BUG", int BaseID=-1, int radius=19, bool UnitID = false)
 {
     float otherBaseWallRadius = radius;
     int RingWallPlan = aiPlanCreate(""+WallPlanName, cPlanBuildWall);
     if (RingWallPlan != -1)
     {
-        aiPlanSetNumberVariableValues(RingWallPlan, cBuildWallPlanAreaIDs, 20, true);
+        
         int numAreasAdded = 0;
 		
         int mainArea = -1;
+		if (UnitID == false)
         vector mainCenter = kbBaseGetLocation(cMyID, BaseID);
+	    else
+	    mainCenter = kbUnitGetPosition(BaseID);
         aiPlanSetInitialPosition(RingWallPlan, mainCenter);
         
         float mainX = xsVectorGetX(mainCenter);
         float mainZ = xsVectorGetZ(mainCenter);
         mainArea = kbAreaGetIDByPosition(mainCenter);
-        aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
-        numAreasAdded = numAreasAdded + 1;
-		
-        int firstRingCount = -1;      // How many areas are in first ring around main?
-        int firstRingIndex = -1;      // Which one are we on?
-        int firstRingID = -1;         // Actual ID of current 1st ring area
-        vector areaCenter = cInvalidVector;    // Center point of this area
-        float areaX = 0.0;
-        float dx = 0.0;
-        float areaZ = 0.0;
-        float dz = 0.0;
-        bool needToSave = false;
-		
-        firstRingCount = kbAreaGetNumberBorderAreas(mainArea);
-		
-        for (firstRingIndex = 0; < firstRingCount)      // Check each border area of the main area
-        {
-            needToSave = true;            // We'll save this unless we have a problem
-            firstRingID = kbAreaGetBorderAreaID(mainArea, firstRingIndex);
-            areaCenter = kbAreaGetCenter(firstRingID);
-            // Now, do the checks.
-            areaX = xsVectorGetX(areaCenter);
-            areaZ = xsVectorGetZ(areaCenter);
-            dx = mainX - areaX;
-            dz = mainZ - areaZ;
-            if ((dx > otherBaseWallRadius) || (dx < -1.0*otherBaseWallRadius)
-			|| (dz > otherBaseWallRadius) || (dz < -1.0*otherBaseWallRadius))
-            {
-                needToSave = false;
-			}
+		if (UnitID == false)
+		{
+			aiPlanSetNumberVariableValues(RingWallPlan, cBuildWallPlanAreaIDs, radius, true);
+			aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanAreaIDs, numAreasAdded, mainArea);
+			numAreasAdded = numAreasAdded + 1;
 			
-            // Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
-            if (needToSave == true)
-            {
-                bool found = false;
-                for (j = 0; < numAreasAdded)
-                {
-                    if (aiPlanGetVariableInt(RingWallPlan, cBuildWallPlanAreaIDs, j) == firstRingID)
-                    {
-                        found = true;     // It's in there, don't add it
-					}
+			int firstRingCount = -1;      // How many areas are in first ring around main?
+			int firstRingIndex = -1;      // Which one are we on?
+			int firstRingID = -1;         // Actual ID of current 1st ring area
+			vector areaCenter = cInvalidVector;    // Center point of this area
+			float areaX = 0.0;
+			float dx = 0.0;
+			float areaZ = 0.0;
+			float dz = 0.0;
+			bool needToSave = false;
+			
+			firstRingCount = kbAreaGetNumberBorderAreas(mainArea);
+			
+			for (firstRingIndex = 0; < firstRingCount)      // Check each border area of the main area
+			{
+				needToSave = true;            // We'll save this unless we have a problem
+				firstRingID = kbAreaGetBorderAreaID(mainArea, firstRingIndex);
+				areaCenter = kbAreaGetCenter(firstRingID);
+				// Now, do the checks.
+				areaX = xsVectorGetX(areaCenter);
+				areaZ = xsVectorGetZ(areaCenter);
+				dx = mainX - areaX;
+				dz = mainZ - areaZ;
+				if ((dx > otherBaseWallRadius) || (dx < -1.0*otherBaseWallRadius)
+				|| (dz > otherBaseWallRadius) || (dz < -1.0*otherBaseWallRadius))
+				{
+					needToSave = false;
 				}
-                if ((found == false) && (numAreasAdded < 20))  // add it
-                {
-                    aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanAreaIDs, numAreasAdded, firstRingID);
-                    numAreasAdded = numAreasAdded + 1;
+				
+				// Now, if we need to save it, zip through the list of saved areas and make sure it isn't there, then add it.
+				if (needToSave == true)
+				{
+					bool found = false;
+					for (j = 0; < numAreasAdded)
+					{
+						if (aiPlanGetVariableInt(RingWallPlan, cBuildWallPlanAreaIDs, j) == firstRingID)
+						{
+							found = true;     // It's in there, don't add it
+						}
+					}
+					if ((found == false) && (numAreasAdded < 20))  // add it
+					{
+						aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanAreaIDs, numAreasAdded, firstRingID);
+						numAreasAdded = numAreasAdded + 1;
+					}
 				}
 			}
 		}
         // Set the true number of area variables, preserving existing values, then turn on the plan
-        aiPlanSetNumberVariableValues(RingWallPlan, cBuildWallPlanAreaIDs, numAreasAdded, false);
 		
-        aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
+		if (UnitID == false)
+		{
+            aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeArea);
+			aiPlanSetBaseID(RingWallPlan, BaseID);
+			aiPlanSetVariableFloat(RingWallPlan, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
+		}
+	    else
+		{
+		    aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanWallType, 0, cBuildWallPlanWallTypeRing);
+	        aiPlanSetVariableVector(RingWallPlan, cBuildWallPlanWallRingCenterPoint, 0, mainCenter);
+	        aiPlanSetVariableFloat(RingWallPlan, cBuildWallPlanWallRingRadius, 0, radius);
+			
+			aiPlanSetBaseID(RingWallPlan, kbUnitGetBaseID(BaseID));
+		}
+		
         aiPlanAddUnitType(RingWallPlan, cBuilderType, 1, 1, 1);
         aiPlanSetVariableInt(RingWallPlan, cBuildWallPlanNumberOfGates, 0, 40);
-        aiPlanSetVariableFloat(RingWallPlan, cBuildWallPlanEdgeOfMapBuffer, 0, 12.0);
-        aiPlanSetBaseID(RingWallPlan, BaseID);
+        
         aiPlanSetEscrowID(RingWallPlan, cMilitaryEscrowID);
         aiPlanSetDesiredPriority(RingWallPlan, 100);
         aiPlanSetActive(RingWallPlan, true);
@@ -2375,7 +2385,7 @@ inactive
             else if (cMyCulture == cCultureChinese)
 			building1ID = cUnitTypeStableChinese;					
             int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
-            if (numBuilding1NearBase > 1)
+            if (numBuilding1NearBase > 0)
 		    TryMB = true;	
 		}
         else
@@ -2387,7 +2397,7 @@ inactive
     otherBaseID = mainBaseID;
     location = kbBaseGetLocation(cMyID, otherBaseID);
     int numFortressesNearMainBase = getNumUnits(bigBuildingID, cUnitStateAliveOrBuilding, -1, cMyID, location, 60.0);
-    if (numFortressesNearMainBase > 4)
+    if (numFortressesNearMainBase > 3)
     {
        return;
 	}	
@@ -2499,7 +2509,7 @@ inactive
         vector otherBaseLocation = kbUnitGetPosition(otherBaseUnitID);
 		
         int numTowersNearBase = getNumUnits(cUnitTypeTower, cUnitStateAliveOrBuilding, -1, cMyID, otherBaseLocation, 30.0);
-		
+		int Fortressthere = getNumUnits(cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding, -1, cMyID, otherBaseLocation, 30.0);
         if (otherBaseID == mainBaseID)
         {
             if (ShowAiEcho == true) aiEcho("otherBaseID == mainBaseID, returning");
@@ -2514,7 +2524,7 @@ inactive
         if (ShowAiEcho == true) aiEcho("numTowersNearBase #"+otherBaseID+": "+numTowersNearBase);
         if ((numTowersNearBase > 1) && (kbGetAge() == cAge2))
 		return;
-        else if (numTowersNearBase >= 2)
+        else if (numTowersNearBase+Fortressthere >= 2)
 		return;
 		
         baseID = otherBaseID;
@@ -2631,7 +2641,7 @@ inactive
     if (ShowAiEcho == true) aiEcho("location: "+location);
 	
     //return if we already have a building1 at the other base
-    int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 20.0);
+    int numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 25.0);
     if ((cMyCulture == cCultureEgyptian)|| (cMyCulture == cCultureNorse))
     {
         if (numBuilding1NearBase > 1)
@@ -2653,21 +2663,17 @@ inactive
 			building1ID = cUnitTypeBarracksAtlantean;
 			if (cMyCulture == cCultureChinese)
 			building1ID = cUnitTypeBarracksChinese;	
-			numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 20.0);
+			numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 25.0);
 			if ((cMyCiv == cCivOuranos) && (gTransportMap == false) && (numBuilding1NearBase > 0))
 			{
 				building1ID = cUnitTypeSkyPassage;
-				numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 20.0);
+				numBuilding1NearBase = getNumUnits(building1ID, cUnitStateAliveOrBuilding, -1, cMyID, location, 25.0);
 			}
 		}
 		if (numBuilding1NearBase > 0)
 		return;		
 	}
 	
-	int numFortressesNearOtherBase = getNumUnits(cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding, -1, cMyID, location, 30.0);
-    if (numFortressesNearOtherBase > 0)
-    return;
-    
     
     bool planActive = false;
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
@@ -3531,120 +3537,6 @@ inactive
 }
 
 //==============================================================================
-rule buildGoldMineTower
-minInterval 47 //starts in cAge2
-inactive
-{
-    float goldSupply = kbResourceGet(cResourceGold);
-	if ((kbGetAge() < cAge3) || (aiGetGameMode() == cGameModeDeathmatch) && (xsGetTime() < 12*60*1000))
-	return; // We need the gold to advance quicker.
-	
-	if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
-	
-    int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
-    
-    if (cMyCulture != cCultureEgyptian)
-    {
-        if ((kbGetTechStatus(cTechWatchTower) < cTechStatusResearching) && (numTowers > 0))
-		return;
-		
-        if ((gAge2MinorGod == cTechAge2Heimdall) && (kbGetTechStatus(cTechSafeguard) < cTechStatusResearching))
-		return;
-	}
-	
-    float currentWood = kbResourceGet(cResourceWood);
-    float currentGold = kbResourceGet(cResourceGold);
-    float currentFood = kbResourceGet(cResourceFood);
-	
-    if ((currentWood < 500) || (currentGold < 500))
-	return;
-	
-    if ((currentFood > 700) && (currentGold > 700) && (kbGetAge() == cAge3))
-	return;
-    
-    int towerLimit = kbGetBuildLimit(cMyID, cUnitTypeTower);
-    if (numTowers >= towerLimit)
-	return;
-	
-    if ((numTowers > 8) && (kbGetAge() == cAge3))
-	return;
-	
-    if (ShowAiEcho == true) aiEcho("buildGoldMineTower:");
-    
-    int mainBaseID = kbBaseGetMainID(cMyID);
-    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    vector location = cInvalidVector;
-	
-    int numGoldMinesInR90 = getNumUnits(cUnitTypeGold, cUnitStateAlive, -1, 0, mainBaseLocation, 90.0);
-    if (ShowAiEcho == true) aiEcho("numGoldMinesInR90: "+numGoldMinesInR90);
-    if (numGoldMinesInR90 > 0)
-    {
-        for (i = 0; < numGoldMinesInR90)
-        {
-            int goldMineID = findUnitByIndex(cUnitTypeGold, i, cUnitStateAlive, -1, 0, mainBaseLocation, 90.0);
-            if (goldMineID > 0)
-            {
-                location = kbUnitGetPosition(goldMineID);
-                int numTowersNearLocation = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, location, 45.0); // Any building that shoots.
-                if (ShowAiEcho == true) aiEcho("numTowersNearLocation: "+location+": "+numTowersNearLocation);
-                if (numTowersNearLocation < 1)
-				break;
-                else
-				location = cInvalidVector;
-			}
-		}
-	}
-    
-    if (equal(location, cInvalidVector) == true)
-    {
-        if (ShowAiEcho == true) aiEcho("no location to build a tower, returning");
-        return;
-	}
-	
-	
-    int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
-    if (activeBuildPlans > 0)
-    {
-        for (i = 0; < activeBuildPlans)
-        {
-            int buildPlanIndexID = aiPlanGetIDByIndex(cPlanBuild, -1, true, i);
-            if ((aiPlanGetVariableInt(buildPlanIndexID, cBuildPlanBuildingTypeID, 0) == cUnitTypeTower) && (equal(location, aiPlanGetVariableVector(buildPlanIndexID, cBuildPlanCenterPosition, 0)) == true))
-            {
-                if (ShowAiEcho == true) aiEcho("plan to build tower near gold mine at location "+location+" already exists, returning");
-                return;
-			}
-		}
-	}
-    
-    float distToMainBase = xsVectorLength(mainBaseLocation - location);
-    int numBuilders = kbUnitCount(cMyID, cBuilderType, cUnitStateAlive);    
-
-    //Build a tower near the gold mine
-    static int count = 1;
-    int buildGoldMineTowerPlanID = aiPlanCreate("Build gold mine tower #"+count, cPlanBuild);
-    if (buildGoldMineTowerPlanID >= 0)
-    {
-        aiPlanSetInitialPosition(buildGoldMineTowerPlanID, location);
-        aiPlanSetVariableInt(buildGoldMineTowerPlanID, cBuildPlanBuildingTypeID, 0, cUnitTypeTower);
-        aiPlanSetVariableInt(buildGoldMineTowerPlanID, cBuildPlanMaxRetries, 0, 10);
-        aiPlanSetDesiredPriority(buildGoldMineTowerPlanID, 100);
-        aiPlanSetVariableBool(buildGoldMineTowerPlanID, cBuildPlanInfluenceAtBuilderPosition, 0, false);
-        aiPlanSetVariableFloat(buildGoldMineTowerPlanID, cBuildPlanRandomBPValue, 0, 0.0);
-        aiPlanSetVariableVector(buildGoldMineTowerPlanID, cBuildPlanCenterPosition, 0, location);
-        aiPlanSetVariableFloat(buildGoldMineTowerPlanID, cBuildPlanCenterPositionDistance, 0, 4.0);
-		
-        aiPlanSetVariableFloat(buildGoldMineTowerPlanID, cBuildPlanBuildingBufferSpace, 0, 0.0);
-		aiPlanAddUnitType(buildGoldMineTowerPlanID, cBuilderType, 1, 1, 1);
-        aiPlanSetEscrowID(buildGoldMineTowerPlanID, cMilitaryEscrowID);
-        aiPlanSetBaseID(buildGoldMineTowerPlanID, mainBaseID);
-		
-        aiPlanSetActive(buildGoldMineTowerPlanID);
-        count = count + 1;
-        if (ShowAiEcho == true) aiEcho("building tower near gold mine at location: "+location);
-	}
-}
-
-//==============================================================================
 rule buildMBTower
 minInterval 22 //starts in cAge2
 inactive
@@ -3693,7 +3585,7 @@ inactive
     int towerLimit = kbGetBuildLimit(cMyID, cUnitTypeTower);
 	if (kbGetAge() == cAge2)
 	towerLimit = 4;
-    if ((numTowers >= towerLimit) || (NumTowersInMB >= 12))
+    if ((numTowers >= towerLimit) || (NumTowersInMB >= 8))
 	return;
 	
     int activeBuildPlans = aiPlanGetNumber(cPlanBuild, -1, true);
@@ -4624,11 +4516,11 @@ minInterval 37
 }	
 
 //==============================================================================
-rule buildForwardFortress
-minInterval 60 //starts in cAge3
+rule SupportUnits
+minInterval 10 //starts in cAge3
 inactive
 {
-    if (gTransportMap == true)
+	if (gTransportMap == true)
     {
 		xsDisableSelf();
 		return;
@@ -4636,86 +4528,130 @@ inactive
 	
 	int currentPop = kbGetPop();           
     int currentPopCap = kbGetPopCap();
-    int Building = MyFortress;
-	int Rand = aiRandInt(2);
-	if ((cMyCulture == cCultureAtlantean) && (kbGetTechStatus(cTechAge4Helios) == cTechStatusActive))
-	Rand = aiRandInt(3);
-	if (Rand == 1)
-	Building = cUnitTypeTower;
-	if (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 20)
-	Building = MyFortress;
-	if (kbUnitCount(cMyID, MyFortress, cUnitStateAliveOrBuilding) >= 10)
-	Building = cUnitTypeTower;
-	if ((Rand == 2) && (kbUnitCount(cMyID, cUnitTypeTowerMirror, cUnitStateAliveOrBuilding) < 10))
-	Building = cUnitTypeTowerMirror;	
-	int ActivePlans = findPlanByString("Buildforwardfortress", cPlanBuild, -1, true);
+	int ActivePlans = findPlanByString("SupportUnits", cPlanBuild, -1, true, true);
+	if (gGlutRatio > 0.80)
+	xsSetRuleMinIntervalSelf(3);
+    else
+	xsSetRuleMinIntervalSelf(10);	
 	
-	if ((currentPop <= currentPopCap*0.5) && (ActivePlans > 0))
+	if ((currentPop <= currentPopCap*0.5) && (ActivePlans > 0) || (ActivePlans > 0) && (kbResourceGet(cResourceGold) < 300) || (ActivePlans > 0) && (kbResourceGet(cResourceWood) < 300))
 	{
         for (l = 0; < ActivePlans)
 		{
-            int StalledPlanID = findPlanByString("Buildforwardfortress", cPlanBuild, -1, false);
+            int StalledPlanID = findPlanByString("SupportUnits", cPlanBuild, -1, false);
             if (StalledPlanID != -1)
             aiPlanDestroy(StalledPlanID);
 		}
+		xsSetRuleMinIntervalSelf(35);
 		return;
 	}
 	
-    if ((ActivePlans >= 2) || (kbResourceGet(cResourceGold) < 600) ||
-	(kbResourceGet(cResourceWood) < 500) && (cMyCulture != cCultureEgyptian) || (kbResourceGet(cResourceFood) < 500) || (kbResourceGet(cResourceFavor) < 15) ||
-	(Building == cUnitTypeTower) && (kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding) >= 20) || (Building == MyFortress) && (kbUnitCount(cMyID, MyFortress, cUnitStateAliveOrBuilding) >= 10))
+    if ((ActivePlans >= 4) || (kbResourceGet(cResourceGold) < 1200) ||
+	(kbResourceGet(cResourceWood) < 1000) && (cMyCulture != cCultureEgyptian) || (kbResourceGet(cResourceFood) < 1000) || (kbResourceGet(cResourceFavor) < 5))
 	return;  // Quit if we're already building one or not enough resources
-	
-	xsSetRuleMinIntervalSelf(60);
-	if ((kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceWood) > 500) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture != cCultureEgyptian) ||
-	(kbResourceGet(cResourceFood) > 1200) && (kbResourceGet(cResourceGold) > 1000) && (kbResourceGet(cResourceFavor) > 15) && (cMyCulture == cCultureEgyptian))
-	xsSetRuleMinIntervalSelf(22);
-	int MHPTC = getMainBaseUnitIDForPlayer(aiGetMostHatedPlayerID());
-	if (MHPTC > 0)
+
+	for (d = 0; < 2)
 	{
-        vector enemyTCvec = kbUnitGetPosition(MHPTC);
-		vector offset = kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)) - enemyTCvec;
-		offset = xsVectorNormalize(offset);
-		vector target = enemyTCvec + (offset * 80.0);
-		int enemyAreaGroup = kbAreaGroupGetIDByPosition(enemyTCvec);
+        bool Success = false;
+        int Building = MyFortress;
+	    int Rand = aiRandInt(2);
+	    if ((cMyCulture == cCultureAtlantean) && (kbGetTechStatus(cTechAge4Helios) == cTechStatusActive))
+	    Rand = aiRandInt(3);
+	    if (Rand == 0)
+	    Building = cUnitTypeTower;
+	    else if (Rand == 2)
+	    Building = cUnitTypeTowerMirror;	
+        
+		int UnitToUse = cUnitTypeAbstractSiegeWeapon;
+		if (d == 1)
+		UnitToUse = cUnitTypeBuildingsThatShoot;
+		int unitID = findUnitByIndex(UnitToUse, 0, cUnitStateAlive, cActionRangedAttack, cMyID);
+		if (unitID == -1)
+		continue;
+	
+		vector unitLoc = kbUnitGetPosition(unitID);
+		int mainBaseID = kbBaseGetMainID(cMyID);
+		vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
+		float distanceToMainBase = xsVectorLength(mainBaseLocation - unitLoc);
 		
-		vector towardEnemy = offset * -5.0;   // 5m away from me, toward enemy TC
-		bool success = false;
+		int MyUnits = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationSelf, unitLoc, 45.0, true);
+		int AllyUnits = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, unitLoc, 45.0, true);
+		int EnemyUnits = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 35.0, true);
+		int EnemyShoots = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 45.0, true);
+		int MBShoots = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationSelf, mainBaseLocation, 50.0, true);
 		
-		for (i=0; <18)	// Keep testing until areaGroups match
-		{
-			int testAreaGroup = kbAreaGroupGetIDByPosition(target);
-			int NumEnemy = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, target, 28.0, false);
-			int NumSelf = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, target, 100.0);
-			if ((testAreaGroup == enemyAreaGroup) && (NumEnemy == 0) && (NumSelf < 2))
+		if ((EnemyUnits+EnemyShoots < 4) || (MyUnits+AllyUnits < EnemyUnits) || (distanceToMainBase < 50))
+		continue;
+		
+		if ((kbUnitCount(cMyID, Building, cUnitStateAliveOrBuilding) >= kbGetBuildLimit(cMyID, Building)) || (d == 1) && (kbUnitCount(cMyID, Building, cUnitStateAliveOrBuilding)+1 >= kbGetBuildLimit(cMyID, Building)))
+		{ 
+			int UnitsFound = getNumUnits(Building, cUnitStateAlive, cActionIdle, cMyID);
+			for (i=0; < UnitsFound)
 			{
-				success = true;
-				break;
-			}
-			else
-			{
-				target = target + towardEnemy;   // Try a bit closer
+				int doomedID = findUnitByIndex(Building, i, cUnitStateAlive, cActionIdle, cMyID);
+				vector Candidate = kbUnitGetPosition(doomedID);
+				float DistanceFromMB = xsVectorLength(mainBaseLocation - Candidate);
+				float DistanceFromUToLoc = xsVectorLength(unitLoc - Candidate);
+				int Market = findClosestUnitTypeByLoc(cPlayerRelationSelf, cUnitTypeMarket, Candidate, 30);
+				int MarketTowers = 0;
+				int MyTC = findClosestUnitTypeByLoc(cPlayerRelationSelf, cUnitTypeAbstractSettlement, Candidate, 35);
+				int TowerTHere = 0;
+				if (MyTC != -1)
+				TowerTHere = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, kbUnitGetPosition(MyTC), 25.0);
+			    if (MarketTowers != -1)
+				MarketTowers = getNumUnits(cUnitTypeBuildingsThatShoot, cUnitStateAliveOrBuilding, -1, cMyID, kbUnitGetPosition(Market), 25.0);
+			
+				if ((DistanceFromMB < 50) && (MBShoots < 6) || (DistanceFromUToLoc < 45) || (Market != -1) && (MarketTowers <= 2)|| (MyTC != -1) && (TowerTHere < 2))
+				continue;
+				if (doomedID != -1)
+				{
+					aiTaskUnitDelete(doomedID);
+					Success = true;
+					break;
+				}
 			}
 		}
+		else 
+		Success = true;
 		
-		if (success == false)
-		return;
+		if (Success == false)
+		continue;
 		
-		int remotePlanID=aiPlanCreate("Buildforwardfortress", cPlanBuild);
-		if (remotePlanID < 0)
-		return;
-		aiPlanSetVariableInt(remotePlanID, cBuildPlanBuildingTypeID, 0, Building);
-		aiPlanSetVariableInt(remotePlanID, cBuildPlanMaxRetries, 0, 1);
-		aiPlanSetVariableInt(remotePlanID, cBuildPlanAreaID, 0, kbAreaGetIDByPosition(target));
-		aiPlanSetVariableFloat(remotePlanID, cBuildPlanRandomBPValue, 0, 0.99);
-		aiPlanSetVariableInt(remotePlanID, cBuildPlanNumAreaBorderLayers, 0, 1);
-		aiPlanSetDesiredPriority(remotePlanID, 80);
-		aiPlanSetEscrowID(remotePlanID, cMilitaryEscrowID);
+		int numBuilders = 2;
 		if (cMyCulture == cCultureAtlantean)
-		aiPlanAddUnitType(remotePlanID, cBuilderType, 1, 1, 1);
-		else aiPlanAddUnitType(remotePlanID, cBuilderType, 2, 3, 3);
-		aiPlanSetActive(remotePlanID);
-	}
+		numBuilders = 1;
+		else if (gGlutRatio < 0.5)
+		numBuilders = 1;
+		
+		//Build near our UnitLoc
+		
+		int TowerAroundAttUnitPlan = aiPlanCreate("SupportUnits", cPlanBuild);
+		if (TowerAroundAttUnitPlan >= 0)
+		{
+			aiPlanSetInitialPosition(TowerAroundAttUnitPlan, unitLoc);
+			aiPlanSetVariableInt(TowerAroundAttUnitPlan, cBuildPlanBuildingTypeID, 0, Building);
+			aiPlanSetVariableInt(TowerAroundAttUnitPlan, cBuildPlanMaxRetries, 0, 10);
+			aiPlanSetDesiredPriority(TowerAroundAttUnitPlan, 100);
+			
+			//Try to favor the placement around the Unit first.
+			aiPlanSetVariableInt(TowerAroundAttUnitPlan, cBuildPlanInfluenceUnitTypeID, 0, cUnitTypeMilitary); 
+			aiPlanSetVariableFloat(TowerAroundAttUnitPlan, cBuildPlanInfluenceUnitDistance, 0, 35);    
+			aiPlanSetVariableFloat(TowerAroundAttUnitPlan, cBuildPlanInfluenceUnitValue, 0, 100.0);   
+			aiPlanSetVariableVector(TowerAroundAttUnitPlan, cBuildPlanInfluencePosition, 0, unitLoc);
+			aiPlanSetVariableFloat(TowerAroundAttUnitPlan, cBuildPlanInfluencePositionDistance, 0, 30);  
+			aiPlanSetVariableFloat(TowerAroundAttUnitPlan, cBuildPlanInfluencePositionValue, 0, 30.0);       
+			
+			aiPlanSetVariableBool(TowerAroundAttUnitPlan, cBuildPlanInfluenceAtBuilderPosition, 0, true);
+			aiPlanSetVariableFloat(TowerAroundAttUnitPlan, cBuildPlanRandomBPValue, 0, 0.99);
+			aiPlanSetVariableVector(TowerAroundAttUnitPlan, cBuildPlanCenterPosition, 0, unitLoc);
+			aiPlanSetVariableFloat(TowerAroundAttUnitPlan, cBuildPlanCenterPositionDistance, 0, 14.00);
+			aiPlanSetVariableFloat(TowerAroundAttUnitPlan, cBuildPlanBuildingBufferSpace, 0, 4.0);
+
+			aiPlanAddUnitType(TowerAroundAttUnitPlan, cBuilderType, numBuilders, numBuilders, numBuilders);
+			aiPlanSetEscrowID(TowerAroundAttUnitPlan, cEconomyEscrowID);
+			aiPlanSetActive(TowerAroundAttUnitPlan);
+		}
+	}	
 }
 
 //==============================================================================
