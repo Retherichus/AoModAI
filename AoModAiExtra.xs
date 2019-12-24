@@ -682,7 +682,7 @@ active
 				gTransportMap = true;
 				aiSetWaterMap(gTransportMap == true);
 				gWaterMap = true;
-				aiEcho("Transport is needed, because a player or a TC is on a different island!");
+				if (ShowAiEcho == true) aiEcho("Transport is needed, because a player or a TC is on a different island!");
 			}
 		}
 	}
