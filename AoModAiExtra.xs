@@ -1505,7 +1505,7 @@ group HateScriptsSpecial
 	else if (cMyCulture == cCultureNorse)
 	{
 	    UnitType = cUnitTypeBogsveigir;
-		UnitToCounter = cUnitTypeFlyingUnit;
+		UnitToCounter = cUnitTypeMythUnit;
 	}
 
 	int UnitsFound = kbUnitCount(cMyID, UnitType, cUnitStateAlive);
