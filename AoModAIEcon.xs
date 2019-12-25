@@ -889,7 +889,7 @@ inactive
 			{
 				vector InitialPos = aiPlanGetInitialPosition(FarmPlanID);
 				int CurrentID = aiPlanGetVariableInt(FarmPlanID, cFarmPlanDropsiteID, 0);
-				if ((kbUnitIsType(CurrentID, cUnitTypeAbstractSettlement) != true) && (CurrentID != -1) && (equal(InitialPos, kbBaseGetLocation(cMyID, mainBaseID)) == false))
+				if ((kbUnitIsType(CurrentID, cUnitTypeAbstractSettlement) != true) && (CurrentID != -1) && (equal(InitialPos, kbBaseGetLocation(cMyID, mainBaseID)) == true))
 				{
 					int TC = getMainBaseUnitIDForPlayer(cMyID);
 					if (TC != -1)
@@ -897,6 +897,7 @@ inactive
 						vector baseLocation = kbBaseGetLocation(cMyID, mainBaseID);
 					    aiPlanSetVariableInt(FarmPlanID, cFarmPlanDropsiteID, 0, TC);
 						aiPlanSetVariableVector(FarmPlanID, cFarmPlanFarmingPosition, 0, InitialPos);
+						break;
 					}
 				}				
 			}	
