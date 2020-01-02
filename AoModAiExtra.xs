@@ -477,6 +477,7 @@ void initRethlAge2(void)
 		case cCultureEgyptian:
 		{   
 		    xsEnableRule("buildMonuments");
+			xsEnableRule("getHandsOfThePharaoh");
 		    if (cMyCiv == cCivIsis)
 			xsEnableRule("getFloodOfTheNile");
 		    else if (cMyCiv == cCivRa)

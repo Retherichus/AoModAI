@@ -2895,10 +2895,7 @@ void init(void)
 	}
     
     if (cMyCulture == cCultureEgyptian)
-	{
-		xsEnableRule("getHandsOfThePharaoh");
-	    xsEnableRule("trainMercs");
-	}
+	xsEnableRule("trainMercs");
 
 	
     if (cMyCulture != cCultureGreek)

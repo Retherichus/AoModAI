@@ -524,7 +524,7 @@ minInterval 79 //starts in cAge3
 	int numTowers = kbUnitCount(cMyID, cUnitTypeTower, cUnitStateAliveOrBuilding);
     int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding);
    
-    if ((numTowers < 1) || (numMarkets < 1))
+    if ((numTowers < 1) || (numMarkets < 1) || (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching))
 	return;
 
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 70);
@@ -595,13 +595,9 @@ minInterval 43 //starts in cAge3
     
     int numFortresses = kbUnitCount(cMyID, cUnitTypeAbstractFortress, cUnitStateAliveOrBuilding);
     int numMarkets = kbUnitCount(cMyID, cUnitTypeMarket, cUnitStateAliveOrBuilding);
-    if ((numFortresses < 1) || (numMarkets < 1))
-	return;
-    
-    if ((goldSupply < 400) || (woodSupply < 400))
-	return;
 	
-    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() == cAge3))
+    if ((foodSupply > 700) && (goldSupply > 700) && (kbGetAge() == cAge3) || (goldSupply < 400) 
+	|| (woodSupply < 400) || (numFortresses < 1) || (numMarkets < 1) || (kbGetTechStatus(cTechWatchTower) < cTechStatusResearching))
 	return;
 	
 	createSimpleResearchPlan(techID, -1, cMilitaryEscrowID, 80);
