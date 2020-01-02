@@ -1519,7 +1519,7 @@ group Apollo
 rule getFlamesOfTyphon
 inactive
 minInterval 29 //starts in cAge4
-group Hera
+group Artemis
 {
 	
     int techID = cTechFlamesofTyphon;
@@ -1540,7 +1540,7 @@ group Hera
 rule getTrierarch
 inactive
 minInterval 31 //starts in cAge4
-group Hera
+group Artemis
 {
     if (gTransportMap == false)
     {
