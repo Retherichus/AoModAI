@@ -424,55 +424,42 @@ vector center = cInvalidVector, float radius = -1, bool seeable = false, int are
 }
 
 //==============================================================================
-// findUnitByIndex  // Will find a unit of the given playerID by the index, default index = 0
+// findUnitByIndex // Will find a random unit of the given playerID  // Thanks goes to nate_e for optimizing this loop! :)
 //==============================================================================
 int findUnitByIndex(int unitTypeID = -1, int index = 0, int state = cUnitStateAlive, int action = -1, int playerID = cMyID, 
 vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
-{	
+{
     static int unitQueryID = -1;
-	
-    //If we don't have the query yet, create one.
     if (unitQueryID < 0)
-	unitQueryID = kbUnitQueryCreate("findUnitByIndexQuery");
-	
-    //Define a query to get all matching units
-    if (unitQueryID != -1)
-	configQuery(unitQueryID, unitTypeID, action, state, playerID, center, true, radius, seeable, areaID);  //sort = true
-    else
-	return(-1);
-	
-    kbUnitQueryResetResults(unitQueryID);
-	int numberFound = kbUnitQueryExecute(unitQueryID);
-    for (i=0; < numberFound)
-	return(kbUnitQueryGetResult(unitQueryID, index));
-    return(-1);
+    unitQueryID = kbUnitQueryCreate("findUnitByIndex");
+    if (index == 0) 
+    {
+        kbUnitQueryResetResults( unitQueryID );
+        configQuery(unitQueryID, unitTypeID, action, state, playerID, center, true, radius, seeable, areaID ); //sort = true
+        kbUnitQueryExecute( unitQueryID );
+    }
+    int retval = kbUnitQueryGetResult(unitQueryID, index);
+    return(retval);
 }
-
 //==============================================================================
-// findUnitByRelByIndex // Will find a random unit of the given playerRelation
+// findUnitByRelByIndex // Will find a random unit of the given playerRelation // Thanks goes to nate_e for optimizing this loop! :)
 //==============================================================================
 int findUnitByRelByIndex(int unitTypeID = -1, int index = 0, int state = cUnitStateAlive, int action = -1, 
 int playerRelation = cPlayerRelationSelf, vector center = cInvalidVector, float radius = -1, 
 bool seeable = false, int areaID = -1)
 {
     static int unitQueryID = -1;
-    //If we don't have the query yet, create one.
     if (unitQueryID < 0)
-	unitQueryID=kbUnitQueryCreate("randFindUnitByRelByIndexQuery");
-	
-    //Define a query to get all matching units
-    if (unitQueryID != -1)
-	configQueryRelation(unitQueryID, unitTypeID, action, state, playerRelation, center, true, radius, seeable, areaID); //sort = true
-    else
-	return(-1);
-	
-    kbUnitQueryResetResults(unitQueryID);
-	int numberFound = kbUnitQueryExecute(unitQueryID);
-    for (i=0; < numberFound)
-	return(kbUnitQueryGetResult(unitQueryID, index));
-    return(-1);
+    unitQueryID = kbUnitQueryCreate("findUnitByIndex");
+    if (index == 0) 
+    {
+        kbUnitQueryResetResults( unitQueryID );
+        configQueryRelation(unitQueryID, unitTypeID, action, state, playerRelation, center, true, radius, seeable, areaID); //sort = true
+        kbUnitQueryExecute(unitQueryID);
+    }
+    int retval = kbUnitQueryGetResult(unitQueryID, index);
+    return(retval);
 }
-
 //==============================================================================
 // getNumUnits  // Returns the number of units of the given playerID (within the radius of a position)
 //==============================================================================

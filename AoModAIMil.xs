@@ -154,9 +154,9 @@ inactive
 					HealUnit = cUnitTypeHeroChineseMonk;
 					else if (cMyCulture == cCultureGreek)
 					HealUnit = cUnitTypePhysician;				
-					int Unit = findUnitByIndex(HealUnit, 0, cUnitStateAlive, cActionIdle, cMyID, mainBaseLocation, 85);
+					int Unit = findUnit(HealUnit, cUnitStateAlive, cActionIdle, cMyID, mainBaseLocation, 85);
 					if ((cMyCulture == cCultureEgyptian) && (Unit == -1))
-					Unit = findUnitByIndex(cUnitTypeAbstractPharaoh, 0, cUnitStateAlive, cActionIdle, cMyID, mainBaseLocation, 85);	
+					Unit = findUnit(cUnitTypeAbstractPharaoh, cUnitStateAlive, cActionIdle, cMyID, mainBaseLocation, 85);	
 					if (Unit != -1)
 					{
 				        int Healables = getNumUnits(cUnitTypeLogicalTypeCanBeHealed, cUnitStateAlive, -1, cMyID, mainBaseLocation, 85);
