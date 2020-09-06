@@ -28,8 +28,6 @@ void persDecidePersonality(void)
 	}
 	else if (Personality == 8)
 	choice = aiRandInt(6);
-    else
-    choice = Personality;     // 0..5
     switch(choice)
     {
         case 0:  // Defensive Boomer (protector)

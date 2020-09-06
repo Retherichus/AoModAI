@@ -9,12 +9,11 @@
 //==============================================================================
 void navalAge2Handler(int age=1)
 {
-    if (ShowAiEcho == true) aiEcho("Naval Age "+age+".");
-	
     // Naval (scout other islands etc...)
     if (gTransportMap == true)
     {
         xsEnableRuleGroup("NavalClassical");
+	    xsEnableRule("PurgeLostEcoUnits");			
 	}
     
     if ((cRandomMapName == "anatolia") // TODO: maybe on (cRandomMapName == "highlands") too?
@@ -41,7 +40,6 @@ void navalAge3Handler(int age=2)
 //==============================================================================
 void navalAge4Handler(int age=3)
 {
-    if (ShowAiEcho == true) aiEcho("Naval Age "+age+".");
 	if (gNavalUPID != -1)
 	kbUnitPickSetDesiredNumberUnitTypes(gNavalUPID, 3, 3, true);
 }
@@ -52,7 +50,6 @@ minInterval 26 //starts in cAge3
 group NavalHeroic
 inactive
 {
-	if (ShowAiEcho == true) aiEcho("findOtherSettlements:");
 	static int bStartTime = -1;
 	static int Attempts = 0;
 	int TotalBuilders = kbUnitCount(cMyID, cBuilderType, cUnitStateAlive);
@@ -75,10 +72,10 @@ inactive
 	int startAreaID=kbAreaGetIDByPosition(here);
 	
 	//Find other islands area group.
-	vector there = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeSettlement, here));
+	vector there = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeSettlement, cUnitStateAliveOrBuilding, here));
 	
 	// settlement is on my island
-	if ((isOnMyIsland(there) == true) || (equal(there, cInvalidVector) == true))
+	if ((SameAG(there, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) == true) || (equal(there, cInvalidVector) == true))
 	return; // no transport needed!
 	
 	//Create transport plan to get builders to the other island
@@ -165,7 +162,7 @@ inactive
 	
 	int numMyMilShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
 	int numAlliedMilShips = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationAlly);
-	if ((numMyMilShips + numAlliedMilShips > numberEnemyWarships + 2) && (numMyMilShips > 1))
+	if ((numMyMilShips + numAlliedMilShips > numberEnemyWarships) && (numMyMilShips > 1))
 	reduceCount = reduceCount + 1;
 	else
 	reduceCount = 0;
@@ -265,7 +262,6 @@ inactive
 	return;
 	
 	//Else, create the Naval attack goal.
-	if (ShowAiEcho == true) aiEcho("Creating NavalAttackGoal for "+maxShips+" ships since I've seen "+numberEnemyWarships+" for Player "+aiGetMostHatedPlayerID()+".");
 	gNavalUPID=kbUnitPickCreate("Naval");
 	if (gNavalUPID < 0)
 	{
@@ -316,7 +312,6 @@ inactive
 	    ArrowShipMaintain = createSimpleMaintainPlan(ArrowShip, 2, false, kbBaseGetMainID(cMyID));
 	    aiPlanSetDesiredPriority(ArrowShipMaintain, 100);
 	}
-	xsEnableRule("FishBoatMonitor"); // looks for transport too
 	
 	if (gWaterExploreID == -1)
     {
