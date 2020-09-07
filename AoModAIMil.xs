@@ -1660,8 +1660,8 @@ inactive
 		}
         else
         {
-            index = aiRandInt(numMHPlayerSettlements);
-            targetSettlementID = findUnitByIndex(cUnitTypeAbstractSettlement, index, cUnitStateAliveOrBuilding, -1, mostHatedPlayerID);
+            
+            targetSettlementID = findUnit(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, mostHatedPlayerID);
             if (targetSettlementID != -1)
             {
                 targetPlayerID = mostHatedPlayerID;
@@ -2017,8 +2017,7 @@ inactive
                 int dropsiteUnitIDinCloseRange = -1;
                 if (numEnemyDropsitesInCloseRange > 0)
                 {
-                    index = aiRandInt(numEnemyDropsitesInCloseRange);
-                    dropsiteUnitIDinCloseRange = findUnitByIndex(enemyEconUnit, index, cUnitStateAlive, -1, playerID, mainBaseLocation, closeRangeRadius);
+                    dropsiteUnitIDinCloseRange = findUnit(enemyEconUnit, cUnitStateAlive, -1, playerID, mainBaseLocation, closeRangeRadius);
                     if (kbUnitIsType(dropsiteUnitIDinCloseRange, cUnitTypeAbstractSettlement) == true)
                     {
                         dropsiteUnitIDinCloseRange = -1;
@@ -2111,7 +2110,7 @@ inactive
 	{
 		if ((equal(gRaidingPartyLastTargetLocation, cInvalidVector) == false) && ((aiRandInt(2) < 1) || (kbGetCultureForPlayer(enemyPlayerID) == cCultureAtlantean)))
 		{
-			militaryUnit1ID = findUnitByIndex(cUnitTypeHumanSoldier, 0, cUnitStateAlive, cActionIdle);
+			militaryUnit1ID = findUnit(cUnitTypeHumanSoldier, cUnitStateAlive, cActionIdle);
 			if (militaryUnit1ID > 0)
 			{
 				aiTaskUnitMove(militaryUnit1ID, gRaidingPartyLastTargetLocation);
@@ -2119,7 +2118,7 @@ inactive
 		}
 		if ((equal(gRaidingPartyLastMarketLocation, cInvalidVector) == false) && (aiRandInt(2) < 1))
 		{
-			int militaryUnit2ID = findUnitByIndex(cUnitTypeHumanSoldier, 1, cUnitStateAlive, cActionIdle);
+			int militaryUnit2ID = findUnit(cUnitTypeHumanSoldier, cUnitStateAlive, cActionIdle);
 			if (militaryUnit2ID > 0)
 			{
 				aiTaskUnitMove(militaryUnit2ID, gRaidingPartyLastMarketLocation);
@@ -2133,7 +2132,7 @@ inactive
 	{
 		if ((equal(gRaidingPartyLastTargetLocation, cInvalidVector) == false) && (kbGetCultureForPlayer(playerID) == cCultureAtlantean))
 		{
-			militaryUnit1ID = findUnitByIndex(cUnitTypeHumanSoldier, 0, cUnitStateAlive, cActionIdle);
+			militaryUnit1ID = findUnit(cUnitTypeHumanSoldier,cUnitStateAlive, cActionIdle);
 			if (militaryUnit1ID > 0)
 			{
 				aiTaskUnitMove(militaryUnit1ID, gRaidingPartyLastTargetLocation);

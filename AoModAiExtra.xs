@@ -1849,7 +1849,7 @@ inactive
 			int BadWalls = getNumUnits(unitTypeID, cUnitStateAliveOrBuilding, -1, cMyID, unitLoc, 4);
 			for (j=0; < BadWalls)
 			{
-				int WallPiece = findUnitByIndex(unitTypeID, j, cUnitStateAliveOrBuilding, -1, cMyID, unitLoc);
+				int WallPiece = findUnit(unitTypeID, cUnitStateAliveOrBuilding, -1, cMyID, unitLoc, 4);
 				if (WallPiece != -1)
 				{
 				    aiTaskUnitDelete(WallPiece);
@@ -1878,7 +1878,7 @@ inactive
 		int BadDocks = kbUnitCount(cMyID, unitTypeID, cUnitStateBuilding);
 		for (j=0; < BadDocks)
 		{		
-			int BadDock = findUnitByIndex(unitTypeID, j, cUnitStateBuilding, -1, cMyID, unitLoc, 15);
+			int BadDock = findUnit(unitTypeID, cUnitStateBuilding, -1, cMyID, unitLoc, 15);
 			if (BadDock != unitID)
 			{
 				aiTaskUnitDelete(BadDock);

@@ -3671,7 +3671,7 @@ minInterval 2 //starts in cAge3 activated in watchForFirstWonderStart
 
 //==============================================================================
 rule watchForWonder  // See if my wonder has been placed.  If so, go build it.
-minInterval 23 //starts in cAge4, activated in make wonder
+minInterval 5 //starts in cAge4, activated in make wonder
 inactive
 {
     if (kbUnitCount(cMyID, cUnitTypeWonder, cUnitStateAliveOrBuilding) < 1)
@@ -3684,11 +3684,13 @@ inactive
 		}
 		return;
 	}
+	
+    int wonderID = findUnit(cUnitTypeWonder, cUnitStateAlive);
+	if (wonderID < 0)
+	return;
     xsEnableRule("watchWonderLost");    // Kill the defend plan if the wonder is destroyed.
-	
-    int wonderID = findUnit(cUnitTypeWonder, cUnitStateAliveOrBuilding);
     vector wonderLocation = kbUnitGetPosition(wonderID);
-	
+
     // Make the defend plan
     gWonderDefendPlan = createDefOrAttackPlan("Wonder Defend Plan", true, 60, 40, wonderLocation, -1, 95, false);
     if (gWonderDefendPlan >= 0)
@@ -3704,7 +3706,7 @@ rule watchWonderLost    // Kill the uber-defend plan if wonder falls
 minInterval 7 //starts in cAge4, activated in watchForWonder
 inactive
 {
-    if ( kbUnitCount(cMyID, cUnitTypeWonder, cUnitStateAliveOrBuilding) > 0 )
+    if (kbUnitCount(cMyID, cUnitTypeWonder, cUnitStateAliveOrBuilding) > 0 )
 	return;
 	
     aiPlanDestroy(gWonderDefendPlan);

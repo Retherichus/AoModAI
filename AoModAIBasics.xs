@@ -434,9 +434,9 @@ vector center = cInvalidVector, float radius = -1, bool seeable = false, int are
     unitQueryID = kbUnitQueryCreate("findUnitByIndex");
     if (index == 0) 
     {
-        kbUnitQueryResetResults( unitQueryID );
+        kbUnitQueryResetResults(unitQueryID);
         configQuery(unitQueryID, unitTypeID, action, state, playerID, center, true, radius, seeable, areaID ); //sort = true
-        kbUnitQueryExecute( unitQueryID );
+        kbUnitQueryExecute(unitQueryID);
     }
     int retval = kbUnitQueryGetResult(unitQueryID, index);
     return(retval);
@@ -450,10 +450,10 @@ bool seeable = false, int areaID = -1)
 {
     static int unitQueryID = -1;
     if (unitQueryID < 0)
-    unitQueryID = kbUnitQueryCreate("findUnitByIndex");
+    unitQueryID = kbUnitQueryCreate("findUnitByRelByIndex");
     if (index == 0) 
     {
-        kbUnitQueryResetResults( unitQueryID );
+        kbUnitQueryResetResults(unitQueryID);
         configQueryRelation(unitQueryID, unitTypeID, action, state, playerRelation, center, true, radius, seeable, areaID); //sort = true
         kbUnitQueryExecute(unitQueryID);
     }
