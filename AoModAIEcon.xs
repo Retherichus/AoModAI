@@ -87,6 +87,8 @@ inactive
 		int numberResBaseSites = 0;
 		if ((BaseID >= 0) && (BaseID != mainBaseID))    // Count res base if different
 		numberResBaseSites = kbGetNumberValidResources(BaseID, Resource, cAIResourceSubTypeEasy);
+		if ((BaseID == ResourceBaseID) && (ResBaseEmpty == true))
+		numberResBaseSites = 0;		
 		//Get the count of plans we currently have going.
 		int numPlans = aiPlanGetVariableInt(gGatherGoalPlanID, cNumberPlanType, 0);
 		int desiredPlans = 2;
@@ -453,14 +455,6 @@ inactive
 			}			
 		 }
 	}
-	
-    if ((unassigned <= 0) && (numberEasyResourceSpots > 0))
-    {
-        if (cMyCulture == cCultureAtlantean)
-        unassigned = 1;
-        else
-        unassigned = 3;
-    }	
 	int numPlansWanted = 2;
     int farmThreshold = 12;
     if (cMyCulture == cCultureAtlantean)

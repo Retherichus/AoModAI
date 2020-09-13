@@ -107,7 +107,7 @@ bool MessagePlayer(int PlayerID = -1, int Prompt = -1, int Other = -1, vector lo
 void Comms(int PlayerID = -1)
 {
     int iSenderID = aiCommsGetRecordPlayerID(PlayerID);
-    if ((kbIsPlayerMutualAlly(iSenderID) == true) && (kbIsPlayerResigned(iSenderID) == false) && (kbIsPlayerValid(iSenderID) == true && kbHasPlayerLost(iSenderID) == false))
+    if ((kbIsPlayerMutualAlly(iSenderID) == true) && (kbIsPlayerValid(iSenderID) == true) && (kbHasPlayerLost(iSenderID) == false))
     {
 		int iPromptType = aiCommsGetRecordPromptType(PlayerID);
 		int iUserData = aiCommsGetRecordData(PlayerID);
@@ -142,20 +142,14 @@ void Comms(int PlayerID = -1)
 		    aEnemyTCID = iUserData;
 			aLastTCIDTime = xsGetTime();
 			if (ShowAIComms == true) aiEcho("Player "+iSenderID+" is asking us to assist on tcid: "+iUserData);	
-			if (aiPlanGetState(gEnemySettlementAttPlanID) > 0)
+			if (aiPlanGetState(gEnemySettlementAttPlanID) != -1)
 			{
-				vector SettleThere = kbUnitGetPosition(aEnemyTCID);
-				for (n=1; <= cNumberPlayers)
-                {
-					if ((n == cMyID) || (kbIsPlayerAlly(n) == true) || (kbHasPlayerLost(n) == true))
-		            continue;
-					if (getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, -1, n, SettleThere, 15.0) > 0)
-					{
-						aiPlanSetVariableInt(gEnemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, aEnemyTCID);
-						aiPlanSetVariableInt(gEnemySettlementAttPlanID, cAttackPlanPlayerID, 0, n);
-						break;
-					}	
-				}
+	            int Owner = kbUnitGetOwner(aEnemyTCID);
+			    if ((Owner > 0) && (kbIsPlayerEnemy(Owner) == true))
+				{
+					aiPlanSetVariableInt(gEnemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0, aEnemyTCID);
+					aiPlanSetVariableInt(gEnemySettlementAttPlanID, cAttackPlanPlayerID, 0, Owner);
+				}	
 			}
 		}
 		
@@ -212,7 +206,7 @@ void Comms(int PlayerID = -1)
 					aiPlanSetActive(TowerPlan);
 					if (ShowAIComms == true) aiEcho("Player "+iSenderID+" is requesting a tower over at the following location: "+iPos);	
 				}
-				if ((ActiveBPlan  != -1) && (numGatherers <= allowconstructors))
+				if ((ActiveBPlan != -1) && (numGatherers <= allowconstructors))
 				aiPlanDestroy(TowerPlan);				
 			}
 		}
@@ -222,11 +216,11 @@ void Comms(int PlayerID = -1)
 	        if ((ShouldIAgeUp() == true) && (iUserData != cEmergency))
 			return;
             int AmountToSend = 0.0;
-			float Percentage = 0.30;
+			float Percentage = 0.40;
 			if (iUserData == cLowPriority)
-			Percentage = 0.20;
+			Percentage = 0.15;
 			else if (IsTechActive(cTechAmbassadors) == true)
-			Percentage = 0.40;
+			Percentage = 0.50;
 			
             switch(iPromptType)
 			{
@@ -280,19 +274,19 @@ void Comms(int PlayerID = -1)
 			{
                 case ExtraFood:
                 {
-					if (kbResourceGet(cResourceFood) < 400)
+					if (kbResourceGet(cResourceFood) < 600)
 					MessagePlayer(iSenderID, RequestFood);
                     break;
 				}
                 case ExtraWood:
                 {
-					if (kbResourceGet(cResourceWood) < 400)
+					if (kbResourceGet(cResourceWood) < 600)
 					MessagePlayer(iSenderID, RequestWood);
                     break;
 				}
                 case ExtraGold:
                 {
-					if (kbResourceGet(cResourceGold) < 400)
+					if (kbResourceGet(cResourceGold) < 600)
 					MessagePlayer(iSenderID, RequestGold);
                     break;
 				}
@@ -716,7 +710,7 @@ active
 		if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Dabogong) == cTechStatusActive)
 		{
 			xsEnableRuleGroup("Dabogong");
-			aiPlanSetVariableInt(cMonkMaintain, cTrainPlanNumberToMaintain, 0, 4);
+			aiPlanSetVariableInt(cMonkMaintain, cTrainPlanNumberToMaintain, 0, 3);
 		}
         if (cMyCulture == cCultureChinese && kbGetTechStatus(cTechAge3Hebo) == cTechStatusActive)
         xsEnableRuleGroup("Hebo");
@@ -958,17 +952,20 @@ Group Donations
 
 	//First, check if we need a boost ourselves...
 	int VilPop = aiPlanGetVariableInt(gCivPopPlanID, cTrainPlanNumberToMaintain, 0);
-	if ((kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAliveOrBuilding) < VilPop * 0.4))
+	if ((kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAliveOrBuilding) < VilPop * 0.6))
 	{ 	
-        bool FoodTooLow = true;
-		bool GoldTooLow = true;
-		bool WoodTooLow = true;
-		if ((kbEscrowGetAmount(cEconomyEscrowID, cResourceFood) >= 200) || (kbEscrowGetAmount(cRootEscrowID, cResourceFood) >= 200))
-		FoodTooLow = false;
-	    if ((kbEscrowGetAmount(cEconomyEscrowID, cResourceGold) >= 50) || (kbEscrowGetAmount(cRootEscrowID, cResourceGold) >= 50))
-		GoldTooLow = false;	
-		if ((kbEscrowGetAmount(cEconomyEscrowID, cResourceWood) >= 80) || (kbEscrowGetAmount(cRootEscrowID, cResourceWood) >= 80))
-		WoodTooLow = false;
+        bool FoodTooLow = false;
+		bool GoldTooLow = false;
+		bool WoodTooLow = false;
+		float REFood = (kbEscrowGetAmount(cEconomyEscrowID, cResourceFood) + kbEscrowGetAmount(cRootEscrowID, cResourceFood));
+		float REgold = (kbEscrowGetAmount(cEconomyEscrowID, cResourceGold) + kbEscrowGetAmount(cRootEscrowID, cResourceGold));
+		float REWood = (kbEscrowGetAmount(cEconomyEscrowID, cResourceWood) + kbEscrowGetAmount(cRootEscrowID, cResourceWood));
+		if (REFood < 200)
+		FoodTooLow = true;
+	    if (REgold < 80)
+		GoldTooLow = true;	
+		if (REWood < 50)
+		WoodTooLow = true;
 	
         if (FoodTooLow == true)
 		{ 
@@ -986,7 +983,10 @@ Group Donations
 	        if (ShowAIComms == true) aiEcho("This is looking bad, requesting extra Wood!");
 	    }
 		if ((FoodTooLow == true) || (GoldTooLow == true) || (WoodTooLow == true))
-		return;
+		{
+		    xsSetRuleMinIntervalSelf(20);
+		    return;
+		}
 	}	
 	
 	if (ShouldIAgeUp() == true)
@@ -1008,6 +1008,7 @@ Group Donations
 		    MessageRel(cPlayerRelationAlly, RequestGold);
 	        if (ShowAIComms == true) aiEcho("Requesting Gold for age up!");
 	    }
+		xsSetRuleMinIntervalSelf(25);
         return;
     }
 	
@@ -2172,7 +2173,6 @@ active
 	   if ((Villager != -1) && (Food != -1))
        aiTaskUnitWork(Villager, Food);
 	}
-	
 	//Crashed plans
     if ((aiGetGameMode() != cGameModeDeathmatch) && (xsGetTime() >= LastRun+ 1*45*1000))
 	{ 

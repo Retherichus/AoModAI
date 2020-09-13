@@ -687,11 +687,8 @@ bool mapPreventsHousesAtTowers()
 bool mapRestrictsMarketAttack()
 {
     if ((cRandomMapName == "highland")
-	|| (cRandomMapName == "watering hole") //TODO: Test if this is really better!
 	|| (cRandomMapName == "jotunheim"))
-    {
 	return(true);
-	}
     else
 	return(false);
-	}		
+}

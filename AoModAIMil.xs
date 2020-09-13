@@ -103,8 +103,8 @@ inactive
 					aiPlanSetDesiredPriority(defendPlanID, 60);
 				}
 				
-				if ((AoModAllies == true) && (secondsUnderAttack > 20) && 
-                (enemyMilUnitsInR80 > numMilUnitsInDefPlan * 1.20))
+				if ((AoModAllies == true) && (secondsUnderAttack > 5) && 
+                (enemyMilUnitsInR80 > numMilUnitsInDefPlan))
                 {
 					if (xsGetTime() - ResourceTimer > 1*20*1000)
 					{
@@ -127,7 +127,7 @@ inactive
 						ResourceTimer = xsGetTime();
 					}
 					
-					if (xsGetTime() - HelpTimer > 2*60*1000)
+					if (xsGetTime() - HelpTimer > 1*60*1000)
 					{
 						vector TCLoc = aiPlanGetVariableVector(defendPlanID, cDefendPlanDefendPoint, 0);
 						int TCID = findClosestUnitTypeByLoc(cPlayerRelationSelf, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding, TCLoc, 30);
@@ -432,10 +432,8 @@ inactive
             numAttEnemySiegeNearDefBInR50 = getNumUnitsByRel(cUnitTypeAbstractSiegeWeapon, cUnitStateAlive, cActionAttack, cPlayerRelationEnemy, defPlanBaseLocation, 50.0, true);
 		}
 	}
-    
-    
+
     int mainBaseUnderAttack = kbBaseGetTimeUnderAttack(cMyID, mainBaseID);
-    
     int mostHatedPlayerID = aiGetMostHatedPlayerID();
     int numMHPlayerSettlements = kbUnitCount(mostHatedPlayerID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
     
@@ -611,14 +609,14 @@ inactive
                     {
                         if ((numEnemyMilUnitsNearMBInR70 > 10) || (numEnemyMilUnitsNearDefBInR40 > 6))
                         {
-                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, 300.0);
+                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, 500.0);
                             countA = 0;
 						}
                         else
                         {
                             if (countA < 0)
 							countA = 0;
-							aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, 300.0);
+							aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, 500.0);
                             countA = countA + 1;
 						}
 					}
@@ -688,7 +686,9 @@ inactive
                         gRaidingPartyTargetUnitID = -1;
                         continue;
 					}
-                    
+                    if (aiPlanGetVariableInt(attackPlanID, cAttackPlanGatherStartTime, 0) < (xsGetTime() - 10*1000) && (aiPlanGetState(attackPlanID) == cPlanStateGather))
+					aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, 500.0);
+				
                     if (mainBaseUnderAttack > 0)
                     {
                         aiPlanSetDesiredPriority(attackPlanID, 15);
@@ -701,8 +701,8 @@ inactive
 				}
                 else if (planState == cPlanStateAttack)
                 {
-                    if ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.5) && (numMilUnitsInPlan < 3) && (numEnemyBuildingsThatShootNearAttPlanInR25 > 0)
-					|| (numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan) && (numMilUnitsInPlan < 3))
+                    if ((numMilUnitsNearAttPlan >= numMilUnitsInPlan * 0.5) && (numMilUnitsInPlan < 1) && (numEnemyBuildingsThatShootNearAttPlanInR25 > 0)
+					|| (numEnemyMilUnitsNearAttPlan > numMilUnitsNearAttPlan + numAlliedMilUnitsNearAttPlan) && (numMilUnitsInPlan < 1))
                     {
                         aiPlanSetVariableInt(attackPlanID, cAttackPlanRefreshFrequency, 0, 60);
                         aiPlanSetUnitStance(attackPlanID, cUnitStanceDefensive);
@@ -813,12 +813,12 @@ inactive
                     {
                         if ((numEnemyMilUnitsNearMBInR85 > 14) || (numEnemyMilUnitsNearDefBInR50 > 14))
                         {
-                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, 300.0);
+                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, 500.0);
                             countD = 0;
 						}
                         else
                         {
-                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, 300.0);
+                            aiPlanSetVariableFloat(attackPlanID, cAttackPlanGatherDistance, 0, 500.0);
                             countD = countD + 1;
 						}
 					}
@@ -1675,7 +1675,7 @@ inactive
 		}
 	}
     
-    if ((AoModAllies == true) && (aEnemyTCID != -1) && (aiGetCaptainPlayerID(cMyID) != cMyID) && (xsGetTime() < aLastTCIDTime + 25*60*1000))
+    if ((AoModAllies == true) && (aEnemyTCID != -1) && (aiGetCaptainPlayerID(cMyID) != cMyID) && (xsGetTime() < aLastTCIDTime + 10*60*1000))
 	{ 
         int Owner = kbUnitGetOwner(aEnemyTCID);
         if ((Owner > 0) && (kbIsPlayerEnemy(Owner) == true))
@@ -1909,10 +1909,11 @@ inactive
 
 //==============================================================================
 rule createRaidingParty
-minInterval 28 //starts in cAge2
+minInterval 29 //starts in cAge2
 inactive
 {
-	xsSetRuleMinIntervalSelf(28);	
+	xsSetRuleMinIntervalSelf(29);	
+	static int attackPlanStartTime = -1;
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     vector baseLocationToUse = mainBaseLocation;
@@ -1935,18 +1936,7 @@ inactive
             numAttEnemyTitansNearDefBInR55 = getNumUnitsByRel(cUnitTypeAbstractTitan, cUnitStateAlive, cActionAttack, cPlayerRelationEnemy, defPlanBaseLocation, 55.0, true);
 		}
 	}
-    
-    static int attackPlanStartTime = -1;
-    
-    if ((numEnemyTitansNearMBInR60 > 0) || (numAttEnemyTitansNearMBInR85 > 0))
-    {
-        return;
-	}
-    else if ((numEnemyTitansNearDefBInR35 > 0) || (numAttEnemyTitansNearDefBInR55 > 0))
-    {
-        return;
-	}
-    
+	
     //If we already have a raiding party attack plan don't make another one.
     int activeAttPlans = aiPlanGetNumber(cPlanAttack, -1, true);
     if (activeAttPlans > 0)
@@ -1972,143 +1962,108 @@ inactive
 			}
 		}
 	}
+	int currentPop = kbGetPop();
+	int currentPopCap = kbGetPopCap();
 	
-    if (gEnemyWonderDefendPlan > 0)
+    if ((numEnemyMilUnitsNearMBInR80 > 8) || (currentPop <= currentPopCap - 14) || 
+	(currentPop < 100) || (aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeHumanSoldier) < 4) 
+	|| (gEnemyWonderDefendPlan > 0) || (numEnemyTitansNearMBInR60 > 0) || (numAttEnemyTitansNearMBInR85 > 0)
+    || (numEnemyTitansNearDefBInR35 > 0) || (numAttEnemyTitansNearDefBInR55 > 0))
     return;
 	
-    static int lastTargetUnitID = -1;
+	static int lastTargetUnitID = -1;
     static int lastTargetCount = 0;
-    
-    int targetUnitID = -1;
+    int militaryUnit1ID = -1;
+	int targetUnitID = -1;
     bool targetIsMarket = false;
     bool targetIsDropsite = false;
-    int index = 0;
+	bool success = false;
     float closeRangeRadius = 100.0;
-    int playerID = -1;
-    for (playerID = 1; < cNumberPlayers)
-    {
-        if (playerID == cMyID)
-		continue;
-        else if (kbIsPlayerAlly(playerID) == true)
-		continue;
-        else
-        {
-            if ((kbIsPlayerResigned(playerID) == true) || (kbHasPlayerLost(playerID) == true))
-			continue;
-            else
-            {
-                int enemyEconUnit = -1;
-                if (kbGetCultureForPlayer(playerID) == cCultureAtlantean)
-				{
-					enemyEconUnit = cUnitTypeVillagerAtlantean;
-					if (kbGetCivForPlayer(playerID) == cCivOuranos)	
-					{
-						int SkyPassages = getNumUnits(cUnitTypeSkyPassage, cUnitStateAlive, -1, playerID, mainBaseLocation, closeRangeRadius);
-						if (SkyPassages > 0)
-						enemyEconUnit = cUnitTypeSkyPassage;
-					}				
-				}
-                else
-				enemyEconUnit = cUnitTypeDropsite;
-				
-                int numEnemyDropsitesInCloseRange = getNumUnits(enemyEconUnit, cUnitStateAlive, -1, playerID, mainBaseLocation, closeRangeRadius);	
-				if ((numEnemyDropsitesInCloseRange < 1) && (kbGetCultureForPlayer(playerID) != cCultureAtlantean))
-				numEnemyDropsitesInCloseRange = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, playerID, mainBaseLocation, closeRangeRadius);
-                int dropsiteUnitIDinCloseRange = -1;
-                if (numEnemyDropsitesInCloseRange > 0)
-                {
-                    dropsiteUnitIDinCloseRange = findUnit(enemyEconUnit, cUnitStateAlive, -1, playerID, mainBaseLocation, closeRangeRadius);
-                    if (kbUnitIsType(dropsiteUnitIDinCloseRange, cUnitTypeAbstractSettlement) == true)
-                    {
-                        dropsiteUnitIDinCloseRange = -1;
-                        continue;
-					}
-                    targetIsDropsite = true;
-                    targetUnitID = dropsiteUnitIDinCloseRange;
-                    break;
-				}
-			}
-		}
-	}
-    int militaryUnit1ID = -1;
-    int currentPop = kbGetPop();
-    int currentPopCap = kbGetPopCap();
-	
-	if ((numEnemyMilUnitsNearMBInR80 > 8) || (currentPop <= currentPopCap - 9) 
-		|| (aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeHumanSoldier) < 5))
-	{
-		return;
-	}
-	
-	int enemyPlayerID = aiGetMostHatedPlayerID();
-	int numEnemyMarkets = kbUnitCount(enemyPlayerID, cUnitTypeMarket, cUnitStateAlive);
-	
-	if (kbGetCultureForPlayer(enemyPlayerID) == cCultureAtlantean)
+	int enemyEconUnit = cUnitTypeDropsite;  
+    int AtlVillager = getNumUnitsByRel(cUnitTypeVillagerAtlantean, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, closeRangeRadius);
+	if (AtlVillager > 0)
 	enemyEconUnit = cUnitTypeVillagerAtlantean;
-	else
-	enemyEconUnit = cUnitTypeDropsite;   
-	int numEnemyDropsites = kbUnitCount(enemyPlayerID, enemyEconUnit, cUnitStateAlive);
 	
-	if ((mapRestrictsMarketAttack() == false) && (numEnemyMarkets > 0) && ((numEnemyDropsites < 1) || (aiRandInt(5) < 2)))
+	int numEnemyDropsitesInCloseRange = getNumUnitsByRel(enemyEconUnit, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, closeRangeRadius);	
+	for (i = 0; < numEnemyDropsitesInCloseRange)
 	{
-		for (j = 0; < numEnemyMarkets)
+		int dropsiteUnitIDinCloseRange = findUnitByRel(enemyEconUnit, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, closeRangeRadius);
+		if ((kbUnitIsType(dropsiteUnitIDinCloseRange, cUnitTypeAbstractSettlement) == true) 
+		|| (kbHasPlayerLost(kbUnitGetOwner(dropsiteUnitIDinCloseRange)) == true))
 		{
-			int enemyMarketUnitID = findUnitByIndex(cUnitTypeMarket, j, cUnitStateAlive, -1, enemyPlayerID);
-			vector enemyMarketLocation = kbUnitGetPosition(enemyMarketUnitID);
-			int numEnemyBuildingsAtMarketLocation = getNumUnitsByRel(cUnitTypeLogicalTypeBuildingsNotWalls, cUnitStateAlive, -1, cPlayerRelationEnemy, enemyMarketLocation, 40.0);
-			int numEnemyTowersAtMarketLocation = getNumUnitsByRel(cUnitTypeTower, cUnitStateAlive, -1, cPlayerRelationEnemy, enemyMarketLocation, 40.0);
-			int numEnemyFortressesAtMarketLocation = getNumUnitsByRel(cUnitTypeAbstractFortress, cUnitStateAlive, -1, cPlayerRelationEnemy, enemyMarketLocation, 40.0);
-			int numEnemySettlementsAtMarketLocation = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationEnemy, enemyMarketLocation, 40.0);
-			int numMotherNatureSettlementsAtMarketLocation = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, 0, enemyMarketLocation, 40.0);
-			numEnemySettlementsAtMarketLocation = numEnemySettlementsAtMarketLocation - numMotherNatureSettlementsAtMarketLocation;
-			if ((numEnemyBuildingsAtMarketLocation < 8) && (numEnemyTowersAtMarketLocation < 1) && (numEnemyFortressesAtMarketLocation < 1) && (numEnemySettlementsAtMarketLocation < 1))
+			dropsiteUnitIDinCloseRange = -1;
+			continue;
+		}
+		targetIsDropsite = true;
+		targetUnitID = dropsiteUnitIDinCloseRange;
+		success = true;
+		break;
+	}
+	
+	if (success == false)
+	{
+		int enemyPlayerID = aiGetMostHatedPlayerID();
+		int numEnemyMarkets = kbUnitCount(enemyPlayerID, cUnitTypeMarket, cUnitStateAlive);
+		if (kbGetCultureForPlayer(enemyPlayerID) == cCultureAtlantean)
+		enemyEconUnit = cUnitTypeVillagerAtlantean;
+		else
+		enemyEconUnit = cUnitTypeDropsite;   
+		int numEnemyDropsites = kbUnitCount(enemyPlayerID, enemyEconUnit, cUnitStateAlive);		
+		
+		if ((numEnemyMarkets > 0) && (mapRestrictsMarketAttack() == false))
+		{
+			for (j = 0; < numEnemyMarkets)
 			{
-				targetUnitID = enemyMarketUnitID;
-				targetIsMarket = true;
-				break;
+				int enemyMarketUnitID = findUnitByIndex(cUnitTypeMarket, j, cUnitStateAlive, -1, enemyPlayerID);
+				vector enemyMarketLocation = kbUnitGetPosition(enemyMarketUnitID);
+				int numEnemyBuildingsAtMarketLocation = getNumUnitsByRel(cUnitTypeLogicalTypeBuildingsNotWalls, cUnitStateAlive, -1, cPlayerRelationEnemy, enemyMarketLocation, 40.0);
+				int numEnemyShootersAtMarketLocation = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, enemyMarketLocation, 40.0);
+				if ((numEnemyBuildingsAtMarketLocation < 8) && (numEnemyShootersAtMarketLocation < 3) && (SameAG(kbUnitGetPosition(enemyMarketUnitID), mainBaseLocation) == true))
+				{
+					targetUnitID = enemyMarketUnitID;
+					targetIsMarket = true;
+					success = true;
+					break;
+				}
 			}
 		}
-	}
-	else if ((numEnemyDropsites > 0) && (aiRandInt(5) < 4))
-	{
-		int enemyMainBaseUnitID = getMainBaseUnitIDForPlayer(enemyPlayerID);
-		vector enemyMainBaseUnitLocation = kbUnitGetPosition(enemyMainBaseUnitID);
-		float distanceToSavedEnemyDropsiteUnitID = 0.0;
-		int max = 9;
-		if (numEnemyDropsites > max)
-		numEnemyDropsites = max;
-		for (k = 0; < numEnemyDropsites)
+		if ((success == false) && (numEnemyDropsites > 0))
 		{
-			int dropsiteUnitID = -1;
-			int possibleEnemyDropsiteUnitID = findUnitByIndex(enemyEconUnit, k, cUnitStateAlive, -1, enemyPlayerID);
-			vector possibleEnemyDropsiteUnitLocation = kbUnitGetPosition(possibleEnemyDropsiteUnitID);
-			float distanceToEnemyMainBase = xsVectorLength(enemyMainBaseUnitLocation - possibleEnemyDropsiteUnitLocation);
-			if ((distanceToEnemyMainBase > 85.0) && (distanceToEnemyMainBase > distanceToSavedEnemyDropsiteUnitID))
+			int enemyMainBaseUnitID = getMainBaseUnitIDForPlayer(enemyPlayerID);
+			vector enemyMainBaseUnitLocation = kbUnitGetPosition(enemyMainBaseUnitID);
+			float distanceToSavedEnemyDropsiteUnitID = 0.0;
+			int max = 9;
+			if (numEnemyDropsites > max)
+			numEnemyDropsites = max;
+			for (k = 0; < numEnemyDropsites)
 			{
-				dropsiteUnitID = possibleEnemyDropsiteUnitID;
-				//reduced radius from 55 to 40; TODO: check if it's OK
-				int numEnemyMilitaryBuildingsAtDropsiteLocation = getNumUnitsByRel(cUnitTypeMilitaryBuilding, cUnitStateAlive, -1, cPlayerRelationEnemy, kbUnitGetPosition(dropsiteUnitID), 40.0);
-				int numEnemyTowersAtDropsiteLocation = getNumUnitsByRel(cUnitTypeTower, cUnitStateAlive, -1, cPlayerRelationEnemy, kbUnitGetPosition(dropsiteUnitID), 40.0);
-				int numEnemyFortressesAtDropsiteLocation = getNumUnitsByRel(cUnitTypeAbstractFortress, cUnitStateAlive, -1, cPlayerRelationEnemy, kbUnitGetPosition(dropsiteUnitID), 40.0);
-				int numEnemySettlementsAtDropsiteLocation = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationEnemy, kbUnitGetPosition(dropsiteUnitID), 40.0);
-				int numMotherNatureSettlementsAtDropsiteLocation = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, 0, kbUnitGetPosition(dropsiteUnitID), 40.0);
-				numEnemySettlementsAtDropsiteLocation = numEnemySettlementsAtDropsiteLocation - numMotherNatureSettlementsAtDropsiteLocation;
-				if ((numEnemyMilitaryBuildingsAtDropsiteLocation < 3) && (numEnemyTowersAtDropsiteLocation < 1) && (numEnemyFortressesAtDropsiteLocation < 1) && (numEnemySettlementsAtDropsiteLocation < 1))
+				int dropsiteUnitID = -1;
+				int possibleEnemyDropsiteUnitID = findUnitByIndex(enemyEconUnit, k, cUnitStateAlive, -1, enemyPlayerID);
+				vector possibleEnemyDropsiteUnitLocation = kbUnitGetPosition(possibleEnemyDropsiteUnitID);
+				float distanceToEnemyMainBase = xsVectorLength(enemyMainBaseUnitLocation - possibleEnemyDropsiteUnitLocation);
+				if ((distanceToEnemyMainBase > 85.0) && (distanceToEnemyMainBase > distanceToSavedEnemyDropsiteUnitID))
 				{
-					if ((lastTargetCount > 1) && (dropsiteUnitID == lastTargetUnitID))
+					dropsiteUnitID = possibleEnemyDropsiteUnitID;
+					int numEnemyMilitaryBuildingsAtDropsiteLocation = getNumUnitsByRel(cUnitTypeMilitaryBuilding, cUnitStateAlive, -1, cPlayerRelationEnemy, kbUnitGetPosition(dropsiteUnitID), 40.0);
+					int numEnemyShooters = getNumUnitsByRel(cUnitTypeBuildingsThatShoot, cUnitStateAlive, -1, cPlayerRelationEnemy, kbUnitGetPosition(dropsiteUnitID), 40.0);
+					if ((numEnemyMilitaryBuildingsAtDropsiteLocation < 3) && (numEnemyShooters < 1) && (SameAG(kbUnitGetPosition(dropsiteUnitID), mainBaseLocation) == true))
 					{
-						continue;
+						if ((lastTargetCount > 1) && (dropsiteUnitID == lastTargetUnitID))
+						{
+							continue;
+						}
+						targetUnitID = dropsiteUnitID;
+						targetIsDropsite = true;
+						success = true;
+						distanceToSavedEnemyDropsiteUnitID = distanceToEnemyMainBase;
 					}
-					targetUnitID = dropsiteUnitID;
-					targetIsDropsite = true;
-					distanceToSavedEnemyDropsiteUnitID = distanceToEnemyMainBase;
 				}
 			}
 		}
 	}
-	else
+	if (success == false)
 	{
-		if ((equal(gRaidingPartyLastTargetLocation, cInvalidVector) == false) && ((aiRandInt(2) < 1) || (kbGetCultureForPlayer(enemyPlayerID) == cCultureAtlantean)))
+		if ((equal(gRaidingPartyLastTargetLocation, cInvalidVector) == false) && (aiRandInt(2) < 1))
 		{
 			militaryUnit1ID = findUnit(cUnitTypeHumanSoldier, cUnitStateAlive, cActionIdle);
 			if (militaryUnit1ID > 0)
@@ -2130,7 +2085,7 @@ inactive
 	
 	if ((lastTargetCount > 1) && (dropsiteUnitIDinCloseRange != -1))
 	{
-		if ((equal(gRaidingPartyLastTargetLocation, cInvalidVector) == false) && (kbGetCultureForPlayer(playerID) == cCultureAtlantean))
+		if (equal(gRaidingPartyLastTargetLocation, cInvalidVector) == false)
 		{
 			militaryUnit1ID = findUnit(cUnitTypeHumanSoldier,cUnitStateAlive, cActionIdle);
 			if (militaryUnit1ID > 0)
@@ -2140,47 +2095,36 @@ inactive
 		}
 	}
 	
-	if ((targetUnitID < 0) || (SameAG(kbUnitGetPosition(targetUnitID), mainBaseLocation) == false) && (gTransportMap == true)) // transport and can't reach?
+	if (targetUnitID < 0)// transport and can't reach?
 	{
 		return;
 	}
-	
+	int Owner = kbUnitGetOwner(targetUnitID);
 	int raidingPartyAttackID = createDefOrAttackPlan("Raiding Party", false, -1, 20, cInvalidVector, -1, -1, false);
 	if (raidingPartyAttackID < 0)
 	return;
-	if (dropsiteUnitIDinCloseRange < 0)
-	aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanPlayerID, 0, enemyPlayerID);
-	else
-	aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanPlayerID, 0, playerID);
 	
+	aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanPlayerID, 0, Owner);
 	aiPlanSetVariableInt(raidingPartyAttackID, cAttackPlanSpecificTargetID, 0, targetUnitID);
 	aiPlanSetVariableBool(raidingPartyAttackID, cAttackPlanAutoUseGPs, 0, false);
-	aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeHumanSoldier, 1, 5, 9);
+	aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeHumanSoldier, 4, 5, 6);
 	
 	if (targetIsMarket == true)
 	{
-		if (aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeAbstractSiegeWeapon) > 1)
-		aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeAbstractSiegeWeapon, 0, 1, 1);
+		if (aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeAbstractSiegeWeapon) > 0)
+		aiPlanAddUnitType(raidingPartyAttackID, cUnitTypeAbstractSiegeWeapon, 1, 1, 1);
 	}
 	
-	if ((dropsiteUnitIDinCloseRange != -1) && (dropsiteUnitIDinCloseRange == targetUnitID))
 	aiPlanSetDesiredPriority(raidingPartyAttackID, 44); //lower than most attack plans
-	else
-	aiPlanSetDesiredPriority(raidingPartyAttackID, 34); //lower than most attack plans
-	
 	aiPlanSetActive(raidingPartyAttackID);
 	gRaidingPartyTargetUnitID = targetUnitID;
 	gRaidingPartyAttackID = raidingPartyAttackID;
 	if (targetIsMarket == true)
-	{
-		gRaidingPartyLastMarketLocation = kbUnitGetPosition(gRaidingPartyTargetUnitID);
-	}
+	gRaidingPartyLastMarketLocation = kbUnitGetPosition(gRaidingPartyTargetUnitID);
 	else
-	{
-		gRaidingPartyLastTargetLocation = kbUnitGetPosition(gRaidingPartyTargetUnitID);
-	}
+	gRaidingPartyLastTargetLocation = kbUnitGetPosition(gRaidingPartyTargetUnitID);
+
 	attackPlanStartTime = xsGetTime();
-	
 	if (lastTargetUnitID == gRaidingPartyTargetUnitID)
 	lastTargetCount = lastTargetCount + 1;
 	else

@@ -970,7 +970,7 @@ active
 		econPercent = adjustSigmoid(econPercent, econAdjust, 0.0, 1.0);
 		econEscrow = econPercent;	
 		
-		if ((xsGetTime() > 12*60*1000) && (kbGetAge() == cAge2) && (AgingUp() == false) || 
+		if ((xsGetTime() > 10*60*1000) && (kbGetAge() == cAge2) && (AgingUp() == false) || 
 		(xsGetTime() > 22*60*1000) && (AgingUp() == false) && (xsGetTime() - ageStartTime3 > 6*60*1000) && (kbGetAge() == cAge3)
 		|| (kbGetAge() == cAge3) && (AgingUp() == false) && (xsGetTime() - ageStartTime3 > 3*60*1000) && (ShouldIAgeUp() == true) 
 		|| (TitanAvailable == true) && (kbGetAge() == cAge4) && (AgingUp() == false) && (gTransportMap == false) && (xsGetTime() - ageStartTime4 > 3*60*1000))
@@ -2183,7 +2183,7 @@ void initChinese(void)
     gGardenBuildLimit = 2;
 	
 	createSimpleMaintainPlan(cUnitTypeHeroChineseGeneral, 2, false, kbBaseGetMainID(cMyID));
-	cMonkMaintain = createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(2)+3, false, kbBaseGetMainID(cMyID));
+	cMonkMaintain = createSimpleMaintainPlan(cUnitTypeHeroChineseMonk, aiRandInt(2)+2, false, kbBaseGetMainID(cMyID));
 	eChineseHero = createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 1, true, kbBaseGetMainID(cMyID));  // Eco
     mChineseImmortal = createSimpleMaintainPlan(cUnitTypeHeroChineseImmortal, 0, false, kbBaseGetMainID(cMyID)); // Mil	
 	
@@ -2303,6 +2303,11 @@ int maxUnits=20, int minPop=-1, int maxPop=-1, int numberBuildings=1)
 		}			
 		case cCultureChinese:
 		{
+		    kbUnitPickSetPreferenceFactor(upID, cUnitTypeScoutChinese, 0.6);
+			if (cMyCiv == cCivShennong)
+			kbUnitPickSetPreferenceFactor(upID, cUnitTypeFireLanceShennong, 1.0);
+			else 
+			kbUnitPickSetPreferenceFactor(upID, cUnitTypeFireLance, 1.0);		
 			break;			
 		}
 	}		
@@ -2590,11 +2595,11 @@ void init(void)
         rushSize = rushSize / rushCount;
 	}
 
-   if (rushSize > 65)
-	  rushSize = 65;
+   if (rushSize > 50)
+	  rushSize = 50;
   
-    if (rushSize < 30)
-        rushSize = 30;  // Give unitpicker something to do...
+    if (rushSize < 20)
+        rushSize = 20;  // Give unitpicker something to do...
 	
 	if ((cMyCulture == cCultureNorse) || (cMyCulture == cCultureEgyptian))
 	gRushUPID=initUnitPicker("Rush", numTypes, -1, -1, rushSize, rushSize*1.25, 3); // Rush with rushSize pop slots of 3 types and 2 buildings.
