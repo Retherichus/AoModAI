@@ -24,12 +24,10 @@ void persDecidePersonality(void)
 		else if (Rand == 1) 
 		choice = 2;
 		else
-		choice = 4;
+		choice = 3;
 	}
 	else if (Personality == 8)
 	choice = aiRandInt(6);
-    else
-    choice = Personality;     // 0..5
     switch(choice)
     {
         case 0:  // Defensive Boomer (protector)
@@ -59,13 +57,7 @@ void persDecidePersonality(void)
             cvSliderNoise = 0.2; 
             break;
 		}
-        case 3:  // Balanced
-        {
-            aiEcho("Choosing personality:  Balanced (Standard)");
-            cvSliderNoise = 0.2;
-            break;
-		}
-        case 4:  // Aggressive Boomer (conqueror)
+        case 3:  // Aggressive Boomer (conqueror)
         {
             aiEcho("Choosing personality:  Aggressive Boomer (Conqueror)");
             cvRushBoomSlider = -0.9;
@@ -74,7 +66,7 @@ void persDecidePersonality(void)
             cvSliderNoise = 0.2; 
             break;
 		}
-        case 5:  // Aggressive Rusher (attacker)
+        case 4:  // Aggressive Rusher (attacker)
         {
             aiEcho("Choosing personality:  Aggressive Rusher (Attacker)");
             cvRushBoomSlider = 0.9;
@@ -83,6 +75,12 @@ void persDecidePersonality(void)
             cvSliderNoise = 0.2;  
             break;
 		}
+        case 5:  // Balanced hidden
+        {
+            aiEcho("Choosing personality:  Balanced (Standard)");
+            cvSliderNoise = 0.2;  
+            break;
+		}		
 	}
 	
     if (ShowAiEcho == true) aiEcho("RushBoom "+cvRushBoomSlider+", MilitaryEcon "+cvMilitaryEconSlider+", OffenseDefense "+cvOffenseDefenseSlider);

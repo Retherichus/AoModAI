@@ -37,8 +37,6 @@
 //==============================================================================
 bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 {
-    if (ShowAiEcho == true) aiEcho("setupGodPowerPlan:");    
-	
     if (planID == -1)
 	return (false);
     if (powerProtoID == -1)
@@ -55,7 +53,10 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
     {
         aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
         aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
-        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 8);
+		if ((aiGetGameMode() == cGameModeLightning) || (aiGetWorldDifficulty() <= cDifficultyModerate))
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 6);
+	    else
+        aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 12);
         aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceGold);
         aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
         return (true);
@@ -119,7 +120,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
         //-- we also prevent the default "back of town" placement
         aiPlanSetVariableInt(planID, cGodPowerPlanBPLocationPreference, 0, cBuildingPlacementPreferenceNone);
 		
-        vector v = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeHuntable, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)), 85));
+        vector v = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeHuntable, cUnitStateAlive, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID)), 85));
         aiPlanSetVariableVector(planID, cGodPowerPlanBPInfluence, 0, v);
         aiPlanSetVariableFloat(planID, cGodPowerPlanBPInfluenceValue, 0, 300.0);
         aiPlanSetVariableFloat(planID, cGodPowerPlanBPInfluenceDistance, 0, 100.0);
@@ -450,7 +451,7 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelTown);
 		aiPlanSetVariableInt(planID,  cGodPowerPlanResourceType, 0, cResourceFood);
 		aiPlanSetVariableInt(planID,  cGodPowerPlanResourceSubType, 0, cAIResourceSubTypeEasy);
-        vector v2 = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeHuntable, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))));
+        vector v2 = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeHuntable, cUnitStateAlive, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))));
         aiPlanSetVariableVector(planID, cGodPowerPlanBPInfluence, 0, v2);
         aiPlanSetVariableFloat(planID, cGodPowerPlanBPInfluenceValue, 0, 300.0);
         aiPlanSetVariableFloat(planID, cGodPowerPlanBPInfluenceDistance, 0, 150.0);		
@@ -708,10 +709,16 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	}
 	
     // Set up the heroize power
-    // Any time we have a group of 8 or more military units
+    // Any time we have a group of 5 or more military units
     if (powerProtoID == cPowerHeroize)
     {
-        aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, false);  
+		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
+		aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistanceSelf);
+		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
+		aiPlanSetVariableFloat(planID, cGodPowerPlanDistance, 0, 20.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
+		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
+		aiPlanSetVariableBool(planID, cGodPowerPlanMultiCast, 0, true);
         return (true);
 	}
 	
@@ -835,12 +842,11 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	if(powerProtoID == cPowerCallToArms)
 	{
 		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
-		aiPlanSetVariableInt(planID,  cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistanceSelf);
-		aiPlanSetVariableInt(planID,  cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
-		aiPlanSetVariableFloat(planID,  cGodPowerPlanDistance, 0, 0.0);
-		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 10);
+		aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelCombatDistanceSelf);
+		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
+		aiPlanSetVariableFloat(planID, cGodPowerPlanDistance, 0, 30.0);
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 5);
 		aiPlanSetVariableInt(planID, cGodPowerPlanUnitTypeID, 0, cUnitTypeMilitary);
-		aiPlanSetVariableBool(planID, cGodPowerPlanTownDefensePlan, 0, true);
 		return (true);  
 	}
 	// Set up the Earth Dragon power
@@ -946,7 +952,10 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 	{
 		aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
 		aiPlanSetVariableInt(planID, cGodPowerPlanEvaluationModel, 0, cGodPowerEvaluationModelWorkers);
-		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 12);
+		if ((aiGetGameMode() == cGameModeLightning) || (aiGetWorldDifficulty() <= cDifficultyModerate))
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 6);
+	    else
+		aiPlanSetVariableInt(planID, cGodPowerPlanCount, 0, 14);
 		aiPlanSetVariableInt(planID, cGodPowerPlanResourceType, 0, cResourceWood);
 		aiPlanSetVariableInt(planID, cGodPowerPlanTargetingModel, 0, cGodPowerTargetingModelWorld);
 		return (true);
@@ -984,7 +993,6 @@ bool setupGodPowerPlan(int planID = -1, int powerProtoID = -1)
 //==============================================================================
 void initGodPowers(void)    //initialize the god power module
 {
-    if (ShowAiEcho == true) aiEcho("GP Init.");
 	if ((cMyCiv == cCivGaia) && (gTransportMap == false))
 	xsSetRuleMinInterval("rAge1FindGP", 1);
     xsEnableRule("rAge1FindGP");
@@ -995,8 +1003,6 @@ rule rAge1FindGP
 minInterval 12 //starts in cAge1
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rAge1FindGP:");    
-	
     int id=aiGetGodPowerTechIDForSlot(0); 
     if ((id == -1) || (gpDelayMigration == true) && (kbGetAge() < cAge2))
 	return;
@@ -1035,8 +1041,6 @@ rule rAge2FindGP
 minInterval 12 //starts in cAge2
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rAge2FindGP:");    
-	
     //Figure out the age2 god power and create the plan.
     int id=aiGetGodPowerTechIDForSlot(1); 
     if (id == -1)
@@ -1066,7 +1070,6 @@ inactive
         return;
 	}
 	
-    if (ShowAiEcho == true) aiEcho("initializing god power plan for age 2");
     if (cvOkToUseAge2GodPower == true)
 	aiPlanSetActive(gAge2GodPowerPlanID);
 	
@@ -1078,8 +1081,6 @@ rule rAge3FindGP
 minInterval 12 //starts in cAge3
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rAge3FindGP:");    
-	
     //Figure out the age3 god power and create the plan.
     int id=aiGetGodPowerTechIDForSlot(2); 
     if (id == -1)
@@ -1109,7 +1110,6 @@ inactive
         return;
 	}
 	
-    if (ShowAiEcho == true) aiEcho("initializing god power plan for age 3");
     if (cvOkToUseAge3GodPower == true)
 	aiPlanSetActive(gAge3GodPowerPlanID);
 	
@@ -1121,8 +1121,6 @@ rule rAge4FindGP
 minInterval 12 //starts in cAge4
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rAge4FindGP:");    
-	
     //Figure out the age4 god power and create the plan.
     int id = aiGetGodPowerTechIDForSlot(3); 
     if (id == -1)
@@ -1152,7 +1150,6 @@ inactive
         return;
 	}
 	
-    if (ShowAiEcho == true) aiEcho("initializing god power plan for age 4");
     if (cvOkToUseAge4GodPower == true)
 	aiPlanSetActive(gAge4GodPowerPlanID);
 	
@@ -1164,11 +1161,10 @@ rule rCeaseFire
 minInterval 35 //starts in cAge2
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rCeaseFire:");    
-	
     static int defCon=0;
     bool nowUnderAttack=kbBaseGetUnderAttack(cMyID, kbBaseGetMainID(cMyID));
-	
+    int mainBaseID = kbBaseGetMainID(cMyID);
+    vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     //Not in a state of alert.
     if (defCon == 0)
     {
@@ -1186,33 +1182,12 @@ inactive
         defCon=0;
         return;
 	}
-	
-    //Otherwise handle the different alert levels.
-    //Do we have any help in the area that we can use?
-    //If we don't have a query ID, create it.
-    static int allyQueryID=-1;
-    if (allyQueryID < 0)
-    {
-        allyQueryID=kbUnitQueryCreate("AllyCount");
-        //If we still don't have one, bail.
-        if (allyQueryID < 0)
-		return;
-	}
-	
-    //Else, setup the query data.
-    kbUnitQuerySetPlayerRelation(cPlayerRelationAlly);
-    kbUnitQuerySetUnitType(allyQueryID, cUnitTypeMilitary);
-    kbUnitQuerySetState(allyQueryID, cUnitStateAlive);
-    //Reset the results.
-    kbUnitQueryResetResults(allyQueryID);
-    //Run the query. 
-    int count=kbUnitQueryExecute(allyQueryID);
-	
+	int NumAllyMilUnits = getNumUnitsByRel(cUnitTypeMilitary, cUnitStateAlive, -1, cPlayerRelationAlly, mainBaseLocation, 85.0);
     //If there are still allies in the area, then just stay at this alert level.
-    if (count > 0)
+    if (NumAllyMilUnits > 0)
 	return;
 	
-    //Defcon 2.  Cast the god power.
+    //Defcon 2.  Cast the god power.	
     aiPlanSetVariableBool(gCeaseFirePlanID, cGodPowerPlanAutoCast, 0, true); 
     xsDisableSelf();
 }
@@ -1222,7 +1197,6 @@ rule rUnbuild
 minInterval 12 //starts in cAge1
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rUnbuild:");    
 	
     //Create the plan.
     gUnbuildPlanID = aiPlanCreate("Unbuild", cPlanGodPower);
@@ -1245,31 +1219,25 @@ inactive
     aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanUnitTypeID, 0, cUnitTypeLogicalTypeBuildingsNotWalls);
     aiPlanSetVariableInt(gUnbuildPlanID, cGodPowerPlanCount, 0, 5);
 	
-    aiPlanSetActive(gUnbuildPlanID);
+    aiPlanSetActive(false);
     xsDisableSelf();
 }
 
 //==============================================================================
 void gpAge2Handler(int age=1)
 {
-    if (ShowAiEcho == true) aiEcho("gpAge2Handler:");    
-	
     xsEnableRule("rAge2FindGP");
 }
 
 //==============================================================================
 void gpAge3Handler(int age=2)
 {
-    if (ShowAiEcho == true) aiEcho("gpAge3Handler:");    
-	
     xsEnableRule("rAge3FindGP");  
 }
 
 //==============================================================================
 void gpAge4Handler(int age=3)
 {
-    if (ShowAiEcho == true) aiEcho("gpAge4Handler:");    
-	
     xsEnableRule("rAge4FindGP");
 }
 
@@ -1278,8 +1246,6 @@ rule rDwarvenMinePower
 minInterval 109 //starts in cAge1
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rDwarvenMinePower:");
-	
     if (gDwarvenMinePlanID == -1)
     {
         xsDisableSelf();
@@ -1303,8 +1269,6 @@ inactive
 //==============================================================================
 void unbuildHandler(void)
 {
-    if (ShowAiEcho == true) aiEcho("unbuildHandler:");    
-	
     xsEnableRule("rUnbuild");
 }
 
@@ -1313,8 +1277,6 @@ rule rPlaceTitanGate
 minInterval 11 //starts in cAge5
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rPlaceTitanGate:");    
-	
     //Figure out the age 5 (yes, 5) god power and create the plan.
     int id = aiGetGodPowerTechIDForSlot(4); 
     if (id == -1)
@@ -1327,7 +1289,6 @@ inactive
     if (gPlaceTitanGatePlanID == -1)
     {
 		// TODO: does this work at all?
-        if (ShowAiEcho == true) aiEcho("couldn't create plan to place Titan Gate, retrying in 2 minutes");
         xsSetRuleMinIntervalSelf(127);
         return;
 	}
@@ -1347,9 +1308,7 @@ inactive
     //-- override the default building placement distance so that the Titan Gate has some room to cast
     //-- it is pretty big..
     aiPlanSetVariableFloat(gPlaceTitanGatePlanID, cGodPowerPlanBuildingPlacementDistance, 0, 110.0);
-	
     aiPlanSetActive(gPlaceTitanGatePlanID);
-	
     xsDisableSelf();
 }
 
@@ -1358,71 +1317,40 @@ rule rSentinel
 minInterval 15 //starts in cAge1
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rSentinel:");    
-	
     int planID=gSentinelPlanID;
-    static int unitQueryID=-1;
-    static int enemyQueryID=-1;
-	
-    //If we don't have the query yet, create one.
-    if (unitQueryID < 0)
-    unitQueryID=kbUnitQueryCreate("Settlement Query");
-	
-    //Define a query to get all matching units
-    if (unitQueryID != -1)
-    {
-        if (aiRandInt(100) < 50)
-        {
-            kbUnitQuerySetPlayerID(unitQueryID, cMyID);
-            kbUnitQuerySetPlayerRelation(unitQueryID, cPlayerRelationSelf);
-		}
-        else
-        {
-            kbUnitQuerySetPlayerID(unitQueryID, -1);
-            kbUnitQuerySetPlayerRelation(unitQueryID, cPlayerRelationAlly);
-		}
-        kbUnitQuerySetUnitType(unitQueryID, cUnitTypeAbstractSettlement);
-        kbUnitQuerySetState(unitQueryID, cUnitStateAlive);
-	}
-	
-    kbUnitQueryResetResults(unitQueryID);
-    int settlementFound=kbUnitQueryExecute(unitQueryID);
+    bool Ally = true;
+    if ((aiRandInt(2) < 1) || (IhaveAllies == false))
+    Ally = false;
+  
+    int settlementFound= 0;
+    if (Ally == true)
+	settlementFound = getNumUnitsByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly);
+	else
+    settlementFound = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAlive);
 	
     if (settlementFound < 1)
 	return;
+	int baseID = -1;
 	
-    //If we don't have the query yet, create one.
-    if (enemyQueryID < 0)
-	enemyQueryID=kbUnitQueryCreate("Enemy Query");
-	
-    //Define a query to get all matching units
-    if (enemyQueryID != -1)
-    {
-        kbUnitQuerySetPlayerID(enemyQueryID, -1);
-        kbUnitQuerySetPlayerRelation(enemyQueryID, cPlayerRelationEnemy);
-        kbUnitQuerySetUnitType(enemyQueryID, cUnitTypeLogicalTypeLandMilitary);
-        kbUnitQuerySetState(enemyQueryID, cUnitStateAlive);
-        kbUnitQuerySetMaximumDistance(enemyQueryID, 32);
-	}
-	
-    int i=0;
-    int baseID=-1;
-    int enemyFound=0;
     for (i=0; < settlementFound)
     {
-        kbUnitQuerySetPosition(enemyQueryID, kbUnitGetPosition(kbUnitQueryGetResult(unitQueryID, i)));
-        kbUnitQueryResetResults(enemyQueryID);
-        enemyFound=kbUnitQueryExecute(enemyQueryID);
-        if (enemyFound > 4)
+        int unitID = -1; 
+	    if (Ally == true)
+		unitID = findUnitByRel(cUnitTypeAbstractSettlement, cUnitStateAlive, -1, cPlayerRelationAlly);
+	    else
+		unitID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAlive);	
+	    vector unitLoc = kbUnitGetPosition(unitID);	
+	    int enemyMilUnits = getNumUnitsByRel(cUnitTypeMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 32.0, true);
+        if ((enemyMilUnits > 4) && (unitID != -1))
         {
-            baseID = kbUnitGetBaseID(kbUnitQueryGetResult(unitQueryID, i));
+            baseID = kbUnitGetBaseID(unitID);
             break;
 		}
 	}
 	
     if (baseID != -1)
     {
-        if (aiCastGodPowerAtUnit(cTechSentinel,kbUnitQueryGetResult(unitQueryID, i)) == true)
+        if (aiCastGodPowerAtUnit(cTechSentinel, unitID) == true)
         {
             aiPlanSetBaseID(planID, baseID);
             aiPlanSetVariableBool(planID, cGodPowerPlanAutoCast, 0, true); 
@@ -1438,7 +1366,6 @@ rule rRagnorokPower
 minInterval 13 //starts in cAge4
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rRagnorokPower:");    
 	
     if (gRagnorokPlanID == -1)
     {
@@ -1463,17 +1390,13 @@ inactive
     int numTitans = kbUnitCount(cMyID, cUnitTypeAbstractTitan, cUnitStateAlive);
     int numEnemyTitansInR75 = getNumUnitsByRel(cUnitTypeAbstractTitan, cUnitStateAlive, -1, cPlayerRelationEnemy, mainBaseLocation, 75.0, true);
     int numAlliedTitansInR75 = getNumUnitsByRel(cUnitTypeAbstractTitan, cUnitStateAlive, -1, cPlayerRelationAlly, mainBaseLocation, 75.0, true);
-    if (ShowAiEcho == true) aiEcho("numVillagers: "+numVillagers);
-    if (ShowAiEcho == true) aiEcho("myMilUnitsInR75: "+myMilUnitsInR75);
-    if (ShowAiEcho == true) aiEcho("alliedMilUnitsInR75: "+alliedMilUnitsInR75);
-    if (ShowAiEcho == true) aiEcho("enemyMilUnitsInR75: "+enemyMilUnitsInR75);
     
     static int count = 0;
     
     if ((currentPop > currentPopCap * 0.7) && (myMilUnitsInR75 + alliedMilUnitsInR75 + 3 >= enemyMilUnitsInR75)
 	&& (numEnemyTitansInR75 - numAlliedTitansInR75 - numTitans <= 0))
     {
-        if ((currentPop <= currentPopCap - 2) || (foodSupply < 1000) || (goldSupply < 1000) || ((woodSupply < 800)))
+        if ((currentPop <= currentPopCap - 2) || (foodSupply < 1000) || (goldSupply < 1000) || ((woodSupply < 1000)))
         {
             count = 0;
             return;
@@ -1530,68 +1453,54 @@ rule castHeavyGP
 minInterval 12  //starts in cAge4
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("castHeavyGP:");
     //check if we have a gEnemySettlementAttPlanID
     if (gEnemySettlementAttPlanID < 0)
     {
-        if (ShowAiEcho == true) aiEcho("gEnemySettlementAttPlanID < 0, returning");
         return;
 	}
     static int CastAttempt=0; 
     //get the targetPlayerID, the targetID, its unitType, its health and its position
     int targetPlayerID = aiPlanGetVariableInt(gEnemySettlementAttPlanID, cAttackPlanPlayerID, 0);
-    if (ShowAiEcho == true) aiEcho("targetPlayerID: "+targetPlayerID);
     int targetID = aiPlanGetVariableInt(gEnemySettlementAttPlanID, cAttackPlanSpecificTargetID, 0);
-    if (ShowAiEcho == true) aiEcho("targetID: "+targetID);
     if (targetID < 0)
     targetID = getMainBaseUnitIDForPlayer(targetPlayerID);
     
     if ((kbUnitIsType(targetID, cUnitTypeAbstractSettlement) == false) ||(targetID < 0))
     {
-        if (ShowAiEcho == true) aiEcho("target is no cUnitTypeAbstractSettlement, returning");
         return;
 	}
     
     float targetHealth = kbUnitGetHealth(targetID);
-    if (ShowAiEcho == true) aiEcho("targetHealth: "+targetHealth);
     if (targetHealth < 0.5)
     {
-        if (ShowAiEcho == true) aiEcho("targetHealth < 0.5, returning");
         return;
 	}
     
     vector targetPosition = kbUnitGetPosition(targetID);
-    if (ShowAiEcho == true) aiEcho("targetPosition: "+targetPosition);
     
     if (kbLocationVisible(targetPosition) == false)
     {
-        if (ShowAiEcho == true) aiEcho("Target position is not visible, returning");
         return;
 	}
     
     //check if the settlement is still being built
     int numSettlementsBeingBuiltAtTargetPos = getNumUnits(cUnitTypeAbstractSettlement, cUnitStateBuilding, -1, targetPlayerID, targetPosition, 5.0);
-    if (ShowAiEcho == true) aiEcho("numSettlementsBeingBuiltAtTargetPos: "+numSettlementsBeingBuiltAtTargetPos);
     if (numSettlementsBeingBuiltAtTargetPos > 0)
     {
-        if (ShowAiEcho == true) aiEcho("the settlement is still being built, returning");
         return;
 	}
     
     //count the number of enemy buildings in range
     int numMilBuildingsInR50 = getNumUnitsByRel(cUnitTypeMilitaryBuilding, cUnitStateAlive, -1, cPlayerRelationEnemy, targetPosition, 50.0);
-    if (ShowAiEcho == true) aiEcho("numMilBuildingsInR50: "+numMilBuildingsInR50);
 	
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     float distanceToMainBase = xsVectorLength(mainBaseLocation - targetPosition);
-    if (ShowAiEcho == true) aiEcho("distanceToMainBase: "+distanceToMainBase);
     
     if (distanceToMainBase > 110.0)
     {
         if (numMilBuildingsInR50 <= 2)
         {
-            if (ShowAiEcho == true) aiEcho("there are just a few military buildings, returning");
             return;
 		}
 		
@@ -1600,12 +1509,9 @@ inactive
 		int enemyVilUnitsInR50 = getNumUnitsByRel(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cPlayerRelationEnemy, targetPosition, 50.0, true);
         int enemyMilUnitsInR50 = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, targetPosition, 50.0, true);
 		int Combined = enemyVilUnitsInR50 + enemyMilUnitsInR50;
-        if (ShowAiEcho == true) aiEcho("myMilUnitsInR40: "+myMilUnitsInR40);
-        if (ShowAiEcho == true) aiEcho("enemyMilUnitsInR30: "+enemyMilUnitsInR50);
 		
         if  (Combined < 10)
         {
-            if (ShowAiEcho == true) aiEcho("there are too few enemies, returning");
             return;
 		}
         
@@ -1615,7 +1521,6 @@ inactive
     //cast gHeavyGPTechID
     if (aiCastGodPowerAtPosition(gHeavyGPTechID, targetPosition) == true)
     {
-        if (ShowAiEcho == true) aiEcho("Casting heavyGP: "+gHeavyGPTechID+" at position: "+targetPosition);
         aiPlanDestroy(gHeavyGPPlanID);
 	    CastAttempt = CastAttempt+1;
 	    if (CastAttempt > 3)		
@@ -1623,7 +1528,6 @@ inactive
 	}
     else
     {
-        if (ShowAiEcho == true) aiEcho("Couldn't cast gHeavyGPTechID: "+gHeavyGPTechID);
 	}
 }
 
@@ -1686,7 +1590,6 @@ rule rGaiaForestPower
 minInterval 35 //starts in cAge1
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rGaiaForestPower:"); 
 	static bool FirstRun = false;	
 	if (kbGetAge() < cAge2) 
 	return;
@@ -1700,8 +1603,8 @@ inactive
     bool JustCastIt = false;
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
-    int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 45.0);
-	if (NumTreesMB <= 10)
+    int NumTreesMB = getNumUnits(cUnitTypeGaiaForesttree, cUnitStateAlive, -1, 0, mainBaseLocation, 50.0);
+	if (NumTreesMB <= 20)
 	JustCastIt = true;
     static int count = 0;
     bool autoCast = aiPlanGetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0);
@@ -1715,7 +1618,6 @@ inactive
     if (JustCastIt == true)
     {
         aiPlanSetVariableBool(gGaiaForestPlanID, cGodPowerPlanAutoCast, 0, true);
-        if (ShowAiEcho == true) aiEcho("Setting cGodPowerPlanAutoCast to true");
         count = count + 1;
 	}
     
@@ -1732,7 +1634,6 @@ rule rHesperidesPower
 minInterval 109 //starts in cAge3
 inactive
 {
-    if (ShowAiEcho == true) aiEcho("rHesperidesPower:");    
 	
     if (gHesperidesPlanID == -1)
     {
@@ -1753,7 +1654,6 @@ inactive
     if (numHesperides < 1)
     {
         aiPlanSetVariableBool(gHesperidesPlanID, cGodPowerPlanAutoCast, 0, true);
-        if (ShowAiEcho == true) aiEcho("Setting cGodPowerPlanAutoCast to true");
         count = count + 1;
 	}
     
@@ -1773,16 +1673,9 @@ rule rCitadel
 minInterval 20 //starts in cAge1
 inactive
 {
-    if (cMyCiv != cCivSet && cMyCiv != cCivRa) {
-        xsDisableSelf();
-        return;    
-	}
-	
-    if (ShowAiEcho == true) aiEcho("rCitadel:");    
-	
     int planID=fCitadelPlanID;
     bool Ally = true;
-    if (aiRandInt(2) < 1)
+    if ((aiRandInt(2) < 1) || (IhaveAllies == false))
     Ally = false;
   
     int settlementFound= 0;
@@ -2003,12 +1896,14 @@ inactive
 }
 //==============================================================================
 rule rYearOfTheGoat
-minInterval 15
+minInterval 12
 inactive
 {
-	vector position = kbGetTownLocation()+ vector(2,2,2);// Little bit off the town position
-	aiCastGodPowerAtPosition(cTechYearoftheGoat,position);
-	xsDisableSelf();
+	if ((cvRushBoomSlider > 0.5) || (kbGetAge() > cAge1))
+	{
+		aiCastGodPowerAtPosition(cTechYearoftheGoat, kbGetTownLocation()+ vector(2,2,2));
+		xsDisableSelf();
+	}
 }
 
 rule rCastExamination
@@ -2036,7 +1931,7 @@ inactive
 {
 	static int CastAttempt = 0;
     int TartGate = kbUnitCount(cMyID, cUnitTypeTartarianGate, cUnitStateAlive);
-	if ((TartGate > 1) || (CastAttempt > 5))
+	if ((TartGate > 0) || (CastAttempt > 5))
 	{
 		xsDisableSelf();
 		return;
@@ -2091,15 +1986,13 @@ inactive
 	
 	if ((TargetTitanGate == true) && (TargetSettlement == false))
 	{
-		int NumGates = getNumUnitsByRel(cUnitTypeTitanGate, cUnitStateAliveOrBuilding, -1, cPlayerRelationEnemy);
-		for (j = 0; < NumGates)
+		int TitanGate = findUnitByRel(cUnitTypeTitanGate, cUnitStateAliveOrBuilding, -1, cPlayerRelationEnemy);
+        if (TitanGate != -1)
+		eUnitID = TitanGate;
+	    if (eUnitID != -1)
 		{
-		    eUnitID = findUnitByRelByIndex(cUnitTypeTitanGate, j, cUnitStateAliveOrBuilding, -1, cPlayerRelationEnemy);
-			if (eUnitID != -1)
-			{
-			    eLocation = kbUnitGetPosition(eUnitID);
-				break;
-			}
+		    eUnitID = TitanGate;
+		    eLocation = kbUnitGetPosition(eUnitID);
 		}
 	}
 	
@@ -2118,7 +2011,6 @@ inactive
 		{
 			if(aiCastGodPowerAtPosition(cTechVision, kbUnitGetPosition(eUnitID)) == true)
 			CastNow = true;
-			if (ShowAiEcho == true) aiEcho("CASTING VISION");
 			xsSetRuleMinIntervalSelf(1);
 			return;
 		}
@@ -2135,7 +2027,6 @@ inactive
 					xsEnableRule("castHeavyGP");
 					xsDisableSelf();
 				}
-				if (ShowAiEcho == true) aiEcho("CASTING A4 GP");
 				return;
 			}
 		}

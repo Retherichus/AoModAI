@@ -9,12 +9,11 @@
 //==============================================================================
 void navalAge2Handler(int age=1)
 {
-    if (ShowAiEcho == true) aiEcho("Naval Age "+age+".");
-	
     // Naval (scout other islands etc...)
     if (gTransportMap == true)
     {
         xsEnableRuleGroup("NavalClassical");
+	    xsEnableRule("PurgeLostEcoUnits");			
 	}
     
     if ((cRandomMapName == "anatolia") // TODO: maybe on (cRandomMapName == "highlands") too?
@@ -41,7 +40,6 @@ void navalAge3Handler(int age=2)
 //==============================================================================
 void navalAge4Handler(int age=3)
 {
-    if (ShowAiEcho == true) aiEcho("Naval Age "+age+".");
 	if (gNavalUPID != -1)
 	kbUnitPickSetDesiredNumberUnitTypes(gNavalUPID, 3, 3, true);
 }
@@ -49,10 +47,9 @@ void navalAge4Handler(int age=3)
 //==============================================================================
 rule findOtherSettlements
 minInterval 26 //starts in cAge3
-group NavalHeroic
+group NavalClassical
 inactive
 {
-	if (ShowAiEcho == true) aiEcho("findOtherSettlements:");
 	static int bStartTime = -1;
 	static int Attempts = 0;
 	int TotalBuilders = kbUnitCount(cMyID, cBuilderType, cUnitStateAlive);
@@ -65,7 +62,7 @@ inactive
 	int ActivePlans = findPlanByString("Remote Settlement Transport", cPlanTransport, -1, true, true);
 	int ActiveBackupPlans = findPlanByString("Backup Remote Settlement", cPlanBuild, -1, true, true);
 	if ((ActivePlans >= 1) || (TotalBuilders < 10) || (kbUnitCount(cMyID, cUnitTypeTransport, cUnitStateAlive) < 1) 
-	|| (kbResourceGet(cResourceGold) < 500) || (kbResourceGet(cResourceFood) < 200) || (kbResourceGet(cResourceWood) < 400) && (cMyCulture != cCultureEgyptian))
+	|| (kbResourceGet(cResourceGold) < 500) || (kbResourceGet(cResourceFood) < 300) || (kbResourceGet(cResourceWood) < 400) && (cMyCulture != cCultureEgyptian))
 	return;
 	
 	//Get our initial location.
@@ -75,10 +72,10 @@ inactive
 	int startAreaID=kbAreaGetIDByPosition(here);
 	
 	//Find other islands area group.
-	vector there = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeSettlement, here));
+	vector there = kbUnitGetPosition(findClosestUnitTypeByLoc(cPlayerRelationAny, cUnitTypeSettlement, cUnitStateAliveOrBuilding, here));
 	
 	// settlement is on my island
-	if ((isOnMyIsland(there) == true) || (equal(there, cInvalidVector) == true))
+	if ((SameAG(there, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) == true) || (equal(there, cInvalidVector) == true))
 	return; // no transport needed!
 	
 	//Create transport plan to get builders to the other island
@@ -165,7 +162,7 @@ inactive
 	
 	int numMyMilShips = kbUnitCount(cMyID, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive);
 	int numAlliedMilShips = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationAlly);
-	if ((numMyMilShips + numAlliedMilShips > numberEnemyWarships + 2) && (numMyMilShips > 1))
+	if ((numMyMilShips + numAlliedMilShips > numberEnemyWarships) && (numMyMilShips > 1))
 	reduceCount = reduceCount + 1;
 	else
 	reduceCount = 0;
@@ -265,7 +262,6 @@ inactive
 	return;
 	
 	//Else, create the Naval attack goal.
-	if (ShowAiEcho == true) aiEcho("Creating NavalAttackGoal for "+maxShips+" ships since I've seen "+numberEnemyWarships+" for Player "+aiGetMostHatedPlayerID()+".");
 	gNavalUPID=kbUnitPickCreate("Naval");
 	if (gNavalUPID < 0)
 	{
@@ -316,7 +312,6 @@ inactive
 	    ArrowShipMaintain = createSimpleMaintainPlan(ArrowShip, 2, false, kbBaseGetMainID(cMyID));
 	    aiPlanSetDesiredPriority(ArrowShipMaintain, 100);
 	}
-	xsEnableRule("FishBoatMonitor"); // looks for transport too
 	
 	if (gWaterExploreID == -1)
     {
@@ -346,9 +341,9 @@ minInterval 18
 	int navyUnit = findUnit(cUnitTypeLogicalTypeNavalMilitary);
 	int DockUnit = findUnit(cUnitTypeDock);
 	int EnemyDock = -1;
+	int Owner = -1;
 	vector WaterVector = aiPlanGetVariableVector(gFishPlanID, cFishPlanWaterPoint, 0);
 	vector Dock = kbUnitGetPosition(DockUnit); 
-	
 	
 	if ((mWaterDefendPlan != -1) && (equal(Dock, cInvalidVector) == false))
 	{
@@ -356,100 +351,78 @@ minInterval 18
 		aiPlanSetInitialPosition(mWaterDefendPlan, WaterVector);
 	}
 	
-	
 	if (mWaterDefendPlan != -1)
 	{
-		int ActiveWaterAttack = findPlanByString("WaterAttack", cPlanAttack, -1);
+        int ActiveWaterAttack = findPlanByString("WaterAttack", cPlanAttack, -1);
 		if (ActiveWaterAttack != -1)
-		{	
+		{
 			if (aiPlanGetNumberUnits(ActiveWaterAttack, cUnitTypeLogicalTypeNavalMilitary) <= 0)
 			{
-		        aiPlanDestroy(ActiveWaterAttack);
+				aiPlanDestroy(ActiveWaterAttack);
 				xsSetRuleMinIntervalSelf(2);
-			    return;
+				return;
 			}
 			int planState = aiPlanGetState(ActiveWaterAttack);
-			int CurrentPlayer = aiPlanGetVariableInt(ActiveWaterAttack, cAttackPlanPlayerID, 0);
-			int EnemyBoats = (kbUnitCount(CurrentPlayer, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive) + kbUnitCount(CurrentPlayer, cUnitTypeDock, cUnitStateAlive) + 
-			kbUnitCount(CurrentPlayer, cUnitTypeUtilityShip, cUnitStateAlive));
 			if (aiPlanGetNumberUnits(mWaterDefendPlan, cUnitTypeLogicalTypeNavalMilitary) >= 3)
 			aiPlanAddUnitType(ActiveWaterAttack, cUnitTypeLogicalTypeNavalMilitary, 0, 200, 200);
 			
-		    if ((EnemyBoats <= 0) || (planState == cPlanStateNone))
+			if (planState == cPlanStateNone)
 			{
-				bool Success = false;
-				int startIndex = aiRandInt(cNumberPlayers);
-				for (i = 0; < cNumberPlayers)
+				EnemyDock = findUnitByRel(cUnitTypeDock, cUnitStateAlive, -1, cPlayerRelationEnemy, cInvalidVector, -1, true);
+				if (EnemyDock == -1)
+				EnemyDock = findUnitByRel(cUnitTypeShip, cUnitStateAlive, -1, cPlayerRelationEnemy, cInvalidVector, -1, true);
+			    Owner = kbUnitGetOwner(EnemyDock);
+				if ((EnemyDock != -1) && (Owner != -1))
 				{
-					//If we're past the end of our players, go back to the start.
-					int actualIndex = i + startIndex;
-					if (actualIndex >= cNumberPlayers)
-					actualIndex = actualIndex - cNumberPlayers;
-					if (actualIndex <= 0)
-					continue;
-					if ((kbIsPlayerEnemy(actualIndex) == true) &&
-					(kbIsPlayerResigned(actualIndex) == false) &&
-					(kbHasPlayerLost(actualIndex) == false))
-					{
-						EnemyBoats = (kbUnitCount(actualIndex, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive) + kbUnitCount(actualIndex, cUnitTypeDock, cUnitStateAlive) + 
-						kbUnitCount(actualIndex, cUnitTypeUtilityShip, cUnitStateAlive));
-						if (EnemyBoats > 0)
-						{
-							aiPlanSetVariableInt(ActiveWaterAttack, cAttackPlanPlayerID, 0, actualIndex);
-							EnemyDock = findUnit(cUnitTypeDock, cUnitStateAlive, -1, actualIndex, cInvalidVector, true);
-			                if (EnemyDock == -1)
-			                EnemyDock = findUnitByRel(cUnitTypeDock, cUnitStateAlive, -1, cPlayerRelationEnemy, cInvalidVector, -1, true);							
-			                if (EnemyDock != -1)
-			                aiPlanSetVariableInt(ActiveWaterAttack, cAttackPlanSpecificTargetID, 0, EnemyDock);							
-							Success = true;
-							break;
-						}
-					}
-					if (Success == true)
-					return;
+					aiPlanSetVariableInt(ActiveWaterAttack, cAttackPlanSpecificTargetID, 0, EnemyDock);
+					aiPlanSetVariableInt(ActiveWaterAttack, cAttackPlanPlayerID, 0, Owner);
 				}
+				else
+				aiPlanDestroy(ActiveWaterAttack);
+				
 			}
-			else if (EnemyBoats > 0)
-			return;
-		}
-		if ((Success == false) && (ActiveWaterAttack != -1))
-		{
-		    aiPlanDestroy(ActiveWaterAttack);
-			xsSetRuleMinIntervalSelf(2);
 			return;
 		}
 		
-	    if ((aiPlanGetNumberUnits(mWaterDefendPlan, cUnitTypeLogicalTypeNavalMilitary) >= 3) && (ActiveWaterAttack == -1))
+		
+		if ((aiPlanGetNumberUnits(mWaterDefendPlan, cUnitTypeLogicalTypeNavalMilitary) >= 3) && (ActiveWaterAttack == -1))
 		{
-	        vector vectorToUse = kbUnitGetPosition(navyUnit);
+			vector vectorToUse = kbUnitGetPosition(navyUnit);
 			if (equal(WaterVector, cInvalidVector) == false)
 			vectorToUse = WaterVector;
-		    if (equal(vectorToUse, cInvalidVector) == true)
+			if (equal(vectorToUse, cInvalidVector) == true)
 			return; 
-		    int MHP = aiGetMostHatedPlayerID();
-			EnemyDock = findUnit(cUnitTypeDock, cUnitStateAlive, -1, MHP, cInvalidVector, true);
+			
+			EnemyDock = findUnit(cUnitTypeShip, cUnitStateAlive, -1, aiGetMostHatedPlayerID());
 			if (EnemyDock == -1)
 			EnemyDock = findUnitByRel(cUnitTypeDock, cUnitStateAlive, -1, cPlayerRelationEnemy, cInvalidVector, -1, true);
-			
+			if (EnemyDock == -1)
+			EnemyDock = findUnitByRel(cUnitTypeShip, cUnitStateAlive, -1, cPlayerRelationEnemy, cInvalidVector, -1, true);
+			Owner = kbUnitGetOwner(EnemyDock);
+			if (Owner < 0)
+			{	
+			    xsSetRuleMinIntervalSelf(5);
+			    return;
+			}
+		
 			int WaterAttackPlan = createDefOrAttackPlan("WaterAttack", false, -1, 30, vectorToUse, -1, 50, false);
 			if (WaterAttackPlan < 0)
 			return;
-		    
+			
 			aiPlanSetVariableVector(WaterAttackPlan, cAttackPlanGatherPoint, 0, WaterVector);
 			aiPlanSetInitialPosition(WaterAttackPlan, WaterVector);
-			aiPlanSetVariableInt(WaterAttackPlan, cAttackPlanPlayerID, 0, MHP);
+			aiPlanSetVariableInt(WaterAttackPlan, cAttackPlanPlayerID, 0, Owner);
 			aiPlanAddUnitType(WaterAttackPlan, cUnitTypeLogicalTypeNavalMilitary, 0, 0, 200);  
 			aiPlanSetVariableFloat(WaterAttackPlan, cAttackPlanGatherDistance, 0, 2000.0);
 			aiPlanSetVariableInt(WaterAttackPlan, cAttackPlanBaseAttackMode, 0, cAttackPlanBaseAttackModeWeakest);
-			if (EnemyDock != -1)
 			aiPlanSetVariableInt(WaterAttackPlan, cAttackPlanSpecificTargetID, 0, EnemyDock);
 			aiPlanSetNumberVariableValues(WaterAttackPlan, cAttackPlanTargetTypeID, 2, true);
-            aiPlanSetVariableInt(WaterAttackPlan, cAttackPlanTargetTypeID, 0, cUnitTypeUnit);
-            aiPlanSetVariableInt(WaterAttackPlan, cAttackPlanTargetTypeID, 1, cUnitTypeBuilding);
+			aiPlanSetVariableInt(WaterAttackPlan, cAttackPlanTargetTypeID, 0, cUnitTypeUnit);
+			aiPlanSetVariableInt(WaterAttackPlan, cAttackPlanTargetTypeID, 1, cUnitTypeBuilding);
 			aiPlanSetActive(WaterAttackPlan);
 		}
-	    return;	
-	}  
+		return;	
+	}
 	
 	if (DockUnit < 0)
 	return;

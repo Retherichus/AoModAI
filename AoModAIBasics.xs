@@ -29,17 +29,8 @@ extern float cvSliderNoise = 0.3;            // The amount of random variance in
 // Minor god choices.  These MUST be made in setParameters and not changed after that.  
 // -1 means the AI chooses as it normally would.  List of god names follows.
 extern int  cvAge2GodChoice = -1;
-// cTechAge2Athena, cTechAge2Ares, cTechAge2Hermes, cTechAge2Anubis, cTechAge2Bast,
-// cTechAge2Ptah, cTechAge2Forseti, cTechAge2Heimdall, cTechAge2Freyja,
-// cTechAge2Okeanus, cTechAge2Prometheus, cTechAge2Leto
 extern int  cvAge3GodChoice = -1;
-// cTechAge3Apollo, cTechAge3Aphrodite, cTechAge3Hathor, cTechAge3Nephthys, cTechAge3Sekhmet
-// cTechAge3Skadi, cTechAge3Bragi, cTechAge3Njord, cTechAge3Dionysos
-// cTechAge3Hyperion, cTechAge3Rheia, cTechAge3Theia
 extern int  cvAge4GodChoice = -1;
-// cTechAge4Hera, cTechAge4Artemis, cTechAge4Hephaestus, cTechAge4Thoth
-// cTechAge4Osiris, cTechAge4Horus, cTechAge4Hel, cTechAge4Baldr, cTechAge4Tyr,
-// cTechAge4Helios, cTechAge4Hekate, cTechAge4Atlas
 
 // DelayStart:  Setting this true will suspend ai initialization.  To resume, call setDelayStart(false).
 extern bool    cvDelayStart = false;
@@ -56,10 +47,6 @@ extern int     cvMaxGathererPop = -1;    // -1 turns it off, meaning the scripts
 // MaxMilPop:  The maximum number of military UNITS (not pop slots) that the player can create.  
 // Set initially in setParameters(), can be changed dynamically with setMaxMilPop().
 extern int     cvMaxMilPop = -1;         // -1 turns it off, meaning the scripts can do what they want.  0 means no military.
-
-// MaxSettlements:  The maximum number of settlements this AI player may claim.
-// Set initially in setParameters(), can be changed dynamically with setMaxSettlements().
-extern int     cvMaxSettlements = 100; // Way high, no limit really.
 
 // MaxTradePop:  Tells the AI how many trade units to make.  May be changed via setMaxTradePop().  If set to -1, the AI decides on its own.
 extern int     cvMaxTradePop = -1;
@@ -89,48 +76,6 @@ extern bool    cvOkToUseAge4GodPower = true;
 // PlayerToAttack:  -1 means not defined.  Number > 0 means attack that player number, overrides mostHatedPlayer.
 extern int     cvPlayerToAttack = -1;     
 
-// Military unit controls.  Read the entire comment block below the variable declarations, these must be used carefully.
-extern int     cvPrimaryMilitaryUnit = -1;
-extern int     cvSecondaryMilitaryUnit = -1;
-extern int     cvTertiaryMilitaryUnit = -1;
-extern int     cvNumberMilitaryUnitTypes = -1;
-/*
-   These variables can be used to tell the AI which military units to make, and how many types to make.  
-   They should be set in setParameters if you want them to take effect immediately.  
-   Later, they may be changed via the following calls:
-      setMilitaryUnitPrefs(primary, secondary, tertiary), and setNumberMilitaryUnitTypes().
-   Set each choice to -1 to turn it off, which then will allow the AI to make its normal choices.
-   Set the numberMilitaryUnits to -1 (or use no parameter) to return the AI to its default.
-   Example:
-      // In setParameters(), start with an archer/cav army.
-      cvNumberMilitaryUnitTypes = 2;
-      cvPrimaryMilitaryUnit = cUnitTypeToxotes;
-      cvSecondaryMilitaryUnit = cUnitTypeHippikon;
-
-      // Then, in a rule that fires in age 3, and archer/counterCav/siege army
-      setNumberMilitaryUnitTypes(3);
-      setMilitaryUnitPrefs(cUnitTypeHoplite, cUnitTypeProdromos, cUnitTypePetrobolos);
-
-      // Use an age 4 rule to make a hippikon/siege army
-      setNumberMilitaryUnits(2);
-      setMilitaryUnitPrefs(cUnitTypeHippikon, cUnitTypePetrobolos);  // No tertiary required, all parameters are options.
-
-      // Finally, turn it off and let the AI choose:
-      setNumberMilitaryUnits();  // No parameter means AI gets its choice.  Could also send -1 if you prefer.
-      setMilitaryUnitPrefs();    // No parameter means clear them all.
-
-  These functions work by massively distorting the unit picker's inherent preferences, so it's very important to turn
-  them off when you're done.
-
-  Primary must be used if secondary or tertiary are used.  For example, setting primary and secondary to -1 (off) and
-  setting tertiary to cUnitTypeToxotes will have the effect of choosing nothing.  There is no way to tell 
-  the AI to pick its own primary and secondary but override the tertiary.  You can set numberMiltiaryUnitTypes to 3 and only define 
-  the primary, leaving it to pick the second and third.
-
-  Finally, there is a side effect.  Hades may prefer archers initially.  If you tell him to make archers, he will.  When you tell him
-  to later make up his own mind, his preference for archers is lost.  (There is no ai function to read the current preference value.)
-*/
-
 // Random map name.  Can be set in setParameters to make scenario AI's adopt map-specific behaviors.  Must be set in setParameters() to be
 // used, there is no way to activate it later.
 
@@ -143,27 +88,34 @@ extern const int NOMADMAP = 2;
 extern const int SHIMOMAP = 3;
 extern const int VINLANDSAGAMAP = 4;
 extern const int WATERNOMADMAP = 5;
-// for shimo kinda maps
-extern int gShimoKingUnitTypeID = cUnitTypeArkantos; 
-extern int gShimoKingID = -1; // the unit ID for our king!
 // nothing special for start...
 extern int cvMapSubType = -1;
 
 //for trigonometric functions
 extern float PI = 3.141592;
 
-// Reth Placeholder
-extern bool ShowAiEcho = false;
-extern bool DisallowPullBack = false;
-extern int KOTHTransportPlan = -1;
-extern int KOTHTHomeTransportPlan = -1;
-extern int SendBackCount = 0;
-extern bool KoTHOkNow = false;
-extern bool DestroyTransportPlan = false;  
-extern bool DestroyHTransportPlan = false;
-extern int rExploreIsland = -1;
-extern int MyFortress = cUnitTypeAbstractFortress;
-extern int cBuilderType = cUnitTypeAbstractVillager;
+//Update:  borrowed lots of code from aiMicroHelp. credit goes to the original creators! 
+//and I hope it is okay that I use/tweak some of these amazing functions! I love you guys, this is so neat! <3
+//If it is not okay.. please do contact me on Github through an issue, and I will have it removed at once!
+
+//==============================================================================
+// ORDER: calcDistanceToUnit //borrowed
+//==============================================================================
+int calcDistanceToUnit(int puidA=-1, int puidB=-1)
+{
+	vector A = kbUnitGetPosition(puidA);
+	int ax = xsVectorGetX(A);
+	int ay = xsVectorGetY(A);
+	int az = xsVectorGetZ(A);
+	
+	vector B = kbUnitGetPosition(puidB);
+	int bx = xsVectorGetX(B);
+	int by = xsVectorGetY(B);
+	int bz = xsVectorGetZ(B);
+	
+	return(xsVectorLength(xsVectorSet(ax-bx,ay-by,az-bz)));
+}
+
 //==============================================================================
 bool equal(vector left=cInvalidVector, vector right=cInvalidVector) //true if the given vectors are equal
 {
@@ -194,10 +146,7 @@ bool configQuery( int queryID = -1, int unitType = -1, int action = -1, int stat
 vector center = cInvalidVector, bool sort = false, float radius = -1, bool seeable = false, int areaID = -1 )
 {
     if ( queryID == -1)
-    {
-        if (ShowAiEcho == true) aiEcho("Invalid query ID");
-        return(false);
-	}
+    return(false);
 	
 	kbUnitQuerySetPlayerID(queryID, player);
 	kbUnitQuerySetUnitType(queryID, unitType);
@@ -254,16 +203,13 @@ int NumUnitsOnAreaGroupByRel(bool Player = false, int AreaGroupID = -1, int Unit
         if (AreaUnitQuery < 0)
 		return(-1);
 	}
+    kbUnitQuerySetPlayerRelation(AreaUnitQuery, -1);
+	kbUnitQuerySetPlayerID(AreaUnitQuery, -1);	
 	if (Player == false)
-	{
-	    kbUnitQuerySetPlayerRelation(AreaUnitQuery, PlayerIDOrRelation);
-        kbUnitQuerySetPlayerID(AreaUnitQuery, -1);
-	}
+    kbUnitQuerySetPlayerRelation(AreaUnitQuery, PlayerIDOrRelation);
     else
-	{
-        kbUnitQuerySetPlayerID(AreaUnitQuery, PlayerIDOrRelation);	
-        kbUnitQuerySetPlayerRelation(AreaUnitQuery, -1);
-	}
+    kbUnitQuerySetPlayerID(AreaUnitQuery, PlayerIDOrRelation);	
+	
     kbUnitQuerySetUnitType(AreaUnitQuery, UnitID);
     kbUnitQueryResetResults(AreaUnitQuery);
     kbUnitQuerySetState(AreaUnitQuery, iState);
@@ -271,23 +217,58 @@ int NumUnitsOnAreaGroupByRel(bool Player = false, int AreaGroupID = -1, int Unit
     kbUnitQueryResetResults(AreaUnitQuery);
     return(kbUnitQueryExecute(AreaUnitQuery));
 }
-//==============================================================================
-bool isOnMyIsland(vector there=cInvalidVector)
+
+int GetUnitsOnAreaGroupByRelIndex(bool Player = false, int AreaGroupID = -1, int UnitID = -1, 
+int PlayerIDOrRelation = cPlayerRelationSelf, int index = 0, int iState = cUnitStateAlive, int Action = cActionAny) 
 {
-    if (ShowAiEcho == true) aiEcho("isOnMyIsland:");
+    static int AreaUnitQuery = -1;
+    if (AreaUnitQuery < 0) 
+	{
+        AreaUnitQuery = kbUnitQueryCreate("AreaGroupQuery");
+        if (AreaUnitQuery < 0)
+		return(-1);
+	}
+    if (index == 0) 
+    {
+        kbUnitQueryResetResults(AreaUnitQuery);
+        kbUnitQuerySetPlayerRelation(AreaUnitQuery, -1);
+	    kbUnitQuerySetPlayerID(AreaUnitQuery, -1);	
+	    if (Player == false)
+        kbUnitQuerySetPlayerRelation(AreaUnitQuery, PlayerIDOrRelation);
+        else
+        kbUnitQuerySetPlayerID(AreaUnitQuery, PlayerIDOrRelation);	
 	
-    //Get our initial location.
-    vector here=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
-    int myAreaGroupID = kbAreaGroupGetIDByPosition(here);
-    int islandGroupID=kbAreaGroupGetIDByPosition(there);
-    return(myAreaGroupID==islandGroupID);
+        kbUnitQuerySetUnitType(AreaUnitQuery, UnitID);
+    
+        kbUnitQuerySetState(AreaUnitQuery, iState);
+        kbUnitQuerySetAreaGroupID(AreaUnitQuery, AreaGroupID);		
+        kbUnitQueryExecute(AreaUnitQuery);
+    }	
+ 
+	int retval = kbUnitQueryGetResult(AreaUnitQuery, index);
+	return(retval);
+}
+bool SameAG(vector vec1 = cInvalidVector, vector vec2 = cInvalidVector)
+{
+    if ((kbAreaGroupGetIDByPosition(vec1) == kbAreaGroupGetIDByPosition(vec2)))
+    return(true);
+	else
+	return(false);
 }
 
+int addSDT(int planID = -1, int TimerInSeconds = 1)
+{
+	if (planID != -1)
+	{
+	    TimerInSeconds = TimerInSeconds * 1000;
+        aiPlanAddUserVariableInt(planID, 0, "SelfDestruct Timer", 2);
+		aiPlanSetUserVariableInt(planID, 0, 0, 150);
+        aiPlanSetUserVariableInt(planID, 0, 1, xsGetTime()+TimerInSeconds);
+	}
+}
 //==============================================================================
 bool hasWaterNeighbor(int areaID = -1)    // True if the test area has a water area neighbor
 {
-    if (ShowAiEcho == true) aiEcho("hasWaterNeighbor:");
-	
     int areaCount = -1;
     int areaIndex = -1;
     int testArea = -1;
@@ -303,17 +284,12 @@ bool hasWaterNeighbor(int areaID = -1)    // True if the test area has a water a
 			hasWater = true;
 		}
 	}
-    if (hasWater == true)
-	if (ShowAiEcho == true) aiEcho("    "+areaID+" has a water neighbor.");
-	
     return(hasWater);
 }
 
 //==============================================================================
 int verifyVinlandsagaBase(int goalAreaID = -1, int recurseCount = 3)    //verify that this area borders water, find another if it doesn't.
 {
-    if (ShowAiEcho == true) aiEcho("verifyVinlandsagaBase:");
-	
     int newAreaID = goalAreaID;      // New area will be the one we use.  By default,
 	// we'll start with the one passed to us.
     bool done = false;               // Set true when we find an acceptable one
@@ -325,7 +301,7 @@ int verifyVinlandsagaBase(int goalAreaID = -1, int recurseCount = 3)    //verify
     if (hasWaterNeighbor(goalAreaID) == true)    // Simple case
     {
         return(goalAreaID);
-		}
+	}
     int recurseLevel = 0;
     if (recurseCount > 0)
     {
@@ -342,115 +318,7 @@ int verifyVinlandsagaBase(int goalAreaID = -1, int recurseCount = 3)    //verify
 			}
 		}
 	}
-	
-    if (recurseCount == 3)     // Sigh, just fail and return -1.
-	if (ShowAiEcho == true) aiEcho("Couldn't find a water-bordered area.");
     return(-1);
-}
-
-//==============================================================================
-// some trigonometric functions stolen from The Void RMS by Wolfenhex
-// Many thanks to Wolfenhex for providing these functions
-// His RMS can be found here:
-// http://aom.heavengames.com/downloads/showfile.php?fileid=1377
-//==============================================================================
-float _pow(float n = 0,int x = 0) 
-{
-    float r = n;
-    for (i = 1; < x) 
-    {
-        r = r * n;
-	}
-    return (r);
-}
-
-float _atan(float n = 0) 
-{
-    float m = n;
-    if (n > 1)
-	m = 1.0 / n;
-    if (n < -1) 
-	m = -1.0 / n;
-    float r = m;
-    for (i = 1; < 100) 
-    {
-        int j = i * 2 + 1;
-        float k = _pow(m,j) / j;
-        if (k == 0) 
-		break;
-        if (i % 2 == 0) 
-		r = r + k;
-        if (i % 2 == 1) 
-		r = r - k;
-	}
-    if (n > 1 || n < -1) 
-	r = PI / 2.0 - r;
-    if (n < -1) 
-	r = 0.0 - r;
-    return (r);
-}
-
-float _atan2(float z = 0,float x = 0) 
-{
-    if (x > 0) 
-	return (_atan(z / x));
-    if (x < 0) 
-    {
-        if (z < 0) 
-		return (_atan(z / x) - PI);
-        if (z > 0) 
-		return (_atan(z / x) + PI);
-        return (PI);
-	}
-    if (z > 0) 
-	return (PI / 2.0);
-    if (z < 0) 
-	return (0.0 - (PI / 2.0));
-    return (0);
-}
-
-float _fact(float n = 0) 
-{
-    float r = 1;
-    for (i = 1; <= n) 
-    {
-        r = r * i;
-	}
-    return (r);
-}
-
-float _cos(float n = 0) 
-{
-    float r = 1;
-    for (i = 1; < 100) 
-    {
-        int j = i * 2;
-        float k = _pow(n,j) / _fact(j);
-        if (k == 0) 
-		break;
-        if (i % 2 == 0) 
-		r = r + k;
-        if (i % 2 == 1) 
-		r = r - k;
-	}
-    return (r);
-}
-
-float _sin(float n = 0) 
-{
-    float r = n;
-    for (i = 1; < 100) 
-    {
-        int j = i * 2 + 1;
-        float k = _pow(n,j) / _fact(j);
-        if (k == 0) 
-		break;
-        if (i % 2 == 0) 
-		r = r + k;
-        if (i % 2 == 1) 
-		r = r - k;
-	}
-    return (r);
 }
 
 //==============================================================================
@@ -504,66 +372,49 @@ vector center = cInvalidVector, float radius = -1, bool seeable = false, int are
 }
 
 //==============================================================================
-// findUnitByIndex  // Will find a unit of the given playerID by the index, default index = 0
+// findUnitByIndex // Will find a random unit of the given playerID  // Thanks goes to nate_e for optimizing this loop! :)
 //==============================================================================
 int findUnitByIndex(int unitTypeID = -1, int index = 0, int state = cUnitStateAlive, int action = -1, int playerID = cMyID, 
 vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
-{	
+{
     static int unitQueryID = -1;
-	
-    //If we don't have the query yet, create one.
     if (unitQueryID < 0)
-	unitQueryID = kbUnitQueryCreate("findUnitByIndexQuery");
-	
-    //Define a query to get all matching units
-    if (unitQueryID != -1)
-	configQuery(unitQueryID, unitTypeID, action, state, playerID, center, true, radius, seeable, areaID);  //sort = true
-    else
-	return(-1);
-	
-    kbUnitQueryResetResults(unitQueryID);
-	int numberFound = kbUnitQueryExecute(unitQueryID);
-    for (i=0; < numberFound)
-	return(kbUnitQueryGetResult(unitQueryID, index));
-    return(-1);
+    unitQueryID = kbUnitQueryCreate("findUnitByIndex");
+    if (index == 0) 
+    {
+        kbUnitQueryResetResults(unitQueryID);
+        configQuery(unitQueryID, unitTypeID, action, state, playerID, center, true, radius, seeable, areaID ); //sort = true
+        kbUnitQueryExecute(unitQueryID);
+    }
+    int retval = kbUnitQueryGetResult(unitQueryID, index);
+    return(retval);
 }
-
 //==============================================================================
-// findUnitByRelByIndex // Will find a random unit of the given playerRelation
+// findUnitByRelByIndex // Will find a random unit of the given playerRelation // Thanks goes to nate_e for optimizing this loop! :)
 //==============================================================================
 int findUnitByRelByIndex(int unitTypeID = -1, int index = 0, int state = cUnitStateAlive, int action = -1, 
 int playerRelation = cPlayerRelationSelf, vector center = cInvalidVector, float radius = -1, 
 bool seeable = false, int areaID = -1)
 {
-    
     static int unitQueryID = -1;
-	
-    //If we don't have the query yet, create one.
     if (unitQueryID < 0)
-	unitQueryID=kbUnitQueryCreate("randFindUnitByRelByIndexQuery");
-	
-    //Define a query to get all matching units
-    if (unitQueryID != -1)
-	configQueryRelation(unitQueryID, unitTypeID, action, state, playerRelation, center, true, radius, seeable, areaID); //sort = true
-    else
-	return(-1);
-	
-    kbUnitQueryResetResults(unitQueryID);
-	int numberFound = kbUnitQueryExecute(unitQueryID);
-    for (i=0; < numberFound)
-	return(kbUnitQueryGetResult(unitQueryID, index));
-    return(-1);
+    unitQueryID = kbUnitQueryCreate("findUnitByRelByIndex");
+    if (index == 0) 
+    {
+        kbUnitQueryResetResults(unitQueryID);
+        configQueryRelation(unitQueryID, unitTypeID, action, state, playerRelation, center, true, radius, seeable, areaID); //sort = true
+        kbUnitQueryExecute(unitQueryID);
+    }
+    int retval = kbUnitQueryGetResult(unitQueryID, index);
+    return(retval);
 }
-
 //==============================================================================
 // getNumUnits  // Returns the number of units of the given playerID (within the radius of a position)
 //==============================================================================
 int getNumUnits(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, 
 int playerID = cMyID, vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-	
     static int unitQueryID = -1;
-	
     //If we don't have the query yet, create one.
     if (unitQueryID < 0)
 	unitQueryID = kbUnitQueryCreate("getNumUnitsQuery");
@@ -585,10 +436,7 @@ int playerID = cMyID, vector center = cInvalidVector, float radius = -1, bool se
 int getNumUnitsByRel(int unitTypeID = -1, int state = cUnitStateAlive, int action = -1, int playerRelation = cPlayerRelationSelf,
 vector center = cInvalidVector, float radius = -1, bool seeable = false, int areaID = -1)
 {
-    
-    int count = -1;
     static int unitQueryID = -1;
-	
     //If we don't have the query yet, create one.
     if (unitQueryID < 0)
 	unitQueryID = kbUnitQueryCreate("getNumUnitsByRelQuery");
@@ -607,8 +455,6 @@ vector center = cInvalidVector, float radius = -1, bool seeable = false, int are
 //==============================================================================
 vector getMainBaseMilitaryGatherPoint()
 {
-    if (ShowAiEcho == true) aiEcho("******** getMainBaseMilitaryGatherPoint");
-	
     int mainBaseID = kbBaseGetMainID(cMyID);
     vector mainBaseLocation = kbBaseGetLocation(cMyID, mainBaseID);
     vector militaryGatherPoint = cInvalidVector;
@@ -693,11 +539,7 @@ int getMainBaseUnitIDForPlayer(int playerID = -1)
 //==============================================================================
 int findNumUnitsInBase(int playerID = 0, int baseID = -1, int unitTypeID = -1, int state = cUnitStateAliveOrBuilding, int action = cActionAny)
 {
-    if (ShowAiEcho == true) aiEcho("findNumUnitsInBase:");
-	
-    int count = -1;
     static int unitQueryID = -1;
-	
     //Create the query if we don't have it.
     if (unitQueryID < 0)
 	unitQueryID = kbUnitQueryCreate("getUnitsInBaseQuery");
@@ -722,15 +564,13 @@ int createSimpleAttackGoal(string name="BUG", int attackPlayerID=-1,
 int unitPickerID=-1, int repeat=-1, int minAge=-1, int maxAge=-1,
 int baseID=-1, bool allowRetreat=false)
 {
-    if (ShowAiEcho == true) aiEcho("CreateSimpleAttackGoal:  Name="+name+", AttackPlayerID="+attackPlayerID+".");
-	
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
     if (goalID < 0)
 	return(-1);
 	
     //Priority.
-    aiPlanSetDesiredPriority(goalID, 90);
+    aiPlanSetDesiredPriority(goalID, 60);
     //Attack player ID.
     if (attackPlayerID >= 0)
 	aiPlanSetVariableInt(goalID, cGoalPlanAttackPlayerID, 0, attackPlayerID);
@@ -787,8 +627,6 @@ int baseID=-1, bool allowRetreat=false)
 int createBaseGoal(string name="BUG", int goalType=-1, int attackPlayerID=-1,
 int repeat=-1, int minAge=-1, int maxAge=-1, int parentBaseID=-1)
 {
-    if (ShowAiEcho == true) aiEcho("CreateBaseGoal:  Name="+name+", AttackPlayerID="+attackPlayerID+".");
-	
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
     if (goalID < 0)
@@ -828,8 +666,6 @@ int repeat=-1, int minAge=-1, int maxAge=-1, int parentBaseID=-1)
 int createCallbackGoal(string name="BUG", string callbackName="BUG", int repeat=-1,
 int minAge=-1, int maxAge=-1, bool autoUpdate=false)
 {
-    if (ShowAiEcho == true) aiEcho("CreateCallbackGoal:  Name="+name+", CallbackName="+callbackName+".");
-	
     //Get the callbackFID.
     int callbackFID=xsGetFunctionID(callbackName);
     if (callbackFID < 0)
@@ -863,9 +699,6 @@ int createBuildSettlementGoal(string name="BUG", int minAge=-1, int maxAge=-1, i
 bool autoUpdate=true, int pri=100)
 {
     int buildingTypeID = cUnitTypeSettlementLevel1;
-	
-    if (ShowAiEcho == true) aiEcho("CreateBuildSettlementGoal:  Name="+name+", BuildingType="+kbGetUnitTypeName(buildingTypeID)+".");
-	
     //Create the goal.
     int goalID=aiPlanCreate(name, cPlanGoal);
     if (goalID < 0)
@@ -903,8 +736,6 @@ bool autoUpdate=true, int pri=100)
 int createTransportPlan(string name="BUG", int startAreaID=-1, int goalAreaID=-1,
 bool persistent=false, int transportPUID=-1, int pri=-1, int baseID=-1)
 {
-    if (ShowAiEcho == true) aiEcho("CreateTransportPlan:  Name="+name+", Priority="+pri+".");
-	
     //Create the plan.
     int planID=aiPlanCreate(name, cPlanTransport);
     if (planID < 0)
@@ -940,14 +771,12 @@ bool persistent=false, int transportPUID=-1, int pri=-1, int baseID=-1)
 //                funct will try to find builders
 //==============================================================================
 void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
-{
-    if (ShowAiEcho == true) aiEcho("claimSettlement:");    
-    
+{   
     int baseID=-1;
     int startAreaID=-1;
     static int builderQuery=-1;
-	int NumBuilder = NumUnitsOnAreaGroupByRel(false, kbAreaGroupGetIDByPosition(where), cBuilderType);
-    if ((cBuilderType < 0 ) || (NumBuilder > 0))
+	int NumBuilder = NumUnitsOnAreaGroupByRel(true, kbAreaGroupGetIDByPosition(where), cBuilderType, cMyID);
+    if (NumBuilder > 0)
 	return;
     
 	baseID = kbBaseGetMainID(cMyID);
@@ -1001,19 +830,8 @@ void claimSettlement(vector where=cInvalidVector, int baseToUseID=-1)
 	
 }
 //==============================================================================
-void setTownLocation(void)
-{
-    if (ShowAiEcho == true) aiEcho("setTownLocation:");    
-    int TC = findUnit(cUnitTypeAbstractSettlement);
-    if (TC != -1)
-    kbSetTownLocation(kbUnitGetPosition(TC));
-}
-
-//==============================================================================
 int createSimpleMaintainPlan(int puid=-1, int number=1, bool economy=true, int baseID=-1)
 {
-    if (ShowAiEcho == true) aiEcho("createSimpleMaintainPlan:");    
-	
     //Create the plan name.
     string planName="Military";
     if (economy == true)
@@ -1048,11 +866,30 @@ int createSimpleMaintainPlan(int puid=-1, int number=1, bool economy=true, int b
 }
 
 //==============================================================================
+int createSimpleTrainPlan(int puid = -1, int number = 1, int escrowID = -1, int baseID = -1)
+{
+	string planName="Simple";
+	planName=planName+kbGetProtoUnitName(puid)+"Train";
+	int planID=aiPlanCreate(planName, cPlanTrain);
+	if (planID < 0)
+	return(-1);
+
+	aiPlanSetEscrowID(planID, escrowID);
+	aiPlanSetVariableInt(planID, cTrainPlanUnitType, 0, puid);
+	aiPlanSetVariableInt(planID, cTrainPlanNumberToTrain, 0, number);
+	if (baseID >= 0)
+	{
+		aiPlanSetBaseID(planID, baseID);
+		aiPlanSetVariableVector(planID, cTrainPlanGatherPoint, 0, kbBaseGetMilitaryGatherPoint(cMyID, baseID));
+	}
+	aiPlanSetActive(planID);
+	return(planID);
+} 
+
+//==============================================================================
 bool createSimpleBuildPlan(int puid=-1, int number=1, int pri=100,
 bool military=false, bool economy=true, int escrowID=-1, int baseID=-1, int numberBuilders=1)
 {
-    if (ShowAiEcho == true) aiEcho("createSimpleBuildPlan:");    
-	
     //Create the right number of plans.
     for (i=0; < number)
     {
@@ -1158,73 +995,35 @@ float adjustSigmoid(float var=0.0, float fraction=0.0,  float lowerLimit=0.0, fl
 //==============================================================================
 void pullBackUnits(int planID = -1, vector retreatPosition = cInvalidVector)
 {
-    if (ShowAiEcho == true) aiEcho("pullBackUnits:");    
-    if (DisallowPullBack == true)
-	return;
     int numUnitsInPlan = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
     if (numUnitsInPlan > 0)
     {
         //Limited the maximum number of loops
-        int min = 0;
         int max = 9;
-        
         int unitID = -1;
-        static int flipFlop = 0;
-        if (flipFlop == 0)
+		if (numUnitsInPlan > max)
+		numUnitsInPlan = max;
+		for (i = 0; < numUnitsInPlan)
         {
-            flipFlop = 1;
-            if (numUnitsInPlan > max)
-			numUnitsInPlan = max;
-            for (i = 0; < numUnitsInPlan)
-            {
-                unitID = aiPlanGetUnitByIndex(planID, i);
-                if (unitID != -1)
-                {
-                    aiTaskUnitMove(unitID, retreatPosition);
-                    if (ShowAiEcho == true) aiEcho("pulling unit: "+unitID+" back to retreatPosition: "+retreatPosition);
-				}
-			}
+            unitID = aiPlanGetUnitByIndex(planID, i);
+            if (unitID != -1)
+            aiTaskUnitMove(unitID, retreatPosition);
 		}
-        else
-        {
-            flipFlop = 0;
-            if (numUnitsInPlan > max)
-			min = numUnitsInPlan - max;
-            for (i = numUnitsInPlan - 1; >= min)
-            {
-                unitID = aiPlanGetUnitByIndex(planID, i);
-                if (unitID != -1)
-                {
-                    aiTaskUnitMove(unitID, retreatPosition);
-                    if (ShowAiEcho == true) aiEcho("pulling unit: "+unitID+" back to retreatPosition: "+retreatPosition);
-				}
-			}
-		}
-		
 	}
 }
 
 //==============================================================================
 void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVector)
 {
-    if (ShowAiEcho == true) aiEcho("keepUnitsWithinRange:");    
-	
     int numUnitsInPlan = aiPlanGetNumberUnits(planID, cUnitTypeUnit);
     if (numUnitsInPlan > 0)
     {
-        
-        if (ShowAiEcho == true) aiEcho("planID: "+planID);
         //Limited the maximum number of loops
-        int min = 0;
         int max = 16;
-        if (cMyCulture == cCultureAtlantean)
-		max = 9;
         
         float engageRange = aiPlanGetVariableFloat(planID, cDefendPlanEngageRange, 0);
-        if (ShowAiEcho == true) aiEcho("engageRange: "+engageRange);
         if (engageRange < 35.0)
 		engageRange = 25.0;
-        if (ShowAiEcho == true) aiEcho("modified engageRange: "+engageRange);
         
         int unitID = -1;
         int actionType = -1;
@@ -1235,115 +1034,55 @@ void keepUnitsWithinRange(int planID = -1, vector retreatPosition = cInvalidVect
         float multiplier = 0.0;
         vector directionalVector = cInvalidVector;
         vector desiredPosition = cInvalidVector;
-        
-        static int flipFlop = 0;
-        if (flipFlop == 0)
-        {
-            flipFlop = 1;
-            if (numUnitsInPlan > max)
-			numUnitsInPlan = max;
-            for (i = 0; < numUnitsInPlan)
-            {
-                unitID = aiPlanGetUnitByIndex(planID, i);
-                if (unitID == -1)
-				continue;
-                
-                if (kbUnitIsType(unitID, cUnitTypeAbstractTitan) == true)
-				continue;
-                
-                actionType = kbUnitGetActionType(unitID);
-                if ((actionType != cActionHandAttack) && (actionType != cActionRangedAttack) && (actionType != cActionLightningAttack))
-				continue;
-                
-                unitPosition = kbUnitGetPosition(unitID);
-                if (ShowAiEcho == true) aiEcho("unitPosition: "+unitPosition);
-                distance = xsVectorLength(unitPosition - retreatPosition);
-                if (ShowAiEcho == true) aiEcho("distance: "+distance);
-                
-                modifier = -1.0;
-                if (kbUnitIsType(unitID, cUnitTypeAbstractArcher) == true)
-				modifier = -8.0;
-                else if (kbUnitIsType(unitID, cUnitTypeThrowingAxeman) == true)
-				modifier = -5.0;
-                
-                if (distance < engageRange + modifier)
-				continue;
-                
-                minDistance = 5.0 + distance - engageRange;
-                if (minDistance < 10.0)
-				minDistance = 10.0;
-                multiplier = minDistance / distance;
-                if (ShowAiEcho == true) aiEcho("multiplier: "+multiplier);
-                directionalVector = unitPosition - retreatPosition;
-                if (ShowAiEcho == true) aiEcho("directionalVector: "+directionalVector);
-                desiredPosition = unitPosition - directionalVector * multiplier;
-                if (ShowAiEcho == true) aiEcho("desiredPosition: "+desiredPosition);
-                aiTaskUnitMove(unitID, desiredPosition);
-                if (ShowAiEcho == true) aiEcho("sending unit: "+unitID+" back to position: "+desiredPosition);
-			}
+		if (numUnitsInPlan > max)
+		numUnitsInPlan = max;
+		for (i = 0; < numUnitsInPlan)
+		{
+			unitID = aiPlanGetUnitByIndex(planID, i);
+			if (unitID == -1)
+			continue;
+			
+			if (kbUnitIsType(unitID, cUnitTypeAbstractTitan) == true)
+			continue;
+			
+			actionType = kbUnitGetActionType(unitID);
+			if ((actionType != cActionHandAttack) && (actionType != cActionRangedAttack) && (actionType != cActionLightningAttack))
+			continue;
+			
+			unitPosition = kbUnitGetPosition(unitID);
+			distance = xsVectorLength(unitPosition - retreatPosition);
+			
+			modifier = -1.0;
+			if (kbUnitIsType(unitID, cUnitTypeAbstractArcher) == true)
+			modifier = -8.0;
+			else if (kbUnitIsType(unitID, cUnitTypeThrowingAxeman) == true)
+			modifier = -5.0;
+			
+			if (distance < engageRange + modifier)
+			continue;
+			
+			minDistance = 5.0 + distance - engageRange;
+			if (minDistance < 10.0)
+			minDistance = 10.0;
+			multiplier = minDistance / distance;
+			directionalVector = unitPosition - retreatPosition;
+			desiredPosition = unitPosition - directionalVector * multiplier;
+			aiTaskUnitMove(unitID, desiredPosition);
 		}
-        else
-        {
-            flipFlop = 0;
-            if (numUnitsInPlan > max)
-			min = numUnitsInPlan - max;
-            for (i = numUnitsInPlan - 1; >= min)
-            {
-                unitID = aiPlanGetUnitByIndex(planID, i);
-                if (unitID == -1)
-				continue;
-                
-                if (kbUnitIsType(unitID, cUnitTypeAbstractTitan) == true)
-				continue;
-                
-                actionType = kbUnitGetActionType(unitID);
-                if ((actionType != cActionHandAttack) && (actionType != cActionRangedAttack) && (actionType != cActionLightningAttack))
-				continue;
-                
-                unitPosition = kbUnitGetPosition(unitID);
-                if (ShowAiEcho == true) aiEcho("unitPosition: "+unitPosition);
-                distance = xsVectorLength(unitPosition - retreatPosition);
-                if (ShowAiEcho == true) aiEcho("distance: "+distance);
-                
-                modifier = -1.0;
-                if (kbUnitIsType(unitID, cUnitTypeAbstractArcher) == true)
-				modifier = -8.0;
-                else if (kbUnitIsType(unitID, cUnitTypeThrowingAxeman) == true)
-				modifier = -5.0;
-                
-                if (distance < engageRange + modifier)
-				continue;
-                
-                minDistance = 5.0 + distance - engageRange;
-                if (minDistance < 10.0)
-				minDistance = 10.0;
-                multiplier = minDistance / distance;
-                if (ShowAiEcho == true) aiEcho("multiplier: "+multiplier);
-                directionalVector = unitPosition - retreatPosition;
-                if (ShowAiEcho == true) aiEcho("directionalVector: "+directionalVector);
-                desiredPosition = unitPosition - directionalVector * multiplier;
-                if (ShowAiEcho == true) aiEcho("desiredPosition: "+desiredPosition);
-                aiTaskUnitMove(unitID, desiredPosition);
-                if (ShowAiEcho == true) aiEcho("sending unit: "+unitID+" back to position: "+desiredPosition);
-			}
-		}
-        
 	}
 }
 //==============================================================================
 vector calcMonumentPos(int which=-1)
 {
-    if (ShowAiEcho == true) aiEcho("calcMonumentPos:");
-	
     vector basePos=kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID));
     vector towardCenter=kbGetMapCenter()-basePos;
     vector pos=cInvalidVector;
-    float q=_atan2(xsVectorGetZ(towardCenter), xsVectorGetX(towardCenter)) - 2.0*PI/5.0;
+    float q=xsAtan2(xsVectorGetZ(towardCenter), xsVectorGetX(towardCenter)) - 2.0*PI/5.0;
     float whichfloat=which;
     q = q + whichfloat*2.0*PI/5.0;
 	
-    float c = _cos(q);
-    float s = _sin(q);
+    float c = xsCos(q);
+    float s = xsSin(q);
     float x = c * 22.0;
     float z = s * 22.0;
     pos = xsVectorSetX(pos, x);
@@ -1354,321 +1093,124 @@ vector calcMonumentPos(int which=-1)
 //==============================================================================
 bool AgingUp() 
 {
-    if (kbGetTechStatus(gAge2MinorGod) == cTechStatusResearching)
-	return(true);
-    if (kbGetTechStatus(gAge3MinorGod) == cTechStatusResearching)
-	return(true);
-    if (kbGetTechStatus(gAge4MinorGod) == cTechStatusResearching)
-	return(true);
-    if (kbGetTechStatus(cTechSecretsoftheTitans) == cTechStatusResearching)
+    if ((kbGetAge() == cAge1) && (kbGetTechStatus(gAge2MinorGod) == cTechStatusResearching) && (kbGetTechPercentComplete(gAge2MinorGod) > 0.0) 
+	|| (kbGetAge() == cAge2) && (kbGetTechStatus(gAge3MinorGod) == cTechStatusResearching) && (kbGetTechPercentComplete(gAge3MinorGod) > 0.0)
+	|| (kbGetAge() == cAge3) && (kbGetTechStatus(gAge4MinorGod) == cTechStatusResearching) && (kbGetTechPercentComplete(gAge4MinorGod) > 0.0)
+	|| (kbGetAge() == cAge4) && (kbGetTechStatus(cTechSecretsoftheTitans) == cTechStatusResearching) && (kbGetTechPercentComplete(cTechSecretsoftheTitans) > 0.0))
 	return(true);			
     return(false);
 }
 bool ShouldIAgeUp()
 {
-	bool YesOrNo = false;
-	if ((kbGetAge() > cAge3) || (kbGetAge() == cAge1) || (AgingUp() == true))
-	return(YesOrNo);
-	
+	if ((kbGetAge() > cAge3) || (kbGetAge() == cAge1) || (AgingUp()))
+	return(false);
+	if ((kbGetAge() == cAge2) && (xsGetTime() > 14*60*1000))
+	return(true);
+
 	for (i=0; < cNumberPlayers)
 	{
 		if ((i == cMyID) || (kbIsPlayerAlly(i) == true))
 		continue;
 		if (kbGetAgeForPlayer(i) > kbGetAge())
-		{
-			YesOrNo = true;
-			break;
+		return(true);
+	}
+	return(false);
+}
+bool TrainPlanExists(int puid = -1, int baseID = -1)
+{
+	if ((puid == -1) || (baseID == -1))
+	return(false);
+    int activeTrainPlans = aiPlanGetNumber(cPlanTrain, -1, true);
+    if (activeTrainPlans > 0)
+    {
+        for (i = 0; < activeTrainPlans)
+        {
+            int trainPlanIndexID = aiPlanGetIDByIndex(cPlanTrain, -1, true, i);
+            if ((puid == aiPlanGetVariableInt(trainPlanIndexID, cTrainPlanUnitType, 0)) && (aiPlanGetBaseID(trainPlanIndexID) == baseID))
+            {
+		        //aiEcho("Skipping train plan.. plan already exist for training unit:  "+kbGetProtoUnitName(puid));
+                return(true);
+			}
 		}
 	}
-	return(YesOrNo);
+	return(false);
 }
 //==============================================================================
-void taskMilUnitTrainAtBase(int baseID = -1)
+void taskMilUnitTrainAtBase(int baseID = -1, int amount = 1, int ignoreUnit1 = -1, int ignoreUnit2 = -1, int sdtTimer = 40)
 {
-    if (ShowAiEcho == true) aiEcho("taskMilUnitTrainAtBase: "+baseID);
-	
     if (baseID == -1)
-    {
-        if (ShowAiEcho == true) aiEcho("no baseID specified, returning");
-        return;
-	}
-    
-    float foodSupply = kbResourceGet(cResourceFood);
-    float woodSupply = kbResourceGet(cResourceWood);
-    float goldSupply = kbResourceGet(cResourceGold);
-    if ((foodSupply < 150) || (woodSupply < 150) || (goldSupply < 150))
-	return;
-	
+    return;
+
+    bool CanAfford = false;
     vector baseLocation = kbBaseGetLocation(cMyID, baseID);
-	
-    int building1ID = cUnitTypeBarracks;
-    if (cMyCulture == cCultureGreek)
-	building1ID = cUnitTypeStable;
-    else if (cMyCulture == cCultureNorse)
-	building1ID = cUnitTypeLonghouse;
-    else if (cMyCulture == cCultureAtlantean)
-	building1ID = cUnitTypeBarracksAtlantean;
-    else if (cMyCulture == cCultureChinese)
-	building1ID = cUnitTypeBarracksChinese;		
-	
-    int bigBuildingID = MyFortress;		
-    
-    int building1NearBase = getNumUnits(building1ID, cUnitStateAlive, -1, cMyID, baseLocation, 30.0);
-    int bigBuildingNearBase = getNumUnits(bigBuildingID, cUnitStateAlive, -1, cMyID, baseLocation, 30.0);
-    
-    bool militaryBuilding1Available = false;
-    bool bigBuildingAvailable = false;
-    
-    if (building1NearBase > 0)
-    {
-        int militaryBuilding1ID = findUnitByIndex(building1ID, 0, cUnitStateAlive, -1, cMyID, baseLocation, 30.0);
-        if (militaryBuilding1ID > 0)
-		militaryBuilding1Available = true;
-	}
-	
-    if (bigBuildingNearBase > 0)
-    {
-        int bigBuilding1ID = findUnitByIndex(bigBuildingID, 0, cUnitStateAlive, -1, cMyID, baseLocation, 30.0);
-        if (bigBuilding1ID > 0)
-		bigBuildingAvailable = true;
-	}
-    
-    int buildingToUse = -1;
-    bool override = false;
-    int hero1ID = -1;
-    int hero2ID = -1;
-    int settlementIDNearBase = findUnitByIndex(cUnitTypeAbstractSettlement, 0, cUnitStateAlive, -1, cMyID, baseLocation, 15.0);
-    if (ShowAiEcho == true) aiEcho("settlementIDNearBase: "+settlementIDNearBase);
-    if ((settlementIDNearBase != -1) && (cMyCulture == cCultureGreek))
-    {
-        if (cMyCiv == cCivZeus)
-        {
-            hero1ID = cUnitTypeHeroGreekJason;
-            hero2ID = cUnitTypeHeroGreekOdysseus;
-		}
-        else if (cMyCiv == cCivPoseidon)
-        {
-            hero1ID = cUnitTypeHeroGreekTheseus;
-            hero2ID = cUnitTypeHeroGreekHippolyta;
-		}
-        else if (cMyCiv == cCivHades)
-        {
-            hero1ID = cUnitTypeHeroGreekAjax;
-            hero2ID = cUnitTypeHeroGreekChiron;
-		}
-        int numHero1 = kbUnitCount(cMyID, hero1ID, cUnitStateAliveOrBuilding);
-        int numHero2 = kbUnitCount(cMyID, hero2ID, cUnitStateAliveOrBuilding);
-	}
-    
-    if ((militaryBuilding1Available == false) && (bigBuildingAvailable == false))
-    {
-        if ((settlementIDNearBase != -1) && (cMyCulture != cCultureAtlantean))
-        {
-            override = true;
-            if (ShowAiEcho == true) aiEcho("setting override = true");
-		}
-        else
-        {
-            if (ShowAiEcho == true) aiEcho("No building available, returning");
-            return;
-		}
-	}
-    else if ((militaryBuilding1Available == true) && (bigBuildingAvailable == true))
-    {
-        int randomBuilding = aiRandInt(4);
-        if (((cMyCulture == cCultureNorse) && (randomBuilding < 2))
-		|| ((cMyCulture != cCultureNorse) && (randomBuilding < 3) && (kbGetAge() < cAge4))
-		|| ((cMyCulture != cCultureNorse) && (randomBuilding < 2) && (kbGetAge() >= cAge4)))
-        {
-            buildingToUse = militaryBuilding1ID;
-		}
-        else
-        {
-            buildingToUse = bigBuilding1ID;
-		}
-	}
-    else if (militaryBuilding1Available == true)
-    {
-        buildingToUse = militaryBuilding1ID;
-	}
-    else if (bigBuildingAvailable == true)
-    {
-        if ((settlementIDNearBase != -1) && (cMyCulture == cCultureGreek))
-        {
-            if ((numHero1 < 1) || (numHero2 < 1))
-            {
-                override = true;
-                if (ShowAiEcho == true) aiEcho("setting override = true");
+	int buildingToUse = -1;
+	int bProto = -1;
+	int puid = -1;
+	int upID = gLateUPID;
+	if (kbGetAge() < cAge3)
+	upID = gRushUPID;		
+
+	for (i = 0; < kbUnitPickGetDesiredNumberUnitTypes(upID))
+	{
+        bProto = kbTechTreeGetUnitIDByTrain(kbUnitPickGetResult(upID, i), cMyCiv);
+		int buildingsThere = getNumUnits(bProto, cUnitStateAlive, -1, cMyID, baseLocation, 25.0);
+		if ((cMyCulture == cCultureNorse) && (bProto == cUnitTypeUlfsark) && (buildingsThere < 0))
+		buildingsThere = getNumUnits(cUnitTypeLonghouse, cUnitStateAlive, -1, cMyID, baseLocation, 25.0);	
+	    if (buildingsThere > 0)
+	    {
+	        if (TrainPlanExists(kbUnitPickGetResult(upID, i), baseID) == false)
+			{
+	            buildingToUse = findUnitByIndex(kbTechTreeGetUnitIDByTrain(kbUnitPickGetResult(upID, i), cMyCiv), 0, cUnitStateAlive, -1, cMyID, baseLocation, 30.0);
+			    puid = kbUnitPickGetResult(upID, i);
+		        break;
 			}
 		}
-        
-        if (override == false)
-		buildingToUse = bigBuilding1ID;
 	}
-    else
-    {
-        //shouldn't happen anyway
-        if (ShowAiEcho == true) aiEcho("strange, no building available, returning");
-        return;
-		}
-    
-    int puid = -1;
 	
-    if (override == true)
-    {
-        if (cMyCulture == cCultureEgyptian)
-        {
-            puid = cUnitTypePriest;
-		}
-        else if (cMyCulture == cCultureGreek)
-        {
-            if (numHero1 < 1)
-            {
-                puid = hero1ID;
-			}
-            else
-            {
-                if (numHero2 < 1)
-                {
-                    puid = hero2ID;
+	if (buildingToUse == -1)
+	{
+		buildingToUse = findUnit(cUnitTypeLogicalTypeBuildingsThatTrainMilitary, cUnitStateAlive, -1, cMyID, baseLocation, 25.0);
+		if (buildingToUse < 0)
+		buildingToUse = findUnit(cUnitTypeSettlementsThatTrainVillagers, cUnitStateAlive, -1, cMyID, baseLocation, 25.0);
+	    bProto = kbGetUnitBaseTypeID(buildingToUse);
+		if (buildingToUse > 0)
+		{
+	        int UnitType = cUnitTypeHumanSoldier;
+			if (kbProtoUnitIsUnitType(bProto, cUnitTypeTemple))
+			UnitType = cUnitTypeMythUnit;
+			for (l = 0; < 14)
+			{
+				int RandUnit = kbGetRandomEnabledPUID(UnitType, cMilitaryEscrowID);
+				int RandBuildID = kbTechTreeGetUnitIDByTrain(RandUnit, cMyCiv);
+				if ((kbProtoUnitIsUnitType(RandUnit, ignoreUnit1)) || (kbProtoUnitIsUnitType(RandUnit, ignoreUnit2)) || (kbProtoUnitIsUnitType(RandUnit, cUnitTypeKhopesh)) 
+				|| (kbProtoUnitIsUnitType(RandUnit, cUnitTypePhysician)) || (kbProtoUnitIsUnitType(RandUnit, cUnitTypeRoc)) || (kbProtoUnitIsUnitType(RandUnit, cUnitTypeFlyingMedic)) 
+			    || (cMyCulture == cCultureEgyptian) && (kbProtoUnitIsUnitType(RandBuildID, cUnitTypeAbstractSettlement)) && (RandUnit != cUnitTypePriest) 
+				|| (kbProtoUnitIsUnitType(RandUnit, cUnitTypePegasus)))
+			    continue;
+			    if ((RandBuildID == bProto) && (TrainPlanExists(RandUnit, baseID) == false))
+				{
+					puid = RandUnit;
+					break;
 				}
 			}
 		}
-        else if (cMyCulture == cCultureNorse)
-        {
-            puid = cUnitTypeUlfsark;
-		}
-        else if (cMyCulture == cCultureChinese)
-        {
-            puid = cUnitTypeHeroChineseImmortal;
-		}		
-        
-        buildingToUse = settlementIDNearBase;
 	}
-    
-    int randomUnit = aiRandInt(4);
-    
-    if (buildingToUse == militaryBuilding1ID)
-    {
-        if (cMyCulture == cCultureGreek)
-        {
-            puid = cUnitTypeHippikon;
-		}
-        else if (cMyCulture == cCultureEgyptian)
-        {
-            puid = cUnitTypeSpearman;
-		}
-        else if (cMyCulture == cCultureNorse)
-        {
-            if (randomUnit < 2)
-			puid = cUnitTypeThrowingAxeman;
-            else
-			puid = cUnitTypeRaidingCavalry;
-		}
-        else if (cMyCulture == cCultureAtlantean)
-        {
-            puid = cUnitTypeSwordsman;
-		}
-        else if (cMyCulture == cCultureChinese)
-        {
-            if (randomUnit < 2)
-			puid = cUnitTypeHalberdier;
-            else
-			puid = cUnitTypeChuKoNu;
-		}		
-	}
-    else if (buildingToUse == bigBuilding1ID)
-    {
-        if (cMyCulture == cCultureGreek)
-        {
-            if (kbGetAge() > cAge3)
-            {
-                if (cMyCiv == cCivZeus)
-				puid = cUnitTypeMyrmidon;
-                else if (cMyCiv == cCivHades)
-				puid = cUnitTypeCrossbowman;
-                else if (cMyCiv == cCivPoseidon)
-				puid = cUnitTypeHetairoi;
-			}
-            else
-            {
-                puid = cUnitTypePetrobolos;
-			}
-		}
-        else if (cMyCulture == cCultureEgyptian)
-        {
-            if (randomUnit > 1)
-            {
-                puid = cUnitTypeChariotArcher;
-			}
-            else
-            {
-                puid = cUnitTypeCamelry;
-			}
-		}
-        else if (cMyCulture == cCultureNorse)
-        {
-            if (randomUnit > 1)
-            {
-                puid = cUnitTypeJarl;
-			}
-            else
-            {
-                puid = cUnitTypeHuskarl;
-			}
-		}
-        else if (cMyCulture == cCultureAtlantean)
-        {
-            if ((kbGetAge() > cAge3) && (randomUnit > 0))
-            {
-                puid = cUnitTypeRoyalGuard;
-			}
-            else
-            {
-                puid = cUnitTypeTridentSoldier;
-			}
-		}
-        else if (cMyCulture == cCultureChinese)
-        {
-            if ((kbGetAge() > cAge3) && (randomUnit > 0))
-            {
-                puid = cUnitTypeWarChariot;
-			}
-            else
-            {
-                puid = cUnitTypeFireLance;
-			}
-		}		
-	}
-    else
-    {
-        if (override == false)
-        {
-            //shouldn't happen anyway
-            if (ShowAiEcho == true) aiEcho("strange building ID: "+buildingToUse+", returning");
-            return;
-		}
-	}
-    
-    if ((puid == -1) || (kbCanAffordUnit(puid, cMilitaryEscrowID) == false) && (ShouldIAgeUp() = true))
-    {
-        if (ShowAiEcho == true) aiEcho("puid == -1, returning");
-        return;
-	}
-    
-    int numUnitsBeingTrainedNearBase = getNumUnits(puid, cUnitStateBuilding, -1, cMyID, baseLocation, 30.0);
-    if (numUnitsBeingTrainedNearBase < 1)
-    {
-        //train a unit via aiTaskUnitTrain
-        aiTaskUnitTrain(buildingToUse, puid);
-        if (ShowAiEcho == true) aiEcho("Trying to train a unit with puid: "+puid+" at building with ID: "+buildingToUse);
-	}
-    else
-    {
-        if (ShowAiEcho == true) aiEcho("a unit with puid: "+puid+" is already being trained near baseID: "+baseID);
-	}
-}
  
+	if ((kbCanAffordUnit(puid, cRootEscrowID) == true) || (kbCanAffordUnit(puid, cMilitaryEscrowID) == true))
+	CanAfford = true;
+
+    if ((puid == -1) || (buildingToUse == -1) || (CanAfford == false))
+    return;
+    //aiEcho(" Made trainPlan for unit: "+kbGetProtoUnitName(puid));
+    int planID = createSimpleTrainPlan(puid, amount, false, baseID);
+	int Attackplan = aiPlanGetIDByIndex(cPlanAttack, -1, true, 0);
+    if (Attackplan != -1)
+    aiPlanSetVariableInt(planID, cTrainPlanIntoPlanID, 0, Attackplan);
+    aiPlanSetVariableInt(planID, cTrainPlanFrequency, 0, 1); 
+	aiPlanSetDesiredPriority(planID, 100);
+	addSDT(planID, sdtTimer);
+}
+
 // borrowed from "Notonecta" ):
 //==============================================================================
 int findPlanByString(string autoName = "BUG", int iPlanType = -1, int iState = -1, bool ActiveOnly = true, bool ReturnNumbers = false) 
@@ -1696,8 +1238,20 @@ int findPlanByString(string autoName = "BUG", int iPlanType = -1, int iState = -
 	}
     return(iPlanID);
 }
+
+bool uOV(int UnitID = -1)
+{
+	if (UnitID < 0)
+	return(false);
+    int Owner = kbUnitGetOwner(UnitID);
+    if ((kbIsPlayerResigned(Owner) == false) && (kbHasPlayerLost(Owner) == false))
+    return(true);
+    else
+	return(false); 
+}
+
 //------------------------------------------------------------------------
-int findClosestUnitTypeByLoc(int Relevance = cPlayerRelationEnemy, int UnitType = -1, vector loc = cInvalidVector, int radius = -1, bool seeable = true) 
+int findClosestUnitTypeByLoc(int Relevance = cPlayerRelationEnemy, int UnitType = -1, int Status = cUnitStateAliveOrBuilding, vector loc = cInvalidVector, int radius = -1, bool seeable = true, bool sameArea = false) 
 {
     static int findTargets = -1;
     if (findTargets < 0) 
@@ -1706,22 +1260,31 @@ int findClosestUnitTypeByLoc(int Relevance = cPlayerRelationEnemy, int UnitType 
         if (findTargets < 0)
 		return(-1);
 	}
+	kbUnitQuerySetAreaGroupID(findTargets, -1);
     kbUnitQuerySetPlayerRelation(findTargets, Relevance);
 	kbUnitQuerySetSeeableOnly(findTargets, seeable);
 	kbUnitQuerySetAscendingSort(findTargets, true);
     kbUnitQuerySetUnitType(findTargets, UnitType);
-    kbUnitQuerySetState(findTargets, cUnitStateAlive);
+    kbUnitQuerySetState(findTargets, Status);
 	kbUnitQuerySetMaximumDistance(findTargets, radius);
 	kbUnitQuerySetPosition(findTargets, loc);
+	if (sameArea == true)
+    kbUnitQuerySetAreaGroupID(findTargets, kbAreaGroupGetIDByPosition(loc));	
     kbUnitQueryResetResults(findTargets);
-
+    int Result = -1;
     int Run = kbUnitQueryExecute(findTargets);
-    int CurrentCandidate = kbUnitQueryGetResult(findTargets, 0);
-    return(CurrentCandidate);
+	for (i=0; < Run)
+	{
+        int CurrentCandidate = kbUnitQueryGetResult(findTargets, i);
+		if (uOV(CurrentCandidate) == true)
+		{
+	        Result = CurrentCandidate;
+			break;
+		}
+	}
+    return(Result);
 }
 // Thank you, "Artifical Zoo"!. .I hope you don't mind me using your stuff. :)
-
-
 
 //==============================================================================
 vector GetMilGatherOrBase (bool Mil = true)
@@ -1773,7 +1336,7 @@ vector GetMilGatherOrBase (bool Mil = true)
 }
 
 //==============================================================================
-int createDefOrAttackPlan(string Name = "INVALID", bool DefendPlan = true, int EngageRange = -1, int GatherRange = -1, vector Location = cInvalidVector, int BaseID = -1, int Prio = -1, bool Activated = true)
+int createDefOrAttackPlan(string Name = "INVALID", bool DefendPlan = true, int EngageRange = 50, int GatherRange = 30, vector Location = cInvalidVector, int BaseID = -1, int Prio = 50, bool Activated = true)
 {
 	int PlanID = -1;
 	if (DefendPlan == true)
@@ -1784,19 +1347,14 @@ int createDefOrAttackPlan(string Name = "INVALID", bool DefendPlan = true, int E
 			if (equal(Location, cInvalidVector) == false)
 			aiPlanSetVariableVector(PlanID, cDefendPlanDefendPoint, 0, Location);
 			
-			if (EngageRange != -1)
 			aiPlanSetVariableFloat(PlanID, cDefendPlanEngageRange, 0, EngageRange);
-			if (GatherRange != -1)
 			aiPlanSetVariableFloat(PlanID, cDefendPlanGatherDistance, 0, GatherRange);
 			aiPlanSetVariableInt(PlanID, cDefendPlanRefreshFrequency, 0, 5);
 			aiPlanSetUnitStance(PlanID, cUnitStanceDefensive);
 			aiPlanSetVariableBool(PlanID, cDefendPlanPatrol, 0, false);
-			
-			aiPlanSetNumberVariableValues(PlanID, cDefendPlanAttackTypeID, 3, true);
-			aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 0, cUnitTypeAbstractVillager);
-			aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 1, cUnitTypeUnit);
-			aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 2, cUnitTypeBuilding);
-			if (Prio != -1)
+            aiPlanSetNumberVariableValues(PlanID, cDefendPlanAttackTypeID, 2, true);
+            aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 0, cUnitTypeUnit);
+            aiPlanSetVariableInt(PlanID, cDefendPlanAttackTypeID, 1, cUnitTypeBuilding);
 			aiPlanSetDesiredPriority(PlanID, Prio);
 			
 			if (BaseID != -1)
@@ -1813,9 +1371,8 @@ int createDefOrAttackPlan(string Name = "INVALID", bool DefendPlan = true, int E
 		{
 			aiPlanSetVariableVector(PlanID, cAttackPlanGatherPoint, 0, GetMilGatherOrBase(true));
 			aiPlanSetInitialPosition(PlanID, GetMilGatherOrBase(false));
-			if (GatherRange != -1)
 			aiPlanSetVariableFloat(PlanID, cAttackPlanGatherDistance, 0, GatherRange);
-			aiPlanSetVariableInt(PlanID, cAttackPlanRefreshFrequency, 0, 10); 
+			aiPlanSetVariableInt(PlanID, cAttackPlanRefreshFrequency, 0, 5); 
 			aiPlanSetUnitStance(PlanID, cUnitStanceDefensive);
 			aiPlanSetAllowUnderAttackResponse(PlanID, true);
 			
@@ -1828,12 +1385,22 @@ int createDefOrAttackPlan(string Name = "INVALID", bool DefendPlan = true, int E
             else
 	        aiPlanSetVariableBool(PlanID, cAttackPlanAutoUseGPs, 0, true);			
 			
-			aiPlanSetNumberVariableValues(PlanID, cAttackPlanTargetTypeID, 3, true);
-			aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 0, cUnitTypeAbstractVillager);
-            aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
-            aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuilding);
-			if (Prio != -1)
+			aiPlanSetNumberVariableValues(PlanID, cAttackPlanTargetTypeID, 7, true);
+			aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 0, cUnitTypeLogicalTypeIdleCivilian);
+			aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 1, cUnitTypeUnit);
+			aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 2, cUnitTypeBuildingsThatShoot);
+		    aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 3, cUnitTypeMilitaryBuilding);
+            aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 4, cUnitTypeLogicalTypeBuildingsNotWalls);
+			aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 5, cUnitTypeGate);
+			aiPlanSetVariableInt(PlanID, cAttackPlanTargetTypeID, 6, cUnitTypeAbstractWall);
 			aiPlanSetDesiredPriority(PlanID, Prio);
+			//Ban these units
+			aiPlanAddUnitType(PlanID, cUnitTypePhysician, 0, 0, 0);
+			aiPlanAddUnitType(PlanID, cUnitTypeFlyingMedic, 0, 0, 0);
+			aiPlanAddUnitType(PlanID, cUnitTypeOracleHero, 0, 0, 0);
+			aiPlanAddUnitType(PlanID, cUnitTypeOracleScout, 0, 0, 0);
+			if (gTransportMap == true)
+			aiPlanAddUnitType(PlanID, cUnitTypeRoc, 0, 0, 0);
 			
 			if (BaseID != -1)
 			aiPlanSetBaseID(PlanID, BaseID);		
@@ -1862,7 +1429,7 @@ int createSimpleResearchPlan(int techID=-1, int buildingType=-1, int escrowID=cR
 	
 	if ((IsTechActive(techID) == true) || (kbGetTechStatus(techID) < cTechStatusAvailable) || (aiPlanGetIDByTypeAndVariableType(cPlanProgression, cProgressionPlanGoalTechID, techID, true) >= 0) && (Override == false))
 	{
-		if (ShowAiEcho == true) aiEcho("Failed to create a simple research plan for ''"+ReadableTech+"'', already active, not available or researching?");
+		if (ShowAIDebug == true) aiEcho("Failed to create a simple research plan for ''"+ReadableTech+"'', already active, not available or researching?");
 		return(-1);
 	}
 	int planID = -1;
@@ -1872,7 +1439,7 @@ int createSimpleResearchPlan(int techID=-1, int buildingType=-1, int escrowID=cR
 	planID=aiPlanCreate("Research "+kbGetTechName(techID), cPlanResearch);
 	if (planID < 0)
 	{
-		if (ShowAiEcho == true) aiEcho("Failed to create simple research plan for "+techID);
+		if (ShowAIDebug == true) aiEcho("Failed to create simple research plan for "+techID);
 	}	
 	else
 	{
@@ -1900,61 +1467,73 @@ int createSimpleResearchPlan(int techID=-1, int buildingType=-1, int escrowID=cR
 		Escrow = "EcoEscrow";
 		else if (escrowID == 2)
 		Escrow = "MilEscrow";	   
-		if (ShowAiEcho == true) aiEcho("Created a simple "+ReadablePlan+" plan for ''"+ReadableTech+"'', which is taxed on our "+Escrow+" and given a priority of "+pri+".");
+		if (ShowAIDebug == true) aiEcho("Created a simple "+ReadablePlan+" plan for ''"+ReadableTech+"'', which is taxed on our "+Escrow+" and given a priority of "+pri+".");
 	}
 	return(planID);
 }
-
 //==============================================================================
 int AvailableUnitsFromDefPlans(int NumberFound=0)
 {
-	int numMilUnitsIngDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeUnit);
-	int numMilUnitsInMBDefPlan1 = aiPlanGetNumberUnits(gMBDefPlan1ID, cUnitTypeUnit);
-    int numMilUnitsInBaseUnderAttackDefPlan = aiPlanGetNumberUnits(gBaseUnderAttackDefPlanID, cUnitTypeUnit) * 0.4;
-    int numMilUnitsInSettlementPosDefPlan = aiPlanGetNumberUnits(gSettlementPosDefPlanID, cUnitTypeUnit) * 0.4;
-    int numMilUnitsInOB1DefPlan = aiPlanGetNumberUnits(gOtherBase1DefPlanID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInOB2DefPlan = aiPlanGetNumberUnits(gOtherBase2DefPlanID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInOB3DefPlan = aiPlanGetNumberUnits(gOtherBase3DefPlanID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInOB4DefPlan = aiPlanGetNumberUnits(gOtherBase4DefPlanID, cUnitTypeLogicalTypeLandMilitary);
-    int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + numMilUnitsInMBDefPlan1 + numMilUnitsInBaseUnderAttackDefPlan + numMilUnitsInSettlementPosDefPlan 
-	+ numMilUnitsInOB1DefPlan + numMilUnitsInOB2DefPlan + numMilUnitsInOB3DefPlan + numMilUnitsInOB4DefPlan;
-	if (ShowAiEcho == true) aiEcho("total numMilUnitsInDefPlans: "+numMilUnitsInDefPlans);
-	
-	if (numMilUnitsInDefPlans > 0)
+	int numMilUnitsIngDefendPlan = aiPlanGetNumberUnits(gDefendPlanID, cUnitTypeLogicalTypeLandMilitary);
+	int numMilUnitsInMBDefPlan1 = aiPlanGetNumberUnits(gMBDefPlan1ID, cUnitTypeLogicalTypeLandMilitary);
+	int numMilUnitsInBaseUnderAttackDefPlan = aiPlanGetNumberUnits(gBaseUnderAttackDefPlanID, cUnitTypeLogicalTypeLandMilitary) * 0.4;
+	int numMilUnitsInSettlementPosDefPlan = aiPlanGetNumberUnits(gSettlementPosDefPlanID, cUnitTypeLogicalTypeLandMilitary) * 0.4;
+	int numMilUnitsInOB1DefPlan = aiPlanGetNumberUnits(gOtherBase1DefPlanID, cUnitTypeLogicalTypeLandMilitary);
+	int numMilUnitsInOB2DefPlan = aiPlanGetNumberUnits(gOtherBase2DefPlanID, cUnitTypeLogicalTypeLandMilitary);
+	int numMilUnitsInOB3DefPlan = aiPlanGetNumberUnits(gOtherBase3DefPlanID, cUnitTypeLogicalTypeLandMilitary);
+	int numMilUnitsInOB4DefPlan = aiPlanGetNumberUnits(gOtherBase4DefPlanID, cUnitTypeLogicalTypeLandMilitary);
+	int numMilUnitsInDefPlans = numMilUnitsIngDefendPlan + numMilUnitsInMBDefPlan1 + numMilUnitsInBaseUnderAttackDefPlan + numMilUnitsInSettlementPosDefPlan 
+	+ numMilUnitsInOB1DefPlan + numMilUnitsInOB2DefPlan + numMilUnitsInOB3DefPlan + numMilUnitsInOB4DefPlan;	
 	NumberFound = numMilUnitsInDefPlans;
-	
 	return(NumberFound);		
-}
+}	
 
+//==============================================================================
+int MilitaryPopFromDefPlan(int NumberFound=0)
+{
+	if (kbGetPopSlots(cMyID, cUnitTypeHoplite) != 2)
+	NumberFound = AvailableUnitsFromDefPlans() * 3;
+	else	
+	{
+		int MilUnits = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID);
+		float InfPop = 0.5;
+		for (a = 0; < MilUnits)
+		{
+			int cMilUnit = findUnitByIndex(cUnitTypeLogicalTypeLandMilitary, a, cUnitStateAlive, -1, cMyID);
+			int Plan = kbUnitGetPlanID(cMilUnit);
+			if ((Plan == gDefendPlanID) || (Plan == gMBDefPlan1ID) || (Plan == gOtherBase1DefPlanID) 
+			|| (Plan == gOtherBase2DefPlanID) || (Plan == gOtherBase3DefPlanID) || (Plan == gOtherBase4DefPlanID))
+			InfPop = InfPop + kbGetPopSlots(cMyID, kbGetUnitBaseTypeID(cMilUnit));
+			else if ((Plan == gBaseUnderAttackDefPlanID) || (Plan == gSettlementPosDefPlanID))
+			InfPop = InfPop + kbGetPopSlots(cMyID, kbGetUnitBaseTypeID(cMilUnit))*0.4;
+		}
+	}
+	if (InfPop > 0.5)
+	NumberFound = InfPop;
+	return(NumberFound);		
+}	
 //==============================================================================
 bool ReadyToAttack() 
 {
-    bool Ready = false;
-	
 	// Try not to be too aggressive if we're lagging behind.
-    if ((xsGetTime() > 15*60*1000) && (kbGetAge() == cAge2) || (kbGetAge() == cAge2) && (ShouldIAgeUp() == true))
-	return(Ready);
+    if ((kbGetAge() == cAge2) && (ShouldIAgeUp() == true))
+	return(false);
 
 	// Standard AI
-	int upID = -1;
-	int targetPop = -1;              
-	
+	int upID = gLateUPID;
 	if (kbGetAge() < cAge3)
 	upID = gRushUPID;
-	else
-	upID = gLateUPID;
-	targetPop = kbUnitPickGetMinimumPop(upID);  
-    int numMilUnitsInDefPlans = AvailableUnitsFromDefPlans();   
-	//
-	if (numMilUnitsInDefPlans*3 >= targetPop)
-	Ready = true;	
-    return(Ready);
+	int targetPop = kbUnitPickGetMinimumPop(upID);  
+    int NumMilPopInDefPlans = MilitaryPopFromDefPlan();   
+	if (NumMilPopInDefPlans >= targetPop)
+	return(true);
+    else
+    return(false);
 }
 
 //==============================================================================
 int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 {
-    if (ShowAiEcho == true) aiEcho("newResourceBase:");
 	int Villagers = kbUnitCount(cMyID, cUnitTypeAbstractVillager, cUnitStateAlive);
     if (cMyCulture == cCultureAtlantean)
     Villagers = Villagers * 2;
@@ -1976,7 +1555,7 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 	
     vector there = kbUnitGetPosition(kbUnitQueryGetResult(resourceQueryID, 0));
 	
-    if ( isOnMyIsland(there) )
+    if (SameAG(there, kbBaseGetLocation(cMyID, kbBaseGetMainID(cMyID))) == true)
     return(-1);
     if (resourceID==cResourceGold)
     {
@@ -1998,13 +1577,13 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
 	startBaseID = kbBaseGetMainID(cMyID);
     vector here=kbBaseGetLocation(cMyID, startBaseID);
     int startAreaID=kbAreaGetIDByPosition(here);
-	int hereID = kbAreaGetIDByPosition(there);
-
+    if ((startAreaID == -1) || (startBaseID == -1))
+	return(-1);	
     int resourceTransportPlan = -1;
     resourceTransportPlan=createTransportPlan("Remote Resource Transport", startAreaID, kbAreaGetIDByPosition(there), false, cUnitTypeTransport, 80, startBaseID);
 	
     int gathererCount = kbUnitCount(cMyID,cUnitTypeAbstractVillager,cUnitStateAlive);
-    int numVills = 0.5 + aiGetResourceGathererPercentage(resourceID, cRGPActual) * gathererCount;
+    int numVills = 0.5 + aiPlanGetVariableFloat(gGatherGoalPlanID, cGatherGoalPlanGathererPct, resourceID) * gathererCount;
 	if (cMyCulture == cCultureAtlantean)
     {
         if (numVills > 3)
@@ -2046,16 +1625,11 @@ int newResourceBase(int oldResourceBase=-1, int resourceID=-1)
     return(newBaseID);
 }
 
-float upAV(float value = 0, int DivideNum = 10)
-{
-    float retVal = value;
-    retVal = retVal / DivideNum;
-    return(retVal);
-}
 bool IsImpossiblePoint(vector TestLocation = cInvalidVector) 
 {
     return((xsVectorGetX(TestLocation) < 0.0) || (xsVectorGetZ(TestLocation) < 0.0));
 }   
+
 int CreateBaseInBackLoc(int BaseID = -1, float Distance = 0, float baseRadius = 25, string Name = "INVALID NAME")
 {
 	vector backVector=kbBaseGetBackVector(cMyID, BaseID);
@@ -2076,19 +1650,356 @@ int CreateBaseInBackLoc(int BaseID = -1, float Distance = 0, float baseRadius = 
 		location = location + backVector;
         int AreaGroupBase = kbAreaGroupGetIDByPosition(kbBaseGetLocation(cMyID, BaseID));
         int AreaGroupNewLoc=kbAreaGroupGetIDByPosition(location);
-        int Trees = getNumUnits(cUnitTypeTree, cUnitStateAny, -1, 0, location, 2);
+        int Trees = getNumUnits(cUnitTypeTree, cUnitStateAny, -1, 0, location, 3);
 	    if ((IsImpossiblePoint(location) == false) && (AreaGroupBase == AreaGroupNewLoc) && (kbCanPath2(position, location, cUnitTypeHoplite) == true) && (Trees <= 0) || (baseRadius == 0))
 		{
 	        Success = true;
 		    break;
 		}
-		NewDistance = NewDistance - 2;
+		NewDistance = NewDistance - 1;
 	}
-    if (Success == false)
+    if ((Success == false) || (NewDistance < 0))
 	return(-1);
 
 	int Base = kbBaseCreate(cMyID, ""+Name, location, baseRadius);
+	kbBaseSetEconomy(cMyID, Base, true);
 	kbBaseSetMaximumResourceDistance(cMyID, Base, baseRadius);
+	kbBaseSetActive(cMyID, Base, true);
 	aiEcho("A New Base was successfully created! *** Name:  "+Name+",  ID:  "+Base+",  Final distance:  "+NewDistance+".");
     return(Base);
+}
+
+// Stolen from BD :)
+int getRandomPlayerByRel(int Relation = -1, int exludePlayer = -1, bool AoModAllyReq = false)
+{
+   int retVal = -1;
+   int matchCount = 0;
+   int matchIndex = -1; 
+   
+   for (matchIndex = 1; < cNumberPlayers)
+   {
+      if ((AoModAllyReq == false) && (Relation == cPlayerRelationAlly) && (kbIsPlayerAlly(matchIndex) == true) && (kbHasPlayerLost(matchIndex) == false) && (matchIndex != cMyID) && (matchIndex != exludePlayer))
+      matchCount = matchCount + 1;
+      if ((AoModAllyReq == true) && (aiPlanGetUserVariableInt(gSomeData, PlayersData+matchIndex, 0) == 1) && (Relation == cPlayerRelationAlly) 
+	  && (kbIsPlayerAlly(matchIndex) == true) && (kbHasPlayerLost(matchIndex) == false) && (matchIndex != cMyID) && (matchIndex != exludePlayer))
+      matchCount = matchCount + 1;   
+      if ((Relation == cPlayerRelationEnemy) && (kbIsPlayerEnemy(matchIndex) == true) && (kbHasPlayerLost(matchIndex) == false) && (matchIndex != 0) && (matchIndex != exludePlayer))
+      matchCount = matchCount + 1;
+   }
+   if (matchCount < 1)
+   return(-1);
+  
+   int playerToGet = aiRandInt(matchCount) + 1;
+   matchCount = 0;
+   for (matchIndex = 1; < cNumberPlayers)
+   {
+      if ((AoModAllyReq == false) && (Relation == cPlayerRelationAlly) && (kbIsPlayerAlly(matchIndex) == true) && (kbHasPlayerLost(matchIndex) == false) && (matchIndex != cMyID) && (matchIndex != exludePlayer))
+      matchCount = matchCount + 1;
+      if ((AoModAllyReq == true) && (aiPlanGetUserVariableInt(gSomeData, PlayersData+matchIndex, 0) == 1) && (Relation == cPlayerRelationAlly) 
+	  && (kbIsPlayerAlly(matchIndex) == true) && (kbHasPlayerLost(matchIndex) == false) && (matchIndex != cMyID) && (matchIndex != exludePlayer))
+      matchCount = matchCount + 1;   
+      if ((Relation == cPlayerRelationEnemy) && (kbIsPlayerEnemy(matchIndex) == true) && (kbHasPlayerLost(matchIndex) == false) && (matchIndex != 0) && (matchIndex != exludePlayer))
+      matchCount = matchCount + 1;
+      if (matchCount == playerToGet)
+      {
+         retVal = matchIndex;
+         break;
+      }
+   }
+   return(retVal);
+}
+
+int FindSaferTC(bool RestrictToAg = false, int AG = -1)
+{
+    int numSettlements = -1;
+	int unit=-1;
+	if ((RestrictToAg == true) && (AG != -1))
+	numSettlements = NumUnitsOnAreaGroupByRel(true, AG, cUnitTypeAbstractSettlement, cMyID);
+    else
+	numSettlements = kbUnitCount(cMyID, cUnitTypeAbstractSettlement, cUnitStateAliveOrBuilding);
+    if (numSettlements > 0)
+    {    
+        Float CandidateScore = 0;
+        for (i = 0; < numSettlements)
+        {
+            int TCID = -1;
+			if ((RestrictToAg == true) && (AG != -1))
+			TCID = GetUnitsOnAreaGroupByRelIndex(true, AG, cUnitTypeAbstractSettlement, cMyID, i);
+		    else
+			TCID = findUnitByIndex(cUnitTypeAbstractSettlement, i, cUnitStateAliveOrBuilding);
+		    int BeingAttacked = kbBaseGetTimeUnderAttack(cMyID, kbUnitGetBaseID(TCID));
+		    int BaseID=kbUnitGetBaseID(TCID);
+		    vector baseLocation = kbBaseGetLocation(cMyID, BaseID);
+		    int BuildingsThere = getNumUnits(cUnitTypeLogicalTypeBuildingsNotWalls, cUnitStateAlive, -1, cMyID, baseLocation, 70.0) * 5;
+		    int MilThere = getNumUnits(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cMyID, baseLocation, 80.0) * 4;
+		    int VillThere = getNumUnits(cUnitTypeAbstractVillager, cUnitStateAlive, -1, cMyID, baseLocation, 60.0) * 2;
+		    int WallsThere = getNumUnits(cUnitTypeAbstractWall, cUnitStateAlive, -1, cMyID, baseLocation, 60.0) * 0.15;
+		    int Baddies = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, baseLocation, 95.0, true)*10;
+		    Float Score = 0+(BuildingsThere+MilThere+VillThere+WallsThere)-Baddies;
+		    //aiEcho("TC "+TCID+"  has a score of: "+Score+"");
+		    if (Score < 0)
+		    Score = 0;
+		
+		    if (Score > CandidateScore)
+		    {
+			    CandidateScore = Score;	
+	            unit = TCID;
+	        }
+		}
+    }
+	return(unit);
+}
+
+/* disabled until aiTaskUnitEject gets fixed.. it currently only works for Human players that play as an AI.
+// *****************************************************************************
+// ORDER: microFishingBoat Patched//borrowed
+// (Sending damaged boats into the closest dock)
+// *****************************************************************************
+void MicroFishingBoats(void)		//Type: GarrisonScript
+{
+	int UnitType = cUnitTypeUtilityShip;
+	int Action = -1;
+	int UnitsFound = kbUnitCount(cMyID, UnitType, cUnitStateAlive);
+	
+	if(UnitsFound > 0) //Not the case? Skip the calculation.
+	{
+		for (i=0; < UnitsFound)
+		{
+			int unitID = findUnitByIndex(UnitType, i, cUnitStateAlive, Action);
+		    if ((kbUnitGetCurrentHitpoints(unitID) > kbUnitGetMaximumHitpoints(unitID)*0.9))
+			continue;			
+			vector unitLoc = kbUnitGetPosition(unitID);
+			int RetreatDock = findClosestUnitTypeByLoc(cPlayerRelationSelf, cUnitTypeDock, cUnitStateAlive, unitLoc, 40) ;
+			if (RetreatDock == -1)
+			continue;
+		
+			int enemyID = findClosestUnitTypeByLoc(cPlayerRelationEnemy, cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, unitLoc, 24);
+			if (enemyID > -1)
+			aiTaskUnitGarrison(unitID, RetreatDock);
+		}
+	}
+}
+
+// *****************************************************************************
+//  microDockVsFish   Patched//borrowed
+//  Fish plans send them back to work automatically.
+// *****************************************************************************
+void EjectBoats(void)
+{
+    int UnitType = cUnitTypeUtilityShip;
+	int Action = -1;
+	int UnitsFound = kbUnitCount(cMyID, UnitType, cUnitStateAlive);
+	if(UnitsFound > 0)
+	{
+		for (i=0; < UnitsFound)
+		{
+			
+			int unitID = findUnitByIndex(UnitType, i, cUnitStateAlive, Action);
+			vector unitLoc = kbUnitGetPosition(unitID);
+            int myBuildingID = findUnit(cUnitTypeDock, cUnitStateAlive, -1, cMyID, unitLoc, 1);
+			int NumEnemy = getNumUnitsByRel(cUnitTypeLogicalTypeNavalMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 30, true);
+            if ((NumEnemy > 0) || (myBuildingID == -1))
+			continue;			
+			if (calcDistanceToUnit(unitID,myBuildingID) < 0.1)
+			aiTaskUnitEject(myBuildingID,unitID);
+		}
+	}
+}
+
+// *****************************************************************************
+// ejectVillager Patched//borrowed
+// *****************************************************************************
+void EjectVillagers(void)
+{
+	int UnitType = cUnitTypeAbstractVillager;
+	int Action = -1;
+	int UnitsFound = kbUnitCount(cMyID, UnitType, cUnitStateAlive);
+	
+	if(UnitsFound > 0)
+	{
+		for (i=0; < UnitsFound)
+		{
+			
+			int unitID = findUnitByIndex(UnitType, i, cUnitStateAlive, Action);
+			vector unitLoc = kbUnitGetPosition(unitID);
+            int myBuildingID = findClosestUnitTypeByLoc(cPlayerRelationSelf, cUnitTypeBuildingsThatShoot, cUnitStateAlive, unitLoc, 1);
+			int NumEnemy = getNumUnitsByRel(cUnitTypeLogicalTypeLandMilitary, cUnitStateAlive, -1, cPlayerRelationEnemy, unitLoc, 32, true);
+            if ((NumEnemy > 0) || (myBuildingID == -1))
+			continue;			
+			if (calcDistanceToUnit(unitID,myBuildingID) < 1)
+			aiTaskUnitEject(myBuildingID,unitID);
+		}
+	}
+}
+
+// *****************************************************************************
+// ORDER: microVillager  Patched//borrowed
+// (Sending damaged villagers into the closest building)
+// *****************************************************************************
+void MicroVillagers(void)		//Type: GarrisonScript
+{
+	int UnitType = cUnitTypeAbstractVillager;
+	int Action = -1;
+	int UnitsFound = kbUnitCount(cMyID, UnitType, cUnitStateAlive);
+	
+	if(UnitsFound > 0) //Not the case? Skip the calculation.
+	{
+		for (i=0; < UnitsFound)
+		{
+			int unitID = findUnitByIndex(UnitType, i, cUnitStateAlive, Action);	
+			if ((kbUnitGetCurrentHitpoints(unitID) > kbUnitGetMaximumHitpoints(unitID)*0.9) || (kbUnitGetActionType(unitID) == cActionBuild) 
+			|| (kbUnitGetActionType(unitID) == cActionRepair))
+			continue;			
+			vector unitLoc = kbUnitGetPosition(unitID);
+			//Are we screwed if we don't take the risk?
+			int retreatUnit = findClosestUnitTypeByLoc(cPlayerRelationSelf, cUnitTypeAbstractSettlement, cUnitStateAlive, unitLoc, 50); //tc first. to prevent ping pong
+			if (retreatUnit < 0)
+			retreatUnit = findClosestUnitTypeByLoc(cPlayerRelationSelf, cUnitTypeBuildingsThatShoot, cUnitStateAlive, unitLoc, 50);
+			
+			if (retreatUnit < 0)
+			continue;
+			int enemyID = findClosestUnitTypeByLoc(cPlayerRelationEnemy, cUnitTypeMilitary, cUnitStateAlive, unitLoc, 22);
+			if ((kbUnitIsType(enemyID, cUnitTypeScout)) || (kbUnitIsType(enemyID, cUnitTypeOracleScout)) 
+			|| (enemyID == -1))
+			continue;
+			
+			if (calcDistanceToUnit(unitID,enemyID) < 20)
+			aiTaskUnitGarrison(unitID, kbUnitGetPosition(retreatUnit));
+		}
+	}
+}
+
+	
+// alt version, move only... not worth it unless the rule runs at minInterval 0..
+void MicroVillagers(void)		//Type: GarrisonScript
+{
+	int UnitType = cUnitTypeAbstractVillager;
+	int Action = -1;
+	int UnitsFound = kbUnitCount(cMyID, UnitType, cUnitStateAlive);
+	
+	if(UnitsFound > 0) //Not the case? Skip the calculation.
+	{
+		for (i=0; < UnitsFound)
+		{
+			int unitID = findUnitByIndex(UnitType, i, cUnitStateAlive, Action);	
+		    if ((kbUnitGetCurrentHitpoints(unitID) > kbUnitGetMaximumHitpoints(unitID)*0.9) || (kbUnitGetActionType(unitID) == cActionBuild) 
+			|| (kbUnitGetActionType(unitID) == cActionRepair) || (aiPlanGetState(kbUnitGetPlanID(unitID)) == cPlanStateVillagerAttack))
+			continue;		
+			vector unitLoc = kbUnitGetPosition(unitID);
+			//Are we screwed if we don't take the risk?
+			int retreatUnit = findClosestUnitTypeByLoc(cPlayerRelationSelf, cUnitTypeAbstractSettlement, cUnitStateAlive, unitLoc, 50); //tc first. to prevent ping pong
+			if (retreatUnit < 0)
+			retreatUnit = findClosestUnitTypeByLoc(cPlayerRelationSelf, cUnitTypeBuildingsThatShoot, cUnitStateAlive, unitLoc, 50);
+		
+			int enemyID = findClosestUnitTypeByLoc(cPlayerRelationEnemy, cUnitTypeMilitary, cUnitStateAlive, unitLoc, 22);
+			if ((kbUnitIsType(enemyID, cUnitTypeScout)) || (kbUnitIsType(enemyID, cUnitTypeOracleScout)) 
+			|| (enemyID == -1))
+			continue;
+			
+			if (calcDistanceToUnit(unitID, enemyID) < 22)
+			{
+				//First move in range of our town, then run away!
+				int retreatID = -1;
+				if ((calcDistanceToUnit(unitID,retreatUnit) > 18) && (retreatUnit != -1)) //keep in range for arrows?
+				retreatID = retreatUnit;
+				else
+				retreatID = enemyID;
+			
+				vector A = kbUnitGetPosition(retreatID);
+				int ax = xsVectorGetX(A);
+				int ay = xsVectorGetY(A);
+				int az = xsVectorGetZ(A);
+				
+				vector B = unitLoc;
+				int bx = xsVectorGetX(B);
+				int by = xsVectorGetY(B);
+				int bz = xsVectorGetZ(B);
+				
+				vector path = xsVectorSet(ax-bx,ay-by,az-bz);
+				path = xsVectorNormalize(path);
+				int px = xsVectorGetX(path)*20;
+				int py = xsVectorGetY(path)*20;
+				int pz = xsVectorGetZ(path)*20;
+				
+				vector retreatPoint = xsVectorSet(ax-px,ay-py,az-pz);
+				aiTaskUnitMove(unitID, retreatPoint);			
+			}
+		}
+	}
+}	
+*/
+
+// *****************************************************************************
+//Only works with Eco or Mil Escrow. I'm too dumb to figure out anything else.
+int AddResourceToEscrow(int ResourceType = cResourceFood, int EscrowID = -1, int Amount = 0)
+{
+	// calculate actual percentages
+	
+	float ActualResource = kbResourceGet(ResourceType);
+	float OrigEcoPercentage = xsMin(xsMax(kbEscrowGetPercentage(cEconomyEscrowID, ResourceType), 0.00), 1.00);
+	float OrigmilPercentage = xsMin(xsMax(kbEscrowGetPercentage(cMilitaryEscrowID, ResourceType), 0.00), 1.00);
+    float newEcoPercentage = kbEscrowGetAmount(cEconomyEscrowID, ResourceType) / ActualResource;
+	float newmilPercentage = kbEscrowGetAmount(cMilitaryEscrowID, ResourceType) / ActualResource;
+    string cEscrow = "invalid";
+	string cRes = "invalid";
+	if (ResourceType == cResourceFood)
+	cRes = "Food";
+	if (ResourceType == cResourceGold)
+	cRes = "Gold";
+	if (ResourceType == cResourceWood)
+	cRes = "Wood";	
+	if (ResourceType == cResourceFavor)
+	cRes = "Favor";	
+
+	if (EscrowID == cMilitaryEscrowID)
+	cEscrow = "MilEscrow";
+	if (EscrowID == cEconomyEscrowID)
+	cEscrow = "EcoEscrow";
+    
+	int oldRes = kbEscrowGetAmount(EscrowID, ResourceType);
+	if (EscrowID == cEconomyEscrowID)
+	{
+		newEcoPercentage = kbEscrowGetAmount(cEconomyEscrowID, ResourceType)+Amount / ActualResource;
+		newmilPercentage = (kbEscrowGetAmount(cMilitaryEscrowID, ResourceType)-Amount) / ActualResource;
+	}
+	else if (EscrowID == cMilitaryEscrowID)
+	{
+		newmilPercentage = (kbEscrowGetAmount(cMilitaryEscrowID, ResourceType)+Amount) / ActualResource;
+		newEcoPercentage = (kbEscrowGetAmount(cEconomyEscrowID, ResourceType)-Amount) / ActualResource;
+	}
+	
+        for (i = 0; < cNumResourceTypes+1) // also favour
+	    {
+			if (i == ResourceType)
+			continue; // skip it, ResourceType is handled above.
+			ActualResource =  kbResourceGet(i);
+			float EcoBankAccount = kbEscrowGetAmount(cEconomyEscrowID, i);
+			float MilBankAccount = kbEscrowGetAmount(cMilitaryEscrowID, i);
+            float EcoPercentage = xsMin(xsMax(EcoBankAccount/ActualResource, 0), 1);
+            float milPercentage = xsMin(xsMax(MilBankAccount/ActualResource, 0), 1);
+
+			kbEscrowSetPercentage(cEconomyEscrowID, i, EcoPercentage);
+			kbEscrowSetPercentage(cMilitaryEscrowID, i, milPercentage);
+		}
+	// Make sure total percentage does not exceed 1
+    newEcoPercentage = xsMin(xsMax(newEcoPercentage, 0), 1);
+    newmilPercentage = xsMin(xsMax(newmilPercentage, 0), 1);
+	kbEscrowSetPercentage(cEconomyEscrowID, ResourceType, newEcoPercentage);
+	kbEscrowSetPercentage(cMilitaryEscrowID, ResourceType, newmilPercentage);
+	kbEscrowFlush(EscrowID, ResourceType, true); // flush and re-assign..
+	kbEscrowAllocateCurrentResources();
+	int NewRes = kbEscrowGetAmount(EscrowID, ResourceType);
+	
+	if ((Amount > 0) && (oldRes != NewRes))
+	aiEcho(" Trying to add the missing "+Amount+" "+cRes+" to "+cEscrow+" . Old amount: "+oldRes+", new amount: "+NewRes+".");
+    else if ((Amount == 0) && (oldRes != NewRes))
+	aiEcho(" Trying to fix incorrect "+cRes+" on "+cEscrow+"... Old amount: "+oldRes+", new amount: "+NewRes+" .");
+
+    //Reset to old values again.
+	for (t = 0; < cNumResourceTypes+1)
+	{
+	    kbEscrowSetPercentage(cEconomyEscrowID, t, OrigEcoPercentage);
+	    kbEscrowSetPercentage(cMilitaryEscrowID, t, OrigmilPercentage);
+		kbEscrowSetPercentage(cRootEscrowID, t, 0.20);
+	}
 }
