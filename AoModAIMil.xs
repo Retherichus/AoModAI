@@ -524,7 +524,7 @@ inactive
 					aiPlanAddUnitType(attackPlanID, cUnitTypeUnit, 0, 0, 0); 	
 					if (aiPlanGetUserVariableInt(attackPlanID, 0, 0) == -1)
 					addSDT(attackPlanID, 16);
-					aiEcho("CRITICAL: PLAN TRIED TO TRANSPORT ON A LAND MAP!!!");
+					//aiEcho("CRITICAL: PLAN TRIED TO TRANSPORT ON A LAND MAP!!!");
 					continue;
 				}
 				else

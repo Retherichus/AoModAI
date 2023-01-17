@@ -1990,10 +1990,10 @@ int AddResourceToEscrow(int ResourceType = cResourceFood, int EscrowID = -1, int
 	kbEscrowAllocateCurrentResources();
 	int NewRes = kbEscrowGetAmount(EscrowID, ResourceType);
 	
-	if ((Amount > 0) && (oldRes != NewRes))
-	aiEcho(" Trying to add the missing "+Amount+" "+cRes+" to "+cEscrow+" . Old amount: "+oldRes+", new amount: "+NewRes+".");
-    else if ((Amount == 0) && (oldRes != NewRes))
-	aiEcho(" Trying to fix incorrect "+cRes+" on "+cEscrow+"... Old amount: "+oldRes+", new amount: "+NewRes+" .");
+	//if ((Amount > 0) && (oldRes != NewRes))
+	//aiEcho(" Trying to add the missing "+Amount+" "+cRes+" to "+cEscrow+" . Old amount: "+oldRes+", new amount: "+NewRes+".");
+    //else if ((Amount == 0) && (oldRes != NewRes))
+	//aiEcho(" Trying to fix incorrect "+cRes+" on "+cEscrow+"... Old amount: "+oldRes+", new amount: "+NewRes+" .");
 
     //Reset to old values again.
 	for (t = 0; < cNumResourceTypes+1)
