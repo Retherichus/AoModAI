@@ -263,8 +263,8 @@ inactive
 			} 
 		}
 		if (Candidate > 0)
-		Candidate = kbAreaGroupGetIDByPosition(unitLoc);
-		aiEcho("Candidate "+Candidate);
+		mainlandGroupID = Candidate;
+		//aiEcho("Candidate "+Candidate);
 	}
 	if (mainlandGroupID < 0)
 	mainlandGroupID=kbFindAreaGroup(cAreaGroupTypeLand, 3.0, kbAreaGetIDByPosition(location));

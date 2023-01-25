@@ -1189,7 +1189,9 @@ void econAge4Handler(int age=0)
 
 //==============================================================================
 void createCivPopPlan()
-{    
+{
+    if ((cMyCulture == cCultureNorse) && (aiGetGameMode() == cGameModeDeathmatch) && (kbGetAge() < cAge4))
+	return;
 	gCivPopPlanID=aiPlanCreate("civPop", cPlanTrain);
     if (gCivPopPlanID >= 0)
     {

@@ -931,6 +931,8 @@ active
 		}
 		if (cMyCiv == cCivSet)
 		kbUnitPickSetPreferenceFactor(gLateUPID, cUnitTypeCrocodileofSet, 0.05);
+        if ((cMyCulture == cCultureNorse) && (aiGetGameMode() == cGameModeDeathmatch))
+		createCivPopPlan();
 		xsDisableSelf();  
 	}
 }	  
